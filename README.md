@@ -1,4 +1,4 @@
-```markdown
+
 # xPlorer
 
 `xPlorer` is a symbolic Mathematica package for organizing tensorial calculations on different metric backgrounds in a systematic and reusable way.
