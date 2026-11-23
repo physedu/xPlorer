@@ -1,0 +1,22 @@
+(* Loaded after Fixture.wl in an isolated context. *)
+With[{ss=phi},PrintAs[ss]^="m"];
+RegisterTheory["Field","Scalar",phi];
+RegisterTheory["Presentation",<|"Metric"->"q"|>];
+tagPrint="PrintCase"; CreateBackground[tagPrint,Presentation-><|"phi"->"M1"|>];
+ps=BackgroundObject[tagPrint,"phi"]; pg=BackgroundObject[tagPrint,"Metric"]; pc=BackgroundObject[tagPrint,"CovD"];
+assert["print-inheritance-default",PresentationOf[tagPrint]["Defaults"]["phi"],"m"];
+assert["print-field-override",With[{hh=ps},PrintAs[hh]],"M1"];
+assert["print-theory-override",With[{hh=pg},PrintAs[hh]],"q"];
+assert["print-source-unchanged",PrintAs[phi],"m"];
+SetPresentation[tagPrint,<|"phi"->Automatic|>];
+assert["print-reset",With[{hh=ps},PrintAs[hh]],"m"];
+assert["readable-curvature-name",SymbolName[RiemannOf[tagPrint]],"RiemannCDPrintCase"];
+assert["real-curvature-tensor",xTensorQ[RiemannOf[tagPrint]],True];
+assert["bare-head-boxes",With[{rr=RiemannOf[tagPrint]},MatchQ[MakeBoxes[rr,StandardForm],_InterpretationBox]],True];
+assert["native-give-symbol-unchanged",Riemann[CD],RiemannCD];
+assert["print-invalid-key",FailureQ[SetPresentation[tagPrint,<|"missing"->"x"|>]],True];
+assert["print-delete",DeleteBackground[tagPrint],Null];
+CreateBackground[tagPrint];
+assert["print-recreate",With[{hh=BackgroundObject[tagPrint,"phi"]},PrintAs[hh]],"m"];
+assert["print-recreated-independent",BackgroundObject[tagPrint,"phi"] =!= ps,True];
+DeleteBackground[tagPrint];

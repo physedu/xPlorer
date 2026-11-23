@@ -31,3 +31,9 @@ The checkpoint commit containing this document is the recovery point (inspect gi
 ## Required updates at each checkpoint
 
 Record completed requirements, changed API, checks actually run and outcomes, current limitations, failed attempts that affect future work, next concrete action, and a recoverable commit/tag reference. Push important validated milestones without rewriting history. If publication fails, keep a local commit and report the pending push. Never record credentials or claim unexecuted checks passed.
+
+## Stage 2 completed
+
+Version: 14.0.0-beta.3. Effective source PrintAs is inherited; optional theory/background/later overrides use Presentation and SetPresentation. BackgroundObject returns actual heads. Scoped naming hooks generate readable curvature names and interpreted bare-head boxes retain identity. No global GiveSymbol changes.
+New targeted checks: 13/13; existing core checks: 40/40, in a fresh WL 15.0.1 kernel with xAct 1.3.0. PrintAs holds its argument, so inspection of aliases in tests uses With; this was a test-harness correction, not a tensor mutation.
+Next: Stage 3 scoped expression views, then lifecycle and multiple connections. Native property coverage and front-end rendering remain limited as specified in the plan.

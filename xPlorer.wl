@@ -96,7 +96,13 @@ ApplySpecialization::usage = "ApplySpecialization controls whether background sp
 StrictComponents::usage = "StrictComponents -> True returns Failure when tensor components or covariant derivatives remain unresolved.";
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.2";
+$XPlorerVersion = "14.0.0-beta.3";
+
+Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
+SetPresentation::usage = "SetPresentation[tag, association] changes only labels of owned background objects. Automatic restores the inherited default for a key.";
+PresentationOf::usage = "PresentationOf[tag] reports current labels and their defaults.";
+SetXPlorerPreferences::usage = "SetXPlorerPreferences[association] sets optional presentation defaults for future backgrounds; use <||> to reset. It never changes mathematical options.";
+BackgroundObject::usage = "BackgroundObject[tag, key] returns the actual field or geometry head. Full InputForm retains its context.";
 
 Begin["`Private`"]
 
@@ -145,7 +151,8 @@ MergeTheoryValue[old_, new_] := Which[
 ];
 
 InferFieldKey[head_] := SymbolName[Unevaluated[head]];
-InferFieldPrintAs[head_] := SymbolName[Unevaluated[head]];
+InferFieldPrintAs[head_] := Module[{p = PrintAs[head]},
+  Which[StringQ[p], p, p === Identity, SymbolName[head], Head[p] === Function, p[head], True, SymbolName[head]]];
 
 FieldPrintAsFromOpts[head_, opts___Rule] := Lookup[Association[opts], PrintAs, InferFieldPrintAs[head]];
 MetricPertOrderFromOpts[opts___Rule] := Lookup[Association[opts], Order, 1];
@@ -355,10 +362,10 @@ allGeometry[cd_, g_] := <|"Christoffel" -> GiveSymbol[Christoffel, cd], "Riemann
   "Weyl" -> Weyl[cd], "TFRicci" -> TFRicci[cd], "Kretschmann" -> Kretschmann[cd],
   "Epsilon" -> epsilon[g], "DetMetric" -> GiveSymbol[Determinant, g, AIndex]|>;
 
-Options[CreateBackground] = {Indices -> Automatic, MetricSignature -> Automatic};
+Options[CreateBackground] = {Indices -> Automatic, MetricSignature -> Automatic, Presentation -> <||>};
 CreateBackground[tag_String, OptionsPattern[]] := Module[
   {theory = $Theory, srcg, srccd, srcm, dim, base, display, inds, ctx, m, g, cd, sig,
-   specs, fields = <||>, oldgeo, geo, rules, result, parameter, make, owned, perturbHead = None},
+   specs, fields = <||>, oldgeo, geo, rules, result, parameter, make, owned, labels, defaults, suffix, perturbHead = None},
   If[KeyExistsQ[$BG, tag], Return[$BG[tag]]];
   If[!And @@ (KeyExistsQ[theory, #] & /@ {"Metric", "CovD", "Indices"}),
     Return[failure["IncompleteTheory", "Register a metric, covariant derivative and indices first."]]];
@@ -377,15 +384,25 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
   If[!MemberQ[{-1, 1}, sig] && !(MatchQ[sig, {_Integer, _Integer, 0}] && Min[sig] >= 0 && Total[sig] === dim),
     Return[failure["Signature", "Use determinant sign -1 or +1, or signature counts {positive,negative,0} matching the dimension."]]];
   ctx = "xPlorer`Backgrounds`B" <> ToString[++$BackgroundCounter] <> "`";
-  m = Symbol[ctx <> "M"]; g = Symbol[ctx <> "g"]; cd = Symbol[ctx <> "CD"];
+  suffix = safeName[tag];
+  m = Symbol[ctx <> "M" <> suffix]; g = Symbol[ctx <> SymbolName[srcg] <> suffix]; cd = Symbol[ctx <> SymbolName[srccd] <> suffix];
+  labels = OptionValue[Presentation];
+  If[!AssociationQ[labels], Return[failure["Presentation", "Presentation must be an association of labels."]]];
+  labels = Join[$PresentationPreferences, Lookup[theory, "Presentation", <||>], labels];
+  defaults = <|"Metric" -> InferFieldPrintAs[srcg], "CovD" -> SymbolOfCovD[srccd]|>;
+  installCovDNames[cd, ctx];
   parameter = Symbol[ctx <> "eps"];
   inds = MapIndexed[Symbol[ctx <> "i" <> ToString[First[#2]]] &, display];
   specs = Lookup[theory, "Field", <||>];
   If[!AssociationQ[specs], Return[failure["Fields", "Field must be an association."]]];
+  If[Complement[Keys[labels], Join[Keys[specs], {"Metric", "CovD", "Christoffel", "Riemann", "Ricci", "RicciScalar", "Einstein", "Weyl", "TFRicci", "Kretschmann", "Epsilon", "DetMetric"}]] =!= {} ||
+    !AllTrue[Normal[labels], Function[r, If[First[r] === "CovD", MatchQ[Last[r], {_String,_String}], StringQ[Last[r]]]]],
+    Return[failure["Presentation", "Supply valid labels for known objects before creating a background."]]];
   make[key_, spec_] := Module[{head, new, type, rank, slots, signs, symmetry, deps, args, print, n},
     If[!AssociationQ[spec] || !And @@ (KeyExistsQ[spec, #] & /@ {"Head", "Type"}), Return[$Failed]];
     head = spec["Head"]; type = spec["Type"]; print = Lookup[spec, "PrintAs", key];
-    new = Symbol[ctx <> "field" <> ToString[Length[fields] + 1]];
+    new = Symbol[ctx <> safeName[key] <> suffix <> ToString[Length[fields] + 1]];
+    print = Lookup[labels, key, print];
     If[type === "MetricPert",
       If[perturbHead =!= None, Return[$Failed]];
       Block[{$PerturbationParameter}, With[{gg = g, hh = new, pp = parameter, pr = print},
@@ -415,26 +432,29 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
   ];
   result = guard[
     With[{mm = m, nn = dim, ii = inds}, DefManifold[mm, nn, ii]];
-    MapThread[Function[{ix, lab}, With[{s = ix, p = SymbolName[lab]}, PrintAs[s] ^= p]], {inds, display}];
-    With[{gg = g, aa = inds[[1]], bb = inds[[2]], cc = cd, ss = sig},
+    MapThread[Function[{ix, lab}, With[{s = ix, p = InferFieldPrintAs[lab]}, PrintAs[s] ^= p]], {inds, display}];
+    With[{gg = g, aa = inds[[1]], bb = inds[[2]], cc = cd, ss = sig, gp = Lookup[labels, "Metric", defaults["Metric"]], cp = Lookup[labels, "CovD", defaults["CovD"]]},
       If[MemberQ[First /@ Options[DefMetric], DefMetricPerturbation],
-        DefMetric[ss, gg[-aa, -bb], cc, PrintAs -> "g", DefMetricPerturbation -> False],
-        DefMetric[ss, gg[-aa, -bb], cc, PrintAs -> "g"]]];
+        DefMetric[ss, gg[-aa, -bb], cc, cp, PrintAs -> gp, DefMetricPerturbation -> False],
+        DefMetric[ss, gg[-aa, -bb], cc, cp, PrintAs -> gp]]];
     KeyValueMap[make, specs]
   ];
   If[result === $Failed || !ListQ[result] || MemberQ[result, $Failed],
     guard[disposeObjects[<|"Manifold" -> m, "Metric" -> g, "CovD" -> cd, "Field" -> fields, "PerturbationParameter" -> parameter|>]];
     Return[failure["CreateBackground", "xAct could not create every requested object; the partial background was rolled back."]]];
   oldgeo = allGeometry[srccd, srcg]; geo = allGeometry[cd, g];
+  defaults = Join[defaults, Association@KeyValueMap[(#1 -> Lookup[#2,"PrintAs",InferFieldPrintAs[#2["Head"]]] ) &, specs],
+    Association@KeyValueMap[(#1 -> If[xTensorQ[#2], InferFieldPrintAs[#2], SymbolName[#2]]) &, geo]];
   rules = Join[{srcg -> g, srccd -> cd}, Thread[Values[oldgeo] -> Values[geo]],
     (# ["OldHead"] -> # ["NewHead"] & /@ Values[fields])];
-  $BG[tag] = Join[<|"Tag" -> tag, "Context" -> ctx, "Theory" -> theory, "Dimension" -> dim,
+  $BG[tag] = Join[<|"Tag" -> tag, "Context" -> ctx, "PresentationDefaults" -> defaults, "PresentationOverrides" -> labels, "Theory" -> theory, "Dimension" -> dim,
     "SourceManifold" -> srcm, "SourceBundle" -> VBundleOfMetric[srcg], "Manifold" -> m,
     "Metric" -> g, "CovD" -> cd, "Signature" -> sig, "Indices" -> inds, "BaseIndices" -> base,
     "DisplayIndices" -> display, "Field" -> fields, "HeadRules" -> rules,
     "IndexRules" -> Thread[base -> inds], "SpecializationRules" -> {},
     "MetricRevision" -> 0, "ComputedGeometry" -> {}, "GeometryRuns" -> 0,
     "FieldComponents" -> <||>, "PerturbationHead" -> perturbHead, "PerturbationParameter" -> parameter|>, geo];
+  SetPresentation[tag, labels];
   $BG[tag]
 ];
 
@@ -817,6 +837,49 @@ BackgroundIndices[tag_String, n_: Automatic] := Module[{b = background[tag]}, If
 ShowBackground[tag_String] := background[tag];
 ShowTheory[] := $Theory;
 TheoryValue[key_String] := Lookup[$Theory, key, failure["TheoryKey", "The theory key does not exist.", <|"Key" -> key|>]];
+
+
+(* Scoped formatting and naming: only owned symbols receive upvalues. *)
+If[!AssociationQ[$PresentationPreferences], $PresentationPreferences = <||>];
+safeName[s_String] := Module[{t = StringReplace[s, Except[LetterCharacter | DigitCharacter] -> ""]},
+  If[t === "", "Object", If[StringMatchQ[StringTake[t,1], DigitCharacter], "N" <> t, t]]];
+installCovDNames[cd_, ctx_] := With[{cc = cd, context = ctx},
+  cc /: GiveSymbol[kind_Symbol, cc] := Symbol[context <> SymbolName[kind] <> SymbolName[cc]];
+  cc /: GiveSymbol[Christoffel, cc, other_Symbol] := Symbol[context <> "Christoffel" <> SymbolName[cc] <> SymbolName[other]];
+  cc /: GiveSymbol[Christoffel, other_Symbol, cc] := Symbol[context <> "Christoffel" <> SymbolName[other] <> SymbolName[cc]];
+];
+setBareBoxes[head_Symbol, label_String] := With[{hh = head, ll = label},
+  hh /: MakeBoxes[hh, StandardForm] := InterpretationBox[ll, hh];
+  hh /: MakeBoxes[hh, TraditionalForm] := InterpretationBox[ll, hh];
+];
+SetXPlorerPreferences[assoc_Association] := If[AllTrue[Values[assoc], StringQ[#] || MatchQ[#, {_String,_String}] &],
+  $PresentationPreferences = assoc, failure["Presentation", "Defaults must be strings or connection marker pairs."]];
+RegisterTheory["Presentation", assoc_Association] := ($Theory["Presentation"] = assoc; $Theory);
+BackgroundObject[tag_String, key_String] := Module[{b = background[tag]},
+  If[FailureQ[b], Return[b]];
+  If[KeyExistsQ[b["Field"], key], b["Field"][key]["NewHead"], getter[tag,key]]
+];
+SetPresentation[tag_String, assoc_Association] := Module[{b = background[tag], unknown, current, effective, objects, val},
+  If[FailureQ[b], Return[b]];
+  unknown = Complement[Keys[assoc], Keys[b["PresentationDefaults"]]];
+  If[unknown =!= {} || !AllTrue[Normal[assoc], Function[r, Last[r] === Automatic || If[First[r] === "CovD", MatchQ[Last[r], {_String,_String}], StringQ[Last[r]]]]],
+    Return[failure["Presentation", "Use known object keys and string labels; CovD takes two strings.", <|"Keys" -> unknown|>]]];
+  current = Join[b["PresentationOverrides"], assoc];
+  current = Select[current, # =!= Automatic &];
+  effective = Join[b["PresentationDefaults"], current];
+  objects = Join[AssociationThread[Keys[b["Field"]], Lookup[Values[b["Field"]], "NewHead"]], KeyTake[b, Keys[b["PresentationDefaults"]]]];
+  KeyValueMap[Function[{key,head},
+    val = effective[key];
+    If[key === "CovD", With[{cc = head, vv = val}, SymbolOfCovD[cc] ^= vv],
+      With[{hh = head, vv = val}, PrintAs[hh] ^= vv]];
+    setBareBoxes[head, SymbolName[head]];
+  ], objects];
+  Scan[setBareBoxes[#, SymbolName[#]] &, Join[{b["Manifold"]}, b["Indices"]]];
+  put[tag, <|"PresentationOverrides" -> current|>]; effective
+];
+PresentationOf[tag_String] := Module[{b = background[tag]}, If[FailureQ[b], b,
+  <|"Defaults" -> b["PresentationDefaults"], "Overrides" -> b["PresentationOverrides"],
+    "Effective" -> Join[b["PresentationDefaults"], b["PresentationOverrides"]]|>]];
 
 RegisterTheory[args___] := failure["Registration", "Unsupported registration arguments."];
 
