@@ -65,3 +65,10 @@ ReplaceRules/RemoveRules and named rule groups provide explicit first-match orde
 Checks: core 40 plus connection components/rules/dependency cases 24 = 64/64. Separately, updated presentation+notation+core passed 71/71. Tested an independently known curvature component using xAct's Riemann convention, covector derivative, curved-background difference coefficients, replay after metric change, declaration rejection and cache retention/invalidation. StrictComponents now accepts chart coordinate scalars rather than incorrectly flagging them as unresolved tensors.
 Avoided native BreakChristoffel over every global derivative: xAct 1.3.0 can produce mixed rule lists across unrelated bundles. Expansion is scoped to compatible tracked relative tensors. Derived connection curvature values are expanded on demand, not stored as a separate geometric cache. No speedup claim.
 Next: final regression, applied notebook updates, support/API documentation and application/paclet layout. This is still a beta checkpoint; front-end rendering and other xAct versions remain unverified.
+
+## Additional Stage 6 validation
+
+Core+components+rules: 64/64 (40 core, 14 independent-connection checks, 10 rule checks). Includes a known nonzero Riemann component in xAct's sign convention, torsion-free/flat declaration protection, curved difference input, replay after metric changes, inactive rule-group dependencies, and presentation retaining saved results.
+Core+presentation+notation after label refinement: 71/71 (40 core, 15 presentation, 16 notation). Native function-derived labels and boxed overrides are supported. StrictComponents now treats chart coordinate scalars as resolved, rather than incorrectly reporting them as unknown tensors.
+A native BreakChristoffel call over the global connection registry returned mixed empty lists for unrelated bundles. The implementation now expands only the selected background's tracked relative heads, preserving background isolation.
+Next: extend the principal notebook, create installable layout and execute final regression groups and the full notebook.
