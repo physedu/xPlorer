@@ -1,0 +1,14 @@
+SetFieldComponents[tagMink,h,Function[{t,x,y,z},DiagonalMatrix[{0,t^2,0,0}]]];
+SetFieldComponents[tagMink,h,ConstantArray[0,{4,4}],PerturbationOrderLabel->2];
+timeMink = CoordinatesOf[tagMink][[1]][];
+assert["first-metric-variation", PerturbOn[tagMink,g[-a,-b],1,Output->"Components"], DiagonalMatrix[{0,timeMink^2,0,0}]];
+assert["second-inverse-variation", PerturbOn[tagMink,g[a,b],2,Output->"Components"], DiagonalMatrix[{0,2timeMink^4,0,0}]];
+assert["second-taylor-coefficient", PerturbOn[tagMink,g[a,b],2,Output->"Components",PerturbationForm->"TaylorCoefficient"], DiagonalMatrix[{0,timeMink^4,0,0}]];
+assert["first-scalar-curvature-variation", PerturbOn[tagMink,RicciScalar[CD][],1,Output->"Components"], 2];
+assert["negative-perturbation-order", FailureQ[PerturbOn[tagMink,g[-a,-b],-1]], True];
+assert["invalid-perturbation-form", FailureQ[PerturbOn[tagMink,g[-a,-b],1,PerturbationForm->"Unknown"]], True];
+tagExact = "XPTestExact" <> StringTake[CreateUUID[],8];
+DefConstantSymbol[amplitude];
+makeBackground[tagExact,{"t","x","y","z"},Function[{t,x,y,z},DiagonalMatrix[{-1,1+amplitude t^2,1,1}]],Assumptions->True];
+directR = ToComponents[tagExact,RicciScalar[CD][]];
+assert["curvature-variation-vs-exact-metric", Simplify[D[directR,amplitude]/.amplitude->0], 2];

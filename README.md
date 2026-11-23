@@ -66,4 +66,9 @@ Eduardo Sanz Romero
 This project was developed in the context of research work with Gonzalo J. Olmo and the Grupo de Gravedad y Campos:
 
 http://uv-qg.es/
-```
+
+## Available v14 beta and development
+
+The actual package is `xPlorer.wl` (14.0.0-beta.2). Open `xPlorer_Workflow.nb` beside it and evaluate the normal Get startup cell with xAct installed. `ScalarTheory.wl` is optional. See [VALIDATION.md](VALIDATION.md) for prior test evidence and limitations.
+
+Development requirements and recovery instructions are in [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md), [DECISIONS.md](DECISIONS.md), [PROGRESS.md](PROGRESS.md), and [IMPLEMENTATION_PROMPT.md](IMPLEMENTATION_PROMPT.md). Planned extensions are not yet implemented. The prior repository state remains in Git history.

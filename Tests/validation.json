@@ -1,0 +1,1290 @@
+{
+  "date": "2026-11-06",
+  "version": "14.0.0-beta.2",
+  "kernel": "Wolfram Language 15.0.1, Linux x86-64",
+  "xTensor": [
+    "1.3.0",
+    [
+      2025,
+      12,
+      29
+    ]
+  ],
+  "xCoba": [
+    "0.8.6",
+    [
+      2021,
+      2,
+      28
+    ]
+  ],
+  "xPert": [
+    "1.0.6",
+    [
+      2018,
+      2,
+      28
+    ]
+  ],
+  "method": "Three fresh kernels. The package loads its own xAct dependencies; no xAct preload. Core tests repeated in each group. Official xAct 1.3.0 distribution, Wolfram Language permutation backend.",
+  "total": 75,
+  "passed": 75,
+  "failed": 0,
+  "runs": [
+    {
+      "group": "geometry",
+      "total": 48,
+      "passed": 48,
+      "failed": []
+    },
+    {
+      "group": "perturbations",
+      "total": 47,
+      "passed": 47,
+      "failed": []
+    },
+    {
+      "group": "lifecycle",
+      "total": 60,
+      "passed": 60,
+      "failed": []
+    }
+  ],
+  "notebook": {
+    "file": "xPlorer_Workflow.nb",
+    "verified_date": "2026-11-23",
+    "sections": 8,
+    "input_cells": 66,
+    "executed_inputs": 66,
+    "parse_failures": 0,
+    "warnings": [],
+    "checks_passed": 36,
+    "checks_failed": 0,
+    "full_kernel_run_completed": true,
+    "ascii_only": true,
+    "native_wolfram_boxes": true,
+    "embedded_stylesheet": true,
+    "reference_equations": 3,
+    "startup_input_cells": 1,
+    "backend_override_in_notebook": false,
+    "explicit_color_overrides": false,
+    "colors_inherited_from_theme": true
+  },
+  "startup_checks": {
+    "SingleGetReturnsNull": true,
+    "PackageLoaded": true,
+    "PackageVersion": true,
+    "DependenciesAvailable": true
+  },
+  "tests": [
+    {
+      "Test": "string-expression-key",
+      "Passed": true
+    },
+    {
+      "Test": "string-parameter-key",
+      "Passed": true
+    },
+    {
+      "Test": "string-lagrangian-key",
+      "Passed": true
+    },
+    {
+      "Test": "bulk-field-types",
+      "Passed": true
+    },
+    {
+      "Test": "metric-components",
+      "Passed": true
+    },
+    {
+      "Test": "metric-inverse",
+      "Passed": true
+    },
+    {
+      "Test": "explicit-automatic-indices",
+      "Passed": true
+    },
+    {
+      "Test": "invalid-coordinate-count",
+      "Passed": true
+    },
+    {
+      "Test": "unknown-background",
+      "Passed": true
+    },
+    {
+      "Test": "unknown-expression-key",
+      "Passed": true
+    },
+    {
+      "Test": "unsupported-registration",
+      "Passed": true
+    },
+    {
+      "Test": "constant-scalar",
+      "Passed": true
+    },
+    {
+      "Test": "constant-scalar-gradient",
+      "Passed": true
+    },
+    {
+      "Test": "vector-covariant",
+      "Passed": true
+    },
+    {
+      "Test": "vector-contravariant",
+      "Passed": true
+    },
+    {
+      "Test": "vector-contraction",
+      "Passed": true
+    },
+    {
+      "Test": "generated-dummy-index-transfer",
+      "Passed": true
+    },
+    {
+      "Test": "symmetric-tensor",
+      "Passed": true
+    },
+    {
+      "Test": "bad-symmetric-array",
+      "Passed": true
+    },
+    {
+      "Test": "antisymmetric-tensor",
+      "Passed": true
+    },
+    {
+      "Test": "free-index-order",
+      "Passed": true
+    },
+    {
+      "Test": "selected-components",
+      "Passed": true
+    },
+    {
+      "Test": "bad-antisymmetric-array",
+      "Passed": true
+    },
+    {
+      "Test": "invalid-field-shape",
+      "Passed": true
+    },
+    {
+      "Test": "invalid-index-positions",
+      "Passed": true
+    },
+    {
+      "Test": "invalid-component-selection",
+      "Passed": true
+    },
+    {
+      "Test": "invalid-free-indices",
+      "Passed": true
+    },
+    {
+      "Test": "specialization-rules",
+      "Passed": true
+    },
+    {
+      "Test": "clear-specialization",
+      "Passed": true
+    },
+    {
+      "Test": "background-validation",
+      "Passed": true
+    },
+    {
+      "Test": "unknown-check",
+      "Passed": true
+    },
+    {
+      "Test": "geometry-cache",
+      "Passed": true
+    },
+    {
+      "Test": "forced-geometry",
+      "Passed": true
+    },
+    {
+      "Test": "force-retains-field-values",
+      "Passed": true
+    },
+    {
+      "Test": "metric-invalidates-raised-values",
+      "Passed": true
+    },
+    {
+      "Test": "field-values-retained",
+      "Passed": true
+    },
+    {
+      "Test": "bad-metric-signature",
+      "Passed": true
+    },
+    {
+      "Test": "bad-metric-is-atomic",
+      "Passed": true
+    },
+    {
+      "Test": "theory-snapshot",
+      "Passed": true
+    },
+    {
+      "Test": "helper-matrix",
+      "Passed": true
+    },
+    {
+      "Test": "schwarzschild-ricci",
+      "Passed": true
+    },
+    {
+      "Test": "schwarzschild-kretschmann",
+      "Passed": true
+    },
+    {
+      "Test": "curved-scalar-gradient",
+      "Passed": true
+    },
+    {
+      "Test": "curved-scalar-box",
+      "Passed": true
+    },
+    {
+      "Test": "schwarzschild-identities",
+      "Passed": true
+    },
+    {
+      "Test": "coexisting-background-isolation",
+      "Passed": true
+    },
+    {
+      "Test": "flrw-friedmann",
+      "Passed": true
+    },
+    {
+      "Test": "flrw-bianchi",
+      "Passed": true
+    },
+    {
+      "Test": "first-metric-variation",
+      "Passed": true
+    },
+    {
+      "Test": "second-inverse-variation",
+      "Passed": true
+    },
+    {
+      "Test": "second-taylor-coefficient",
+      "Passed": true
+    },
+    {
+      "Test": "first-scalar-curvature-variation",
+      "Passed": true
+    },
+    {
+      "Test": "negative-perturbation-order",
+      "Passed": true
+    },
+    {
+      "Test": "invalid-perturbation-form",
+      "Passed": true
+    },
+    {
+      "Test": "curvature-variation-vs-exact-metric",
+      "Passed": true
+    },
+    {
+      "Test": "external-dependent-protected",
+      "Passed": true
+    },
+    {
+      "Test": "external-dependent-preserves-state",
+      "Passed": true
+    },
+    {
+      "Test": "delete-background",
+      "Passed": true
+    },
+    {
+      "Test": "delete-registry-entry",
+      "Passed": true
+    },
+    {
+      "Test": "delete-manifold-registration",
+      "Passed": true
+    },
+    {
+      "Test": "delete-metric-registration",
+      "Passed": true
+    },
+    {
+      "Test": "delete-chart-registration",
+      "Passed": true
+    },
+    {
+      "Test": "delete-perturbation-parameter",
+      "Passed": true
+    },
+    {
+      "Test": "deletion-preserves-other-background",
+      "Passed": true
+    },
+    {
+      "Test": "recreate-same-tag",
+      "Passed": true
+    },
+    {
+      "Test": "recreated-symbols-are-new",
+      "Passed": true
+    },
+    {
+      "Test": "recreated-fields-have-no-stale-values",
+      "Passed": true
+    },
+    {
+      "Test": "double-delete-fails-clearly",
+      "Passed": true
+    },
+    {
+      "Test": "dimension-is-inferred",
+      "Passed": true
+    },
+    {
+      "Test": "sphere-curvature",
+      "Passed": true
+    },
+    {
+      "Test": "failed-creation-rolls-back",
+      "Passed": true
+    },
+    {
+      "Test": "rollback-cleans-xact-registries",
+      "Passed": true
+    },
+    {
+      "Test": "rollback-no-background-entry",
+      "Passed": true
+    },
+    {
+      "Test": "delete-fully-used-background",
+      "Passed": true
+    },
+    {
+      "Test": "fully-used-background-removed-from-registry",
+      "Passed": true
+    }
+  ],
+  "source_sha256": "c12547a1ab5ae5af386a2a7dbb2549e72bbcdacbc9279132a72f311b4da4ad63",
+  "notebook_sha256": "10df62867128e581cec43dd199c8b0ae3cc0ada2621e638e55ef9ed33a42a5de",
+  "workflow_validation": {
+    "date": "2026-11-08",
+    "workflow": {
+      "Version": "14.0.0-beta.2",
+      "Kernel": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)",
+      "InputCells": 34,
+      "ExecutedInputs": 31,
+      "ParseFailures": 0,
+      "Stages": {
+        "NoBackgroundsBeforeSpecialization": true,
+        "NoChartsBeforeCoordinateChoice": true,
+        "NoMetricMatricesBeforeGeometryChoice": true
+      },
+      "Checks": {
+        "Abstract Klein-Gordon equation": true,
+        "Minkowski PDE": true,
+        "Schwarzschild radial equation": true,
+        "Schwarzschild Ricci scalar": true,
+        "Schwarzschild Kretschmann invariant": true,
+        "FLRW homogeneous equation": true,
+        "FLRW Einstein 00": true,
+        "FLRW scalar Lagrangian": true,
+        "Plane wave with dispersion relation": true,
+        "Different manifolds": true,
+        "Schwarzschild field retained": true,
+        "FLRW field retained": true,
+        "Abstract theory unchanged": true
+      },
+      "Passed": 13,
+      "Failed": 0,
+      "Seconds": 5.749186
+    },
+    "theory_replay": {
+      "NoBackgrounds": true,
+      "ManifoldDefined": true,
+      "MetricDefined": true,
+      "ScalarDefined": true,
+      "HasLagrangian": true,
+      "SavedConditions": true,
+      "SavedAssumptions": true,
+      "SavedEquation": true,
+      "KleinGordonDifference": 0
+    },
+    "regression_after_workflow": [
+      {
+        "Group": "geometry",
+        "Total": 48,
+        "Passed": 48,
+        "Failed": 0,
+        "ReportObject": true,
+        "AbstractTheoryRestored": true,
+        "UserSymbolsIntact": true,
+        "UserBackgroundsRetained": true,
+        "ContextPathRestored": true,
+        "WorkflowPassed": 13
+      }
+    ]
+  },
+  "theory_sha256": "ab3071c4cb8336d392d1b048d0b749b122578626b301e6804cc303eb89ee632e",
+  "history": {
+    "superseded_guide_2026_11_23": {
+      "date": "2026-11-23",
+      "notebook": "xPlorer_Workflow.nb",
+      "input_cells": 59,
+      "main_input_cells": 56,
+      "distinct_checks": 48,
+      "passed": 48,
+      "failed": 0,
+      "method": "Four fresh kernels; prerequisites repeated. Inputs executed directly from the delivered notebook's native boxes. All 59 input cells parse; each executed group has no Wolfram warning messages. Deliberate Failure objects are part of the examples.",
+      "full_kernel_run": {
+        "completed": false,
+        "reason": "The remote evaluator returned internal errors for whole-guide calls; the guide was verified in four independent groups."
+      },
+      "groups": [
+        {
+          "Group": "Abstract tensors and indices",
+          "InputCells": 59,
+          "ExecutedInputs": 23,
+          "ParseFailures": 0,
+          "WarningCells": [],
+          "Checks": {
+            "Abstract Klein-Gordon equation": true,
+            "Formal study had no charts": true,
+            "Direct and transported gradient agree": true,
+            "Original index excluded from other bundle": true,
+            "Background index belongs to its bundle": true,
+            "Raised abstract vector": true,
+            "Symmetric tensor identity": true,
+            "Antisymmetric tensor identity": true,
+            "Dummy index relabelling": true,
+            "Local rules scope": true,
+            "Abstract flat-curvature rule": true,
+            "First abstract metric variation": true
+          },
+          "Passed": 12,
+          "Failed": 0,
+          "CellTimes": [
+            {
+              "Cell": "load",
+              "Seconds": 2.042578
+            },
+            {
+              "Cell": "tool_map",
+              "Seconds": 0.000479
+            },
+            {
+              "Cell": "abstract_objects",
+              "Seconds": 0.457044
+            },
+            {
+              "Cell": "additional_fields",
+              "Seconds": 0.011042
+            },
+            {
+              "Cell": "lagrangian",
+              "Seconds": 0.001022
+            },
+            {
+              "Cell": "conditions",
+              "Seconds": 0.001109
+            },
+            {
+              "Cell": "derive_equation",
+              "Seconds": 0.026167
+            },
+            {
+              "Cell": "register_theory",
+              "Seconds": 0.00364
+            },
+            {
+              "Cell": "inspect_theory",
+              "Seconds": 0.000284
+            },
+            {
+              "Cell": "create_manifolds",
+              "Seconds": 1.526828
+            },
+            {
+              "Cell": "inspect_backgrounds",
+              "Seconds": 0.002116
+            },
+            {
+              "Cell": "formal_gallery",
+              "Seconds": 0.013091
+            },
+            {
+              "Cell": "transport_stages",
+              "Seconds": 0.002939
+            },
+            {
+              "Cell": "background_aliases",
+              "Seconds": 0.000724
+            },
+            {
+              "Cell": "direct_abstract",
+              "Seconds": 0.001097
+            },
+            {
+              "Cell": "index_membership",
+              "Seconds": 0.001006
+            },
+            {
+              "Cell": "abstract_index_algebra",
+              "Seconds": 0.015347
+            },
+            {
+              "Cell": "pretty_comparison",
+              "Seconds": 0.000813
+            },
+            {
+              "Cell": "massless_rules",
+              "Seconds": 0.005429
+            },
+            {
+              "Cell": "clear_local_rules",
+              "Seconds": 7.1e-05
+            },
+            {
+              "Cell": "flat_abstract_rules",
+              "Seconds": 0.00137
+            },
+            {
+              "Cell": "restore_abstract_rules",
+              "Seconds": 0.000494
+            },
+            {
+              "Cell": "abstract_perturbation",
+              "Seconds": 0.004663
+            }
+          ]
+        },
+        {
+          "Group": "Scalar physics, components and validation",
+          "InputCells": 59,
+          "ExecutedInputs": 27,
+          "ParseFailures": 0,
+          "WarningCells": [],
+          "Checks": {
+            "Readable and active Minkowski PDE agree": true,
+            "Schwarzschild radial equation": true,
+            "Schwarzschild Ricci scalar": true,
+            "Schwarzschild Kretschmann invariant": true,
+            "FLRW scalar equation": true,
+            "FLRW scalar Lagrangian": true,
+            "FLRW Einstein 00": true,
+            "Plane wave solves equation": true,
+            "Vector variance and contraction": true,
+            "Scalar stress energy and flux": true,
+            "Tensor assignment retained after rejected data": true,
+            "Reordered two-form axes": true,
+            "Selected components": true,
+            "Incompatible symmetry rejected": true,
+            "Missing components reported": true,
+            "Geometry checks passed": true,
+            "Incomplete field data is inconclusive": true
+          },
+          "Passed": 17,
+          "Failed": 0,
+          "CellTimes": [
+            {
+              "Cell": "load",
+              "Seconds": 1.957435
+            },
+            {
+              "Cell": "abstract_objects",
+              "Seconds": 0.459656
+            },
+            {
+              "Cell": "additional_fields",
+              "Seconds": 0.010952
+            },
+            {
+              "Cell": "lagrangian",
+              "Seconds": 0.001061
+            },
+            {
+              "Cell": "conditions",
+              "Seconds": 0.00124
+            },
+            {
+              "Cell": "derive_equation",
+              "Seconds": 0.026059
+            },
+            {
+              "Cell": "register_theory",
+              "Seconds": 0.003746
+            },
+            {
+              "Cell": "create_manifolds",
+              "Seconds": 1.559736
+            },
+            {
+              "Cell": "background_aliases",
+              "Seconds": 0.000855
+            },
+            {
+              "Cell": "charts",
+              "Seconds": 0.213864
+            },
+            {
+              "Cell": "coordinate_aliases",
+              "Seconds": 0.000844
+            },
+            {
+              "Cell": "minkowski_metric",
+              "Seconds": 0.10661
+            },
+            {
+              "Cell": "schwarzschild_metric",
+              "Seconds": 0.162202
+            },
+            {
+              "Cell": "flrw_metric",
+              "Seconds": 0.074014
+            },
+            {
+              "Cell": "minkowski_field",
+              "Seconds": 0.165989
+            },
+            {
+              "Cell": "readable_pde",
+              "Seconds": 0.004908
+            },
+            {
+              "Cell": "schwarzschild_field",
+              "Seconds": 0.09587
+            },
+            {
+              "Cell": "flrw_field",
+              "Seconds": 0.086578
+            },
+            {
+              "Cell": "curvature",
+              "Seconds": 0.195008
+            },
+            {
+              "Cell": "plane_wave",
+              "Seconds": 0.110295
+            },
+            {
+              "Cell": "tensor_assignments",
+              "Seconds": 0.289367
+            },
+            {
+              "Cell": "vector_components",
+              "Seconds": 0.027952
+            },
+            {
+              "Cell": "tensor_components",
+              "Seconds": 0.025437
+            },
+            {
+              "Cell": "stress_components",
+              "Seconds": 0.107799
+            },
+            {
+              "Cell": "assignment_failure",
+              "Seconds": 0.054418
+            },
+            {
+              "Cell": "missing_components",
+              "Seconds": 0.003895
+            },
+            {
+              "Cell": "background_validation",
+              "Seconds": 0.18756
+            }
+          ]
+        },
+        {
+          "Group": "Alternate chart, cache and perturbations",
+          "InputCells": 59,
+          "ExecutedInputs": 21,
+          "ParseFailures": 0,
+          "WarningCells": [],
+          "Checks": {
+            "Flat spherical calculation": true,
+            "Temporary spherical case closed": true,
+            "Geometry cache reused": true,
+            "Metric change retains assigned covector": true,
+            "Metric change updates raised components": true,
+            "Metric change invalidates old curvature cache": true,
+            "First component metric variation": true,
+            "Second inverse metric variation": true,
+            "Taylor factorial": true,
+            "First curvature variation": true
+          },
+          "Passed": 10,
+          "Failed": 0,
+          "CellTimes": [
+            {
+              "Cell": "load",
+              "Seconds": 1.94273
+            },
+            {
+              "Cell": "abstract_objects",
+              "Seconds": 0.470273
+            },
+            {
+              "Cell": "additional_fields",
+              "Seconds": 0.0124
+            },
+            {
+              "Cell": "lagrangian",
+              "Seconds": 0.001029
+            },
+            {
+              "Cell": "conditions",
+              "Seconds": 0.001295
+            },
+            {
+              "Cell": "derive_equation",
+              "Seconds": 0.030729
+            },
+            {
+              "Cell": "register_theory",
+              "Seconds": 0.004544
+            },
+            {
+              "Cell": "create_manifolds",
+              "Seconds": 1.578705
+            },
+            {
+              "Cell": "background_aliases",
+              "Seconds": 0.000767
+            },
+            {
+              "Cell": "charts",
+              "Seconds": 0.211762
+            },
+            {
+              "Cell": "coordinate_aliases",
+              "Seconds": 0.000807
+            },
+            {
+              "Cell": "minkowski_metric",
+              "Seconds": 0.10374
+            },
+            {
+              "Cell": "schwarzschild_metric",
+              "Seconds": 0.165106
+            },
+            {
+              "Cell": "flrw_metric",
+              "Seconds": 0.075277
+            },
+            {
+              "Cell": "spherical_case",
+              "Seconds": 0.858798
+            },
+            {
+              "Cell": "close_spherical_case",
+              "Seconds": 1.780679
+            },
+            {
+              "Cell": "workspace_setup",
+              "Seconds": 0.638852
+            },
+            {
+              "Cell": "cache_reuse",
+              "Seconds": 0.074823
+            },
+            {
+              "Cell": "metric_change",
+              "Seconds": 0.075059
+            },
+            {
+              "Cell": "perturbation_profiles",
+              "Seconds": 1.680609
+            },
+            {
+              "Cell": "perturbed_curvature",
+              "Seconds": 6.409613
+            }
+          ]
+        },
+        {
+          "Group": "Snapshots, deletion and recreation",
+          "InputCells": 59,
+          "ExecutedInputs": 27,
+          "ParseFailures": 0,
+          "WarningCells": [],
+          "Checks": {
+            "Existing snapshot retained": true,
+            "New snapshot used edited expression": true,
+            "External dependency protected": true,
+            "Background deletion unregistered its objects": true,
+            "Recreated symbols are new": true,
+            "Recreated field has no stale assignment": true,
+            "Other backgrounds retained their fields": true,
+            "Original xAct theory still defined": true,
+            "Original registration unchanged": true
+          },
+          "Passed": 9,
+          "Failed": 0,
+          "CellTimes": [
+            {
+              "Cell": "load",
+              "Seconds": 1.965125
+            },
+            {
+              "Cell": "abstract_objects",
+              "Seconds": 0.415871
+            },
+            {
+              "Cell": "additional_fields",
+              "Seconds": 0.009533
+            },
+            {
+              "Cell": "lagrangian",
+              "Seconds": 0.000891
+            },
+            {
+              "Cell": "conditions",
+              "Seconds": 0.000968
+            },
+            {
+              "Cell": "derive_equation",
+              "Seconds": 0.023961
+            },
+            {
+              "Cell": "register_theory",
+              "Seconds": 0.003711
+            },
+            {
+              "Cell": "create_manifolds",
+              "Seconds": 1.420034
+            },
+            {
+              "Cell": "background_aliases",
+              "Seconds": 0.000639
+            },
+            {
+              "Cell": "charts",
+              "Seconds": 0.197967
+            },
+            {
+              "Cell": "coordinate_aliases",
+              "Seconds": 0.000734
+            },
+            {
+              "Cell": "minkowski_metric",
+              "Seconds": 0.088782
+            },
+            {
+              "Cell": "schwarzschild_metric",
+              "Seconds": 0.157674
+            },
+            {
+              "Cell": "flrw_metric",
+              "Seconds": 0.069891
+            },
+            {
+              "Cell": "minkowski_field",
+              "Seconds": 0.156221
+            },
+            {
+              "Cell": "schwarzschild_field",
+              "Seconds": 0.10229
+            },
+            {
+              "Cell": "flrw_field",
+              "Seconds": 0.096609
+            },
+            {
+              "Cell": "plane_wave",
+              "Seconds": 0.100623
+            },
+            {
+              "Cell": "workspace_setup",
+              "Seconds": 0.626639
+            },
+            {
+              "Cell": "cache_reuse",
+              "Seconds": 0.074451
+            },
+            {
+              "Cell": "metric_change",
+              "Seconds": 0.077337
+            },
+            {
+              "Cell": "snapshot_example",
+              "Seconds": 0.536349
+            },
+            {
+              "Cell": "restore_snapshot",
+              "Seconds": 0.760322
+            },
+            {
+              "Cell": "external_dependency",
+              "Seconds": 0.005664
+            },
+            {
+              "Cell": "delete_workspace",
+              "Seconds": 1.706124
+            },
+            {
+              "Cell": "recreate_workspace",
+              "Seconds": 0.619854
+            },
+            {
+              "Cell": "management_reference",
+              "Seconds": 0.000632
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "tutorial_validation": {
+    "date": "2026-11-23",
+    "notebook": "xPlorer_Workflow.nb",
+    "sections": 8,
+    "method": "Complete sequential execution of all 66 native input cells in a single fresh kernel. Reference Program cells are non-evaluatable; three DisplayFormula cells are presentation only.",
+    "full_kernel_run_completed": true,
+    "Version": "14.0.0-beta.2",
+    "Kernel": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)",
+    "InputCells": 66,
+    "ExecutedInputs": 66,
+    "ParseFailures": 0,
+    "WarningCells": [],
+    "Stages": {
+      "Theory registered before backgrounds": true,
+      "Backgrounds created before charts": true,
+      "Charts chosen before metric matrices": true
+    },
+    "Checks": {
+      "Named expression registration": true,
+      "Bulk expression registration": true,
+      "Mass parameter registration": true,
+      "Scalar variation": true,
+      "Direct and transferred gradient": true,
+      "Riemann getter returns a tensor head": true,
+      "Raised gradient": true,
+      "Comparison notation": true,
+      "Scoped massless equation": true,
+      "ApplyRules on an existing expression": true,
+      "General mass restored": true,
+      "Flat curvature rules": true,
+      "Minkowski equation": true,
+      "Schwarzschild radial equation": true,
+      "Schwarzschild Ricci scalar": true,
+      "Schwarzschild Kretschmann": true,
+      "FLRW scalar equation": true,
+      "FLRW Einstein component": true,
+      "FLRW scalar Lagrangian": true,
+      "Plane-wave solution": true,
+      "Original background retains its snapshot": true,
+      "Vector variance and contraction": true,
+      "Reordered tensor axes": true,
+      "Selected tensor components": true,
+      "Geometry reuse": true,
+      "Metric change updates raised components": true,
+      "First metric variation": true,
+      "Second inverse metric variation": true,
+      "Taylor coefficient factor": true,
+      "Metric was registered before deletion": true,
+      "Deleted metric is unregistered": true,
+      "Recreation starts with no assigned field data": true,
+      "Recreated vector uses fresh values": true,
+      "Other field profiles retained": true,
+      "Source xAct objects retained": true,
+      "Source scalar Lagrangian retained": true
+    },
+    "Passed": 36,
+    "Failed": 0,
+    "Seconds": 11.955234,
+    "CellTimes": [
+      {
+        "Cell": "load",
+        "Seconds": 2.036312
+      },
+      {
+        "Cell": "abstract_objects",
+        "Seconds": 0.421
+      },
+      {
+        "Cell": "lagrangian",
+        "Seconds": 0.000363
+      },
+      {
+        "Cell": "conditions",
+        "Seconds": 0.000683
+      },
+      {
+        "Cell": "derive_equation",
+        "Seconds": 0.027008
+      },
+      {
+        "Cell": "register_geometry",
+        "Seconds": 0.001663
+      },
+      {
+        "Cell": "register_matter",
+        "Seconds": 0.000491
+      },
+      {
+        "Cell": "register_expressions",
+        "Seconds": 0.000768
+      },
+      {
+        "Cell": "register_bulk",
+        "Seconds": 0.001128
+      },
+      {
+        "Cell": "register_named_expression",
+        "Seconds": 0.000369
+      },
+      {
+        "Cell": "register_metadata",
+        "Seconds": 0.000288
+      },
+      {
+        "Cell": "inspect_registration",
+        "Seconds": 0.000233
+      },
+      {
+        "Cell": "registered_lagrangian",
+        "Seconds": 2.8e-05
+      },
+      {
+        "Cell": "create_manifolds",
+        "Seconds": 1.452827
+      },
+      {
+        "Cell": "inspect_background",
+        "Seconds": 0.000136
+      },
+      {
+        "Cell": "formal_equations",
+        "Seconds": 0.004422
+      },
+      {
+        "Cell": "transport_gradient",
+        "Seconds": 0.000618
+      },
+      {
+        "Cell": "saved_gradient",
+        "Seconds": 0.000524
+      },
+      {
+        "Cell": "background_objects",
+        "Seconds": 0.000512
+      },
+      {
+        "Cell": "direct_gradient",
+        "Seconds": 0.00014
+      },
+      {
+        "Cell": "raise_gradient",
+        "Seconds": 0.000772
+      },
+      {
+        "Cell": "riemann_head",
+        "Seconds": 6.5e-05
+      },
+      {
+        "Cell": "riemann_tensor",
+        "Seconds": 0.000258
+      },
+      {
+        "Cell": "pretty_gradient",
+        "Seconds": 0.00026
+      },
+      {
+        "Cell": "massless_rules",
+        "Seconds": 0.001439
+      },
+      {
+        "Cell": "inspect_rules",
+        "Seconds": 6e-05
+      },
+      {
+        "Cell": "apply_rules",
+        "Seconds": 0.000204
+      },
+      {
+        "Cell": "restore_massive",
+        "Seconds": 0.001414
+      },
+      {
+        "Cell": "flat_rules",
+        "Seconds": 0.000709
+      },
+      {
+        "Cell": "clear_flat_rules",
+        "Seconds": 6.7e-05
+      },
+      {
+        "Cell": "charts",
+        "Seconds": 0.183625
+      },
+      {
+        "Cell": "coordinate_aliases",
+        "Seconds": 0.000777
+      },
+      {
+        "Cell": "minkowski_metric",
+        "Seconds": 0.094949
+      },
+      {
+        "Cell": "schwarzschild_metric",
+        "Seconds": 0.149725
+      },
+      {
+        "Cell": "flrw_metric",
+        "Seconds": 0.065065
+      },
+      {
+        "Cell": "metric_matrices",
+        "Seconds": 0.023617
+      },
+      {
+        "Cell": "minkowski_field",
+        "Seconds": 0.001937
+      },
+      {
+        "Cell": "minkowski_equation",
+        "Seconds": 0.144741
+      },
+      {
+        "Cell": "minkowski_lagrangian",
+        "Seconds": 0.03727
+      },
+      {
+        "Cell": "schwarzschild_field",
+        "Seconds": 0.002643
+      },
+      {
+        "Cell": "schwarzschild_equation",
+        "Seconds": 0.081758
+      },
+      {
+        "Cell": "schwarzschild_check",
+        "Seconds": 0.001082
+      },
+      {
+        "Cell": "schwarzschild_curvature",
+        "Seconds": 0.103064
+      },
+      {
+        "Cell": "flrw_field",
+        "Seconds": 0.002109
+      },
+      {
+        "Cell": "flrw_equation",
+        "Seconds": 0.064745
+      },
+      {
+        "Cell": "flrw_geometry",
+        "Seconds": 0.077988
+      },
+      {
+        "Cell": "plane_wave",
+        "Seconds": 0.074483
+      },
+      {
+        "Cell": "dispersion_condition",
+        "Seconds": 0.019747
+      },
+      {
+        "Cell": "extra_fields",
+        "Seconds": 0.006996
+      },
+      {
+        "Cell": "field_background",
+        "Seconds": 0.618003
+      },
+      {
+        "Cell": "field_snapshots",
+        "Seconds": 0.000335
+      },
+      {
+        "Cell": "vector_values",
+        "Seconds": 0.027002
+      },
+      {
+        "Cell": "formal_vector",
+        "Seconds": 0.000563
+      },
+      {
+        "Cell": "tensor_values",
+        "Seconds": 0.264875
+      },
+      {
+        "Cell": "tensor_selection",
+        "Seconds": 0.010848
+      },
+      {
+        "Cell": "geometry_reuse",
+        "Seconds": 0.072512
+      },
+      {
+        "Cell": "change_metric",
+        "Seconds": 0.189073
+      },
+      {
+        "Cell": "restore_metric",
+        "Seconds": 0.181343
+      },
+      {
+        "Cell": "register_perturbation",
+        "Seconds": 0.564072
+      },
+      {
+        "Cell": "abstract_perturbation",
+        "Seconds": 0.005149
+      },
+      {
+        "Cell": "perturbation_profile",
+        "Seconds": 0.512082
+      },
+      {
+        "Cell": "perturbation_results",
+        "Seconds": 1.228761
+      },
+      {
+        "Cell": "before_deletion",
+        "Seconds": 0.000186
+      },
+      {
+        "Cell": "delete_background",
+        "Seconds": 1.932723
+      },
+      {
+        "Cell": "recreate_background",
+        "Seconds": 0.65303
+      },
+      {
+        "Cell": "fresh_vector",
+        "Seconds": 0.011634
+      }
+    ]
+  },
+  "theme_revision": {
+    "date": "2026-11-23",
+    "ParsedNotebook": true,
+    "InputCells": 66,
+    "FormulaCells": 3,
+    "Sections": 8,
+    "ExplicitColorRules": 0,
+    "ExplicitColorObjects": 0,
+    "input_and_formula_definitions_unchanged": true,
+    "front_end_theme_screenshots_captured": false,
+    "serialized_input_boxes_unchanged": true,
+    "serialized_formula_boxes_unchanged": true
+  }
+}
