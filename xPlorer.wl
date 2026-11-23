@@ -104,6 +104,12 @@ PresentationOf::usage = "PresentationOf[tag] reports current labels and their de
 SetXPlorerPreferences::usage = "SetXPlorerPreferences[association] sets optional presentation defaults for future backgrounds; use <||> to reset. It never changes mathematical options.";
 BackgroundObject::usage = "BackgroundObject[tag, key] returns the actual field or geometry head. Full InputForm retains its context.";
 
+DisplayExpression::usage = "DisplayExpression[tag, expr, opts] creates a reversible interpreted view. Normal returns the original expression; copying the boxes retains the mathematical expression.";
+SetNotation::usage = "SetNotation[tag, association] sets background display defaults; no mathematical data changes.";
+PartialStyle::usage = "PartialStyle chooses Native, MultiIndex, Fraction, Partial, or Prime (single argument only) in DisplayExpression.";
+CovariantStyle::usage = "CovariantStyle chooses Native, Prefix, or Postfix in DisplayExpression.";
+ShowBackgroundLabel::usage = "ShowBackgroundLabel adds a background label to an expression view.";
+
 Begin["`Private`"]
 
 SetAttributes[NameKey, HoldAll];
@@ -880,6 +886,60 @@ SetPresentation[tag_String, assoc_Association] := Module[{b = background[tag], u
 PresentationOf[tag_String] := Module[{b = background[tag]}, If[FailureQ[b], b,
   <|"Defaults" -> b["PresentationDefaults"], "Overrides" -> b["PresentationOverrides"],
     "Effective" -> Join[b["PresentationDefaults"], b["PresentationOverrides"]]|>]];
+
+(* Expression views are interpreted boxes, never replacements in the calculation. *)
+$notationDefaults = <|"PartialStyle" -> "Native", "CovariantStyle" -> "Native", "ShowBackgroundLabel" -> False|>;
+validNotation[a_] := AssociationQ[a] && Complement[Keys[a], Keys[$notationDefaults]] === {} &&
+  MemberQ[{"Native","MultiIndex","Fraction","Partial","Prime"}, Lookup[a,"PartialStyle","Native"]] &&
+  MemberQ[{"Native","Prefix","Postfix"}, Lookup[a,"CovariantStyle","Native"]] &&
+  MemberQ[{True,False}, Lookup[a,"ShowBackgroundLabel",False]];
+SetNotation[tag_String, a_Association] := Module[{b=background[tag]}, If[FailureQ[b],Return[b]];
+  If[!validNotation[a],Return[failure["Notation","Unknown notation setting."]]];
+  put[tag,<|"Notation" -> Join[$notationDefaults,Lookup[b,"Notation",<||>],a]|>]["Notation"]];
+Options[DisplayExpression] = {PartialStyle -> Automatic, CovariantStyle -> Automatic, ShowBackgroundLabel -> Automatic};
+DisplayExpression[tag_String, expr_, OptionsPattern[]] := Module[{b=background[tag],a,local},
+  If[FailureQ[b],Return[b]];
+  local=Select[<|"PartialStyle"->OptionValue[PartialStyle],"CovariantStyle"->OptionValue[CovariantStyle],"ShowBackgroundLabel"->OptionValue[ShowBackgroundLabel]|>,# =!= Automatic &];
+  a=Join[$notationDefaults,Lookup[b,"Notation",<||>],local];
+  If[!validNotation[a],Return[failure["Notation","Unknown notation setting."]]];
+  expressionView[expr,a,tag]
+];
+expressionView /: Normal[expressionView[e_,_,_]] := e;
+expressionView /: MakeBoxes[expressionView[e_,a_,tag_], StandardForm] :=
+  With[{boxes=If[TrueQ[a["ShowBackgroundLabel"]],RowBox[{StyleBox[tag,FontWeight->Bold],": ",notationBoxes[e,a]}],notationBoxes[e,a]], original=e}, InterpretationBox[boxes,original]];
+expressionView /: MakeBoxes[expressionView[e_,a_,tag_], TraditionalForm] := MakeBoxes[expressionView[e,a,tag],StandardForm];
+nativeBoxes[e_] := With[{ex=e},MakeBoxes[ex,StandardForm]];
+notationBoxes[e_,a_] := Module[{orders,args,fn,n,terms,den,body,mark,ix,h=Head[e],items},
+  If[a["PartialStyle"]==="Native" && a["CovariantStyle"]==="Native",Return[nativeBoxes[e]]];
+  If[MatchQ[e,Derivative[__][_][__]] && a["PartialStyle"]=!="Native",
+    orders=List@@Head[Head[e]]; args=List@@e; fn=Head[e][[1]]; n=Total[orders];
+    If[a["PartialStyle"]==="Prime" && Length[args]=!=1,Return[nativeBoxes[e]]];
+    body=RowBox[{nativeBoxes[fn],"[",RowBox[Riffle[nativeBoxes /@ args,","]],"]"}];
+    Return[Switch[a["PartialStyle"],
+      "MultiIndex",RowBox[{SuperscriptBox[nativeBoxes[fn],RowBox[{"(",RowBox[Riffle[ToString /@ orders,","]],")"}]],"[",RowBox[Riffle[nativeBoxes /@ args,","]],"]"}],
+      "Prime",RowBox[{SuperscriptBox[nativeBoxes[fn],StringRepeat["'",n]],"[",nativeBoxes[First[args]],"]"}],
+      _,terms=MapThread[If[#2===0,Nothing,RowBox[{"\[PartialD]",If[#2===1,nativeBoxes[#1],SuperscriptBox[nativeBoxes[#1],ToString[#2]]]}]]&,{args,orders}];
+      den=RowBox[Riffle[terms," "]];
+      If[a["PartialStyle"]==="Fraction",FractionBox[RowBox[{If[n===1,"\[PartialD]",SuperscriptBox["\[PartialD]",ToString[n]]],body}],den],
+        RowBox[{RowBox[Riffle[MapThread[If[#2===0,Nothing,SubscriptBox[If[#2===1,"\[PartialD]",SuperscriptBox["\[PartialD]",ToString[#2]]],nativeBoxes[#1]]]&,{args,orders}]," "]]," ",body}]]]]
+  ];
+  If[MatchQ[e,_?CovDQ[_][_]] && a["CovariantStyle"]=!="Native",
+    fn=Head[Head[e]]; ix=First[Head[e]]; body=notationBoxes[First[e],a];
+    mark=First[SymbolOfCovD[fn]];
+    Return[If[a["CovariantStyle"]==="Postfix",SubscriptBox[RowBox[{"(",body,")"}],RowBox[{mark,nativeBoxes[ix]}]],
+      RowBox[{SubscriptBox[Last[SymbolOfCovD[fn]],nativeBoxes[ix]],"(",body,")"}]]]
+  ];
+  If[AtomQ[e] || xTensorQ[h] || FreeQ[e,Derivative|_?CovDQ],Return[nativeBoxes[e]]];
+  items=notationBoxes[#,a]& /@ (List@@e);
+  Switch[h,
+    Plus, RowBox[Riffle[(RowBox[{"(",#,")"}]& /@ items)," + "]],
+    Times,RowBox[Riffle[(RowBox[{"(",#,")"}]& /@ items)," "]],
+    Power,SuperscriptBox[RowBox[{"(",items[[1]],")"}],items[[2]]],
+    List,RowBox[{"{",RowBox[Riffle[items,","]],"}"}],
+    Equal,RowBox[Riffle[items," == "]],
+    _,RowBox[{nativeBoxes[h],"[",RowBox[Riffle[items,","]],"]"}]
+  ]
+];
 
 RegisterTheory[args___] := failure["Registration", "Unsupported registration arguments."];
 

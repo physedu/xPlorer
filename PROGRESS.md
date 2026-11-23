@@ -37,3 +37,9 @@ Record completed requirements, changed API, checks actually run and outcomes, cu
 Version: 14.0.0-beta.3. Effective source PrintAs is inherited; optional theory/background/later overrides use Presentation and SetPresentation. BackgroundObject returns actual heads. Scoped naming hooks generate readable curvature names and interpreted bare-head boxes retain identity. No global GiveSymbol changes.
 New targeted checks: 13/13; existing core checks: 40/40, in a fresh WL 15.0.1 kernel with xAct 1.3.0. PrintAs holds its argument, so inspection of aliases in tests uses With; this was a test-harness correction, not a tensor mutation.
 Next: Stage 3 scoped expression views, then lifecycle and multiple connections. Native property coverage and front-end rendering remain limited as specified in the plan.
+
+## Stage 3 completed
+
+DisplayExpression provides interpreted views with Native/MultiIndex/Fraction/Partial/Prime ordinary derivatives and Native/Prefix/Postfix covariant derivatives. SetNotation supplies optional background defaults; per-call choices override them. Normal and box interpretation recover the original expression. Prime falls back to native notation for multiple arguments. No derivative definitions are changed globally.
+Checks: 40 core + 13 presentation + 16 notation = 69/69. Native xAct boxes can contain a front-end-dependent font size in a headless kernel, so the checks validate interpreted structure and expression recovery, not pixel rendering. No claim of visual front-end verification.
+Next: Stage 4 lifecycle operations.
