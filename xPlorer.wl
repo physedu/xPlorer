@@ -96,7 +96,7 @@ ApplySpecialization::usage = "ApplySpecialization controls whether background sp
 StrictComponents::usage = "StrictComponents -> True returns Failure when tensor components or covariant derivatives remain unresolved.";
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.4";
+$XPlorerVersion = "14.0.0-beta.5";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, association] changes only labels of owned background objects. Automatic restores the inherited default for a key.";
@@ -117,6 +117,12 @@ DeletionPlan::usage = "DeletionPlan[tag, key, opts] previews dependency blockers
 DeleteBackgroundObject::usage = "DeleteBackgroundObject[tag, key, Cascade -> False] undefines an owned field, chart, connection, metric, parameter or background. External dependents remain protected.";
 Cascade::usage = "Cascade -> True permits deletion of tracked dependents within the selected background only.";
 ReconstructionData::usage = "ReconstructionData[tag] exports managed input records for inspection. It is not automatic kernel undo.";
+
+AddConnection::usage = "AddConnection[tag, key, source, opts] copies an existing source xAct connection onto a background.";
+ConnectionOf::usage = "ConnectionOf[tag, key] returns a named connection; omitted key or Primary returns the metric Levi-Civita derivative.";
+ConnectionsOf::usage = "ConnectionsOf[tag] lists named connection heads.";
+ConnectionDifference::usage = "ConnectionDifference[tag, key1, key2] returns the native Christoffel difference tensor with background indices.";
+TorsionOf::usage = "TorsionOf[tag, key] returns the selected native torsion tensor head.";
 
 Begin["`Private`"]
 
@@ -412,7 +418,7 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
   If[Complement[Keys[labels], Join[Keys[specs], {"Metric", "CovD", "Christoffel", "Riemann", "Ricci", "RicciScalar", "Einstein", "Weyl", "TFRicci", "Kretschmann", "Epsilon", "DetMetric"}]] =!= {} ||
     !AllTrue[Normal[labels], Function[r, If[First[r] === "CovD", MatchQ[Last[r], {_String,_String}], StringQ[Last[r]]]]],
     Return[failure["Presentation", "Supply valid labels for known objects before creating a background."]]];
-  make[key_, spec_] := Module[{head, new, type, rank, slots, signs, symmetry, deps, args, print, n},
+  make[key_, spec_] := Module[{head, new, type, rank, slots, signs, symmetry, deps, args, print, n, dagger=Real, vanish=False, frobenius=False},
     If[!AssociationQ[spec] || !And @@ (KeyExistsQ[spec, #] & /@ {"Head", "Type"}), Return[$Failed]];
     head = spec["Head"]; type = spec["Type"]; print = Lookup[spec, "PrintAs", key];
     new = Symbol[ctx <> safeName[key] <> suffix <> ToString[Length[fields] + 1]];
@@ -427,6 +433,9 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
       symmetry = Lookup[spec, "Symmetry", None];
       signs = ConstantArray[-1, rank]; deps = {m};
       If[xTensorQ[head],
+        If[WeightOfTensor[head]=!=0 || !FreeQ[UpValues[head],OrthogonalToVectorQ|Projected|GradeOfTensor], Return[$Failed]];
+        dagger=Which[HermitianQ[head],Hermitian,AntihermitianQ[head],Antihermitian,Dagger[head]===head,Real,Dagger[head]===MultiplyHead[-1,head],Imaginary,True,Complex];
+        frobenius=FrobeniusQ[head];
         slots = SlotsOfTensor[head];
         If[Length[slots] =!= rank || !And @@ (MemberQ[{VBundleOfMetric[srcg], -VBundleOfMetric[srcg]}, #] & /@ slots), Return[$Failed]];
         signs = If[MatchQ[#, Times[-1, _]], -1, 1] & /@ slots;
@@ -436,8 +445,8 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
       ];
       args = MapThread[Times, {signs, Take[If[rank <= Length[inds], inds, GetIndicesOfVBundle[TangentBundleOfManifold[m], rank]], rank]}];
       symmetry = Switch[symmetry, "Symmetric", Symmetric[Range[rank]], "Antisymmetric", Antisymmetric[Range[rank]], None, GenSet[], _, symmetry];
-      With[{hh = new, aa = args, dd = deps, ss = symmetry, pr = print},
-        DefTensor[hh @@ aa, dd, ss, PrintAs -> pr]];
+      With[{hh = new, aa = args, dd = deps, ss = symmetry, pr = print, dg=dagger,fb=frobenius},
+        DefTensor[hh @@ aa, dd, ss, PrintAs -> pr,Dagger->dg,FrobeniusQ->fb]];
     ];
     If[!xTensorQ[new], Return[$Failed]];
     fields[key] = <|"Type" -> type, "OldHead" -> head, "NewHead" -> new,
@@ -460,7 +469,8 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
   defaults = Join[defaults, Association@KeyValueMap[(#1 -> Lookup[#2,"PrintAs",InferFieldPrintAs[#2["Head"]]] ) &, specs],
     Association@KeyValueMap[(#1 -> If[xTensorQ[#2], InferFieldPrintAs[#2], SymbolName[#2]]) &, geo]];
   rules = Join[{srcg -> g, srccd -> cd}, Thread[Values[oldgeo] -> Values[geo]],
-    (# ["OldHead"] -> # ["NewHead"] & /@ Values[fields])];
+    (# ["OldHead"] -> # ["NewHead"] & /@ Values[fields]),
+    (Dagger[#["OldHead"]] -> Dagger[#["NewHead"]] & /@ Select[Values[fields],xTensorQ[#["OldHead"]] && DaggerQ[#["OldHead"]]&])];
   $BG[tag] = Join[<|"Tag" -> tag, "Context" -> ctx, "PresentationDefaults" -> defaults, "PresentationOverrides" -> labels, "Theory" -> theory, "Dimension" -> dim,
     "SourceManifold" -> srcm, "SourceBundle" -> VBundleOfMetric[srcg], "Manifold" -> m,
     "Metric" -> g, "CovD" -> cd, "Signature" -> sig, "Indices" -> inds, "BaseIndices" -> base,
@@ -468,6 +478,9 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
     "IndexRules" -> Thread[base -> inds], "SpecializationRules" -> {},
     "MetricRevision" -> 0, "ComputedGeometry" -> {}, "GeometryRuns" -> 0,
     "FieldComponents" -> <||>, "PerturbationHead" -> perturbHead, "PerturbationParameter" -> parameter|>, geo];
+  put[tag,<|"Connections"-><|"Primary"-><|"Head"->cd,"OldHead"->srccd,"Geometry"->connectionGeometry[cd],"Torsion"->False,"Curvature"->True,"Metric"->g|>|>|>];
+  result=KeyValueMap[Function[{key,spec},With[{ss=spec["Head"],pr=spec["SymbolOfCovD"]},AddConnection[tag,key,ss,SymbolOfCovD->pr]]],Lookup[theory,"Connections",<||>]];
+  If[AnyTrue[result,FailureQ],DeleteBackground[tag];Return[First@Select[result,FailureQ]]];
   SetPresentation[tag, labels];
   $BG[tag]
 ];
@@ -810,7 +823,7 @@ PerturbOn[tag_String, input_, order_Integer: 1, OptionsPattern[]] := Module[{b =
 ];
 
 ownedObjects[b_] := Module[{roots, relative},
-  roots = DeleteMissing@Join[Lookup[b, {"Manifold", "Metric", "CovD", "Chart", "PerturbationParameter"}], Lookup[Values[b["Field"]], "NewHead", {}]];
+  roots = DeleteMissing@Join[Lookup[b, {"Manifold", "Metric", "CovD", "Chart", "PerturbationParameter"}], Lookup[Values[b["Field"]], "NewHead", {}],connectionHeads[b],relativeHeads[b]];
   If[KeyExistsQ[b,"CovD"] && CovDQ[b["CovD"]] && KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]], relative = GiveSymbol[Christoffel, Sequence @@ Sort[{b["CovD"], PDOfBasis[b["Chart"]]}]]; If[xTensorQ[relative], AppendTo[roots, relative]]];
   FixedPoint[DeleteDuplicates@Join[#, Flatten[ServantsOf /@ #]] &, roots]
 ];
@@ -820,6 +833,7 @@ disposeObjects[b_] := Module[{fields, relative, parameter = b["PerturbationParam
   If[KeyExistsQ[b,"CovD"] && CovDQ[b["CovD"]] && KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]],
     relative = GiveSymbol[Christoffel, Sequence @@ Sort[{b["CovD"], PDOfBasis[b["Chart"]]}]];
     If[xTensorQ[relative], UndefTensor[relative]]];
+  Scan[If[CovDQ[#] && #=!=Lookup[b,"CovD",None],UndefCovD[#]]&,Reverse@connectionHeads[b]];
   If[MetricQ[b["Metric"]], UndefMetric[b["Metric"]]];
   If[KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]], UndefChart[b["Chart"]]];
   If[ManifoldQ[b["Manifold"]], UndefManifold[b["Manifold"]]];
@@ -1036,6 +1050,7 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  If[r===$Failed || remaining=!={},Return[failure["PartialDeletion","Deletion did not complete. Inspect the retained registry and actual xAct objects before retrying.",<|"RemainingNames"->remaining|>]]];
  newb=$BG[tag];deadKeys=Keys@Select[managedObjects[newb],!objectRegisteredQ[#]&];
  newb["Field"]=Select[newb["Field"],xTensorQ[#["NewHead"]]&];
+ newb["Connections"]=Select[Lookup[newb,"Connections",<||>],CovDQ[#["Head"]]&];
  newb["FieldComponents"]=Select[newb["FieldComponents"],xTensorQ[#["Head"]]&];
  newb["HeadRules"]=Select[newb["HeadRules"],objectRegisteredQ[Last[#]]&];
  newb["SpecializationRules"]=Delete[b["SpecializationRules"],List /@ plan["RulePositions"]];
@@ -1057,6 +1072,65 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
 ReconstructionData[tag_String] := Module[{b=background[tag]},If[FailureQ[b],b,
  KeyTake[b,{"Theory","Signature","CoordinateLabels","MetricMatrix","FieldComponents","SpecializationRules","PresentationOverrides","Notation"}]]];
 invalidateResults[tag_] := If[KeyExistsQ[$BG,tag],put[tag,<|"DataRevision"->Lookup[$BG[tag],"DataRevision",0]+1,"SavedResults"-><||>|>]];
+
+(* Named derivatives keep the primary Levi-Civita workflow unchanged. *)
+Options[AddConnection]={SymbolOfCovD->Automatic};
+RegisterTheory["Connection",key_String,source_Symbol,opts___Rule] := Module[{a=Association[opts],spec},
+ If[!CovDQ[source] || Complement[Keys[a],{SymbolOfCovD}]=!={},Return[failure["Connection","Register an existing xAct covariant derivative; only SymbolOfCovD may override presentation here."]]];
+ spec=<|"Head"->source,"SymbolOfCovD"->Lookup[a,SymbolOfCovD,SymbolOfCovD[source]]|>;
+ $Theory["Connections"]=Join[Lookup[$Theory,"Connections",<||>],<|key->spec|>];$Theory
+];
+connectionGeometry[cd_] := Module[{names={"Christoffel","Torsion","Riemann","Ricci"}},
+ If[MetricOfCovD[cd]=!=Null,names=Join[names,{"RicciScalar","Einstein","Weyl","TFRicci","Kretschmann"}]];
+ AssociationThread[names,(GiveSymbol[Symbol["xAct`xTensor`"<>#],cd]& /@ names)]
+];
+ConnectionOf[tag_String,key_:Automatic] := Module[{b=background[tag],a},If[FailureQ[b],Return[b]];
+ If[key===Automatic || key==="Primary",Return[getter[tag,"CovD"]]];
+ a=Lookup[Lookup[b,"Connections",<||>],key,Missing[]];
+ If[AssociationQ[a],a["Head"],failure["ConnectionKey","No connection has this name."]]
+];
+ConnectionsOf[tag_String] := Module[{b=background[tag]},If[FailureQ[b],b,Map[#["Head"]&,Lookup[b,"Connections",<||>]]]];
+AddConnection[tag_String,key_String,source_Symbol,OptionsPattern[]] := Module[
+ {b=background[tag],cd,marker,from,geo,oldgeo,r,all,rec,extra,token},
+ If[FailureQ[b],Return[b]];
+ If[AnyTrue[Values@Lookup[b,"Connections",<||>],Lookup[#,"OldHead",None]===source&],Return[failure["ConnectionSource","This source connection is already represented in the background."]]];
+ If[key==="Primary" || KeyExistsQ[Lookup[b,"Connections",<||>],key] || KeyExistsQ[managedObjects[b],key],Return[failure["ConnectionKey","Choose a new connection name."]]];
+ If[!CovDQ[source] || ManifoldOfCovD[source]=!=b["SourceManifold"] ||
+    VBundlesOfCovD[source]=!={b["SourceBundle"]} || ExtendedFrom[source]=!=Null || WeightedWithBasis[source]=!=Null ||
+    DependenciesOfCovD[source]=!={b["SourceManifold"]},Return[failure["ConnectionScope","Only ordinary covariant derivatives on the source tangent bundle, without extension or weighted-basis dependencies, are currently copied."]]];
+ from=MetricOfCovD[source];
+ If[from=!=Null && from=!=b["Theory"]["Metric"],Return[failure["ConnectionMetric","The associated metric must be the registered theory metric."]]];
+ marker=Replace[OptionValue[SymbolOfCovD],Automatic:>SymbolOfCovD[source]];
+ If[!MatchQ[marker,{_String,_String}],Return[failure["ConnectionSymbol","Supply a pair of display strings."]]];
+ token=ToString[++$BackgroundCounter];cd=Symbol[b["Context"]<>safeName[key]<>safeName[tag]<>token];installCovDNames[cd,b["Context"]];
+ r=guard[With[{cc=cd,ii=First[b["Indices"]],mm=b["Manifold"],sy=marker,tor=TorsionQ[source],cu=CurvatureQ[source],fm=If[from===Null,Null,b["Metric"]],cr=(CurvatureRelations[source]=!={})},
+   DefCovD[cc[-ii],{},SymbolOfCovD->sy,Torsion->tor,Curvature->cu,FromMetric->fm,CurvatureRelations->cr]]];
+ If[r===$Failed || !CovDQ[cd],If[CovDQ[cd],guard[UndefCovD[cd]]];Return[failure["ConnectionCreation","xAct could not copy the connection."]]];
+ geo=connectionGeometry[cd];oldgeo=connectionGeometry[source];
+ KeyValueMap[Function[{name,head},If[xTensorQ[head],With[{hh=head,pr=InferFieldPrintAs[oldgeo[name]]},PrintAs[hh]^=pr];setBareBoxes[head,SymbolName[head]]]],geo];
+ setBareBoxes[cd,SymbolName[cd]];
+ rec=<|"Head"->cd,"OldHead"->source,"Geometry"->geo,"Torsion"->TorsionQ[cd],"Curvature"->CurvatureQ[cd],"Metric"->MetricOfCovD[cd],"SymbolOfCovD"->marker|>;
+ all=Join[Lookup[b,"Connections",<||>],<|key->rec|>];
+ put[tag,<|"Connections"->all,"HeadRules"->Join[b["HeadRules"],{source->cd},Thread[Values[oldgeo]->Values[geo]]]|>];invalidateResults[tag];rec
+];
+connectionGetter[tag_,key_,property_] := Module[{cd=ConnectionOf[tag,key],g},If[FailureQ[cd],Return[cd]];
+ g=connectionGeometry[cd];Lookup[g,property,failure["NonmetricCurvature","This curvature object is not defined for the selected connection."]]
+];
+RiemannOf[tag_String,key_String] := connectionGetter[tag,key,"Riemann"];
+RicciOf[tag_String,key_String] := connectionGetter[tag,key,"Ricci"];
+RicciScalarOf[tag_String,key_String] := connectionGetter[tag,key,"RicciScalar"];
+EinsteinOf[tag_String,key_String] := connectionGetter[tag,key,"Einstein"];
+WeylOf[tag_String,key_String] := connectionGetter[tag,key,"Weyl"];
+ChristoffelOf[tag_String,key_String] := connectionGetter[tag,key,"Christoffel"];
+TorsionOf[tag_String,key_:"Primary"] := connectionGetter[tag,key,"Torsion"];
+ConnectionDifference[tag_String,key1_String,key2_String] := Module[{b=background[tag],c1,c2,ii},If[FailureQ[b],Return[b]];
+ c1=ConnectionOf[tag,key1];c2=ConnectionOf[tag,key2];If[FailureQ[c1]||FailureQ[c2],Return[failure["ConnectionKey","Select two existing connections."]]];
+ ii=indicesFor[b,3];Christoffel[c1,c2][ii[[1]],-ii[[2]],-ii[[3]]]
+];
+connectionHeads[b_] := DeleteDuplicates@DeleteMissing@Join[Lookup[b,{"CovD"}],Lookup[Values@Lookup[b,"Connections",<||>],"Head",{}]];
+relativeHeads[b_] := Module[{allowed=Join[connectionHeads[b],{PD},If[KeyExistsQ[b,"Chart"]&&ChartQ[b["Chart"]],{PDOfBasis[b["Chart"]]},{}]]},
+ First /@ Select[xAct`xTensor`Private`$Christoffels,Function[r,AnyTrue[connectionHeads[b],MemberQ[r[[2]],#]&] && AllTrue[Rest[r[[2]]],MemberQ[allowed,#]&]]]
+];
 
 RegisterTheory[args___] := failure["Registration", "Unsupported registration arguments."];
 
