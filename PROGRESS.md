@@ -1,7 +1,7 @@
 # Development checkpoint
 
 Date: 2026-11-23
-State: package publication and detailed planning; extensions not started.
+State: Stage 1 validated; Stage 2 is next.
 
 ## Repository and recovery
 
@@ -24,7 +24,7 @@ The checkpoint commit containing this document is the recovery point (inspect gi
 
 1. Read DEVELOPMENT_PLAN.md and DECISIONS.md.
 2. Inspect current main and preserve newer user edits; use the actual package published here as the candidate baseline.
-3. Execute Stage 1 checks in a fresh available Wolfram kernel with xAct. Keep environment-specific backend settings in the test harness only.
+3. Stage 1 complete: fresh remote kernels passed core+geometry (48/48) and core+perturbations+lifecycle (67/67), covering all 75 distinct baseline checks. Keep environment-specific backend settings in the test harness only.
 4. Implement Stage 2 inheritance and readable naming; validate baseline behavior and targeted cases before proceeding.
 5. Continue stages in order, updating this file at each checkpoint.
 
