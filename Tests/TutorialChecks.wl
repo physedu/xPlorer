@@ -35,5 +35,14 @@
  "Recreated vector uses fresh values" -> SameQ[freshVector,{-5,0,0,0}],
  "Other field profiles retained" -> SameQ[{ToComponents["Schwarzschild",phi[]],ToComponents["FLRW",phi[]]},{u[rS],q[tF]}],
  "Source xAct objects retained" -> And[ManifoldQ[M],MetricQ[g],xTensorQ[phi]],
- "Source scalar Lagrangian retained" -> SameQ[TheoryValue["Lagrangian"],lagrangian]
+ "Source scalar Lagrangian retained" -> SameQ[TheoryValue["Lagrangian"],lagrangian],
+ "Optional notation preserves equation" -> SameQ[Normal[minkowskiView],minkowskiEquation==0],
+ "Selective rule removal" -> SameQ[remainingMassRule,0],
+ "Affine derivative component" -> SameQ[affineGradient,{{0,0,0,0},{-tA,0,0,0},{0,0,0,0},{0,0,0,0}}],
+ "Affine curvature convention" -> SameQ[affineCurvature,-$RiemannSign],
+ "Affine study cleaned" -> !KeyExistsQ[$BG,"AffineStudy"],
+ "Source affine derivative preserved" -> CovDQ[DA],
+ "Single field truly undefined" -> !ToExpression[sHeadName,InputForm,xTensorQ],
+ "Other source tensors preserved" -> xTensorQ[S] && xTensorQ[A],
+ "Presentation reset" -> SameQ[With[{hh=BackgroundObject["Schwarzschild","phi"]},PrintAs[hh]],"phi"]
 |>

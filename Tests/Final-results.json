@@ -1,0 +1,84 @@
+{
+  "Date": "2026-11-23",
+  "Version": "14.0.0-beta.7",
+  "Kernel": "15.0.1 Linux x86-64",
+  "xAct": "1.3.0",
+  "DistinctAssertions": 196,
+  "Groups": {
+    "geometry": {
+      "Version": "14.0.0-beta.7",
+      "Kernel": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)",
+      "Total": 49,
+      "Passed": 49,
+      "Failures": []
+    },
+    "perturbations": {
+      "Kernel": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)",
+      "Total": 48,
+      "Passed": 48,
+      "Failures": []
+    },
+    "lifecycle": {
+      "Kernel": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)",
+      "Total": 63,
+      "Passed": 63,
+      "Failures": []
+    },
+    "display": {
+      "Version": "14.0.0-beta.7",
+      "Kernel": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)",
+      "Total": 34,
+      "Passed": 34,
+      "Failures": []
+    },
+    "objects_connections": {
+      "Kernel": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)",
+      "Total": 45,
+      "Passed": 45,
+      "Failures": []
+    },
+    "component_rules": {
+      "Version": "14.0.0-beta.7",
+      "Kernel": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)",
+      "Total": 24,
+      "Passed": 24,
+      "Failures": []
+    },
+    "recipe": {
+      "Kernel": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)",
+      "Total": 9,
+      "Passed": 9,
+      "Failures": []
+    },
+    "metric_extra": {
+      "Kernel": "15.0.1 for Linux x86 (64-bit) (July 2, 2026)",
+      "Total": 6,
+      "Passed": 6,
+      "Failures": []
+    }
+  },
+  "ColdStart": {
+    "PackageWasAlreadyLoaded": false,
+    "Checks": {
+      "SingleGetReturnsNull": true,
+      "PackageLoaded": true,
+      "PackageVersion": true,
+      "DependenciesAvailable": true
+    }
+  },
+  "Application": {
+    "ApplicationNeeds": true,
+    "Version": "14.0.0-beta.7",
+    "PacletMetadata": true
+  },
+  "DevelopmentPaclet": {
+    "DirectoryLoad": true,
+    "PackageLoaded": true,
+    "Version": "14.0.0-beta.7"
+  },
+  "Limitations": [
+    "Combined remote requests returned evaluator Internal error; split groups succeeded.",
+    "No front-end screenshots or measured speedup.",
+    "Version checkpoint branch used; Git tag creation is unavailable through current connector."
+  ]
+}

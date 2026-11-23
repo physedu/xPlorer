@@ -1,3 +1,14 @@
+# Changes in 14.0.0-beta.7
+
+- Automatic native source label inheritance, local presentation overrides, readable isolated heads and interpreted bare-head output.
+- Optional expression views for partial/covariant derivatives; native notation remains the default.
+- Explicit value clearing, unregistering, dependency previews and true owned-object/family deletion, including partial metric and chart lifecycles.
+- Named independent connections with native curvature families, supported source properties and coefficient/difference input.
+- Selective and grouped rules; conservative managed-result invalidation.
+- Corrected StrictComponents treatment of coordinate scalars and two old HoldAll test-restoration calls; verified partial-creation cleanup.
+- Expanded single didactic notebook, editable build sources, traditional loader and development paclet metadata.
+- See API_GUIDE.md for supported scope and VALIDATION.md for actual checks. This is a beta, not unrestricted xAct compatibility.
+
 # xPlorer v14 changes
 
 ## Theme compatibility revision - November 23, 2026

@@ -1,0 +1,27 @@
+(* Set Global`$XPlorerTestGroup before Get; use a fresh kernel for each group. *)
+Global`$XPlorerTestsDirectory=DirectoryName[$InputFileName];
+If[!MemberQ[$Packages,"xPlorer`"],Get[FileNameJoin[{DirectoryName[Global`$XPlorerTestsDirectory],"xPlorer.wl"}]]];
+Global`$XPlorerSelectedFiles=Lookup[<|
+ "Geometry"->{"01_Core.wl","02_Geometry.wl"},
+ "Perturbations"->{"01_Core.wl","03_Perturbations.wl"},
+ "Lifecycle"->{"01_Core.wl","04_Lifecycle.wl"},
+ "Display"->{"05_Presentation.wl","06_Notation.wl"},
+ "ObjectsAndConnections"->{"07_LifecycleObjects.wl","08_Connections.wl"},
+ "ComponentsAndRules"->{"09_ConnectionComponents.wl","10_Rules.wl"},
+ "Reconstruction"->{"11_Reconstruction.wl"},
+ "MetricConnectionCurvature"->{"12_MetricConnectionCurvature.wl"}|>,
+ If[ValueQ[Global`$XPlorerTestGroup],Global`$XPlorerTestGroup,"Geometry"],Missing[]];
+If[MissingQ[Global`$XPlorerSelectedFiles],
+ Failure["TestGroup",<|"MessageTemplate"->"Choose Geometry, Perturbations, Lifecycle, Display, ObjectsAndConnections, ComponentsAndRules, Reconstruction, or MetricConnectionCurvature."|>],
+ Global`$XPlorerGroupPreviousContextPath=$ContextPath;
+ $ContextPath=DeleteCases[$ContextPath,"Global`"];
+ Begin["XPlorerGroup"<>StringReplace[CreateUUID[],"-"->""]<>"`"];
+ Block[{Print=(Null &),xAct`xPerm`$xpermQ=False,xAct`xCoba`$CVVerbose=False},
+  Get[FileNameJoin[{Global`$XPlorerTestsDirectory,"Fixture.wl"}]];
+  Scan[Get[FileNameJoin[{Global`$XPlorerTestsDirectory,#}]]&,Global`$XPlorerSelectedFiles];
+ ];
+ Global`$XPlorerGroupReport=With[{results=ToExpression[$Context<>"testResults"]},<|"Version"->$XPlorerVersion,"Kernel"->System`$Version,"Total"->Length[results],
+   "Passed"->Count[Lookup[results,"Passed"],True],"Failures"->Select[results,!TrueQ[#["Passed"]]&]|>];
+ End[];$ContextPath=Global`$XPlorerGroupPreviousContextPath;
+ Global`$XPlorerGroupReport
+]

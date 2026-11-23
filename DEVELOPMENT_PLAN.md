@@ -1,6 +1,6 @@
 # xPlorer development plan
 
-Status: approved scope recorded; implementation of the extensions has not started.
+Status: the seven stages are implemented within the explicitly documented supported scope in 14.0.0-beta.7. See API_GUIDE.md, VALIDATION.md and PROGRESS.md for actual behavior and evidence; the requirements below remain the design record.
 Read DECISIONS.md and PROGRESS.md before changing code. All syntax proposed below is illustrative until implemented and documented.
 
 ## Goal and baseline

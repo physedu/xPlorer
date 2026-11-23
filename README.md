@@ -1,74 +1,51 @@
-
 # xPlorer
 
-`xPlorer` is a symbolic Mathematica package for organizing tensorial calculations on different metric backgrounds in a systematic and reusable way.
+xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
-The project was developed in the context of research work in theoretical physics, with the goal of making it easier to move from an abstract formulation of a theory to concrete background realizations and, when needed, to a component description.
+Current version: **14.0.0-beta.7**. The default workflow remains a normal Get, theory registration and tagged background creation. Personalization is optional.
 
-## Motivation
+## Start here
 
-When working with the `xAct` ecosystem in Mathematica, it is natural to formulate a theory in abstract tensorial language: a metric, a covariant derivative, fields, parameters, and tensor equations. The difficulty appears when the same theory has to be explored on several different backgrounds.
+Keep [xPlorer_Workflow.nb](xPlorer_Workflow.nb) beside [xPlorer.wl](xPlorer.wl), install xAct, start a fresh Mathematica kernel and evaluate the notebook in order. Its startup is simply:
 
-Changing the metric is not enough. Each background carries its own associated geometric structure: manifold, indices, covariant derivative, curvature tensors, fields specialized to that background, and eventually a coordinate chart and component representation. Managing several such backgrounds in a clean way quickly becomes cumbersome if everything is handled manually.
+```wl
+Get[FileNameJoin[{NotebookDirectory[], "xPlorer.wl"}]];
+```
 
-`xPlorer` was created to address this problem.
+The principal notebook develops a scalar theory on Minkowski, Schwarzschild and FLRW, then introduces vectors, tensors, an independent affine connection, perturbations and cleanup. It contains 88 executable input cells, with explanatory prose beside the calculations. The stylesheet inherits light/dark theme colors. ScalarTheory.wl is an optional reusable source recipe; it is not required to run the notebook.
 
-## Main idea
+## Features
 
-The package allows the user to:
+- Independent xAct manifolds, metrics, connections, indices and field copies from a registered theory snapshot.
+- Formal expression transport before introducing coordinates, then xCoba component calculations with explicit tensor axes and component selection.
+- Native PrintAs inheritance, optional local labels, readable internal heads and reversible derivative views.
+- Named additional connections with their own curvature families and supplied coefficients or differences from the primary derivative.
+- Scoped rules, selective removal, named particularizations and conservative invalidation of saved results.
+- Separate value clearing, registration removal and true dependency-aware deletion of owned fields, charts, connections, metric families or whole backgrounds.
 
-- register an abstract theory once,
-- generate different backgrounds from that theory using tags,
-- create for each background its own manifold, metric, covariant derivative, indices, and fields,
-- port abstract expressions to a chosen background,
-- prepare the background for coordinate and component work.
+See [API_GUIDE.md](API_GUIDE.md) for examples and supported configurations. This beta does not implement every xAct option. See [VALIDATION.md](VALIDATION.md) for actual execution evidence and limitations; mathematical checks do not imply front-end screenshot verification or measured speedups.
 
-In this way, the abstract level of the theory is kept separate from its concrete realizations.
+## Installation and development
 
-## Current status
+Direct Get needs no installation. The repository also contains a traditional application loader and PacletInfo.wl. See the installation section in API_GUIDE.md for Needs and development paclet loading. xAct is installed separately and is not bundled.
 
-`xPlorer` is still in an early stage of development, but the main structure is already in place. In particular, the package is designed around:
+- [Development plan](DEVELOPMENT_PLAN.md)
+- [Design decisions](DECISIONS.md)
+- [Current recovery checkpoint](PROGRESS.md)
+- [Implementation/resumption instruction](IMPLEMENTATION_PROMPT.md)
+- [Tests](Tests/) and [notebook build sources](Tools/)
 
-- abstract theory registration,
-- tagged background creation,
-- background-specific tensor objects,
-- transport of expressions from the abstract theory to a concrete background,
-- compatibility with coordinate-based work through the `xAct` ecosystem.
+Each important validated stage is preserved in Git history. Read PROGRESS.md before continuing work so completed stages are not repeated.
 
-The current implementation has been tested on simple control cases such as Minkowski space, where the metric components are recovered correctly and the expected vanishing of Christoffel symbols and Ricci tensor can be verified.
+## Background and author
 
-## Package structure
+Developed by **Eduardo Sanz Romero**, in the context of research with Gonzalo J. Olmo and the Grupo de Gravedad y Campos: http://uv-qg.es/ . The goal is a reusable research tool for moving from formal theories to concrete background calculations.
 
-The repository will contain:
+xTensor supplies abstract tensor calculus, xPert supplies perturbative expansions, and xCoba supplies bases and components. Xplorer organizes and connects these operations; it does not replace their mathematics or solve boundary conditions automatically.
 
-- the Mathematica package file for `xPlorer`,
-- notebook files used for development, testing, and examples.
+## References and help
 
-## Ecosystem
-
-`xPlorer` is built to work with the `xAct` ecosystem in Mathematica, especially with:
-
-- `xTensor` for abstract tensor calculus,
-- `xPert` in the broader background/perturbative setting,
-- `xCoba` for coordinate and component calculations,
-- `xTras` as the working environment that bundles and complements these tools.
-
-## Long-term goal
-
-The long-term aim of the project is to consolidate `xPlorer` into a stable and useful tool for research-oriented tensor calculations in theoretical physics, especially in contexts where the same theory must be explored on multiple metric backgrounds without rebuilding the full geometric setup every time.
-
-## Author
-
-Eduardo Sanz Romero
-
-## Acknowledgments
-
-This project was developed in the context of research work with Gonzalo J. Olmo and the Grupo de Gravedad y Campos:
-
-http://uv-qg.es/
-
-## Available v14 beta and development
-
-The actual package is `xPlorer.wl` (14.0.0-beta.2). Open `xPlorer_Workflow.nb` beside it and evaluate the normal Get startup cell with xAct installed. `ScalarTheory.wl` is optional. See [VALIDATION.md](VALIDATION.md) for prior test evidence and limitations.
-
-Development requirements and recovery instructions are in [DEVELOPMENT_PLAN.md](DEVELOPMENT_PLAN.md), [DECISIONS.md](DECISIONS.md), [PROGRESS.md](PROGRESS.md), and [IMPLEMENTATION_PROMPT.md](IMPLEMENTATION_PROMPT.md). Planned extensions are not yet implemented. The prior repository state remains in Git history.
+- xAct project: https://www.xact.es/
+- xAct documentation: https://josmar493.dreamhosters.com/
+- xAct discussion group: https://groups.google.com/g/xAct
+- Wolfram paclet layout: https://reference.wolfram.com/language/tutorial/Paclets.html

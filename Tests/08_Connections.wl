@@ -31,3 +31,7 @@ assert["connection-metric-reference",MetricOfCovD[mc],ShowBackground["MetricConn
 assert["metric-torsion-has-scalar",xTensorQ[RicciScalarOf["MetricConnectionCase","MetricTorsion"]],True];
 assert["metric-torsion-delete",DeleteBackground["MetricConnectionCase"],Null];
 UnregisterTheory["Connections"];UndefCovD[DT];
+
+DefTensor[zeroField[-a],sourceM,VanishingQ->True];RegisterTheory["Field","Vector",zeroField];CreateBackground["ZeroFieldCase"];
+assert["vanishing-field-copied",With[{hh=BackgroundObject["ZeroFieldCase","zeroField"],ix=First[BackgroundIndices["ZeroFieldCase"]]},hh[-ix]],0];
+DeleteBackground["ZeroFieldCase"];UnregisterTheory["Field","zeroField"];UndefTensor[zeroField];

@@ -25,3 +25,8 @@ CreateBackground["FunctionPrint"];assert["native-function-print",With[{hh=Backgr
 SetPresentation["FunctionPrint",<|"pretty"->SubscriptBox["M","1"]|>];
 assert["boxed-label-override",With[{hh=BackgroundObject["FunctionPrint","pretty"]},PrintAs[hh]],SubscriptBox["M","1"]];
 DeleteBackground["FunctionPrint"];UnregisterTheory["Field","pretty"];UndefTensor[pretty];
+
+beforeReserved=ShowTheory[];
+RegisterTheory["Field","Metric","Scalar",phi];
+assert["reserved-field-key-protected",FailureQ[CreateBackground["ReservedKey"]],True];
+ClearTheory[];With[{tt=beforeReserved},RegisterTheory[tt]];

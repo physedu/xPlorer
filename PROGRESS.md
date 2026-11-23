@@ -1,74 +1,65 @@
-# Development checkpoint
+# Recovery checkpoint
 
 Date: 2026-11-23
-State: Stage 1 validated; Stage 2 is next.
-
-## Repository and recovery
-
+Version: 14.0.0-beta.7
+State: stages 1-7 implemented and validated within API_GUIDE.md's supported scope.
 Repository: https://github.com/physedu/xPlorer
 Branch: main
-Previous preserved commit: bfad1a672b71f3fa76b0ac006e632d33677d8344
-Its xPlorer.wl contains a Notebook expression. This checkpoint replaces that path with the actual available 14.0.0-beta.2 package and adds the corresponding xPlorer_Workflow.nb, optional ScalarTheory.wl, tests, validation record and plans. The previous content remains in Git history.
+Version recovery branch: checkpoint/v14.0.0-beta.7
+The finalization commit containing this file is the current recovery point; inspect git log for its SHA. No history was rewritten.
 
-The checkpoint commit containing this document is the recovery point (inspect git log for its SHA). No extension code has been implemented by this planning/publication step.
+## What is ready
 
-## Evidence and limitations
+- Single-Get startup, existing default workflows and independent background snapshots.
+- Native source presentation inheritance, optional theory/background/later overrides, readable actual curvature heads and interpreted bare-head display.
+- Optional interpreted partial/covariant derivative views that preserve expressions.
+- Value clearing, registration removal, dependency previews, bounded owned-object deletion, external protection, partial metric/chart lifecycles and verified cleanup postconditions.
+- Named additional connections, appropriate curvature getters, supplied coordinate coefficients or differences from Primary, declaration checks and component evaluation.
+- Selective/grouped rules, conservative saved-result invalidation, and managed reconstruction recipes while source definitions remain alive.
+- One applied principal notebook, separate technical tests, editable notebook build sources, normal application loader and development paclet metadata.
 
-- Current source inspected for version, presentation fallback and background lifecycle code.
-- Historical validation is recorded in VALIDATION.md and Tests/validation.json: 66 tutorial inputs executed, 36 expected-result and 3 order checks passed; separate package regression baseline comprises 75 distinct checks run in groups.
-- These are previous execution records, not a new mathematical test run during publication. The theme-only revision preserved computational boxes and removed explicit colors.
-- No new front-end screenshots or full light/dark rendering checks were performed.
-- Publication checks: package starts with BeginPackage, notebook contains Notebook, matching standalone package copies, ASCII and checkpoint file integrity. See repository commit for exact contents.
+## Validation
 
-## Next action
+Wolfram Language 15.0.1 Linux x86-64, official xAct 1.3.0. Portable xPerm settings are confined to the test harness.
 
-1. Read DEVELOPMENT_PLAN.md and DECISIONS.md.
-2. Inspect current main and preserve newer user edits; use the actual package published here as the candidate baseline.
-3. Stage 1 complete: fresh remote kernels passed core+geometry (48/48) and core+perturbations+lifecycle (67/67), covering all 75 distinct baseline checks. Keep environment-specific backend settings in the test harness only.
-4. Implement Stage 2 inheritance and readable naming; validate baseline behavior and targeted cases before proceeding.
-5. Continue stages in order, updating this file at each checkpoint.
+- Package: 196 distinct assertions pass in fresh-kernel groups. Core assertions repeat in geometry/perturbation/lifecycle groups; see Tests/Final-results.json.
+- Actual notebook: 88 input cells executed sequentially, 45 expected-result checks and 3 workflow-order checks passed, zero parse failures and zero warning cells.
+- Cold single Get, traditional application Needs and development PacletDirectoryLoad + Needs checked independently.
+- English ASCII and theme-inherited notebook styles checked statically. No front-end screenshots, binary paclet release or speedup measurement is claimed.
+- Large combined remote requests returned evaluator Internal error; split groups succeeded. Tests/RunGroup.wl supports the same bounded groups for reproducibility.
 
-## Required updates at each checkpoint
+## Checkpoint history
 
-Record completed requirements, changed API, checks actually run and outcomes, current limitations, failed attempts that affect future work, next concrete action, and a recoverable commit/tag reference. Push important validated milestones without rewriting history. If publication fails, keep a local commit and report the pending push. Never record credentials or claim unexecuted checks passed.
+| Stage | Commit | Result |
+| --- | --- | --- |
+| Published actual package baseline and plan | 83a8c2fea299cdc669ea794a77e06c75aab0b30f | Replaced mislabeled notebook content at package path; prior history preserved |
+| 1: revalidated baseline | 78d4ecaee0a40fd35f43dae0f114d8361b8c59f7 | All 75 original distinct checks covered in groups |
+| 2: inherited labels and readable heads | 52a6e57f3d42de0f3aa50770c76125b517e79dfb | Core and targeted presentation checks |
+| 3: optional notation | 4dfddd11e63102e715421dc854c8c197d5efc946 | Interpreted expression recovery |
+| 4: lifecycle operations | 1cb80d6e3baba313ff09bd69c322fea08e60e520 | Field/chart/metric deletion and recreation |
+| 5: connections | e8ec3d01be2bb418cc854a26e0f59d04954e76cd | Independent and metric-associated derivatives, conjugation |
+| 6: components and rules | 170243cc979ef4504579d2927859616a21cac136 | Supplied connection data, rule management and invalidation |
+| 6: recorded refinements | 7ee0206b84138b801ee6a41e14ed2d1ba703df11 | Additional documentation/checkpoint |
+| 7: finalization | Commit containing this document | Full worked notebook, installation, support guide and final regression |
 
-## Stage 2 completed
+## Decisions and fixes that matter when resuming
 
-Version: 14.0.0-beta.3. Effective source PrintAs is inherited; optional theory/background/later overrides use Presentation and SetPresentation. BackgroundObject returns actual heads. Scoped naming hooks generate readable curvature names and interpreted bare-head boxes retain identity. No global GiveSymbol changes.
-New targeted checks: 13/13; existing core checks: 40/40, in a fresh WL 15.0.1 kernel with xAct 1.3.0. PrintAs holds its argument, so inspection of aliases in tests uses With; this was a test-harness correction, not a tensor mutation.
-Next: Stage 3 scoped expression views, then lifecycle and multiple connections. Native property coverage and front-end rendering remain limited as specified in the plan.
+DeleteBackgroundObject avoids Wolfram's protected System DeleteObject. Native servant families must be removed through their owner; chart-specific metric determinant servants may need a managed detach from the live metric before chart deletion. Relative tensors involving external derivatives block deletion. Postcondition checks do not recreate removed names unnecessarily.
 
-## Stage 3 completed
+The old lifecycle suite had two HoldAll restoration calls that did not insert the saved Association. They now use With. Invalid field metadata is rejected before mutation, and a genuine source-rank mismatch separately tests partial-creation rollback. An incomplete cleanup now reports remaining definitions instead of falsely claiming rollback.
 
-DisplayExpression provides interpreted views with Native/MultiIndex/Fraction/Partial/Prime ordinary derivatives and Native/Prefix/Postfix covariant derivatives. SetNotation supplies optional background defaults; per-call choices override them. Normal and box interpretation recover the original expression. Prime falls back to native notation for multiple arguments. No derivative definitions are changed globally.
-Checks: 40 core + 13 presentation + 16 notation = 69/69. Native xAct boxes can contain a front-end-dependent font size in a headless kernel, so the checks validate interpreted structure and expression recovery, not pixel rendering. No claim of visual front-end verification.
-Next: Stage 4 lifecycle operations.
+StrictComponents excludes chart coordinate scalars from unresolved tensors. Scalar wrappers are evaluated as independent contractions, fixing extra metric-connection scalar contractions. Additional metric-connection curvature families are covered by six physical expected-result checks, including nonzero torsion. Native BreakChristoffel must be scoped to compatible tracked relative heads; using its global registry across unrelated bundles generated mixed rule lists in xAct 1.3.0.
 
-## Stage 4 completed
+Presentation uses isolated native label resolution and scoped naming/box definitions; no permanent global native overrides. Fields with density/graded/projected/orthogonal structure, extra bundles/manifold dependencies and extended/weighted connections are outside current support. See API_GUIDE.md before widening that scope.
 
-Version: 14.0.0-beta.4. Added ClearComputedValues, ClearFieldComponents, UnregisterTheory, DeletionPlan, DeleteBackgroundObject, and ReconstructionData. The name DeleteObject was rejected during development because it is a protected Wolfram built-in; no override is shipped. Removing a primary Levi-Civita connection separately is rejected; delete its metric family instead.
-Checks: 40 core + 22 object lifecycle = 62/62. Covers protected registrations, actual field removal, chart deletion/recreation, partial metric removal retaining the manifold, and final cleanup. Existing background lifecycle checks are retained for final regression.
-Native chart servants must be removed by their chart owner. For owned cross-family component servants (such as a chart-specific metric determinant), the deletion executor detaches the known servant from its live master before undefinition, after dependency preflight. It does not manipulate external objects. Partial failures retain the registry with an explicit failure report.
-ReconstructionData is an input record, not an automatic undo command. Arbitrary user variables remain outside managed invalidation. Next: multiple connections and supported property copying.
+RecreateBackground restores managed inputs, not arbitrary kernel state or saved results. It requires the source xAct definitions and rejects recipes with rules on relative-connection tensor heads. Source constants/functions in profiles remain shared.
 
-## Stage 5 completed
+## Remaining work and limits
 
-Version: 14.0.0-beta.5. RegisterTheory["Connection", key, source], AddConnection, ConnectionOf/ConnectionsOf, optional named curvature getters, TorsionOf and ConnectionDifference integrate independent xAct derivatives. Primary retains the old Levi-Civita default. Inherited native markers and supported metric references are copied. Nonmetric scalar-curvature getters return Failure.
-Checks: 40 core + 18 connection/property cases = 58/58, covering nonmetric torsion, metric torsion, relative connection tensors, true deletion/readdition, independent primary retention and complex conjugate tensor transport. Ordinary field conjugation and Frobenius metadata are now copied; slots, symmetries and supported dependencies remain inherited.
-Explicit current scope: one source tangent bundle; no extended derivatives, basis-weighted derivatives, density fields, graded/projected/orthogonal field definitions or extra manifold dependencies. These configurations are rejected, not silently reinterpreted. Native option coverage is not universal. Connection difference tracking uses xAct 1.3.0's private Christoffel registry, isolated in relativeHeads; compatibility with other xAct versions is unverified.
-Next: Stage 6 supplied independent connection components, selective/grouped rules and managed result invalidation.
+1. Verify actual Mathematica front-end appearance under light and dark themes on the user's computer; the mathematical and box-interpretation checks already pass.
+2. Expand native option/bundle support only with new requirements and tests; do not relabel untested options as supported.
+3. Test other xAct/Wolfram versions before claiming compatibility. Relative-connection and label helpers currently depend on isolated xAct 1.3.0 internals.
+4. Build/install a distributable binary paclet if desired; source metadata and development loading are already checked.
+5. Git tag creation is not exposed by the connected GitHub tools, and the local gh CLI has no authenticated session. Commits and the version checkpoint branch preserve recovery without a login request. Actual version tags remain pending; no tag was falsely claimed.
 
-## Stage 6 completed
-
-Version: 14.0.0-beta.6. SetConnectionComponents accepts coordinate coefficients or a difference from Primary. ToComponents expands selected independent curvatures, torsion and derivatives through native xAct transformations. Supplied arrays are checked against declared zero torsion, flatness and metric compatibility. CheckConnection reports appropriate residuals without assuming general Levi-Civita identities.
-ReplaceRules/RemoveRules and named rule groups provide explicit first-match ordering. SaveResult/ResultOf use conservative background-wide invalidation on managed mathematical changes, while presentation changes retain results. Deletion preflight includes inactive groups and registered Lagrangians/metadata, not only active rules.
-Checks: core 40 plus connection components/rules/dependency cases 24 = 64/64. Separately, updated presentation+notation+core passed 71/71. Tested an independently known curvature component using xAct's Riemann convention, covector derivative, curved-background difference coefficients, replay after metric change, declaration rejection and cache retention/invalidation. StrictComponents now accepts chart coordinate scalars rather than incorrectly flagging them as unresolved tensors.
-Avoided native BreakChristoffel over every global derivative: xAct 1.3.0 can produce mixed rule lists across unrelated bundles. Expansion is scoped to compatible tracked relative tensors. Derived connection curvature values are expanded on demand, not stored as a separate geometric cache. No speedup claim.
-Next: final regression, applied notebook updates, support/API documentation and application/paclet layout. This is still a beta checkpoint; front-end rendering and other xAct versions remain unverified.
-
-## Additional Stage 6 validation
-
-Core+components+rules: 64/64 (40 core, 14 independent-connection checks, 10 rule checks). Includes a known nonzero Riemann component in xAct's sign convention, torsion-free/flat declaration protection, curved difference input, replay after metric changes, inactive rule-group dependencies, and presentation retaining saved results.
-Core+presentation+notation after label refinement: 71/71 (40 core, 15 presentation, 16 notation). Native function-derived labels and boxed overrides are supported. StrictComponents now treats chart coordinate scalars as resolved, rather than incorrectly reporting them as unknown tensors.
-A native BreakChristoffel call over the global connection registry returned mixed empty lists for unrelated bundles. The implementation now expands only the selected background's tracked relative heads, preserving background isolation.
-Next: extend the principal notebook, create installable layout and execute final regression groups and the full notebook.
+Read DEVELOPMENT_PLAN.md, DECISIONS.md, API_GUIDE.md and VALIDATION.md before further development. Compare current main and preserve later user changes. Do not restart completed stages or repeat mathematical tests solely for prose edits.

@@ -1,3 +1,5 @@
+Current checkpoint: 14.0.0-beta.7 implements stages 1-7 within the documented supported scope. Read PROGRESS.md first and resume only remaining work; do not automatically reimplement completed stages.
+
 # Resume and implementation instruction
 
 Work autonomously on physedu/xPlorer. First read DEVELOPMENT_PLAN.md, DECISIONS.md and PROGRESS.md at the current repository head. These files are the detailed specification and recovery record. Inspect the real source and preserve newer user changes; do not assume an attachment is the latest version. Resume the next incomplete stage rather than repeating completed work.

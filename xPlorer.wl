@@ -96,7 +96,7 @@ ApplySpecialization::usage = "ApplySpecialization controls whether background sp
 StrictComponents::usage = "StrictComponents -> True returns Failure when tensor components or covariant derivatives remain unresolved.";
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.6";
+$XPlorerVersion = "14.0.0-beta.7";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, association] changes only labels of owned background objects. Automatic restores the inherited default for a key.";
@@ -137,6 +137,7 @@ RemoveRuleGroup::usage = "RemoveRuleGroup[tag, name] removes the group and refre
 SaveResult::usage = "SaveResult[tag, key, value] stores a result until the next managed mathematical change. Display changes retain it.";
 ResultOf::usage = "ResultOf[tag, key] retrieves a saved result, or returns Failure after invalidation.";
 
+RecreateBackground::usage = "RecreateBackground[tag, recipe] rebuilds managed inputs under an unused tag, requiring the source xAct definitions to remain alive. It is not arbitrary kernel undo.";
 Begin["`Private`"]
 
 SetAttributes[NameKey, HoldAll];
@@ -317,7 +318,7 @@ RegisterTheory["Field", key_String, type_String, head_, opts___Rule] /; MemberQ[
 
 RegisterTheory["Field", "Tensor", head_, rank_Integer, rest___] := Module[{newAssoc, key, sym, printAs},
   $Theory = Replace[$Theory, Except[_Association] -> <||>];
-  If[Complement[Keys[Association[opts]],{PrintAs,Order}]=!={},Return[failure["FieldOptions","Only PrintAs and perturbation Order are registration options; define supported native properties on the source xAct tensor."]]];
+  If[!AllTrue[{rest},MemberQ[{"Symmetric","Antisymmetric"},#] || MatchQ[#,PrintAs->_]&],Return[failure["FieldOptions","Only a supported symmetry and PrintAs are accepted here."]]];
   key = InferFieldKey[head];
   sym = TensorSymmetryFromArgs[rest];
   printAs = FieldPrintAsFromOpts[head, Sequence @@ Select[{rest}, MatchQ[#, _Rule] &]];
@@ -328,6 +329,7 @@ RegisterTheory["Field", "Tensor", head_, rank_Integer, rest___] := Module[{newAs
 
 RegisterTheory["Field", key_String, "Tensor", head_, rank_Integer, rest___] := Module[{newAssoc, sym, printAs, ks},
   $Theory = Replace[$Theory, Except[_Association] -> <||>];
+  If[!AllTrue[{rest},MemberQ[{"Symmetric","Antisymmetric"},#] || MatchQ[#,PrintAs->_]&],Return[failure["FieldOptions","Unsupported tensor registration option."]]];
   ks = NameKey[Unevaluated[key]];
   sym = TensorSymmetryFromArgs[rest];
   printAs = FieldPrintAsFromOpts[head, Sequence @@ Select[{rest}, MatchQ[#, _Rule] &]];
@@ -409,6 +411,7 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
   srcg = theory["Metric"]; srccd = theory["CovD"];
   If[!MetricQ[srcg] || !CovDQ[srccd] || CovDOfMetric[srcg] =!= srccd,
     Return[failure["InvalidTheory", "The registered metric and its Levi-Civita derivative must already be defined in xAct."]]];
+  If[DaggerQ[srcg] || WeightOfTensor[srcg]=!=0,Return[failure["MetricScope","Only real zero-weight metrics are currently supported."]]];
   srcm = BaseOfVBundle[VBundleOfMetric[srcg]]; dim = DimOfManifold[srcm];
   If[!IntegerQ[dim] || dim < 2, Return[failure["Dimension", "A concrete dimension of at least two is required."]]];
   base = theory["Indices"];
@@ -427,7 +430,6 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
   If[!AssociationQ[labels], Return[failure["Presentation", "Presentation must be an association of labels."]]];
   labels = Join[$PresentationPreferences, Lookup[theory, "Presentation", <||>], labels];
   defaults = <|"Metric" -> InferFieldPrintAs[srcg], "CovD" -> SymbolOfCovD[srccd]|>;
-  installCovDNames[cd, ctx];
   parameter = Symbol[ctx <> "eps"];
   inds = MapIndexed[Symbol[ctx <> "i" <> ToString[First[#2]]] &, display];
   specs = Lookup[theory, "Field", <||>];
@@ -435,7 +437,12 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
   If[Complement[Keys[labels], Join[Keys[specs], {"Metric", "CovD", "Christoffel", "Riemann", "Ricci", "RicciScalar", "Einstein", "Weyl", "TFRicci", "Kretschmann", "Epsilon", "DetMetric"}]] =!= {} ||
     !AllTrue[Normal[labels], Function[r, If[First[r] === "CovD", MatchQ[Last[r], {_String,_String}], validLabelQ[Last[r]]]]],
     Return[failure["Presentation", "Supply valid labels for known objects before creating a background."]]];
+  If[Intersection[Keys[specs],{"Metric","CovD","Manifold","Chart","PerturbationParameter","Primary","Riemann","Ricci","RicciScalar","Christoffel","Einstein","Weyl","Epsilon","DetMetric","Kretschmann","TFRicci"}]=!={},
+    Return[failure["ReservedFieldKey","Field keys must not shadow managed geometry or ownership keys."]]];
   If[!DuplicateFreeQ[Lookup[Values[specs],"Head",{}]],Return[failure["DuplicateField","One source field must have one registry identity in a background. Use presentation overrides for display alternatives."]]];
+  If[!AllTrue[Values[specs], AssociationQ[#] && KeyExistsQ[#,"Head"] && MemberQ[{"Scalar","Vector","Tensor","MetricPert"},Lookup[#,"Type",None]] &&
+      (Lookup[#,"Type"] =!= "Tensor" || (IntegerQ[Lookup[#,"Rank",-1]] && Lookup[#,"Rank",-1]>=0))&],
+    Return[failure["FieldSpecification","Every field needs a supported type and nonnegative tensor rank."]]];
   make[key_, spec_] := Module[{head, new, type, rank, slots, signs, symmetry, deps, args, print, n, dagger=Real, vanish=False, frobenius=False},
     If[!AssociationQ[spec] || !And @@ (KeyExistsQ[spec, #] & /@ {"Head", "Type"}), Return[$Failed]];
     head = spec["Head"]; type = spec["Type"]; print = resolveLabel[head,Lookup[spec, "PrintAs", InferFieldPrintAs[head]]];
@@ -457,20 +464,22 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
         slots = SlotsOfTensor[head];
         If[Length[slots] =!= rank || !And @@ (MemberQ[{VBundleOfMetric[srcg], -VBundleOfMetric[srcg]}, #] & /@ slots), Return[$Failed]];
         signs = If[MatchQ[#, Times[-1, _]], -1, 1] & /@ slots;
+        vanish=SameQ[head@@MapThread[Times,{signs,Take[If[rank<=Length[base],base,GetIndicesOfVBundle[VBundleOfMetric[srcg],rank]],rank]}],0];
         symmetry = SymmetryGroupOfTensor[head];
         deps = DependenciesOfTensor[head] /. srcm -> m;
         If[!FreeQ[deps, s_Symbol /; ManifoldQ[s] && s =!= m], Return[$Failed]];
       ];
       args = MapThread[Times, {signs, Take[If[rank <= Length[inds], inds, GetIndicesOfVBundle[TangentBundleOfManifold[m], rank]], rank]}];
       symmetry = Switch[symmetry, "Symmetric", Symmetric[Range[rank]], "Antisymmetric", Antisymmetric[Range[rank]], None, GenSet[], _, symmetry];
-      With[{hh = new, aa = args, dd = deps, ss = symmetry, pr = print, dg=dagger,fb=frobenius},
-        DefTensor[hh @@ aa, dd, ss, PrintAs -> pr,Dagger->dg,FrobeniusQ->fb]];
+      With[{hh = new, aa = args, dd = deps, ss = symmetry, pr = print, dg=dagger,fb=frobenius,vn=vanish},
+        DefTensor[hh @@ aa, dd, ss, PrintAs -> pr,Dagger->dg,FrobeniusQ->fb,VanishingQ->vn]];
     ];
     If[!xTensorQ[new], Return[$Failed]];
     fields[key] = <|"Type" -> type, "OldHead" -> head, "NewHead" -> new,
       "PrintAs" -> print, "Rank" -> rank, "IndexPositions" -> signs|>;
     new
   ];
+  installCovDNames[cd,ctx];
   result = guard[
     With[{mm = m, nn = dim, ii = inds}, DefManifold[mm, nn, ii]];
     MapThread[Function[{ix, lab}, With[{s = ix, p = InferFieldPrintAs[lab]}, PrintAs[s] ^= p]], {inds, display}];
@@ -481,8 +490,13 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
     KeyValueMap[make, specs]
   ];
   If[result === $Failed || !ListQ[result] || MemberQ[result, $Failed],
-    guard[disposeObjects[<|"Manifold" -> m, "Metric" -> g, "CovD" -> cd, "Field" -> fields, "PerturbationParameter" -> parameter|>]];
-    Return[failure["CreateBackground", "xAct could not create every requested object; the partial background was rolled back."]]];
+    owned=ToString[#,InputForm]& /@ ownedObjects[<|"Manifold" -> m, "Metric" -> g, "CovD" -> cd, "Field" -> fields, "PerturbationParameter" -> parameter|>];
+    result=guard[Internal`InheritedBlock[{Undef},Unprotect[Undef];
+      Undef[s_Symbol /; StringStartsQ[ToString[Unevaluated[s],InputForm],"Removed["]]:=Null;
+      disposeObjects[<|"Manifold" -> m, "Metric" -> g, "CovD" -> cd, "Field" -> fields, "PerturbationParameter" -> parameter|>]]];
+    owned=Select[owned,registeredNameQ];
+    Return[If[result===$Failed || owned=!={},failure["PartialCreation","Creation failed and cleanup was incomplete. Inspect the remaining native definitions before retrying.",<|"RemainingNames"->owned,"Context"->ctx|>],
+      failure["CreateBackground", "xAct could not create every requested object; the partial background was rolled back."]]]];
   oldgeo = allGeometry[srccd, srcg]; geo = allGeometry[cd, g];
   defaults = Join[defaults, Association@KeyValueMap[(#1 -> Lookup[#2,"PrintAs",InferFieldPrintAs[#2["Head"]]] ) &, specs],
     Association@KeyValueMap[(#1 -> If[xTensorQ[#2], InferFieldPrintAs[#2], SymbolName[#2]]) &, oldgeo]];
@@ -714,6 +728,7 @@ coordinateIndexify[expr_, b_] := Module[{held, indices, rules},
 traceValues[expr_List] := traceValues /@ expr;
 traceValues[expr_Plus] := Total[traceValues /@ List @@ expr];
 traceValues[expr_] := Module[{ex = resolveValues[expr], dummies, traced},
+  ex=ex/.Scalar[inside_]:>traceValues[inside];
   If[Head[ex] === Plus, Return[traceValues[ex]]];
   dummies = IndicesOf[Dummy, BIndex][ex];
   If[Length[dummies] === 0, Return[ex]];
@@ -861,10 +876,11 @@ disposeObjects[b_] := Module[{fields, relative, parameter = b["PerturbationParam
   If[ParameterQ[parameter], UndefParameter[parameter]];
   Null
 ];
-DeleteBackground[tag_String] := Module[{b = background[tag], result, owned, external},
+DeleteBackground[tag_String] := Module[{b = background[tag], result, owned, external, names, remaining},
   If[FailureQ[b], Return[b]];
   owned = ownedObjects[b];
-  external = Complement[DeleteDuplicates@Flatten[VisitorsOf /@ owned], owned];
+  names=ToString[#,InputForm]& /@ owned;
+  external = Union[Complement[DeleteDuplicates@Flatten[VisitorsOf /@ owned], owned],externalRelativeHeads[b]];
   If[external =!= {}, Return[failure["ExternalDependents", "External xAct objects depend on this background; undefine them explicitly first.", <|"Objects" -> external|>]]];
   clearGeometry[tag];
   result = guard[Internal`InheritedBlock[{Undef},
@@ -873,6 +889,8 @@ DeleteBackground[tag_String] := Module[{b = background[tag], result, owned, exte
     disposeObjects[b]
   ]];
   If[result === $Failed, Return[failure["DeleteBackground", "xAct could not undefine all owned objects; the registry entry was retained."]]];
+  remaining=Select[names,registeredNameQ];
+  If[remaining=!={},Return[failure["PartialDeletion","Some owned definitions remain; the registry was retained.",<|"RemainingNames"->remaining|>]]];
   KeyDropFrom[$BG, tag]; Null
 ];
 ClearBackgrounds[] := Module[{results}, results = DeleteBackground /@ Keys[$BG]; If[AnyTrue[results, FailureQ], results, Null]];
@@ -975,8 +993,9 @@ notationBoxes[e_,a_] := Module[{orders,args,fn,n,terms,den,body,mark,ix,h=Head[e
   If[MatchQ[e,_?CovDQ[_][_]] && a["CovariantStyle"]=!="Native",
     fn=Head[Head[e]]; ix=First[Head[e]]; body=notationBoxes[First[e],a];
     mark=First[SymbolOfCovD[fn]];
-    Return[If[a["CovariantStyle"]==="Postfix",SubscriptBox[RowBox[{"(",body,")"}],RowBox[{mark,nativeBoxes[ix]}]],
-      RowBox[{SubscriptBox[Last[SymbolOfCovD[fn]],nativeBoxes[ix]],"(",body,")"}]]]
+    Return[If[a["CovariantStyle"]==="Postfix",
+      If[UpIndexQ[ix],SuperscriptBox[RowBox[{"(",body,")"}],RowBox[{mark,nativeBoxes[UpIndex[ix]]}]],SubscriptBox[RowBox[{"(",body,")"}],RowBox[{mark,nativeBoxes[UpIndex[ix]]}]]],
+      RowBox[{If[UpIndexQ[ix],SuperscriptBox[Last[SymbolOfCovD[fn]],nativeBoxes[ix]],SubscriptBox[Last[SymbolOfCovD[fn]],nativeBoxes[UpIndex[ix]]]],"(",body,")"}]]]
   ];
   If[AtomQ[e] || xTensorQ[h] || FreeQ[e,Derivative|_?CovDQ],Return[nativeBoxes[e]]];
   items=notationBoxes[#,a]& /@ (List@@e);
@@ -1017,6 +1036,7 @@ UnregisterTheory[section_String,key_String,OptionsPattern[]] := Module[{a=Lookup
   $Theory[section]=KeyDrop[a,key];$Theory
 ];
 UnregisterTheory[section_String] := If[KeyExistsQ[$Theory,section],KeyDropFrom[$Theory,section];$Theory,failure["TheoryKey","The section does not exist."]];
+registeredNameQ[name_String] := Names[name] =!= {} && TrueQ[ToExpression[name,InputForm,objectRegisteredQ]];
 objectRegisteredQ[s_] := TrueQ[xTensorQ[s] || CovDQ[s] || ChartQ[s] || MetricQ[s] || ManifoldQ[s] || ParameterQ[s]];
 servantClosure[roots_] := FixedPoint[DeleteDuplicates@Join[#,Flatten[ServantsOf /@ #]]&,roots];
 visitorClosure[roots_] := FixedPoint[DeleteDuplicates@Join[#,Flatten[VisitorsOf /@ #]]&,roots];
@@ -1028,7 +1048,7 @@ DeletionPlan[tag_String,key_String:"Background",OptionsPattern[]] := Module[
  {b=background[tag],obj,roots,owned,remove,external,visitors,fields,exprs,ruleHits,uses,blockers,order,geometry,groupHits,sections,dependentHeads},
  If[FailureQ[b],Return[b]];
  If[MemberQ[{"Background","Manifold"},key],
-  owned=ownedObjects[b];external=Complement[visitorClosure[owned],owned];
+  owned=ownedObjects[b];external=Union[Complement[visitorClosure[owned],owned],externalRelativeHeads[b]];
   Return[<|"Background"->tag,"Key"->key,"Objects"->owned,"ExternalBlockers"->external,"Blockers"->external,
     "RegisteredExpressions"->Keys@Lookup[b["Theory"],"Expr",<||>],"RulePositions"->Range[Length[b["SpecializationRules"]]],
     "Order"->{"Fields","Connections","Metric","Chart","Manifold","Parameter"},"CanDelete"->(external==={})|>]];
@@ -1039,8 +1059,9 @@ DeletionPlan[tag_String,key_String:"Background",OptionsPattern[]] := Module[
    roots=Union[roots,Select[{GiveSymbol[Determinant,b["Metric"],b["Chart"]],GiveSymbol[Christoffel,Sequence@@Sort[{b["CovD"],PDOfBasis[b["Chart"]]}]]},xTensorQ]];
    owned=Union[owned,roots]
  ];
+ roots=Union[roots,Select[relativeHeads[b],Function[h,AnyTrue[roots,!FreeQ[TensorID[h],#]&]]]];
  visitors=visitorClosure[roots];
- external=Complement[visitors,owned];
+ external=Union[Complement[visitors,owned],Select[externalRelativeHeads[b],Function[h,AnyTrue[roots,!FreeQ[TensorID[h],#]&]]]];
  remove=If[TrueQ[OptionValue[Cascade]],Intersection[visitors,owned],roots];
  (* The manifold is always an owner/host, never an implicit cascade target. *)
  If[MemberQ[remove,b["Manifold"]],Return[failure["CascadeScope","Use explicit background deletion for a manifold cascade."]]];
@@ -1075,7 +1096,7 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
    Undef[s_Symbol /; StringStartsQ[ToString[Unevaluated[s],InputForm],"Removed["]]:=Null;
    Scan[undefOwned,plan["Order"]]
  ]];
- remaining=Select[names,TrueQ[ToExpression[#,InputForm,objectRegisteredQ]]&];
+ remaining=Select[names,registeredNameQ];
  If[r===$Failed || remaining=!={},Return[failure["PartialDeletion","Deletion did not complete. Inspect the retained registry and actual xAct objects before retrying.",<|"RemainingNames"->remaining|>]]];
  newb=$BG[tag];deadKeys=Keys@Select[managedObjects[newb],!objectRegisteredQ[#]&];
  newb["Field"]=Select[newb["Field"],xTensorQ[#["NewHead"]]&];
@@ -1102,8 +1123,6 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  $BG[tag]=newb;invalidateResults[tag];
  <|"DeletedNames"->names,"BackgroundRetained"->True,"RemovedExpressions"->plan["RegisteredExpressions"]|>
 ];
-ReconstructionData[tag_String] := Module[{b=background[tag]},If[FailureQ[b],b,
- KeyTake[b,{"Theory","Signature","CoordinateLabels","MetricMatrix","FieldComponents","SpecializationRules","PresentationOverrides","Notation"}]]];
 invalidateResults[tag_] := If[KeyExistsQ[$BG,tag],put[tag,<|"DataRevision"->Lookup[$BG[tag],"DataRevision",0]+1,"SavedResults"-><||>|>]];
 
 (* Named derivatives keep the primary Levi-Civita workflow unchanged. *)
@@ -1165,6 +1184,13 @@ relativeHeads[b_] := Module[{allowed=Join[connectionHeads[b],{PD},If[KeyExistsQ[
  First /@ Select[xAct`xTensor`Private`$Christoffels,Function[r,AnyTrue[connectionHeads[b],MemberQ[r[[2]],#]&] && AllTrue[Rest[r[[2]]],MemberQ[allowed,#]&]]]
 ];
 
+externalRelativeHeads[b_] := Module[{cds=connectionHeads[b],allowed,pd},
+ pd=If[KeyExistsQ[b,"Chart"]&&ChartQ[b["Chart"]],PDOfBasis[b["Chart"]],None];
+ allowed=Join[cds,{PD,pd}];
+ First /@ Select[xAct`xTensor`Private`$Christoffels,Function[r,
+   AnyTrue[Join[cds,{pd}],MemberQ[Rest[r[[2]]],#]&] && !AllTrue[Rest[r[[2]]],MemberQ[allowed,#]&]]]
+];
+
 (* General connection inputs are coefficients relative to the coordinate derivative,
    or a tensor difference from the primary Levi-Civita connection. *)
 Options[SetConnectionComponents]={ReferenceConnection->"Coordinates",Assumptions->Automatic};
@@ -1217,12 +1243,29 @@ ConnectionMatrixOf[tag_String,key_String] := Module[{b=background[tag],r},If[Fai
  r=Lookup[Lookup[b,"ConnectionComponents",<||>],key,Missing[]];
  If[AssociationQ[r],connectionGamma[tag,r],failure["ConnectionValues","No coefficients have been assigned to this connection."]]
 ];
+connectionKretschmann[tag_,cc_] := Module[{b=$BG[tag],key,gamma,n,coords,r,lower,mat,inv,flat},
+ key=First@Keys@Select[b["Connections"],#["Head"]===cc&];
+ gamma=ConnectionMatrixOf[tag,key];If[FailureQ[gamma],Return[gamma]];
+ n=b["Dimension"];coords=coordinateValues[b];mat=b["MetricMatrix"];inv=SparseArray[Inverse[mat]];
+ (* xAct convention R[-i,-j,-k,l] with a coordinate reference derivative. *)
+ r=Table[$RiemannSign(-D[gamma[[l,j,k]],coords[[i]]]+D[gamma[[l,i,k]],coords[[j]]]-
+   Sum[gamma[[l,i,q]]gamma[[q,j,k]]-gamma[[l,j,q]]gamma[[q,i,k]],{q,n}]),{i,n},{j,n},{k,n},{l,n}];
+ lower=Table[Sum[mat[[l,q]] r[[i,j,k,q]],{q,n}],{i,n},{j,n},{k,n},{l,n}];flat=Flatten[lower];
+ flat . KroneckerProduct[inv,inv,inv,inv] . flat
+];
+
 expandConnections[tag_,expr_] := Module[{b=$BG[tag],extra,ex=expr,pd,missing,used,gs},
  pd=PDOfBasis[b["Chart"]];extra=KeyDrop[Lookup[b,"Connections",<||>],"Primary"];
  used=Keys@Select[extra,Function[r,!FreeQ[ex,r["Head"]] || AnyTrue[Values[r["Geometry"]],!FreeQ[ex,#]&] || AnyTrue[relativeHeads[b],(!FreeQ[ex,#] && !FreeQ[TensorID[#],r["Head"]])&]]];
  missing=Complement[used,Keys@Lookup[b,"ConnectionComponents",<||>]];
  If[missing=!={},Return[failure["ConnectionValues","Assign coefficients for every independent connection used in this calculation.",<|"Connections"->missing|>]]];
- Do[With[{cc=extra[key]["Head"]},ex=guard[ChangeCovD[ChangeTorsion[ChangeCurvature[ex,cc,pd],cc,pd],cc,pd]]],{key,used}];
+ Do[With[{cc=extra[key]["Head"]},
+   If[MetricOfCovD[cc]=!=Null,
+    ex=guard[EinsteinToRicci[TFRicciToRicci[WeylToRiemann[ex,cc],cc],cc]];
+    ex=ex/.With[{kh=Kretschmann[cc]},HoldPattern[kh[]]:>connectionKretschmann[tag,cc]];
+   ];
+   ex=guard[ChangeCovD[ChangeTorsion[ChangeCurvature[ex,cc,pd],cc,pd],cc,pd]]
+ ],{key,used}];
  guard[Fold[BreakChristoffel[#1,#2,pd]&,ex,relativeHeads[b]]]
 ];
 Options[CheckConnection]={Assumptions->Automatic};
@@ -1264,6 +1307,44 @@ SaveResult[tag_String,key_String,value_] := Module[{b=background[tag]},If[Failur
 ];
 ResultOf[tag_String,key_String] := Module[{b=background[tag]},If[FailureQ[b],b,
  Lookup[Lookup[b,"SavedResults",<||>],key,failure["ResultInvalidated","The result is missing or was invalidated by a mathematical change."]]]];
+
+(* Portable managed recipes require the original source xAct definitions to remain alive. *)
+recipeObjects[b_] := Join[managedObjects[b],KeyTake[b,{"Christoffel","Torsion","Riemann","Ricci","RicciScalar","Einstein","Weyl","TFRicci","Kretschmann","Epsilon","DetMetric"}],
+ Association@Flatten@KeyValueMap[Function[{key,rec},KeyValueMap[("Connection:"<>key<>":"<>#1 -> #2)&,rec["Geometry"]]],Lookup[b,"Connections",<||>]]];
+ReconstructionData[tag_String] := Module[{b=background[tag],inputs},If[FailureQ[b],Return[b]];
+ inputs=Association@KeyValueMap[Function[{key,fs},key -> (KeyDrop[#,"Head"]& /@ Select[Values[b["FieldComponents"]],#["Head"]===fs["NewHead"]&])],b["Field"]];
+ Join[KeyTake[b,{"Theory","Signature","CoordinateLabels","Coordinates","MetricMatrix","Assumptions","SpecializationRules","RuleGroups","ActiveRuleGroups","PresentationOverrides","Notation","ConnectionComponents"}],
+ <|"RecipeVersion"->1,"Objects"->recipeObjects[b],"Indices"->b["Indices"],"FieldInputs"->inputs,
+  "RelativeHeads"->relativeHeads[b]|>]
+];
+RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,coords,inputs,source,result,relative},
+ If[KeyExistsQ[$BG,tag],Return[failure["BackgroundExists","Choose an unused tag or delete the old background first."]]];
+ If[Lookup[recipe,"RecipeVersion",None]=!=1 || !AssociationQ[Lookup[recipe,"Theory",None]],Return[failure["Recipe","Supply ReconstructionData captured before deletion."]]];
+ relative=Lookup[recipe,"RelativeHeads",{}];
+ If[AnyTrue[relative,(!FreeQ[Lookup[recipe,"SpecializationRules",{}],#] || !FreeQ[Lookup[recipe,"RuleGroups",<||>],#])&],
+  Return[failure["RecipeScope","Reconstruction of rules on relative-connection tensor heads is not supported; rewrite them using named connections first."]]];
+ b=Block[{$Theory=recipe["Theory"]},CreateBackground[tag,MetricSignature->Lookup[recipe,"Signature",Automatic],Presentation->Lookup[recipe,"PresentationOverrides",<||>]]];
+ If[FailureQ[b],Return[b]];
+ If[KeyExistsQ[recipe,"CoordinateLabels"],r=DefineChart[tag,recipe["CoordinateLabels"]];If[FailureQ[r],Return[r]]];
+ b=$BG[tag];old=recipe["Objects"];new=recipeObjects[b];
+ rules=Thread[Values@KeyTake[old,Intersection[Keys[old],Keys[new]]] -> Values@KeyTake[new,Intersection[Keys[old],Keys[new]]]];
+ rules=Join[rules,Thread[recipe["Indices"]->b["Indices"]]];
+ If[KeyExistsQ[recipe,"Coordinates"],rules=Join[rules,Thread[recipe["Coordinates"]->b["Coordinates"]]]];
+ If[KeyExistsQ[recipe,"MetricMatrix"],
+  r=SetCMetricSystem[tag,recipe["MetricMatrix"]/.rules,Assumptions->(Lookup[recipe,"Assumptions",True]/.rules)];If[FailureQ[r],Return[r]]
+ ];
+ inputs=Lookup[recipe,"FieldInputs",<||>];
+ result=KeyValueMap[Function[{key,records},
+   source=recipe["Theory"]["Field"][key]["Head"];
+   Map[Function[rec,SetFieldComponents[tag,source,rec["Values"]/.rules,IndexPositions->rec["IndexPositions"],PerturbationOrderLabel->Replace[rec["Order"],None->1]]],records]
+ ],inputs];
+ If[AnyTrue[Flatten[result],FailureQ],Return[First@Select[Flatten[result],FailureQ]]];
+ result=KeyValueMap[SetConnectionComponents[tag,#1,#2["Values"]/.rules,ReferenceConnection->#2["Reference"]]&,Lookup[recipe,"ConnectionComponents",<||>]];
+ If[AnyTrue[result,FailureQ],Return[First@Select[result,FailureQ]]];
+ put[tag,<|"RuleGroups"->(Lookup[recipe,"RuleGroups",<||>]/.rules),"SpecializationRules"->(Lookup[recipe,"SpecializationRules",{}]/.rules),
+   "ActiveRuleGroups"->Lookup[recipe,"ActiveRuleGroups",{}],"Notation"->Lookup[recipe,"Notation",$notationDefaults]|>];
+ $BG[tag]
+];
 
 RegisterTheory[args___] := failure["Registration", "Unsupported registration arguments."];
 

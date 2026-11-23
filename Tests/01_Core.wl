@@ -18,6 +18,7 @@ SetFieldComponents[tagMink,A,{1,2,3,4}];
 assert["vector-covariant", ToComponents[tagMink,A[-a]], {1,2,3,4}];
 assert["vector-contravariant", ToComponents[tagMink,A[a]], {-1,2,3,4}];
 assert["vector-contraction", ToComponents[tagMink,A[a] A[-a]], 28];
+assert["scalar-wrapper-independent-contractions",ToComponents[tagMink,Scalar[A[a] A[-a]] Scalar[A[b] A[-b]]],28^2];
 generatedIndex = DummyIn[TangentBundleOfManifold[sourceM]];
 assert["generated-dummy-index-transfer", ToComponents[tagMink,A[generatedIndex] A[-generatedIndex]], 28];
 SetFieldComponents[tagMink,S,DiagonalMatrix[{1,2,3,4}]];

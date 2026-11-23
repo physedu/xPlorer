@@ -30,7 +30,7 @@ tagSphere = "XPTestSphere" <> StringTake[CreateUUID[],8];
 makeBackground[tagSphere,{"theta","varphi"},Function[{th,ph},DiagonalMatrix[{1,Sin[th]^2}]],Assumptions->Function[{th,ph},0<th<Pi]];
 assert["dimension-is-inferred", ShowBackground[tagSphere]["Dimension"], 2];
 assert["sphere-curvature", ToComponents[tagSphere,RicciScalar[sphereCD][]], 2];
-ClearTheory[];RegisterTheory[saved4DTheory];
+ClearTheory[];With[{tt=saved4DTheory},RegisterTheory[tt]];
 
 cleanTheory = ShowTheory[];
 registryCounts = {Length[$Manifolds],Length[$Tensors],Length[$CovDs],Length[$Charts],Length[$Parameters]};
@@ -39,7 +39,13 @@ badTag = "XPTestRollback" <> StringTake[CreateUUID[],8];
 assert["failed-creation-rolls-back", FailureQ[CreateBackground[badTag]], True];
 assert["rollback-cleans-xact-registries", {Length[$Manifolds],Length[$Tensors],Length[$CovDs],Length[$Charts],Length[$Parameters]}, registryCounts];
 assert["rollback-no-background-entry", KeyExistsQ[$BG,badTag], False];
-ClearTheory[];RegisterTheory[cleanTheory];
+ClearTheory[];With[{tt=cleanTheory},RegisterTheory[tt]];
 
 assert["delete-fully-used-background", DeleteBackground[tagMink], Null];
 assert["fully-used-background-removed-from-registry", KeyExistsQ[$BG,tagMink], False];
+DefTensor[wrongRank[-a,-b],sourceM];
+RegisterTheory["Field","Vector",wrongRank];
+countsBeforeMismatch={Length[$Manifolds],Length[$Tensors],Length[$CovDs],Length[$Parameters]};
+assert["partial-creation-mismatch",FailureQ[CreateBackground["MismatchRollback"]],True];
+assert["partial-creation-cleanup",{Length[$Manifolds],Length[$Tensors],Length[$CovDs],Length[$Parameters]},countsBeforeMismatch];
+UnregisterTheory["Field","wrongRank"];UndefTensor[wrongRank];

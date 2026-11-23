@@ -9,7 +9,7 @@ testStart = AbsoluteTime[];
 Block[{Print = (Null &), xAct`xCoba`$CVVerbose = False, xAct`xPerm`$xpermQ = False},
   Get[FileNameJoin[{Global`$XPlorerTestsDirectory,"Fixture.wl"}]];
   Scan[Get[FileNameJoin[{Global`$XPlorerTestsDirectory,#}]] &,
-    {"01_Core.wl","02_Geometry.wl","03_Perturbations.wl","04_Lifecycle.wl"}];
+    {"01_Core.wl","02_Geometry.wl","03_Perturbations.wl","04_Lifecycle.wl","05_Presentation.wl","06_Notation.wl","07_LifecycleObjects.wl","08_Connections.wl","09_ConnectionComponents.wl","10_Rules.wl","11_Reconstruction.wl","12_MetricConnectionCurvature.wl"}];
   ClearTheory[]; With[{theoryToRestore = savedTheory},RegisterTheory[theoryToRestore]];
   Scan[If[KeyExistsQ[$BG,#],DeleteBackground[#]] &,DeleteDuplicates[testTags]];
   Scan[If[xTensorQ[#],UndefTensor[#]] &, {h,F,S,A,phi}];

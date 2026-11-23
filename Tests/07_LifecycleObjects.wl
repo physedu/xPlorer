@@ -30,3 +30,10 @@ assert["metric-really-undefined",ToExpression[metricName,InputForm,MetricQ],Fals
 assert["metric-state",ShowBackground["MetricCase"]["GeometryState"],"AbstractWithoutMetric"];
 assert["metric-no-components",FailureQ[ToComponents["MetricCase",A[-a]]],True];
 assert["metric-rest-delete",DeleteBackground["MetricCase"],Null];
+CreateBackground["ExternalRelative"];DefineChart["ExternalRelative",{"t","x","y","z"}];
+ii=BackgroundIndices["ExternalRelative",3];With[{i=First[ii]},DefCovD[outsideD[-i],{}]];
+rel=Christoffel[outsideD,PDOfBasis[ChartOf["ExternalRelative"]]][ii[[1]],-ii[[2]],-ii[[3]]];
+assert["external-relative-blocks-chart",DeletionPlan["ExternalRelative","Chart",Cascade->True]["CanDelete"],False];
+assert["external-relative-blocks-delete",FailureQ[DeleteBackgroundObject["ExternalRelative","Chart",Cascade->True]],True];
+assert["blocked-chart-still-defined",ChartQ[ChartOf["ExternalRelative"]],True];
+UndefCovD[outsideD];assert["external-relative-final-cleanup",DeleteBackground["ExternalRelative"],Null];
