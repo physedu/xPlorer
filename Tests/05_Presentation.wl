@@ -20,3 +20,8 @@ CreateBackground[tagPrint];
 assert["print-recreate",With[{hh=BackgroundObject[tagPrint,"phi"]},PrintAs[hh]],"m"];
 assert["print-recreated-independent",BackgroundObject[tagPrint,"phi"] =!= ps,True];
 DeleteBackground[tagPrint];
+DefTensor[pretty[],sourceM,PrintAs->Function[s,"P"]];RegisterTheory["Field","Scalar",pretty];
+CreateBackground["FunctionPrint"];assert["native-function-print",With[{hh=BackgroundObject["FunctionPrint","pretty"]},PrintAs[hh]],"P"];
+SetPresentation["FunctionPrint",<|"pretty"->SubscriptBox["M","1"]|>];
+assert["boxed-label-override",With[{hh=BackgroundObject["FunctionPrint","pretty"]},PrintAs[hh]],SubscriptBox["M","1"]];
+DeleteBackground["FunctionPrint"];UnregisterTheory["Field","pretty"];UndefTensor[pretty];
