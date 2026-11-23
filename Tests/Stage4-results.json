@@ -1,0 +1,1 @@
+{"version":"14.0.0-beta.4","core":40,"object_lifecycle":22,"passed":62,"failed":0,"checks_include":["chart delete/recreate","metric removal retaining manifold","true deregistration","protected source registration"]}

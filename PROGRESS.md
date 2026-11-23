@@ -43,3 +43,10 @@ Next: Stage 3 scoped expression views, then lifecycle and multiple connections. 
 DisplayExpression provides interpreted views with Native/MultiIndex/Fraction/Partial/Prime ordinary derivatives and Native/Prefix/Postfix covariant derivatives. SetNotation supplies optional background defaults; per-call choices override them. Normal and box interpretation recover the original expression. Prime falls back to native notation for multiple arguments. No derivative definitions are changed globally.
 Checks: 40 core + 13 presentation + 16 notation = 69/69. Native xAct boxes can contain a front-end-dependent font size in a headless kernel, so the checks validate interpreted structure and expression recovery, not pixel rendering. No claim of visual front-end verification.
 Next: Stage 4 lifecycle operations.
+
+## Stage 4 completed
+
+Version: 14.0.0-beta.4. Added ClearComputedValues, ClearFieldComponents, UnregisterTheory, DeletionPlan, DeleteBackgroundObject, and ReconstructionData. The name DeleteObject was rejected during development because it is a protected Wolfram built-in; no override is shipped. Removing a primary Levi-Civita connection separately is rejected; delete its metric family instead.
+Checks: 40 core + 22 object lifecycle = 62/62. Covers protected registrations, actual field removal, chart deletion/recreation, partial metric removal retaining the manifold, and final cleanup. Existing background lifecycle checks are retained for final regression.
+Native chart servants must be removed by their chart owner. For owned cross-family component servants (such as a chart-specific metric determinant), the deletion executor detaches the known servant from its live master before undefinition, after dependency preflight. It does not manipulate external objects. Partial failures retain the registry with an explicit failure report.
+ReconstructionData is an input record, not an automatic undo command. Arbitrary user variables remain outside managed invalidation. Next: multiple connections and supported property copying.

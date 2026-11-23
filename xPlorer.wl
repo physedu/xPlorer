@@ -96,7 +96,7 @@ ApplySpecialization::usage = "ApplySpecialization controls whether background sp
 StrictComponents::usage = "StrictComponents -> True returns Failure when tensor components or covariant derivatives remain unresolved.";
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.3";
+$XPlorerVersion = "14.0.0-beta.4";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, association] changes only labels of owned background objects. Automatic restores the inherited default for a key.";
@@ -109,6 +109,14 @@ SetNotation::usage = "SetNotation[tag, association] sets background display defa
 PartialStyle::usage = "PartialStyle chooses Native, MultiIndex, Fraction, Partial, or Prime (single argument only) in DisplayExpression.";
 CovariantStyle::usage = "CovariantStyle chooses Native, Prefix, or Postfix in DisplayExpression.";
 ShowBackgroundLabel::usage = "ShowBackgroundLabel adds a background label to an expression view.";
+
+ClearComputedValues::usage = "ClearComputedValues[tag] clears derived geometry and restores declared metric/field inputs.";
+ClearFieldComponents::usage = "ClearFieldComponents[tag, fieldOrKey] clears assigned and derived values of one field, retaining its definition.";
+UnregisterTheory::usage = "UnregisterTheory[section, key] removes a registration, not the original xAct definition. Cascade -> True removes dependent expression registrations.";
+DeletionPlan::usage = "DeletionPlan[tag, key, opts] previews dependency blockers and owned deletion order. Default key is Background.";
+DeleteBackgroundObject::usage = "DeleteBackgroundObject[tag, key, Cascade -> False] undefines an owned field, chart, connection, metric, parameter or background. External dependents remain protected.";
+Cascade::usage = "Cascade -> True permits deletion of tracked dependents within the selected background only.";
+ReconstructionData::usage = "ReconstructionData[tag] exports managed input records for inspection. It is not automatic kernel undo.";
 
 Begin["`Private`"]
 
@@ -524,6 +532,7 @@ BasisOf[tag_String] := getter[tag, "Basis"];
 getter[tag_, key_] := Module[{b = background[tag]}, If[FailureQ[b], b, Lookup[b, key, failure["NotInitialized", "The requested background property has not been initialized.", <|"Property" -> key|>]]]];
 
 clearGeometry[tag_] := Module[{b = $BG[tag], heads, cached, positions, owned},
+  If[!KeyExistsQ[b,"Metric"] || !MetricQ[b["Metric"]],Return[Null]];
   owned = DeleteMissing[Lookup[b, {"Metric", "CovD", "Chart"}]];
   cached = DownValues[xCobaCacheTable];
   positions = Select[Range[Length[cached]], Function[pos, AnyTrue[owned, !FreeQ[cached[[pos]], #] &]]];
@@ -802,13 +811,13 @@ PerturbOn[tag_String, input_, order_Integer: 1, OptionsPattern[]] := Module[{b =
 
 ownedObjects[b_] := Module[{roots, relative},
   roots = DeleteMissing@Join[Lookup[b, {"Manifold", "Metric", "CovD", "Chart", "PerturbationParameter"}], Lookup[Values[b["Field"]], "NewHead", {}]];
-  If[KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]], relative = GiveSymbol[Christoffel, Sequence @@ Sort[{b["CovD"], PDOfBasis[b["Chart"]]}]]; If[xTensorQ[relative], AppendTo[roots, relative]]];
+  If[KeyExistsQ[b,"CovD"] && CovDQ[b["CovD"]] && KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]], relative = GiveSymbol[Christoffel, Sequence @@ Sort[{b["CovD"], PDOfBasis[b["Chart"]]}]]; If[xTensorQ[relative], AppendTo[roots, relative]]];
   FixedPoint[DeleteDuplicates@Join[#, Flatten[ServantsOf /@ #]] &, roots]
 ];
 disposeObjects[b_] := Module[{fields, relative, parameter = b["PerturbationParameter"]},
   fields = Reverse[Lookup[Values[b["Field"]], "NewHead", {}]];
   Scan[If[xTensorQ[#], DeleteTensorValues[#]; UndefTensor[#]] &, fields];
-  If[KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]],
+  If[KeyExistsQ[b,"CovD"] && CovDQ[b["CovD"]] && KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]],
     relative = GiveSymbol[Christoffel, Sequence @@ Sort[{b["CovD"], PDOfBasis[b["Chart"]]}]];
     If[xTensorQ[relative], UndefTensor[relative]]];
   If[MetricQ[b["Metric"]], UndefMetric[b["Metric"]]];
@@ -940,6 +949,114 @@ notationBoxes[e_,a_] := Module[{orders,args,fn,n,terms,den,body,mark,ix,h=Head[e
     _,RowBox[{nativeBoxes[h],"[",RowBox[Riffle[items,","]],"]"}]
   ]
 ];
+
+(* Explicit lifecycle operations. Registration never transfers ownership. *)
+ClearComputedValues[tag_String] := Module[{b=background[tag],r},If[FailureQ[b],Return[b]];
+  clearGeometry[tag];
+  If[KeyExistsQ[b,"MetricMatrix"],r=guard[MetricInBasis[b["Metric"],-b["Basis"],b["MetricMatrix"]]];If[r===$Failed,Return[failure["ClearValues","Metric values could not be restored."]]]];
+  replayFields[tag];invalidateResults[tag];Null
+];
+ClearFieldComponents[tag_String,field_] := Module[{b=background[tag],fs,records,r},If[FailureQ[b],Return[b]];
+  fs=If[StringQ[field],Lookup[b["Field"],field,Missing[]],fieldSpec[b,field]];
+  If[!AssociationQ[fs],Return[failure["UnknownField","Choose a registered field."]]];
+  r=guard[DeleteTensorValues[fs["NewHead"]]];If[r===$Failed,Return[failure["ClearValues","Could not clear the field values."]]];
+  records=Select[b["FieldComponents"],#["Head"]=!=fs["NewHead"]&];
+  put[tag,<|"FieldComponents"->records|>];invalidateResults[tag];Null
+];
+Options[UnregisterTheory]={Cascade->False};
+UnregisterTheory[section_String,key_String,OptionsPattern[]] := Module[{a=Lookup[$Theory,section,<||>],head,refs,ex,lag},
+  If[!AssociationQ[a] || !KeyExistsQ[a,key],Return[failure["TheoryKey","The registered item does not exist."]]];
+  head=If[section==="Field",a[key]["Head"],None];refs={};
+  If[head=!=None,
+    ex=Lookup[$Theory,"Expr",<||>];refs=Keys@Select[ex,!FreeQ[#,head]&];
+    lag=!FreeQ[Lookup[$Theory,"Lagrangian",None],head] || !FreeQ[Lookup[$Theory,"LagrangianMap",<||>],head];
+    If[(refs=!={} || lag) && !TrueQ[OptionValue[Cascade]],Return[failure["RegisteredDependents","Expressions depend on this field; Cascade -> True removes their registrations, not xAct source objects.",<|"Expressions"->refs|>]]];
+    If[TrueQ[OptionValue[Cascade]],$Theory["Expr"]=KeyDrop[ex,refs];
+      If[lag,KeyDropFrom[$Theory,{"Lagrangian","LagrangianMap"}]]]
+  ];
+  $Theory[section]=KeyDrop[a,key];$Theory
+];
+UnregisterTheory[section_String] := If[KeyExistsQ[$Theory,section],KeyDropFrom[$Theory,section];$Theory,failure["TheoryKey","The section does not exist."]];
+objectRegisteredQ[s_] := TrueQ[xTensorQ[s] || CovDQ[s] || ChartQ[s] || MetricQ[s] || ManifoldQ[s] || ParameterQ[s]];
+servantClosure[roots_] := FixedPoint[DeleteDuplicates@Join[#,Flatten[ServantsOf /@ #]]&,roots];
+visitorClosure[roots_] := FixedPoint[DeleteDuplicates@Join[#,Flatten[VisitorsOf /@ #]]&,roots];
+managedObjects[b_] := Join[KeyTake[b,{"Metric","CovD","Chart","Manifold","PerturbationParameter"}],
+  AssociationThread[Keys[b["Field"]],Lookup[Values[b["Field"]],"NewHead"]],
+  Map[#["Head"]&,Lookup[b,"Connections",<||>]]];
+Options[DeletionPlan]={Cascade->False};
+DeletionPlan[tag_String,key_String:"Background",OptionsPattern[]] := Module[
+ {b=background[tag],obj,roots,owned,remove,external,visitors,fields,exprs,ruleHits,uses,blockers,order,geometry},
+ If[FailureQ[b],Return[b]];
+ If[MemberQ[{"Background","Manifold"},key],
+  owned=ownedObjects[b];external=Complement[visitorClosure[owned],owned];
+  Return[<|"Background"->tag,"Key"->key,"Objects"->owned,"ExternalBlockers"->external,"Blockers"->external,
+    "RegisteredExpressions"->Keys@Lookup[b["Theory"],"Expr",<||>],"RulePositions"->Range[Length[b["SpecializationRules"]]],
+    "Order"->{"Fields","Connections","Metric","Chart","Manifold","Parameter"},"CanDelete"->(external==={})|>]];
+ If[key==="CovD",Return[failure["PrimaryConnection","The Levi-Civita connection belongs to the metric. Delete Metric with its family instead."]]];
+ obj=Lookup[managedObjects[b],key,Missing[]];If[MissingQ[obj],Return[failure["ObjectKey","Choose an owned background object, not a source symbol or generated curvature servant."]]];
+ owned=ownedObjects[b];roots=servantClosure[{obj}];
+ If[key==="Chart" && KeyExistsQ[b,"Metric"],
+   roots=Union[roots,Select[{GiveSymbol[Determinant,b["Metric"],b["Chart"]],GiveSymbol[Christoffel,Sequence@@Sort[{b["CovD"],PDOfBasis[b["Chart"]]}]]},xTensorQ]];
+   owned=Union[owned,roots]
+ ];
+ visitors=visitorClosure[roots];
+ external=Complement[visitors,owned];
+ remove=If[TrueQ[OptionValue[Cascade]],Intersection[visitors,owned],roots];
+ (* The manifold is always an owner/host, never an implicit cascade target. *)
+ If[MemberQ[remove,b["Manifold"]],Return[failure["CascadeScope","Use explicit background deletion for a manifold cascade."]]];
+ exprs=Keys@Select[Lookup[b["Theory"],"Expr",<||>],Function[e,uses=PortExpression[tag,e];AnyTrue[remove,!FreeQ[uses,#]&]]];
+ ruleHits=Select[Range[Length[b["SpecializationRules"]]],Function[n,AnyTrue[remove,!FreeQ[b["SpecializationRules"][[n]],#]&]]];
+ blockers=Join[external,If[TrueQ[OptionValue[Cascade]],{},Complement[visitors,remove]],If[TrueQ[OptionValue[Cascade]],{},exprs],If[TrueQ[OptionValue[Cascade]],{},ruleHits]];
+ order=Select[Reverse@Values[b["Field"]],MemberQ[remove,#["NewHead"]]&];order=Lookup[order,"NewHead",{}];
+ order=DeleteDuplicates@Join[order,Select[remove,xTensorQ[#] && !MetricQ[#] && MasterOf[#]=!=obj&],
+   Select[remove,CovDQ[#] && #=!=b["CovD"]&],If[MemberQ[remove,b["Metric"]],{b["Metric"]},{}],
+   If[MemberQ[remove,Lookup[b,"Chart",None]],{b["Chart"]},{}],Select[remove,ParameterQ],{obj}];
+ order=Select[order,!MemberQ[remove,MasterOf[#]]&];
+ <|"Background"->tag,"Key"->key,"Objects"->remove,"ExternalBlockers"->external,"Blockers"->blockers,
+  "RegisteredExpressions"->exprs,"RulePositions"->ruleHits,"Order"->order,"CanDelete"->(blockers==={})|>
+];
+undefOwned[o_] := Module[{master=MasterOf[o]},
+ If[objectRegisteredQ[o] && master=!=Null && objectRegisteredQ[master],
+   With[{mm=master,ss=o},ServantsOf[mm]^=DeleteCases[ServantsOf[mm],ss];MasterOf[ss]^=Null]];
+ Which[ChartQ[o],UndefChart[o],MetricQ[o],UndefMetric[o],CovDQ[o],UndefCovD[o],xTensorQ[o],DeleteTensorValues[o];UndefTensor[o],ParameterQ[o],UndefParameter[o],True,Null]
+];
+Options[DeleteBackgroundObject]={Cascade->False};
+DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=background[tag],plan,removed,names,r,newb,deadKeys,exprs,remaining},
+ If[FailureQ[b],Return[b]];
+ plan=DeletionPlan[tag,key,Cascade->OptionValue[Cascade]];If[FailureQ[plan],Return[plan]];
+ If[!TrueQ[plan["CanDelete"]],Return[failure["DeleteBlocked","Owned or external dependents block deletion.",<|"Plan"->plan|>]]];
+ If[MemberQ[{"Background","Manifold"},key],Return[DeleteBackground[tag]]];
+ removed=plan["Objects"];names=ToString[#,InputForm]& /@ removed;
+ If[KeyExistsQ[b,"MetricMatrix"],clearGeometry[tag]];
+ r=guard[Internal`InheritedBlock[{Undef},Unprotect[Undef];
+   Undef[s_Symbol /; StringStartsQ[ToString[Unevaluated[s],InputForm],"Removed["]]:=Null;
+   Scan[undefOwned,plan["Order"]]
+ ]];
+ remaining=Select[names,TrueQ[ToExpression[#,InputForm,objectRegisteredQ]]&];
+ If[r===$Failed || remaining=!={},Return[failure["PartialDeletion","Deletion did not complete. Inspect the retained registry and actual xAct objects before retrying.",<|"RemainingNames"->remaining|>]]];
+ newb=$BG[tag];deadKeys=Keys@Select[managedObjects[newb],!objectRegisteredQ[#]&];
+ newb["Field"]=Select[newb["Field"],xTensorQ[#["NewHead"]]&];
+ newb["FieldComponents"]=Select[newb["FieldComponents"],xTensorQ[#["Head"]]&];
+ newb["HeadRules"]=Select[newb["HeadRules"],objectRegisteredQ[Last[#]]&];
+ newb["SpecializationRules"]=Delete[b["SpecializationRules"],List /@ plan["RulePositions"]];
+ With[{tt=Join[newb["Theory"],<|"Expr"->KeyDrop[Lookup[b["Theory"],"Expr",<||>],plan["RegisteredExpressions"]]|>]},newb["Theory"]=tt];
+ If[MemberQ[deadKeys,"Metric"],
+  newb=KeyDrop[newb,Join[{"Christoffel","Riemann","Ricci","RicciScalar","Einstein","Weyl","TFRicci","Kretschmann","Epsilon","DetMetric"},{"Metric","CovD","MetricMatrix","CMetric","ComponentCovD","GeometryPolicy"}]];
+  newb["GeometryState"]="AbstractWithoutMetric";
+ ];
+ If[MemberQ[deadKeys,"Chart"],
+  Scan[If[xTensorQ[#],DeleteTensorValues[#]]&,Lookup[Values[newb["Field"]],"NewHead",{}]];
+  newb["FieldComponents"]=<||>;
+  newb=KeyDrop[newb,{"Chart","Basis","Coordinates","CoordinateLabels","MetricMatrix","CMetric","ComponentCovD","GeometryPolicy"}]
+ ];
+ newb["PresentationDefaults"]=KeyDrop[newb["PresentationDefaults"],deadKeys];
+ newb["PresentationOverrides"]=KeyDrop[newb["PresentationOverrides"],deadKeys];
+ $BG[tag]=newb;invalidateResults[tag];
+ <|"DeletedNames"->names,"BackgroundRetained"->True,"RemovedExpressions"->plan["RegisteredExpressions"]|>
+];
+ReconstructionData[tag_String] := Module[{b=background[tag]},If[FailureQ[b],b,
+ KeyTake[b,{"Theory","Signature","CoordinateLabels","MetricMatrix","FieldComponents","SpecializationRules","PresentationOverrides","Notation"}]]];
+invalidateResults[tag_] := If[KeyExistsQ[$BG,tag],put[tag,<|"DataRevision"->Lookup[$BG[tag],"DataRevision",0]+1,"SavedResults"-><||>|>]];
 
 RegisterTheory[args___] := failure["Registration", "Unsupported registration arguments."];
 
