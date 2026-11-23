@@ -6,7 +6,9 @@ State: stages 1-7 implemented and validated within API_GUIDE.md's supported scop
 Repository: https://github.com/physedu/xPlorer
 Branch: main
 Version recovery branch: checkpoint/v14.0.0-beta.7
-The finalization commit containing this file is the current recovery point; inspect git log for its SHA. No history was rewritten.
+Version tag: v14.0.0-beta.7
+Pre-release: https://github.com/physedu/xPlorer/releases/tag/v14.0.0-beta.7
+The validated code recovery point is f91015bf5335690f515c80b9f66b39cbbbd40b2e, now preserved by tag v14.0.0-beta.7. Later documentation-only commits do not change that tag. No history was rewritten.
 
 ## What is ready
 
@@ -40,7 +42,7 @@ Wolfram Language 15.0.1 Linux x86-64, official xAct 1.3.0. Portable xPerm settin
 | 5: connections | e8ec3d01be2bb418cc854a26e0f59d04954e76cd | Independent and metric-associated derivatives, conjugation |
 | 6: components and rules | 170243cc979ef4504579d2927859616a21cac136 | Supplied connection data, rule management and invalidation |
 | 6: recorded refinements | 7ee0206b84138b801ee6a41e14ed2d1ba703df11 | Additional documentation/checkpoint |
-| 7: finalization | Commit containing this document | Full worked notebook, installation, support guide and final regression |
+| 7: finalization | f91015bf5335690f515c80b9f66b39cbbbd40b2e | Full worked notebook, installation, support guide and final regression |
 
 ## Decisions and fixes that matter when resuming
 
@@ -60,6 +62,6 @@ RecreateBackground restores managed inputs, not arbitrary kernel state or saved 
 2. Expand native option/bundle support only with new requirements and tests; do not relabel untested options as supported.
 3. Test other xAct/Wolfram versions before claiming compatibility. Relative-connection and label helpers currently depend on isolated xAct 1.3.0 internals.
 4. Build/install a distributable binary paclet if desired; source metadata and development loading are already checked.
-5. Git tag creation is not exposed by the connected GitHub tools, and the local gh CLI has no authenticated session. Commits and the version checkpoint branch preserve recovery without a login request. Actual version tags remain pending; no tag was falsely claimed.
+5. Tag v14.0.0-beta.7 was created through the authenticated GitHub browser session and published as a pre-release. The API confirms its target is f91015bf5335690f515c80b9f66b39cbbbd40b2e. The connected API tools still lack a tag-creation operation, but this version tag is no longer pending.
 
 Read DEVELOPMENT_PLAN.md, DECISIONS.md, API_GUIDE.md and VALIDATION.md before further development. Compare current main and preserve later user changes. Do not restart completed stages or repeat mathematical tests solely for prose edits.
