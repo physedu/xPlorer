@@ -11,8 +11,8 @@ DefConstantSymbol[kappa];
 (* Define mathematics once, in native xAct notation. *)
 Fexpr=CD[-a][A[-b]]-CD[-b][A[-a]];
 Lgrav=RicciScalar[CD][]/(2 kappa);
-Lproca=-1/4 (CD[-a][A[-b]]-CD[-b][A[-a]]) (CD[a][A[b]]-CD[b][A[a]])
- -mass^2 A[-a] A[a]/2;
+Lproca=(-1/4 (CD[-a][A[-b]]-CD[-b][A[-a]]) (CD[a][A[b]]-CD[b][A[a]])
+ -mass^2 A[-a] A[a]/2);
 Ltotal=Lgrav+Lproca;
 Eproca=ToCanonical@ContractMetric@VarD[A[-a],CD][Lproca];
 
@@ -36,13 +36,14 @@ DefineChart["Schwarzschild",{"t","r","theta","varphi"}];
 SetCMetricSystem["Schwarzschild",
  Function[{t,r,th,p},DiagonalMatrix[{-(1-2 Mbh/r),1/(1-2 Mbh/r),r^2,r^2 Sin[th]^2}]],
  Assumptions->Function[{t,r,th,p},Mbh>0&&r>2 Mbh&&0<th<Pi]];
-SetFieldComponents["Schwarzschild","A",Function[{t,r,th,p},{r^2,0,0,0}]];
+fieldData=SetFieldComponents["Schwarzschild",ASchw,Function[{t,r,th,p},{r^2,0,0,0}]];
 radius=CoordinatesOf["Schwarzschild"][[2]][];
-procaComponents=ToComponents["Schwarzschild",{"Expressions","VectorEOM"}];
+procaComponents=ToComponents["Schwarzschild",{"Expressions","VectorEOM"},StrictComponents->True];
 expected={-6+mass^2 radius^2/(1-2 Mbh/radius),0,0,0};
 <|"Version"->$XPlorerVersion,
  "VectorEOM"->Eproca,
  "CopiedLagrangian"->LprocaSchw,
  "Components"->procaComponents,
- "ExpectedResidual"->Simplify[procaComponents-expected],
+ "FieldAssignment"->If[FailureQ[fieldData],fieldData,"OK"],
+ "ExpectedResidual"->If[FailureQ[procaComponents],procaComponents,Simplify[procaComponents-expected]],
  "SectorKeys"->Keys[TheorySector["Proca"]["Expressions"]]|>
