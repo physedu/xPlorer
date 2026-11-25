@@ -34,7 +34,9 @@ ClearTheory[];With[{tt=saved4DTheory},RegisterTheory[tt]];
 
 cleanTheory = ShowTheory[];
 registryCounts = {Length[$Manifolds],Length[$Tensors],Length[$CovDs],Length[$Charts],Length[$Parameters]};
-RegisterTheory["Field","Tensor",badField,-1];
+assert["invalid-native-registration",FailureQ[RegisterTheory["Field",badField]],True];
+(* Inject invalid raw metadata to exercise creation preflight independently of registration. *)
+With[{bad=Join[cleanTheory,<|"Field"->Join[cleanTheory["Field"],<|"badField"-><|"Head"->badField,"Type"->"Tensor","Rank"->-1|>|>]|>]},RegisterTheory[bad]];
 badTag = "XPTestRollback" <> StringTake[CreateUUID[],8];
 assert["failed-creation-rolls-back", FailureQ[CreateBackground[badTag]], True];
 assert["rollback-cleans-xact-registries", {Length[$Manifolds],Length[$Tensors],Length[$CovDs],Length[$Charts],Length[$Parameters]}, registryCounts];
@@ -44,8 +46,10 @@ ClearTheory[];With[{tt=cleanTheory},RegisterTheory[tt]];
 assert["delete-fully-used-background", DeleteBackground[tagMink], Null];
 assert["fully-used-background-removed-from-registry", KeyExistsQ[$BG,tagMink], False];
 DefTensor[wrongRank[-a,-b],sourceM];
-RegisterTheory["Field","Vector",wrongRank];
+RegisterTheory["Field",wrongRank];
+(* Fault injection into a raw snapshot: simulate inconsistent persisted rank. *)
+With[{bad=ShowTheory[]},With[{fields=Join[bad["Field"],<|"wrongRank"->Join[bad["Field"]["wrongRank"],<|"Type"->"Vector","Rank"->1|>]|>]},RegisterTheory[<|"Field"->fields|>]]];
 countsBeforeMismatch={Length[$Manifolds],Length[$Tensors],Length[$CovDs],Length[$Parameters]};
 assert["partial-creation-mismatch",FailureQ[CreateBackground["MismatchRollback"]],True];
 assert["partial-creation-cleanup",{Length[$Manifolds],Length[$Tensors],Length[$CovDs],Length[$Parameters]},countsBeforeMismatch];
-UnregisterTheory["Field","wrongRank"];UndefTensor[wrongRank];
+UnregisterTheory["Fields","wrongRank"];UndefTensor[wrongRank];
