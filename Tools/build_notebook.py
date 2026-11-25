@@ -1,8 +1,12 @@
-# Rebuild the principal notebook with Python 3; no third-party dependencies.
+# Historical beta.7 notebook builder. Its 88-input source is not the current author notebook.
 # Input boxes are generated with Tools/MakeInputBoxes.wl when code cells change.
 from pathlib import Path
 import json
 import re
+import argparse
+parser = argparse.ArgumentParser(description='Build the historical 88-input notebook, not the current author notebook.')
+parser.add_argument('--legacy-output', type=Path, required=True, help='Explicit destination for the historical notebook')
+args = parser.parse_args()
 ROOT = Path(__file__).resolve().parent.parent
 cells = json.loads((ROOT/'Tools/tutorial_cells.json').read_text())
 native=json.loads((ROOT/'Tools/input_boxes.json').read_text())
@@ -53,5 +57,7 @@ styles='''Notebook[{
 },Visible->False,StyleDefinitions->"PrivateStylesheetFormatting.nb"]'''
 nb='(* Wolfram Notebook File - ASCII source *)\nNotebook[{\n'+',\n\n'.join(output)+'\n},WindowTitle->"xPlorer - Theory and backgrounds",StyleDefinitions->'+styles+',Saveable->True]\n'
 assert nb.isascii()
-(ROOT/'xPlorer_Workflow.nb').write_text(nb,encoding='ascii')
+if args.legacy_output.resolve() == (ROOT/'xPlorer_Workflow.nb').resolve():
+    raise SystemExit('Refusing to overwrite the current 115-input author notebook with the legacy source.')
+args.legacy_output.write_text(nb,encoding='ascii')
 print('Wrote tutorial:',len(cells),'cells; eight sections; styles embedded')
