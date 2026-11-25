@@ -66,7 +66,7 @@ ApplySpecialization::usage = "ApplySpecialization controls whether background sp
 StrictComponents::usage = "StrictComponents -> True returns Failure when tensor components or covariant derivatives remain unresolved.";
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.1";
+$XPlorerVersion = "14.0.0-beta.13-dev.2";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label; the association form changes several labels of owned background objects. Automatic restores the inherited default for a key.";
@@ -253,8 +253,8 @@ b13Formula[section_,key_String,held_HoldComplete,opts_Association] := Module[
  If[Head[value]===Symbol && !TrueQ[ConstantSymbolQ[value]] && !MemberQ[{True,False},value],
   Return[failure["FormulaValue","Assign the named source formula before registration."]]];
  If[section==="Lagrangians" &&
-   (MatchQ[value,_Equal|_List] || !TrueQ[Quiet[Check[Length[FindFreeIndices[value]]===0,False]]]),
-  Return[failure["LagrangianScalar","A Lagrangian must be a scalar expression, not a tensor or equation."]]];
+   (MatchQ[value,_Equal|_List|True|False] || !TrueQ[Quiet[Check[With[{e=value},FindFreeIndices[e]===IndexList[] && WeightOf[e]===0],False]]]),
+  Return[failure["LagrangianScalar","A Lagrangian must be a zero-weight scalar expression, not a tensor, density or equation."]]];
  b13FormulaID[section,key] -> <|"Collection"->section,"Key"->key,"Value"->value,
    "AliasBase"->base,"Sector"->sector|>
 ];
