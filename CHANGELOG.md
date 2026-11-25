@@ -1,3 +1,46 @@
+# Development history through beta.12
+
+Retrospective from the exported development conversation, 6–25 November 2026. Test counts below are historical reports, not newly rerun tests. No independent source snapshots or tags are fabricated for intermediate versions.
+
+## 14.0.0-beta.12 — 25 November
+
+- CreateBackground exposes free suffixed object, index and expression names in the calling context, e.g. CDSchw[-aSchw][phiSchw[]]. Occupied names are preserved; BackgroundObject still provides explicit lookup and custom aliases. Recreating backgrounds relinks their owned aliases.
+- Removed redundant manual alias assignments in the didactic notebook.
+- Reported: 115 input cells without warnings, 250 package tests.
+
+## 14.0.0-beta.11 — 24–25 November
+
+- Fixed boxes$... output formatting bug (27 occurrences on 10 PDF pages).
+- Made naming/presentation examples executable; retained Program cells for three alternative recipes.
+- Reported: 112 cells and 58 checks after printer fix; later notebook revision ran 116 cells without warnings.
+
+## 14.0.0-beta.10 — 24 November
+
+- Automatic short dummy-index display, avoiding collisions with free indices and preserving the original expression on copy.
+- Improved scalar, Lagrangian and prefix/postfix derivative presentation.
+- One instruction per line within input cells; reduced redundant tutorial prose.
+- Reported: 112 cells, 57 checks, kernel-level copy round-trip check.
+
+## 14.0.0-beta.9 — 24 November
+
+- SymbolSuffix independent of background tag; SymbolBase for field heads; direct PrintAs at background creation.
+- Registered expression aliases (EabSchw) expose transported expressions; UseExpression additionally applies specialization rules.
+- Session/local derivative notation, reversible display and copy/code/LaTeX views.
+- Multiple charts per background, OutputChart selection, cylindrical scalar/Hessian example.
+- Extended rule inspection and independent connection examples.
+- Reported: 104 cells, 52 checks, ten regression groups separately on Wolfram Language 15.0.1 and xAct 1.3.0. Combined evaluator failed internally; later tutorial revision ran 112 cells, 55 checks. Desktop appearance incompletely verified.
+
+## 14.0.0-beta.8 — development snapshot
+
+- Readable metric and derivative heads, inherited/local PrintAs, isolated contexts. Fields still carried numeric ordinals and indices internal names; SymbolSuffix and automatic coordinate-derivative display were pending.
+- No independent validation total established.
+
+## Earlier history
+
+Beta.7 reported 196 package checks, 88 notebook inputs and 45 result checks. The earlier changelog follows. The conversation does not unambiguously identify separate beta.3–beta.6 snapshots.
+
+---
+
 # Changes in 14.0.0-beta.7
 
 - Automatic native source label inheritance, local presentation overrides, readable isolated heads and interpreted bare-head output.
