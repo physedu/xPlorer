@@ -19,11 +19,11 @@ assert["connection-readd",AssociationQ[AddConnection["ConnectionsCase","Affine",
 assert["connection-background-delete",DeleteBackground["ConnectionsCase"],Null];
 UnregisterTheory["Connections"];UndefCovD[DD];
 DefTensor[chi[],sourceM,Dagger->Complex,PrintAs->"z"];
-RegisterTheory["Field","Scalar",chi];CreateBackground["ComplexCase"];
+RegisterTheory["Field",chi];CreateBackground["ComplexCase"];
 ch=BackgroundObject["ComplexCase","chi"];
 assert["complex-dagger-preserved",DaggerQ[ch],True];
 assert["complex-dagger-transport",PortExpression["ComplexCase",Dagger[chi][]],Dagger[ch][]];
-DeleteBackground["ComplexCase"];UnregisterTheory["Field","chi"];UndefTensor[chi];
+DeleteBackground["ComplexCase"];UnregisterTheory["Fields","chi"];UndefTensor[chi];
 DefCovD[DT[-a],{},FromMetric->g,Torsion->True];
 RegisterTheory["Connection","MetricTorsion",DT];CreateBackground["MetricConnectionCase"];
 mc=ConnectionOf["MetricConnectionCase","MetricTorsion"];
@@ -32,6 +32,6 @@ assert["metric-torsion-has-scalar",xTensorQ[RicciScalarOf["MetricConnectionCase"
 assert["metric-torsion-delete",DeleteBackground["MetricConnectionCase"],Null];
 UnregisterTheory["Connections"];UndefCovD[DT];
 
-DefTensor[zeroField[-a],sourceM,VanishingQ->True];RegisterTheory["Field","Vector",zeroField];CreateBackground["ZeroFieldCase"];
+DefTensor[zeroField[-a],sourceM,VanishingQ->True];RegisterTheory["Field",zeroField];CreateBackground["ZeroFieldCase"];
 assert["vanishing-field-copied",With[{hh=BackgroundObject["ZeroFieldCase","zeroField"],ix=First[BackgroundIndices["ZeroFieldCase"]]},hh[-ix]],0];
-DeleteBackground["ZeroFieldCase"];UnregisterTheory["Field","zeroField"];UndefTensor[zeroField];
+DeleteBackground["ZeroFieldCase"];UnregisterTheory["Fields","zeroField"];UndefTensor[zeroField];
