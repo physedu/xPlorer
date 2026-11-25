@@ -2,7 +2,7 @@
 
 xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
-Current version: **14.0.0-beta.7**. The default workflow remains a normal Get, theory registration and tagged background creation. Personalization is optional.
+Current version: **14.0.0-beta.12**. The default workflow remains a normal Get, theory registration and tagged background creation. Personalization is optional.
 
 ## Start here
 
@@ -12,16 +12,19 @@ Keep [xPlorer_Workflow.nb](xPlorer_Workflow.nb) beside [xPlorer.wl](xPlorer.wl),
 Get[FileNameJoin[{NotebookDirectory[], "xPlorer.wl"}]];
 ```
 
-The principal notebook develops a scalar theory on Minkowski, Schwarzschild and FLRW, then introduces vectors, tensors, an independent affine connection, perturbations and cleanup. It contains 88 executable input cells, with explanatory prose beside the calculations. The stylesheet inherits light/dark theme colors. ScalarTheory.wl is an optional reusable source recipe; it is not required to run the notebook.
+The principal notebook develops a scalar theory on Minkowski, Schwarzschild and FLRW, then introduces vectors, tensors, an independent affine connection, perturbations and cleanup. It contains 115 executable input cells, with explanatory prose beside the calculations. The stylesheet inherits light/dark theme colors. ScalarTheory.wl is an optional reusable source recipe; it is not required to run the notebook.
 
 ## Features
 
 - Independent xAct manifolds, metrics, connections, indices and field copies from a registered theory snapshot.
 - Formal expression transport before introducing coordinates, then xCoba component calculations with explicit tensor axes and component selection.
 - Native PrintAs inheritance, optional local labels, readable internal heads and reversible derivative views.
+- Automatic notebook-context aliases for background objects and indices, e.g. `gSchw`, `CDSchw`, `phiSchw` and `aSchw` after `CreateBackground["Schwarzschild", SymbolSuffix -> "Schw"]`. Occupied names are preserved; `BackgroundObject` remains available for explicit lookup.
 - Named additional connections with their own curvature families and supplied coefficients or differences from the primary derivative.
 - Scoped rules, selective removal, named particularizations and conservative invalidation of saved results.
 - Separate value clearing, registration removal and true dependency-aware deletion of owned fields, charts, connections, metric families or whole backgrounds.
+
+The package and principal notebook were updated from the beta.12 author-supplied files on 25 November 2026. The remaining development documentation, optional loaders and test/build sources have not been revalidated against this snapshot.
 
 See [API_GUIDE.md](API_GUIDE.md) for examples and supported configurations. This beta does not implement every xAct option. See [VALIDATION.md](VALIDATION.md) for actual execution evidence and limitations; mathematical checks do not imply front-end screenshot verification or measured speedups.
 
