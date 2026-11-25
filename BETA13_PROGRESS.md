@@ -27,10 +27,27 @@ Initial dev.1 registration/lifecycle group passed 43/45. FindFreeIndices has Hol
 
 ## Open work (do not release yet)
 
-- Migrate the beta.12 principal notebook, legacy tests, optional ScalarTheory.wl recipe, API_GUIDE, loader metadata and Tools build sources to the breaking API. The beta.12 notebook is intentionally preserved unchanged on this branch for now; it will not run end-to-end with dev.2. The older 196-assertion regression and beta.12 notebook results have NOT been rerun with beta.13.
+- Migrate the beta.12 principal notebook, legacy tests, optional ScalarTheory.wl recipe, API_GUIDE, loader metadata and Tools build sources to the breaking API. The beta.12 notebook is intentionally preserved unchanged on this branch for now; it will not run end-to-end with dev.2. The historical suite is migrated and rerun in the evening checkpoint below; the beta.12 notebook results have not yet been reproduced with beta.13.
 - Finalize public inspection (grouped Geometry/collections versus raw snapshot) and audit raw Association restore validation. Strengthen source-definition preflight on later redefinition, unsupported native properties and dependency tests; registration does not freeze all live xAct definitions.
 - Audit qualified ExpressionText/export and validate unknown collection arguments. Currently SetFieldComponents uses a source/copied tensor symbol, not a string key. Keep native semantics rather than assume every public operation supports every selector.
 - Extend tests for density rejection, extra bundles, SymbolBase/PrintAs, alias collisions with geometry, parameter duplicate source names and additional connections. Sector is a single string; no auto-active theory Rules or multi-sector membership in this checkpoint.
-- Test full perturbation calculations (registration/copy checked; not the full old perturbation regression), FLRW, additional connections and frontend notebook rendering. Spinors/tetrads/Clifford algebra remain outside this ordinary-tensor implementation.
+- Historical perturbation calculations, FLRW and additional connections are now rerun in the evening checkpoint below. Actual notebook execution and frontend rendering remain pending. Spinors/tetrads/Clifford algebra remain outside this ordinary-tensor implementation.
 
 Do not merge or tag a release until the migrated workflow and full regression are actually checked. Continue from this branch rather than restarting the validated beta.12 work.
+
+## Regression migration checkpoint (2026-11-25, evening)
+
+The legacy test fixture, core, lifecycle, presentation, object lifecycle and connection tests, and ScalarTheory.wl have been migrated to the beta.13 API. Tested immutable commit b3349deb336e1d1cc3e31d3a577832c378f7b3a0 with Wolfram MCP, WL 15.0.1 and xAct 1.3.0, fresh kernel per group and portable xPerm backend:
+
+| Group | Passed / total |
+| --- | --- |
+| Geometry | 49/49 |
+| Perturbations | 48/48 |
+| Lifecycle | 64/64 |
+| Display | 34/34 |
+| ObjectsAndConnections | 45/45 |
+| ComponentsAndRules | 24/24 |
+| Reconstruction | 9/9 |
+| MetricConnectionCurvature | 6/6 |
+
+All eight groups returned an empty Failures list. Total 279 assertion executions including repeated core checks. The lifecycle group includes one new assertion for immediate rejection of undefined field registration; its raw snapshot fault injection preserves the separate malformed-data creation tests. The core snapshot test now explicitly unregisters/re-registers its formula rather than relying on replacement semantics. Presentation re-registration restores dependent formulas from the raw snapshot. Principal notebook migration and actual notebook execution still pending; ScalarTheory.wl migration is not yet independently executed. No release or merge to main.
