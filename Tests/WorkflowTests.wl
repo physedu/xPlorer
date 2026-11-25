@@ -1,36 +1,42 @@
-(* Optional full-notebook check. Run in a fresh kernel with xAct installed.
-   The notebook itself needs only xPlorer.wl. This runner selects a portable
-   backend only while checking the examples. *)
-Global`$XPlorerWorkflowDirectory = DirectoryName[DirectoryName[$InputFileName]];
-Global`$XPlorerWorkflowReport = Module[
- {directory = Global`$XPlorerWorkflowDirectory, notebook, inputs, stages = <||>,
-  checks, parseFailures, warnings = {}, timings = {}, started = AbsoluteTime[], run},
- notebook = Get[FileNameJoin[{directory,"xPlorer_Workflow.nb"}]];
- inputs = Cases[notebook,Cell[BoxData[b_],"Input",CellTags -> id_String] :> {id,b},Infinity];
- run[cell_] := Module[{seconds,value},
-  {seconds,value} = AbsoluteTiming[Check[
-   Block[{NotebookDirectory = Function[directory],Print = (Null &)},
-    ToExpression[cell[[2]],StandardForm]],AppendTo[warnings,cell[[1]]];$Failed]];
-  AppendTo[timings,<|"Cell" -> cell[[1]],"Seconds" -> seconds|>];
+(* Execute the actual author notebook boxes sequentially in a fresh kernel.
+   xAct is required; use the portable backend only in this runner. *)
+Global`$XPlorerWorkflowDirectory=DirectoryName[DirectoryName[$InputFileName]];
+Global`$XPlorerWorkflowOutputs=<||>;
+Global`$XPlorerWorkflowReport=Module[
+ {directory=Global`$XPlorerWorkflowDirectory,notebook,inputs,stages=<||>,checks,
+  parseFailures={},warnings={},timings={},started=AbsoluteTime[],run,failed,oldFieldName,initiallyAbsent},
+ initiallyAbsent=!MemberQ[$Packages,"xPlorer`"];
+ notebook=Get[FileNameJoin[{directory,"xPlorer_Workflow.nb"}]];
+ inputs=Cases[notebook,Cell[BoxData[b_],"Input",CellTags->id_String]:>{id,b},Infinity];
+ Block[{Print=(Null&)},Needs["xAct`xPert`"];Needs["xAct`xCoba`"]];
+ run[cell_]:=Module[{id=First[cell],b=Last[cell],seconds,value},
+  If[id==="delete_single_field",oldFieldName=ToString[xPlorer`BackgroundObject["MinkowskiFields","S"],InputForm]];
+  If[Quiet[ToExpression[b,StandardForm,HoldComplete]]===$Failed,AppendTo[parseFailures,id]];
+  {seconds,value}=AbsoluteTiming[Check[
+    Block[{NotebookDirectory=Function[directory],Print=(Null&)},ToExpression[b,StandardForm]],
+    AppendTo[warnings,id];$Failed]];
+  AssociateTo[Global`$XPlorerWorkflowOutputs,id->value];
+  AppendTo[timings,<|"Cell"->id,"Seconds"->seconds|>];
+  Switch[id,
+   "load",stages["Notebook Get loads xPlorer"]=initiallyAbsent&&value===Null&&MemberQ[$Packages,"xPlorer`"],
+   "naming_result",stages["Native copied head and independent printed label"]=With[{head=xPlorer`BackgroundObject["NamingExample","Materia"]},
+     SameQ[First[value],head]&&xAct`xTensor`xTensorQ[head]&&SameQ[SymbolName[head],"matterSchw"]&&SameQ[xAct`xTensor`PrintAs[head],"P"]],
+   "register_metadata",stages["Theory registered before backgrounds"]=Keys[xPlorer`$BG]==={},
+   "create_manifolds",stages["Three independent manifolds before charts"]=Length[xPlorer`$BG]===3&&
+     Length[DeleteDuplicates[Lookup[Values[xPlorer`$BG],"Manifold"]]]===3&&AllTrue[Values[xPlorer`$BG],!KeyExistsQ[#,"Chart"]&],
+   "charts",stages["Charts chosen before metric matrices"]=AllTrue[Values[xPlorer`$BG],KeyExistsQ[#,"Chart"]&&!KeyExistsQ[#,"MetricMatrix"]&],
+   "delete_single_field",stages["Owned field actually undefined"]=!ToExpression[oldFieldName,InputForm,xAct`xTensor`xTensorQ],
+   _,Null
+  ]
  ];
- run[First[inputs]];
- parseFailures = Count[Quiet[ToExpression[#,StandardForm,HoldComplete] & /@ inputs[[All,2]]],$Failed];
- Block[{xAct`xPerm`$xpermQ = False},
-  Scan[Function[cell,
-   run[cell];
-   Switch[cell[[1]],
-    "register_metadata",stages["Theory registered before backgrounds"] = (Keys[xPlorer`$BG] === {}),
-    "create_manifolds",stages["Backgrounds created before charts"] = AllTrue[Values[xPlorer`$BG],!KeyExistsQ[#,"Chart"] &],
-    "charts",stages["Charts chosen before metric matrices"] = AllTrue[Values[xPlorer`$BG],!KeyExistsQ[#,"MetricMatrix"] &]
-   ]
-  ],Rest[inputs]];
-  checks = Get[FileNameJoin[{directory,"Tests","TutorialChecks.wl"}]];
- ];
- <|"Version" -> xPlorer`$XPlorerVersion,"Kernel" -> System`$Version,
-   "InputCells" -> Length[inputs],"ExecutedInputs" -> Length[timings],
-   "ParseFailures" -> parseFailures,"WarningCells" -> warnings,
-   "Stages" -> stages,"Checks" -> checks,
-   "Passed" -> Count[Values[checks],True],"Failed" -> Count[Values[checks],Except[True]],
-   "Seconds" -> N[AbsoluteTime[]-started],"CellTimes" -> timings|>
+ Block[{xAct`xPerm`$xpermQ=False},Scan[run,inputs];
+  checks=Get[FileNameJoin[{directory,"Tests","TutorialChecks.wl"}]]];
+ failed=Keys@Select[Global`$XPlorerWorkflowOutputs,FailureQ[#]||#===$Failed&];
+ <|"Version"->xPlorer`$XPlorerVersion,"Kernel"->System`$Version,
+   "InputCells"->Length[inputs],"ExecutedInputs"->Length[timings],"ParseFailures"->parseFailures,
+   "WarningCells"->warnings,"ExpectedFailureCells"->Intersection[failed,{"invalidated_result"}],
+   "UnexpectedFailureCells"->DeleteCases[failed,"invalidated_result"],
+   "Stages"->stages,"Checks"->checks,"Passed"->Count[Values[checks],True],
+   "Failed"->Count[Values[checks],Except[True]],"Seconds"->N[AbsoluteTime[]-started],"CellTimes"->timings|>
 ];
 Global`$XPlorerWorkflowReport
