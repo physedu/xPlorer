@@ -27,11 +27,11 @@ Initial dev.1 registration/lifecycle group passed 43/45. FindFreeIndices has Hol
 
 ## Open work (do not release yet)
 
-- Migrate the beta.12 principal notebook, legacy tests, optional ScalarTheory.wl recipe, API_GUIDE, loader metadata and Tools build sources to the breaking API. The beta.12 notebook is intentionally preserved unchanged on this branch for now; it will not run end-to-end with dev.2. The historical suite is migrated and rerun in the evening checkpoint below; the beta.12 notebook results have not yet been reproduced with beta.13.
+- The actual author notebook, regression suite and optional ScalarTheory.wl recipe are migrated and validated; see checkpoints below. Still update API_GUIDE, loader metadata, and decide whether to reauthor the historical Tools build sources. The legacy 88-input builder is now guarded against overwriting the current notebook.
 - Finalize public inspection (grouped Geometry/collections versus raw snapshot) and audit raw Association restore validation. Strengthen source-definition preflight on later redefinition, unsupported native properties and dependency tests; registration does not freeze all live xAct definitions.
 - Audit qualified ExpressionText/export and validate unknown collection arguments. Currently SetFieldComponents uses a source/copied tensor symbol, not a string key. Keep native semantics rather than assume every public operation supports every selector.
 - Extend tests for density rejection, extra bundles, SymbolBase/PrintAs, alias collisions with geometry, parameter duplicate source names and additional connections. Sector is a single string; no auto-active theory Rules or multi-sector membership in this checkpoint.
-- Historical perturbation calculations, FLRW and additional connections are now rerun in the evening checkpoint below. Actual notebook execution and frontend rendering remain pending. Spinors/tetrads/Clifford algebra remain outside this ordinary-tensor implementation.
+- Historical perturbation calculations, FLRW and additional connections are now rerun in the evening checkpoint below. Actual notebook execution is now validated in the checkpoint below; front-end rendering remains pending. Spinors/tetrads/Clifford algebra remain outside this ordinary-tensor implementation.
 
 Do not merge or tag a release until the migrated workflow and full regression are actually checked. Continue from this branch rather than restarting the validated beta.12 work.
 
@@ -50,4 +50,28 @@ The legacy test fixture, core, lifecycle, presentation, object lifecycle and con
 | Reconstruction | 9/9 |
 | MetricConnectionCurvature | 6/6 |
 
-All eight groups returned an empty Failures list. Total 279 assertion executions including repeated core checks. The lifecycle group includes one new assertion for immediate rejection of undefined field registration; its raw snapshot fault injection preserves the separate malformed-data creation tests. The core snapshot test now explicitly unregisters/re-registers its formula rather than relying on replacement semantics. Presentation re-registration restores dependent formulas from the raw snapshot. Principal notebook migration and actual notebook execution still pending; ScalarTheory.wl migration is not yet independently executed. No release or merge to main.
+All eight groups returned an empty Failures list. Total 279 assertion executions including repeated core checks. The lifecycle group includes one new assertion for immediate rejection of undefined field registration; its raw snapshot fault injection preserves the separate malformed-data creation tests. The core snapshot test now explicitly unregisters/re-registers its formula rather than relying on replacement semantics. Presentation re-registration restores dependent formulas from the raw snapshot. Principal notebook and ScalarTheory.wl validation followed in the next checkpoint. No release or merge to main.
+
+## Author notebook migration and validation (2026-11-25)
+
+Migrated the actual author-supplied beta.12 notebook (115 inputs, eight sections; original blob 02227e5531596b36748f75efa7f8da1eedabe228), not the older 88-input Tools source. Preserved the eight-section teaching flow, native input boxes, embedded stylesheet, cell tags, coordinate-chart examples, independent connections, perturbation and cleanup. Native boxes for changed inputs were generated in Wolfram MCP. The scalar kinetic and mass terms and their explicitly formed total are now three independently registered Lagrangians. Matter sector groups the field, mass constant and formulas. Formula aliases follow source symbol capitalization (scalarEqSchw, lagrangianSchw), while keys remain explicit ("ScalarEq", "Lagrangian"). Anonymous expressions have explicit Head options. No duplicate registration of the Lagrangian in Expressions.
+
+Notebook blob: 786e0eb2bf3291048f19b5422857326b44f7ee26.
+Final notebook + workflow test commit: f5ea3d95213d43e4de778ce37544ba2916a4471c.
+Kernel: Wolfram Language 15.0.1 Linux x86-64, xAct 1.3.0, portable xPerm backend (test runner only).
+Executed actual BoxData sequentially, not a substitute script:
+- Inputs: 115/115.
+- Parse failures: 0; warning cells: 0.
+- Unexpected Failure cells: 0; expected Failure at invalidated_result (saved-result invalidation demonstration).
+- Expected-result assertions: 65/65.
+- Temporal/workflow-order assertions: 6/6 (startup, naming and label identity, theory before backgrounds, independent manifolds before charts, charts before metric matrices, actual field undefinition).
+
+Includes scalar equations on Minkowski, Schwarzschild, FLRW, Schwarzschild Kretschmann, plane-wave dispersion, cylindrical metric/connection/Hessian/trace, affine gradient and curvature, vector raising, tensor axes, cache, rule and result lifetimes, first/second perturbations and Taylor factor, deletion and recreation. An earlier migration run detected two adjacent display expressions being interpreted as multiplication; corrected to explicit lists and reran. No front-end available for screenshot or visual verification.
+
+Reproduce from a fresh kernel with xAct installed: Get["/path/to/xPlorer/Tests/WorkflowTests.wl"]. The runner checks the actual notebook boxes, captures results at execution time, and returns expected/failed checks separately.
+
+Optional ScalarTheory.wl was aligned with the notebook's initial theory and independently executed at commit 754c85db5f1043f3fb7e3e07433928bc974cd6a2. Confirmed no backgrounds at registration, exact Matter sector keys, scalar variational equation, explicit Lagrangian sum, successful subsequent background creation and copied native metric. The temporary naming demonstration is intentionally omitted from this reusable source recipe.
+
+The historical Tools/tutorial_cells.json and input/formula box caches remain beta.7 authoring sources (88 inputs). Do not regenerate the current notebook from them. Tools/build_notebook.py now requires an explicit --legacy-output destination and refuses the canonical notebook path. The actual xPlorer_Workflow.nb is the source of truth until the authoring sources are rebuilt.
+
+Package code itself is unchanged from dev.2; no release or merge to main. Next: harden the registration/inspection API, finish documentation, metadata and edge-case testing, and check visual layout in Mathematica Desktop.
