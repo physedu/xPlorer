@@ -3,43 +3,13 @@
 (* xPert installs its own output function when first loaded. Preserve the session printer. *)
 Block[{$PrePrint}, BeginPackage["xPlorer`", {"xAct`xTensor`", "xAct`xPert`", "xAct`xCoba`"}]];
 
-RegisterTheory::usage =
-  "RegisterTheory[\"Metric\", metric] registers the abstract metric.
-\
-RegisterTheory[\"CovD\", CD] registers the covariant derivative.
-\
-RegisterTheory[\"Indices\", {a,b,c,...}] registers abstract indices.
-
-\
-RegisterTheory[\"Lagrangian\", L] registers the main lagrangian.
-\
-RegisterTheory[\"Lagrangian\", name, Lx] registers a named lagrangian.
-
-\
-RegisterTheory[\"Parameter\", name, value] registers one parameter.
-\
-RegisterTheory[\"Parameter\", {name1->v1, name2->v2, ...}] registers several parameters.
-
-\
-RegisterTheory[\"Field\", \"Scalar\", phi, opts] registers one scalar.
-\
-RegisterTheory[\"Field\", \"Vector\", A, opts] registers one vector.
-\
-RegisterTheory[\"Field\", \"MetricPert\", h, opts] registers one metric perturbation.
-\
-RegisterTheory[\"Field\", \"Tensor\", T, rank, sym, opts] registers one tensor.
-\
-RegisterTheory[\"Field\", {...}] registers several fields.
-
-\
-RegisterTheory[\"Expr\", expr] registers one expression with inferred name.
-\
-RegisterTheory[\"Expr\", key, expr] registers one expression with explicit key.
-\
-RegisterTheory[\"Expr\", {...}] registers several expressions.";
-ShowTheoryKeys::usage = "ShowTheoryKeys[] returns the keys currently stored in $Theory. Main internal keys are Metric, CovD, Indices, Lagrangian, LagrangianMap, Parameter, Field and Expr.";
+RegisterTheory::usage = "RegisterTheory[\"Metric\",g], RegisterTheory[\"CovD\",CD], RegisterTheory[\"Indices\",{a,b,...}] register source geometry. RegisterTheory[\"Field\",phi,opts] registers one native tensor; RegisterTheory[\"Fields\",{phi,A,{F,Sector->\"EM\"}}] registers a batch. RegisterTheory[\"Lagrangians\", \"Gravity\"->Lgrav] and RegisterTheory[\"Expressions\",{...}] capture named formulas; anonymous formulas require Head->\"base\". RegisterTheory[\"Parameters\",{m,kappa}] registers shared xAct constants.";
+ShowTheoryKeys::usage = "ShowTheoryKeys[] lists the logical sections of the current theory.";
+TheorySector::usage = "TheorySector[sector] returns matching field, parameter, lagrangian and expression records without applying rules.";
+Name::usage = "Name -> \"key\" selects the registry key of a field or parameter.";
+Sector::usage = "Sector -> \"label\" classifies a registered item without imposing any mathematics.";
 ClearTheory::usage = "ClearTheory[] resets $Theory to an empty association.";
-AutoBuildTheory::usage = "AutoBuildTheory[] builds a minimal theory with internal keys Metric, CovD, Indices, Field, Parameter and Lagrangian.";
+
 
 CreateBackground::usage = "CreateBackground[tag] creates a background from $Theory. Use CreateBackground[tag, Indices -> Automatic] to reuse theory indices or CreateBackground[tag, Indices -> {...}] to choose a background-specific index list. Free suffixed names in the calling context refer directly to the created objects, indices and registered expressions. Use SymbolSuffix for the symbol names, PrintAs for the metric label and MetricSignature for its signature.";
 PortExpression::usage = "PortExpression[tag, expr] ports an abstract expression expr to the background tag.";
@@ -48,7 +18,7 @@ AddRules::usage = "AddRules[tag, rules] adds specialization rules to the backgro
 ClearRules::usage = "ClearRules[tag] removes specialization rules from the background tag.";
 ShowRules::usage = "ShowRules[tag] returns active rules in order. ShowRules[tag, \"Numbered\"] pairs them with their one-based positions.";
 ApplyRules::usage = "ApplyRules[tag, expr] applies the specialization rules stored for tag to expr.";
-UseExpression::usage = "UseExpression[tag, key] ports $Theory[\"Expr\"][key] to the background tag and applies its rules.";
+UseExpression::usage = "UseExpression[tag,key] or UseExpression[tag,section,key] transports a registered formula and applies active background rules.";
 DefineChart::usage = "DefineChart[tag, labels] defines the primary chart. DefineChart[tag, name, labels, map] defines another chart; map supplies primary coordinates as a function of the new coordinates.";
 DeleteBackground::usage = "DeleteBackground[tag] undefines owned xAct objects and removes the background from the registry.";
 ClearBackgrounds::usage = "ClearBackgrounds[] deletes each registered background and its owned xAct objects.";
@@ -70,7 +40,7 @@ CMetricOf::usage = "CMetricOf[tag] returns the xCoba component metric stored for
 ComponentCovDOf::usage = "ComponentCovDOf[tag] returns the xCoba component covariant derivative stored for the background tag.";
 MetricMatrixOf::usage = "MetricMatrixOf[tag] returns the matrix used in SetCMetricSystem for the background tag.";
 ShowTheory::usage = "ShowTheory[] returns the internal $Theory association used by the package.";
-TheoryValue::usage = "TheoryValue[key] returns the value stored under a given internal $Theory key.";
+TheoryValue::usage = "TheoryValue[section] returns a logical collection; TheoryValue[section,key] returns one registered item.";
 
 $BG::usage = "$BG stores the backgrounds created by the package.";
 
@@ -96,7 +66,7 @@ ApplySpecialization::usage = "ApplySpecialization controls whether background sp
 StrictComponents::usage = "StrictComponents -> True returns Failure when tensor components or covariant derivatives remain unresolved.";
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.12";
+$XPlorerVersion = "14.0.0-beta.13-dev.1";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label; the association form changes several labels of owned background objects. Automatic restores the inherited default for a key.";
@@ -195,212 +165,136 @@ validLabelQ[x_] := StringQ[x] || MatchQ[x, _RowBox|_SubscriptBox|_SuperscriptBox
 resolveLabel[head_,label_] := If[validLabelQ[label],label,xAct`xTensor`Private`PrintAsString[head,label]];
 
 FieldPrintAsFromOpts[head_, opts___Rule] := resolveLabel[head,Lookup[Association[opts], PrintAs, InferFieldPrintAs[head]]];
-MetricPertOrderFromOpts[opts___Rule] := Lookup[Association[opts], Order, 1];
-
-TensorSymmetryFromArgs[args___] := Module[{lst = {args}},
-  Which[
-    MemberQ[lst, "Symmetric"], "Symmetric",
-    MemberQ[lst, "Antisymmetric"], "Antisymmetric",
-    True, None
-  ]
+(* beta.13: hold syntax before evaluating any formula or source symbol. *)
+b13Items[HoldComplete[{items___}]] :=
+ List @@ Map[HoldComplete, Unevaluated[HoldComplete[items]]];
+b13Items[h_HoldComplete] := {h};
+b13NameQ[x_] := StringQ[x] && x =!= "" && safeName[x] === x;
+b13Options[held_HoldComplete, allowed_List] := Module[{rules=List@@held,keys},
+ If[!VectorQ[rules,MatchQ[#,_Rule]&],
+  Return[failure["RegistrationOptions","Use ordinary option rules."]]];
+ keys=First /@ rules;
+ If[!DuplicateFreeQ[keys] || Complement[keys,allowed]=!={},
+  Return[failure["RegistrationOptions","Unknown or repeated registration option."]]];
+ Association[rules]
 ];
-
-MakeFieldAssoc[key_String, type_String, head_, extra_Association : <||>] := <|
-  key -> Join[
-    <|
-      "Type" -> type,
-      "Head" -> Unevaluated[head],
-      "PrintAs" -> Lookup[extra, "PrintAs", InferFieldPrintAs[head]]
-    |>,
-    KeyDrop[extra, "PrintAs"]
-  ]
-|>;
-
-NormalizeFieldSpec[{key_, type_, head_}] /; MemberQ[{"Scalar", "Vector", "MetricPert"}, type] :=
-  First @ Normal @ MakeFieldAssoc[NameKey[Unevaluated[key]], type, head];
-NormalizeFieldSpec[{key_, type_, head_, printAs_Rule}] /; MemberQ[{"Scalar", "Vector", "MetricPert"}, type] && MatchQ[printAs, PrintAs -> _] :=
-  First @ Normal @ MakeFieldAssoc[NameKey[Unevaluated[key]], type, head, <|"PrintAs" -> Last[printAs]|>];
-NormalizeFieldSpec[{type_, head_}] /; MemberQ[{"Scalar", "Vector", "MetricPert"}, type] :=
-  First @ Normal @ MakeFieldAssoc[InferFieldKey[head], type, head];
-NormalizeFieldSpec[{type_, head_, printAs_Rule}] /; MemberQ[{"Scalar", "Vector", "MetricPert"}, type] && MatchQ[printAs, PrintAs -> _] :=
-  First @ Normal @ MakeFieldAssoc[InferFieldKey[head], type, head, <|"PrintAs" -> Last[printAs]|>];
-NormalizeFieldSpec[{type_, head_, rank_Integer}] /; type === "Tensor" :=
-  First @ Normal @ MakeFieldAssoc[InferFieldKey[head], "Tensor", head, <|"Rank" -> rank, "Symmetry" -> None|>];
-NormalizeFieldSpec[{type_, head_, rank_Integer, sym_}] /; type === "Tensor" && MemberQ[{"Symmetric", "Antisymmetric"}, sym] :=
-  First @ Normal @ MakeFieldAssoc[InferFieldKey[head], "Tensor", head, <|"Rank" -> rank, "Symmetry" -> sym|>];
-NormalizeFieldSpec[{type_, head_, rank_Integer, printAs_Rule}] /; type === "Tensor" && MatchQ[printAs, PrintAs -> _] :=
-  First @ Normal @ MakeFieldAssoc[InferFieldKey[head], "Tensor", head, <|"Rank" -> rank, "Symmetry" -> None, "PrintAs" -> Last[printAs]|>];
-NormalizeFieldSpec[{type_, head_, rank_Integer, sym_, printAs_Rule}] /; type === "Tensor" && MemberQ[{"Symmetric", "Antisymmetric"}, sym] && MatchQ[printAs, PrintAs -> _] :=
-  First @ Normal @ MakeFieldAssoc[InferFieldKey[head], "Tensor", head, <|"Rank" -> rank, "Symmetry" -> sym, "PrintAs" -> Last[printAs]|>];
-NormalizeFieldSpec[{key_, type_, head_, rank_Integer}] /; type === "Tensor" :=
-  First @ Normal @ MakeFieldAssoc[NameKey[Unevaluated[key]], "Tensor", head, <|"Rank" -> rank, "Symmetry" -> None|>];
-NormalizeFieldSpec[{key_, type_, head_, rank_Integer, sym_}] /; type === "Tensor" && MemberQ[{"Symmetric", "Antisymmetric"}, sym] :=
-  First @ Normal @ MakeFieldAssoc[NameKey[Unevaluated[key]], "Tensor", head, <|"Rank" -> rank, "Symmetry" -> sym|>];
-NormalizeFieldSpec[{key_, type_, head_, rank_Integer, printAs_Rule}] /; type === "Tensor" && MatchQ[printAs, PrintAs -> _] :=
-  First @ Normal @ MakeFieldAssoc[NameKey[Unevaluated[key]], "Tensor", head, <|"Rank" -> rank, "Symmetry" -> None, "PrintAs" -> Last[printAs]|>];
-NormalizeFieldSpec[{key_, type_, head_, rank_Integer, sym_, printAs_Rule}] /; type === "Tensor" && MemberQ[{"Symmetric", "Antisymmetric"}, sym] && MatchQ[printAs, PrintAs -> _] :=
-  First @ Normal @ MakeFieldAssoc[NameKey[Unevaluated[key]], "Tensor", head, <|"Rank" -> rank, "Symmetry" -> sym, "PrintAs" -> Last[printAs]|>];
-
-NormalizeFieldSpec[parts_List] /; MemberQ[parts,HoldPattern[SymbolBase->_]] := Module[{entry,option},
-  option=Association[Cases[parts,HoldPattern[SymbolBase->_]]];
-  If[!validBaseOption[option],Return[$Failed]];
-  entry=NormalizeFieldSpec[DeleteCases[parts,HoldPattern[SymbolBase->_]]];
-  If[!MatchQ[entry,_Rule],Return[$Failed]];
-  First[entry]->Append[Last[entry],"SymbolBase"->option[SymbolBase]]
+b13SectorQ[s_] := s===None || (StringQ[s] && StringLength[s]>0);
+b13FormulaID[section_,key_] := section<>":"<>key;
+b13Section[section_] := Switch[section,"Fields","Field","Parameters","Parameter",_,section];
+b13FormulaRecords[t_,section_] := Association@KeyValueMap[
+  (#2["Key"] -> #2)&,Select[Lookup[t,"Formula",<||>],#["Collection"]===section&]];
+b13Collection[t_,section_] := Switch[section,
+ "Lagrangians"|"Expressions",b13FormulaRecords[t,section],
+ "Fields"|"Parameters",Lookup[t,b13Section[section],<||>],
+ _,Lookup[t,section,failure["TheoryKey","Unknown theory section.",<|"Key"->section|>]]];
+b13Values[t_,section_] := Module[{a=b13Collection[t,section]},
+ If[FailureQ[a],a,If[MemberQ[{"Lagrangians","Expressions","Parameters"},section],
+  Map[#["Value"]&,a],a]]];
+ClearTheory[] := ($Theory=<||>; $Theory);
+ShowTheoryKeys[] := Join[
+  DeleteCases[Keys[$Theory],"Field"|"Parameter"|"Formula"],
+  Select[{"Fields","Parameters","Lagrangians","Expressions"},Length[b13Collection[$Theory,#]]>0&]];
+TheorySector[sector_String] := AssociationMap[
+  Select[b13Collection[$Theory,#],Lookup[#,"Sector",None]===sector&]&,
+  {"Fields","Parameters","Lagrangians","Expressions"}];
+(* Raw snapshots are used by reconstruction; not an alternate positional API. *)
+RegisterTheory[assoc_Association] := ($Theory=Join[$Theory,assoc]; $Theory);
+RegisterTheory["Metric",value_] := ($Theory["Metric"]=value;$Theory);
+RegisterTheory["CovD",value_] := ($Theory["CovD"]=value;$Theory);
+RegisterTheory["Indices",value_List] := ($Theory["Indices"]=value;$Theory);
+b13NativeField[h_Symbol,opts_Association] := Module[
+ {g=Lookup[$Theory,"Metric",None],bundle,m,slots,rank,type,key,base,label,sector,pert,idx},
+ If[!TrueQ[xTensorQ[h]] || TrueQ[MetricQ[h]],
+  Return[failure["FieldSource","Define a nonmetric tensor with xAct before registration."]]];
+ If[!TrueQ[MetricQ[g]],Return[failure["FieldGeometry","Register the source metric first."]]];
+ bundle=VBundleOfMetric[g];m=BaseOfVBundle[bundle];
+ slots=SlotsOfTensor[h];rank=Length[slots];
+ If[!ListQ[slots] || WeightOfTensor[h]=!=0 ||
+   !FreeQ[UpValues[h],OrthogonalToVectorQ|Projected|GradeOfTensor] ||
+   !FreeQ[DependenciesOfTensor[h],s_Symbol /; ManifoldQ[s] && s=!=m],
+  Return[failure["FieldScope","Unsupported weight, projection, grading or manifold dependency."]]];
+ If[AllTrue[slots,MemberQ[{bundle,-bundle},#]&],
+  If[MasterOf[h]=!=Null,Return[failure["FieldScope","Register independent tensors, not generated geometry servants."]]];
+  type=Switch[rank,0,"Scalar",1,"Vector",_,"Tensor"],
+  (* xPert adds one label slot. Verify the actual native metric perturbation,
+     rather than guessing from the rank or the name of the tensor. *)
+  idx=Lookup[$Theory,"Indices",{}];
+  If[Length[idx]<2,Return[failure["FieldScope","Register source indices before a metric perturbation."]]];
+  pert=Quiet[Check[With[{gg=g,a=idx[[1]],b=idx[[2]]},
+    ExpandPerturbation[Perturbation[gg[-a,-b]]]],$Failed]];
+  If[Head[pert]=!=h,Return[failure["FieldScope","Additional bundles and unverified perturbation structures are not supported."]]];
+  type="MetricPert";rank=2
+ ];
+ key=Lookup[opts,Name,SymbolName[h]];base=Lookup[opts,SymbolBase,key];
+ label=resolveLabel[h,Lookup[opts,PrintAs,InferFieldPrintAs[h]]];sector=Lookup[opts,Sector,None];
+ If[!b13NameQ[key] || !b13NameQ[base] || !validLabelQ[label] || !b13SectorQ[sector],
+  Return[failure["FieldOptions","Invalid field name, symbol base, label or sector."]]];
+ If[MemberQ[{"Metric","CovD","Manifold","Chart","PerturbationParameter","Primary","Riemann","Ricci","RicciScalar","Christoffel","Einstein","Weyl","Epsilon","DetMetric","Kretschmann","TFRicci"},key],
+  Return[failure["ReservedFieldKey","A field key cannot shadow managed geometry."]]];
+ key -> <|"Head"->h,"Type"->type,"Rank"->rank,"Slots"->slots,
+   "Symmetry"->SymmetryGroupOfTensor[h],"SymbolBase"->base,"PrintAs"->label,"Sector"->sector|>
 ];
-NormalizeFieldRules[list_List] := Module[{entries=NormalizeFieldSpec /@ list},
-  If[AllTrue[entries,MatchQ[#,_Rule]&],Association[entries],failure["FieldOptions","Invalid bulk field specification."]]
+b13NativeField[_,_] := failure["FieldSource","Expected an existing xAct tensor symbol."];
+b13Parameter[h_Symbol,opts_Association] := Module[{key=Lookup[opts,Name,SymbolName[h]],sector=Lookup[opts,Sector,None]},
+ If[!TrueQ[ConstantSymbolQ[h]] || !b13NameQ[key] || !b13SectorQ[sector],
+  Return[failure["Parameter","Expected an unassigned native constant symbol and valid metadata."]]];
+ key -> <|"Value"->h,"Sector"->sector|>
 ];
-NormalizeNameValueRules[list_List] := Association @ Replace[
-  list,
-  {
-    {k_, v_} :> (NameKey[Unevaluated[k]] -> v),
-    (k_ -> v_) :> (NameKey[Unevaluated[k]] -> v)
-  },
-  1
+b13Parameter[_,_] := failure["Parameter","Parameters are shared native xAct constant symbols."];
+b13Formula[section_,key_String,held_HoldComplete,opts_Association] := Module[
+ {named,base,value,sector=Lookup[opts,Sector,None]},
+ named=Replace[held,{HoldComplete[s_Symbol]:>SymbolName[Unevaluated[s]],_:>None}];
+ If[named=!=None && KeyExistsQ[opts,Head],
+  Return[failure["FormulaHead","A named source supplies its own alias base."]]];
+ base=If[named===None,Lookup[opts,Head,None],named];
+ If[key==="" || !b13NameQ[base] || !b13SectorQ[sector],
+  Return[failure["FormulaOptions","Supply a nonempty key and a valid Head for an anonymous formula."]]];
+ value=ReleaseHold[held];
+ If[Head[value]===Symbol && !TrueQ[ConstantSymbolQ[value]] && !MemberQ[{True,False},value],
+  Return[failure["FormulaValue","Assign the named source formula before registration."]]];
+ If[section==="Lagrangians" &&
+   (MatchQ[value,_Equal|_List] || !TrueQ[Quiet[Check[Length[FindFreeIndices[value]]===0,False]]]),
+  Return[failure["LagrangianScalar","A Lagrangian must be a scalar expression, not a tensor or equation."]]];
+ b13FormulaID[section,key] -> <|"Collection"->section,"Key"->key,"Value"->value,
+   "AliasBase"->base,"Sector"->sector|>
 ];
-
-ClearTheory[] := ($Theory = <||>; $Theory);
-ShowTheoryKeys[] := If[AssociationQ[$Theory], Keys[$Theory], {}];
-
-AutoBuildTheory[] := <|
-  "Metric" -> metric,
-  "CovD" -> CD,
-  "Indices" -> {a, b, c, d, e, f, i, j},
-  "Field" -> <|
-    InferFieldKey[\[Phi]] -> <|"Type" -> "Scalar", "Head" -> \[Phi], "PrintAs" -> InferFieldPrintAs[\[Phi]]|>
-  |>,
-  "Parameter" -> <|"Mass" -> m0|>,
-  "Lagrangian" -> L
-|>;
-
-RegisterTheory[assoc_Association] := ($Theory = If[AssociationQ[$Theory], Join[$Theory, assoc], assoc]; $Theory);
-
-RegisterTheory["Metric", value_] := ($Theory = Replace[$Theory, Except[_Association] -> <||>]; $Theory["Metric"] = value; $Theory);
-RegisterTheory["CovD", value_] := ($Theory = Replace[$Theory, Except[_Association] -> <||>]; $Theory["CovD"] = value; $Theory);
-RegisterTheory["Indices", value_List] := ($Theory = Replace[$Theory, Except[_Association] -> <||>]; $Theory["Indices"] = value; $Theory);
-
-RegisterTheory["Lagrangian", value_] := ($Theory = Replace[$Theory, Except[_Association] -> <||>]; $Theory["Lagrangian"] = value; $Theory);
-RegisterTheory["Lagrangian", key_, value_] := Module[{newAssoc},
-  $Theory = Replace[$Theory, Except[_Association] -> <||>];
-  newAssoc = <|NameKey[Unevaluated[key]] -> value|>;
-  If[!KeyExistsQ[$Theory, "LagrangianMap"], $Theory["LagrangianMap"] = newAssoc, $Theory["LagrangianMap"] = MergeTheoryValue[$Theory["LagrangianMap"], newAssoc]];
-  If[!KeyExistsQ[$Theory, "Lagrangian"], $Theory["Lagrangian"] = value];
-  $Theory
+b13Parse[section_,HoldComplete[{first_,opts___Rule}]] :=
+ b13ParseWith[section,HoldComplete[first],HoldComplete[opts]];
+b13Parse[section_,held_HoldComplete] := b13ParseWith[section,held,HoldComplete[]];
+b13ParseWith[section_,held_HoldComplete,options_HoldComplete] := Module[{opts},
+ opts=b13Options[options,Switch[section,"Fields",{Name,SymbolBase,PrintAs,Sector},
+   "Parameters",{Name,Sector},_,{Head,Sector}]];
+ If[FailureQ[opts],Return[opts]];
+ Switch[section,
+  "Fields",b13NativeField[ReleaseHold[held],opts],
+  "Parameters",b13Parameter[ReleaseHold[held],opts],
+  "Expressions"|"Lagrangians",Replace[held,
+    {HoldComplete[Rule[k_String,e_]]:>b13Formula[section,k,HoldComplete[e],opts],
+     _:>failure["FormulaSyntax","Use a string key followed by a rule to a formula."]}],
+  _,failure["Registration","Unknown collection."]]
 ];
-
-RegisterTheory["Parameter", key_, value_] := Module[{newAssoc},
-  $Theory = Replace[$Theory, Except[_Association] -> <||>];
-  newAssoc = <|NameKey[Unevaluated[key]] -> value|>;
-  If[!KeyExistsQ[$Theory, "Parameter"], $Theory["Parameter"] = newAssoc, $Theory["Parameter"] = MergeTheoryValue[$Theory["Parameter"], newAssoc]];
-  $Theory
+b13Commit[section_,items_List] := Module[{entries,slot,old,all,keys},
+ entries=b13Parse[section,#]& /@ items;
+ If[AnyTrue[entries,FailureQ],Return[First@Select[entries,FailureQ]]];
+ keys=First /@ entries;
+ slot=Switch[section,"Fields","Field","Parameters","Parameter",_,"Formula"];
+ old=Lookup[$Theory,slot,<||>];
+ If[!DuplicateFreeQ[keys] || Intersection[keys,Keys[old]]=!={},
+  Return[failure["DuplicateRegistration","Unregister the existing key before replacing it."]]];
+ all=Join[old,Association[entries]];
+ If[section==="Fields" && (!DuplicateFreeQ[Lookup[Values[all],"Head"]] ||
+   !DuplicateFreeQ[Lookup[Values[all],"SymbolBase"]]),
+  Return[failure["DuplicateField","A source head and symbol base must each have one registry identity."]]];
+ If[slot==="Formula" && !DuplicateFreeQ[Lookup[Values[all],"AliasBase"]],
+  Return[failure["DuplicateAlias","Formula alias bases must be unique across both collections."]]];
+ $Theory[slot]=all;$Theory
 ];
-RegisterTheory["Parameter", list_List] := Module[{newAssoc},
-  $Theory = Replace[$Theory, Except[_Association] -> <||>];
-  newAssoc = NormalizeNameValueRules[list];
-  If[!KeyExistsQ[$Theory, "Parameter"], $Theory["Parameter"] = newAssoc, $Theory["Parameter"] = MergeTheoryValue[$Theory["Parameter"], newAssoc]];
-  $Theory
-];
-
-RegisterTheory["Field", type_String, head_, opts___Rule] /; MemberQ[{"Scalar", "Vector", "MetricPert"}, type] := Module[{newAssoc, key, printAs, order},
-  $Theory = Replace[$Theory, Except[_Association] -> <||>];
-  If[!validBaseOption[Association[opts]] || Complement[Keys[Association[opts]],{PrintAs,Order,SymbolBase}]=!={},Return[failure["FieldOptions","Use PrintAs, SymbolBase and perturbation Order; define supported native properties on the source xAct tensor."]]];
-  key = InferFieldKey[head];
-  printAs = FieldPrintAsFromOpts[head, opts];
-  If[type === "MetricPert",
-    order = MetricPertOrderFromOpts[opts];
-    newAssoc = MakeFieldAssoc[key, type, head, <|"PrintAs" -> printAs, "SymbolBase" -> Lookup[Association[opts],SymbolBase,Automatic], "Order" -> order|>],
-    newAssoc = MakeFieldAssoc[key, type, head, <|"PrintAs" -> printAs, "SymbolBase" -> Lookup[Association[opts],SymbolBase,Automatic]|>]
-  ];
-  If[!KeyExistsQ[$Theory, "Field"], $Theory["Field"] = newAssoc, $Theory["Field"] = MergeTheoryValue[$Theory["Field"], newAssoc]];
-  $Theory
-];
-
-RegisterTheory["Field", key_String, type_String, head_, opts___Rule] /; MemberQ[{"Scalar", "Vector", "MetricPert"}, type] := Module[{newAssoc, printAs, order, ks},
-  $Theory = Replace[$Theory, Except[_Association] -> <||>];
-  If[!validBaseOption[Association[opts]] || Complement[Keys[Association[opts]],{PrintAs,Order,SymbolBase}]=!={},Return[failure["FieldOptions","Unsupported registration option."]]];
-  ks = NameKey[Unevaluated[key]];
-  printAs = FieldPrintAsFromOpts[head, opts];
-  If[type === "MetricPert",
-    order = MetricPertOrderFromOpts[opts];
-    newAssoc = MakeFieldAssoc[ks, type, head, <|"PrintAs" -> printAs, "SymbolBase" -> Lookup[Association[opts],SymbolBase,Automatic], "Order" -> order|>],
-    newAssoc = MakeFieldAssoc[ks, type, head, <|"PrintAs" -> printAs, "SymbolBase" -> Lookup[Association[opts],SymbolBase,Automatic]|>]
-  ];
-  If[!KeyExistsQ[$Theory, "Field"], $Theory["Field"] = newAssoc, $Theory["Field"] = MergeTheoryValue[$Theory["Field"], newAssoc]];
-  $Theory
-];
-
-RegisterTheory["Field", "Tensor", head_, rank_Integer, rest___] := Module[{newAssoc, key, sym, printAs},
-  $Theory = Replace[$Theory, Except[_Association] -> <||>];
-  If[!validBaseOption[Association[Select[{rest},MatchQ[#,_Rule]&]]] || !AllTrue[{rest},MemberQ[{"Symmetric","Antisymmetric"},#] || MatchQ[#, (PrintAs|SymbolBase)->_]&],Return[failure["FieldOptions","Only a supported symmetry and PrintAs are accepted here."]]];
-  key = InferFieldKey[head];
-  sym = TensorSymmetryFromArgs[rest];
-  printAs = FieldPrintAsFromOpts[head, Sequence @@ Select[{rest}, MatchQ[#, _Rule] &]];
-  newAssoc = MakeFieldAssoc[key, "Tensor", head, <|"Rank" -> rank, "Symmetry" -> sym, "PrintAs" -> printAs, "SymbolBase" -> Lookup[Association[Select[{rest},MatchQ[#,_Rule]&]],SymbolBase,Automatic]|>];
-  If[!KeyExistsQ[$Theory, "Field"], $Theory["Field"] = newAssoc, $Theory["Field"] = MergeTheoryValue[$Theory["Field"], newAssoc]];
-  $Theory
-];
-
-RegisterTheory["Field", key_String, "Tensor", head_, rank_Integer, rest___] := Module[{newAssoc, sym, printAs, ks},
-  $Theory = Replace[$Theory, Except[_Association] -> <||>];
-  If[!validBaseOption[Association[Select[{rest},MatchQ[#,_Rule]&]]] || !AllTrue[{rest},MemberQ[{"Symmetric","Antisymmetric"},#] || MatchQ[#, (PrintAs|SymbolBase)->_]&],Return[failure["FieldOptions","Unsupported tensor registration option."]]];
-  ks = NameKey[Unevaluated[key]];
-  sym = TensorSymmetryFromArgs[rest];
-  printAs = FieldPrintAsFromOpts[head, Sequence @@ Select[{rest}, MatchQ[#, _Rule] &]];
-  newAssoc = MakeFieldAssoc[ks, "Tensor", head, <|"Rank" -> rank, "Symmetry" -> sym, "PrintAs" -> printAs, "SymbolBase" -> Lookup[Association[Select[{rest},MatchQ[#,_Rule]&]],SymbolBase,Automatic]|>];
-  If[!KeyExistsQ[$Theory, "Field"], $Theory["Field"] = newAssoc, $Theory["Field"] = MergeTheoryValue[$Theory["Field"], newAssoc]];
-  $Theory
-];
-
-RegisterTheory["Field", list_List] := Module[{newAssoc},
-  $Theory = Replace[$Theory, Except[_Association] -> <||>];
-  newAssoc = NormalizeFieldRules[list]; If[FailureQ[newAssoc],Return[newAssoc]];
-  If[!KeyExistsQ[$Theory, "Field"], $Theory["Field"] = newAssoc, $Theory["Field"] = MergeTheoryValue[$Theory["Field"], newAssoc]];
-  $Theory
-];
-
-RegisterTheory["Expr", expr_Symbol] := Module[{newAssoc, key},
-  $Theory = Replace[$Theory, Except[_Association] -> <||>];
-  key = SymbolName[Unevaluated[expr]];
-  newAssoc = <|key -> expr|>;
-  If[
-    !KeyExistsQ[$Theory, "Expr"],
-    $Theory["Expr"] = newAssoc,
-    $Theory["Expr"] = MergeTheoryValue[$Theory["Expr"], newAssoc]
-  ];
-  $Theory
-];
-
-RegisterTheory["Expr", key_, expr_] := Module[{newAssoc, ks},
-  $Theory = Replace[$Theory, Except[_Association] -> <||>];
-  ks = NameKey[Unevaluated[key]];
-  newAssoc = <|ks -> expr|>;
-  If[
-    !KeyExistsQ[$Theory, "Expr"],
-    $Theory["Expr"] = newAssoc,
-    $Theory["Expr"] = MergeTheoryValue[$Theory["Expr"], newAssoc]
-  ];
-  $Theory
-];
-
-RegisterTheory["Expr", list_List] := Module[{newAssoc},
-  $Theory = Replace[$Theory, Except[_Association] -> <||>];
-  newAssoc = Association @ Replace[
-    Unevaluated[list],
-    {
-      s_Symbol :> (SymbolName[Unevaluated[s]] -> s),
-      {k_, v_} :> (NameKey[Unevaluated[k]] -> v),
-      (k_ -> v_) :> (NameKey[Unevaluated[k]] -> v)
-    },
-    1
-  ];
-  If[
-    !KeyExistsQ[$Theory, "Expr"],
-    $Theory["Expr"] = newAssoc,
-    $Theory["Expr"] = MergeTheoryValue[$Theory["Expr"], newAssoc]
-  ];
-  $Theory
-];
+RegisterTheory["Field",s_Symbol,opts___Rule] :=
+ b13Commit["Fields",{HoldComplete[{s,opts}]}];
+RegisterTheory[section:("Fields"|"Parameters"|"Lagrangians"|"Expressions"),list_List] :=
+ b13Commit[section,b13Items[HoldComplete[list]]];
+RegisterTheory[section:("Fields"|"Parameters"|"Lagrangians"|"Expressions"),item_,opts___Rule] :=
+ b13Commit[section,{HoldComplete[{item,opts}]}];
 (* Backgrounds own their symbols. All public operations return Failure on invalid input. *)
 failure[code_, message_, data_: <||>] := Failure[code, Join[<|"MessageTemplate" -> message|>, data]];
 SetAttributes[guard, HoldAll];
@@ -532,8 +426,8 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
   result=KeyValueMap[Function[{key,spec},With[{ss=spec["Head"],pr=spec["SymbolOfCovD"]},AddConnection[tag,key,ss,SymbolOfCovD->pr]]],Lookup[theory,"Connections",<||>]];
   If[AnyTrue[result,FailureQ],DeleteBackground[tag];Return[First@Select[result,FailureQ]]];
   SetPresentation[tag, labels];
-  installExpressionAliases[tag, suffix, $Context];
   installBackgroundObjectAliases[tag,$Context];
+  installExpressionAliases[tag, suffix, $Context];
   $BG[tag]
 ];
 
@@ -569,13 +463,20 @@ SetFlatRules[tag_String] := Module[{b = background[tag], heads, rules}, If[Failu
     With[{rr = b["RicciScalar"], kk = b["Kretschmann"]}, {rr[] -> 0, kk[] -> 0}]];
   AddRules[tag, rules]
 ];
-resolve[tag_, key_String] := Module[{b = background[tag], expressions}, If[FailureQ[b], Return[b]];
-  expressions = Lookup[b["Theory"], "Expr", <||>];
-  Lookup[expressions, key, failure["ExpressionKey", "The expression key is absent from this background's theory snapshot.", <|"Key" -> key|>]]];
-resolve[tag_, expr_] := expr;
-BackgroundExpression[tag_String,key_String] := Module[{ex = resolve[tag,key]},
-  If[FailureQ[ex], ex, PortExpression[tag,ex]]
-];
+resolve[tag_,key_String] := Module[{b=background[tag],records,hits},
+ If[FailureQ[b],Return[b]];
+ records=Lookup[b["Theory"],"Formula",<||>];hits=Select[Values[records],#["Key"]===key&];
+ If[Length[hits]===1,First[hits]["Value"],
+  failure["ExpressionKey",If[hits==={},"The key is absent from this snapshot.","Ambiguous key; specify the collection."],<|"Key"->key|>]]];
+resolve[tag_,{section:("Lagrangians"|"Expressions"),key_String}] := Module[{b=background[tag],rec},
+ If[FailureQ[b],Return[b]];
+ rec=Lookup[Lookup[b["Theory"],"Formula",<||>],b13FormulaID[section,key],Missing[]];
+ If[MissingQ[rec],failure["ExpressionKey","The key is absent from this collection."],rec["Value"]]];
+resolve[tag_,expr_] := expr;
+BackgroundExpression[tag_String,key_String] := Module[{ex=resolve[tag,key]},
+ If[FailureQ[ex],ex,PortExpression[tag,ex]]];
+BackgroundExpression[tag_String,section_String,key_String] := Module[{ex=resolve[tag,{section,key}]},
+ If[FailureQ[ex],ex,PortExpression[tag,ex]]];
 (* Record the exact installed definition so deletion respects user reassignment. *)
 installAlias[context_,name_,HoldComplete[value_]] := Module[{full=context<>name,owned},
   If[Names[full]==={} && AnyTrue[DeleteCases[$ContextPath,context],Names[#<>name]=!={}&],Return[$Failed]];
@@ -587,12 +488,13 @@ installAlias[context_,name_,HoldComplete[value_]] := Module[{full=context<>name,
       sym := value; OwnValues[sym], $Failed],HoldAllComplete]];
   If[owned===$Failed,$Failed,{full,owned}]
 ];
-installExpressionAliases[tag_,suffix_,context_] := Module[{aliases=<||>,skipped={},entry},
-  Do[
-    entry=With[{k=key},installAlias[context,safeName[k]<>suffix,HoldComplete[BackgroundExpression[tag,k]]]];
-    If[entry===$Failed,AppendTo[skipped,key],aliases[key]=entry],
-    {key,Keys@Lookup[$BG[tag]["Theory"],"Expr",<||>]}];
-  put[tag,<|"ExpressionAliases"->aliases,"UnavailableAliases"->skipped|>]
+installExpressionAliases[tag_,suffix_,context_] := Module[{aliases=<||>,skipped={},entry,rec},
+ KeyValueMap[Function[{id,r},
+   entry=With[{section=r["Collection"],key=r["Key"]},
+     installAlias[context,r["AliasBase"]<>suffix,HoldComplete[BackgroundExpression[tag,section,key]]]];
+   If[entry===$Failed,AppendTo[skipped,id],aliases[id]=entry]],
+   Lookup[$BG[tag]["Theory"],"Formula",<||>]];
+ put[tag,<|"ExpressionAliases"->aliases,"UnavailableAliases"->skipped|>]
 ];
 installObjectAliases[tag_,heads_List] := Module[{b=$BG[tag],aliases,skipped,name,entry},
   aliases=Lookup[b,"ObjectAliases",<||>]; skipped=Lookup[b,"UnavailableObjectAliases",{}];
@@ -632,6 +534,8 @@ ShowRules[tag_String,"Numbered"] := Module[{rules=ShowRules[tag]},
 UseExpression[tag_String, key_String] := Module[{ex = resolve[tag, key]}, If[FailureQ[ex], Return[ex]];
   ex = PortExpression[tag, ex]; If[FailureQ[ex], ex, ApplyRules[tag, ex]]];
 UseExpression[tag_String, key_Symbol] := UseExpression[tag, SymbolName[Unevaluated[key]]];
+UseExpression[tag_String,section_String,key_String] := Module[{ex=BackgroundExpression[tag,section,key]},
+ If[FailureQ[ex],ex,ApplyRules[tag,ex]]];
 
 DefineChart[tag_String, names_List] := Module[{b = background[tag], chart, coords, result},
   If[FailureQ[b], Return[b]];
@@ -1033,7 +937,9 @@ BackgroundIndices[tag_String, n_: Automatic] := Module[{b = background[tag]}, If
   If[n === Automatic, b["Indices"], If[IntegerQ[n] && 0 <= n <= Length[b["Indices"]], Take[b["Indices"], n], failure["IndexCount", "Invalid number of indices."]]]];
 ShowBackground[tag_String] := background[tag];
 ShowTheory[] := $Theory;
-TheoryValue[key_String] := Lookup[$Theory, key, failure["TheoryKey", "The theory key does not exist.", <|"Key" -> key|>]];
+TheoryValue[key_String] := b13Values[$Theory,key];
+TheoryValue[section_String,key_String] := Module[{a=b13Values[$Theory,section]},
+ If[FailureQ[a],a,If[AssociationQ[a],Lookup[a,key,failure["TheoryKey","The registered item does not exist."]],failure["TheoryKey","Not a collection."]]]];
 
 
 (* Scoped formatting and naming: only owned symbols receive upvalues. *)
@@ -1189,19 +1095,23 @@ ClearFieldComponents[tag_String,field_] := Module[{b=background[tag],fs,records,
   put[tag,<|"FieldComponents"->records|>];invalidateResults[tag];Null
 ];
 Options[UnregisterTheory]={Cascade->False};
-UnregisterTheory[section_String,key_String,OptionsPattern[]] := Module[{a=Lookup[$Theory,section,<||>],head,refs,ex,lag},
-  If[!AssociationQ[a] || !KeyExistsQ[a,key],Return[failure["TheoryKey","The registered item does not exist."]]];
-  head=If[section==="Field",a[key]["Head"],None];refs={};
-  If[head=!=None,
-    ex=Lookup[$Theory,"Expr",<||>];refs=Keys@Select[ex,!FreeQ[#,head]&];
-    lag=!FreeQ[Lookup[$Theory,"Lagrangian",None],head] || !FreeQ[Lookup[$Theory,"LagrangianMap",<||>],head];
-    If[(refs=!={} || lag) && !TrueQ[OptionValue[Cascade]],Return[failure["RegisteredDependents","Expressions depend on this field; Cascade -> True removes their registrations, not xAct source objects.",<|"Expressions"->refs|>]]];
-    If[TrueQ[OptionValue[Cascade]],$Theory["Expr"]=KeyDrop[ex,refs];
-      If[lag,KeyDropFrom[$Theory,{"Lagrangian","LagrangianMap"}]]]
-  ];
-  $Theory[section]=KeyDrop[a,key];$Theory
+UnregisterTheory[section_String,key_String,OptionsPattern[]] := Module[
+ {slot=b13Section[section],a,id=key,head,refs},
+ If[MemberQ[{"Lagrangians","Expressions"},section],slot="Formula";id=b13FormulaID[section,key]];
+ a=Lookup[$Theory,slot,<||>];
+ If[!AssociationQ[a] || !KeyExistsQ[a,id],Return[failure["TheoryKey","The registered item does not exist."]]];
+ If[slot==="Field",
+  head=a[id]["Head"];
+  refs=Keys@Select[Lookup[$Theory,"Formula",<||>],!FreeQ[#["Value"],head]&];
+  If[refs=!={} && !TrueQ[OptionValue[Cascade]],Return[failure["RegisteredDependents","Registered formulas depend on this field.",<|"Formulas"->refs|>]]];
+  If[TrueQ[OptionValue[Cascade]],$Theory["Formula"]=KeyDrop[Lookup[$Theory,"Formula",<||>],refs]]
+ ];
+ $Theory[slot]=KeyDrop[a,id];$Theory
 ];
-UnregisterTheory[section_String] := If[KeyExistsQ[$Theory,section],KeyDropFrom[$Theory,section];$Theory,failure["TheoryKey","The section does not exist."]];
+UnregisterTheory[section_String] := Module[{keys=Keys[b13Collection[$Theory,section]],snapshot=$Theory,result},
+ If[!MemberQ[{"Fields","Parameters","Lagrangians","Expressions"},section],
+  Return[If[KeyExistsQ[$Theory,section],KeyDropFrom[$Theory,section];$Theory,failure["TheoryKey","Unknown section."]]]];
+ Do[result=UnregisterTheory[section,k];If[FailureQ[result],$Theory=snapshot;Return[result]],{k,keys}];$Theory];
 registeredNameQ[name_String] := Names[name] =!= {} && TrueQ[ToExpression[name,InputForm,objectRegisteredQ]];
 objectRegisteredQ[s_] := TrueQ[xTensorQ[s] || CovDQ[s] || ChartQ[s] || MetricQ[s] || ManifoldQ[s] || ParameterQ[s]];
 servantClosure[roots_] := FixedPoint[DeleteDuplicates@Join[#,Flatten[ServantsOf /@ #]]&,roots];
@@ -1216,7 +1126,7 @@ DeletionPlan[tag_String,key_String:"Background",OptionsPattern[]] := Module[
  If[MemberQ[{"Background","Manifold"},key],
   owned=ownedObjects[b];external=Union[Complement[visitorClosure[owned],owned],externalRelativeHeads[b]];
   Return[<|"Background"->tag,"Key"->key,"Objects"->owned,"ExternalBlockers"->external,"Blockers"->external,
-    "RegisteredExpressions"->Keys@Lookup[b["Theory"],"Expr",<||>],"RulePositions"->Range[Length[b["SpecializationRules"]]],
+    "RegisteredExpressions"->Keys@Lookup[b["Theory"],"Formula",<||>],"RulePositions"->Range[Length[b["SpecializationRules"]]],
     "Order"->{"Fields","Connections","Metric","Chart","Manifold","Parameter"},"CanDelete"->(external==={})|>]];
  If[key==="CovD",Return[failure["PrimaryConnection","The Levi-Civita connection belongs to the metric. Delete Metric with its family instead."]]];
  obj=Lookup[managedObjects[b],key,Missing[]];If[MissingQ[obj],Return[failure["ObjectKey","Choose an owned background object, not a source symbol or generated curvature servant."]]];
@@ -1233,8 +1143,8 @@ DeletionPlan[tag_String,key_String:"Background",OptionsPattern[]] := Module[
  (* The manifold is always an owner/host, never an implicit cascade target. *)
  If[MemberQ[remove,b["Manifold"]],Return[failure["CascadeScope","Use explicit background deletion for a manifold cascade."]]];
  dependentHeads=Join[remove,First /@ Select[b["HeadRules"],MemberQ[remove,Last[#]]&]];
- exprs=Keys@Select[Lookup[b["Theory"],"Expr",<||>],Function[e,AnyTrue[dependentHeads,!FreeQ[e,#]&]]];
- sections=Keys@Select[KeyDrop[b["Theory"],{"Field","Expr","Connections","Metric","CovD","Indices","Presentation"}],Function[e,AnyTrue[dependentHeads,!FreeQ[e,#]&]]];
+ exprs=Keys@Select[Lookup[b["Theory"],"Formula",<||>],Function[e,AnyTrue[dependentHeads,!FreeQ[e["Value"],#]&]]];
+ sections=Keys@Select[KeyDrop[b["Theory"],{"Field","Formula","Connections","Metric","CovD","Indices","Presentation"}],Function[e,AnyTrue[dependentHeads,!FreeQ[e,#]&]]];
  groupHits=Keys@Select[Lookup[b,"RuleGroups",<||>],Function[r,AnyTrue[dependentHeads,!FreeQ[r,#]&]]];
  ruleHits=Select[Range[Length[b["SpecializationRules"]]],Function[n,AnyTrue[dependentHeads,!FreeQ[b["SpecializationRules"][[n]],#]&]]];
  blockers=Join[external,If[TrueQ[OptionValue[Cascade]],{},Complement[visitors,remove]],If[TrueQ[OptionValue[Cascade]],{},exprs],If[TrueQ[OptionValue[Cascade]],{},Join[ruleHits,sections,groupHits]]];
@@ -1281,7 +1191,7 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  newb["ActiveRuleGroups"]={};
  newb["Theory"]=KeyDrop[newb["Theory"],plan["RegisteredSections"]];
  newb["SpecializationRules"]=Delete[b["SpecializationRules"],List /@ plan["RulePositions"]];
- With[{tt=Join[newb["Theory"],<|"Field"->KeyTake[Lookup[newb["Theory"],"Field",<||>],Keys[newb["Field"]]],"Connections"->KeyTake[Lookup[newb["Theory"],"Connections",<||>],Keys[newb["Connections"]]],"Expr"->KeyDrop[Lookup[b["Theory"],"Expr",<||>],plan["RegisteredExpressions"]]|>]},newb["Theory"]=tt];
+ With[{tt=Join[newb["Theory"],<|"Field"->KeyTake[Lookup[newb["Theory"],"Field",<||>],Keys[newb["Field"]]],"Connections"->KeyTake[Lookup[newb["Theory"],"Connections",<||>],Keys[newb["Connections"]]],"Formula"->KeyDrop[Lookup[b["Theory"],"Formula",<||>],plan["RegisteredExpressions"]]|>]},newb["Theory"]=tt];
  If[MemberQ[deadKeys,"Metric"],
   newb=KeyDrop[newb,Join[{"Christoffel","Riemann","Ricci","RicciScalar","Einstein","Weyl","TFRicci","Kretschmann","Epsilon","DetMetric"},{"Metric","CovD","MetricMatrix","CMetric","ComponentCovD","GeometryPolicy"}]];
   newb["GeometryState"]="AbstractWithoutMetric";
