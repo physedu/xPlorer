@@ -1,0 +1,80 @@
+(* beta.13-dev.1 targeted integration checks. Load xPlorer first in a fresh kernel. *)
+ClearTheory[];
+DefManifold[b13M,4,{aa,bb,cc,dd,ee,ff,ii,jj}];
+DefMetric[-1,gg[-aa,-bb],cd];
+DefTensor[ph[],b13M,PrintAs->"p"];
+DefTensor[av[-aa],b13M];
+DefTensor[ffld[-aa,-bb],b13M,Antisymmetric[{-aa,-bb}]];
+DefTensor[tt[aa,-bb,-cc],b13M,Symmetric[{-bb,-cc}]];
+DefTensor[ss[-aa,-bb],b13M,Symmetric[{-aa,-bb}]];
+DefMetricPerturbation[gg,hh,ep];
+DefConstantSymbol[mass];DefConstantSymbol[Mbh];
+checks={};
+SetAttributes[verify,HoldAll];
+verify[id_,expr_,expected_] := Module[{actual=expr,target=expected},
+ AppendTo[checks,<|"ID"->id,"Passed"->SameQ[actual,target],"Actual"->ToString[actual,InputForm]|>]];
+RegisterTheory["Metric",gg];RegisterTheory["CovD",cd];
+RegisterTheory["Indices",{aa,bb,cc,dd,ee,ff,ii,jj}];
+verify["scalar",FailureQ[RegisterTheory["Field",ph,Name->"matter"]],False];
+verify["bulk-fields",FailureQ[RegisterTheory["Fields",{{av,Sector->"EM"},{ffld,Sector->"EM"},tt,ss,hh}]],False];
+verify["rank3",TheoryValue["Fields","tt"]["Rank"],3];
+verify["perturbation",TheoryValue["Fields","hh"]["Type"],"MetricPert"];
+verify["sector",Keys[TheorySector["EM"]["Fields"]],{"av","ffld"}];
+verify["parameters",FailureQ[RegisterTheory["Parameters",{mass,Mbh}]],False];
+verify["parameter-value",TheoryValue["Parameters","mass"],mass];
+Lg=RicciScalar[cd][];Lm=-mass^2 ph[]^2/2;eq=cd[-aa][ph[]];eq2=ph[];
+verify["bulk-formulas",FailureQ[RegisterTheory["Lagrangians",{"Gravity"->Lg,"Matter"->Lm,{"Total"->Lg+Lm,Head->"Lt"}}]],False];
+verify["expressions",FailureQ[RegisterTheory["Expressions",{"Gradient"->eq,"Gravity"->eq2}]],False];
+verify["named-value",TheoryValue["Lagrangians","Gravity"],Lg];
+verify["explicit-total",TheoryValue["Lagrangians","Total"],Lg+Lm];
+snapshot=ShowTheory[];
+verify["anonymous-missing-head",FailureQ[RegisterTheory["Expressions","Missing"->ph[]^2]],True];
+verify["bad-lagrangian",FailureQ[RegisterTheory["Lagrangians","NotScalar"->av[-aa],Head->"BadL"]],True];
+verify["atomic-bulk",FailureQ[RegisterTheory["Expressions",{{"Good"->ph[]^2,Head->"GoodExpr"},"Bad"->ph[]^3}]],True];
+verify["unchanged-registry",ShowTheory[],snapshot];
+verify["legacy-rejected",FailureQ[RegisterTheory["Field","Scalar",ph]],True];
+verify["duplicate-field",FailureQ[RegisterTheory["Field",ph,Name->"other"]],True];
+verify["duplicate-option",FailureQ[RegisterTheory["Field",ph,Name->"one",Name->"two"]],True];
+verify["create",FailureQ[CreateBackground["Schwarzschild",SymbolSuffix->"Schw"]],False];
+If[KeyExistsQ[$BG,"Schwarzschild"],
+ verify["field-alias",matterSchw,BackgroundObject["Schwarzschild","matter"]];
+ verify["original-formula-alias",LgSchw,BackgroundExpression["Schwarzschild","Lagrangians","Gravity"]];
+ verify["direct-formula-alias",LtSchw,BackgroundExpression["Schwarzschild","Lagrangians","Total"]];
+ verify["ambiguous-key",FailureQ[BackgroundExpression["Schwarzschild","Gravity"]],True];
+ verify["qualified-key",eq2Schw,matterSchw[]];
+ verify["variance",SlotsOfTensor[BackgroundObject["Schwarzschild","tt"]],With[{bundle=VBundleOfMetric[BackgroundObject["Schwarzschild","Metric"]]}, {bundle,-bundle,-bundle}]];
+ verify["symmetry",SymmetryGroupOfTensor[BackgroundObject["Schwarzschild","ffld"]],SymmetryGroupOfTensor[ffld]];
+ verify["perturbation-copy",xTensorQ[BackgroundObject["Schwarzschild","hh"]],True];
+ original=LgSchw;Lg=123;
+ verify["snapshot-value",LgSchw,original];
+ LgSecond=99;
+ verify["second-background",FailureQ[CreateBackground["Second"]],False];
+ verify["occupied-alias",LgSecond,99];
+ verify["independent-field",SameQ[matterSchw,BackgroundObject["Second","matter"]],False];
+ AddRules["Schwarzschild",{mass->2}];
+ verify["rule-applied",UseExpression["Schwarzschild","Lagrangians","Matter"],-2 matterSchw[]^2];
+ verify["alias-formal",LmSchw,-mass^2 matterSchw[]^2/2];
+ ClearRules["Schwarzschild"];
+ If[TrueQ[$B13GeometryTests],
+   verify["chart",FailureQ[DefineChart["Schwarzschild",{"t","r","theta","varphi"}]],False];
+   verify["metric-components",FailureQ[SetCMetricSystem["Schwarzschild",Function[{t,r,th,p},DiagonalMatrix[{-(1-2 Mbh/r),1/(1-2 Mbh/r),r^2,r^2 Sin[th]^2}]],Assumptions->Function[{t,r,th,p},Mbh>0&&r>2 Mbh&&0<th<Pi]]],False];
+   radius=CoordinatesOf["Schwarzschild"][[2]][];
+   verify["ricci-scalar",ToComponents["Schwarzschild",{"Lagrangians","Gravity"}],0];
+   verify["kretschmann",Simplify[ToComponents["Schwarzschild",Kretschmann[cd][]]-48 Mbh^2/radius^6],0];
+ ,
+   verify["blocked-unregister",FailureQ[UnregisterTheory["Fields","matter"]],True];
+   verify["cascade-unregister",FailureQ[UnregisterTheory["Fields","matter",Cascade->True]],False];
+   verify["source-preserved",xTensorQ[ph],True];
+   verify["unrelated-lagrangian",TheoryValue["Lagrangians","Gravity"],snapshot["Formula"]["Lagrangians:Gravity"]["Value"]];
+   verify["snapshot-isolated",eq2Schw,matterSchw[]];
+   verify["blocked-deletion",FailureQ[DeleteBackgroundObject["Schwarzschild","matter"]],True];
+   verify["cascade-deletion",FailureQ[DeleteBackgroundObject["Schwarzschild","matter",Cascade->True]],False];
+   verify["dependent-alias-removed",OwnValues[eq2Schw],{}];
+   verify["unrelated-alias-retained",LgSchw,original];
+   recipe=ReconstructionData["Second"];
+   verify["delete-background",FailureQ[DeleteBackground["Second"]],False];
+   verify["recreate",FailureQ[RecreateBackground["Second",recipe]],False];
+   verify["recreate-formula",FailureQ[BackgroundExpression["Second","Lagrangians","Gravity"]],False];
+ ]
+];
+<|"Version"->$XPlorerVersion,"Total"->Length[checks],"Passed"->Count[Lookup[checks,"Passed"],True],"Failures"->Select[checks,!TrueQ[#["Passed"]]&]|>
