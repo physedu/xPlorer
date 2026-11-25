@@ -1,10 +1,10 @@
 # xPlorer
 
-> **Development branch: 14.0.0-beta.13-dev.2.** The new registration API is breaking; the beta.12 notebook and most legacy documentation below have not yet been migrated. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
+> **Development branch: 14.0.0-beta.13-dev.2.** The new registration API is breaking. The original 115-input author notebook and historical regression suite have been migrated and tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
 
 xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
-The stable baseline described below is **14.0.0-beta.12**. The default workflow remains a normal Get, theory registration and tagged background creation. Personalization is optional.
+The current experimental version is **14.0.0-beta.13-dev.2**. The preserved baseline on main is beta.12. The default workflow remains a normal Get, theory registration and tagged background creation. Personalization is optional.
 
 ## Start here
 
@@ -26,9 +26,9 @@ The principal notebook develops a scalar theory on Minkowski, Schwarzschild and 
 - Scoped rules, selective removal, named particularizations and conservative invalidation of saved results.
 - Separate value clearing, registration removal and true dependency-aware deletion of owned fields, charts, connections, metric families or whole backgrounds.
 
-The package and principal notebook were updated from the beta.12 author-supplied files on 25 November 2026. The remaining development documentation, optional loaders and test/build sources have not been revalidated against this snapshot.
+The principal notebook has passed 115/115 input executions, 65/65 expected-result checks and 6/6 workflow-order checks. The eight historical regression groups also passed (279 assertion executions including repeated core tests). The optional scalar recipe has been checked independently. See BETA13_PROGRESS.md for exact commits and evidence. The front-end appearance, older API guide and loader metadata have not been revalidated. The 88-input legacy build source is not the current notebook.
 
-See [API_GUIDE.md](API_GUIDE.md) for examples and supported configurations. This beta does not implement every xAct option. See [VALIDATION.md](VALIDATION.md) for actual execution evidence and limitations; mathematical checks do not imply front-end screenshot verification or measured speedups.
+For the current registration syntax, use the principal notebook and the [Proca example](Examples/Beta13_Proca.wl). [API_GUIDE.md](API_GUIDE.md) and [VALIDATION.md](VALIDATION.md) are historical beta.7-era documentation; do not use their old positional registration forms with beta.13. Current evidence and limitations are in [BETA13_PROGRESS.md](BETA13_PROGRESS.md).
 
 ## Installation and development
 
@@ -36,11 +36,11 @@ Direct Get needs no installation. The repository also contains a traditional app
 
 - [Development plan](DEVELOPMENT_PLAN.md)
 - [Design decisions](DECISIONS.md)
-- [Current recovery checkpoint](PROGRESS.md)
+- [Current beta.13 recovery checkpoint](BETA13_PROGRESS.md)
 - [Implementation/resumption instruction](IMPLEMENTATION_PROMPT.md)
-- [Tests](Tests/) and [notebook build sources](Tools/)
+- [Tests](Tests/) and [historical notebook build sources](Tools/)
 
-Each important validated stage is preserved in Git history. Read PROGRESS.md before continuing work so completed stages are not repeated.
+Each important validated stage is preserved in Git history. Read BETA13_PROGRESS.md before continuing work so completed stages are not repeated.
 
 ## Background and author
 
