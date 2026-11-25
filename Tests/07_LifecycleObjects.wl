@@ -6,8 +6,8 @@ assert["clear-removes-assignment",FailureQ[ToComponents["ObjectsCase",A[-a],Stri
 SetFieldComponents["ObjectsCase",A,{2,3,4,5}];ClearComputedValues["ObjectsCase"];
 assert["cache-clear-retains-input",ToComponents["ObjectsCase",A[-a]],{2,3,4,5}];
 withSource=ShowTheory[];
-assert["unregister-blocked",FailureQ[UnregisterTheory["Field","phi"]],True];
-UnregisterTheory["Field","phi",Cascade->True];
+assert["unregister-blocked",FailureQ[UnregisterTheory["Fields","phi"]],True];
+UnregisterTheory["Fields","phi",Cascade->True];
 assert["unregister-keeps-source",xTensorQ[phi],True];
 assert["unregister-keeps-background",xTensorQ[BackgroundObject["ObjectsCase","phi"]],True];
 ClearTheory[];With[{tt=withSource},RegisterTheory[tt]];
