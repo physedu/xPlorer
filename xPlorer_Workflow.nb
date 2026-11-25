@@ -19,9 +19,9 @@ Cell[TextData[{"Define a four-dimensional Lorentzian manifold, its metric g and 
 
 Cell[BoxData[RowBox[{RowBox[{"DefManifold", "[", RowBox[{"M", ",", "4", ",", RowBox[{"{", RowBox[{"a", ",", "b", ",", "c", ",", "d", ",", "e", ",", "f", ",", "i", ",", "j"}], "}"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"DefMetric", "[", RowBox[{RowBox[{"-", "1"}], ",", RowBox[{"g", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "CD"}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"DefTensor", "[", RowBox[{RowBox[{"phi", "[", "]"}], ",", "M", ",", RowBox[{"PrintAs", "\[Rule]", "\"\[Phi]\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"DefConstantSymbol", "[", "m", "]"}], ";"}]],"Input",CellTags->"abstract_objects"],
 
-Cell[TextData[{"The action integrates \:2112 with the metric volume element. Vary \:03c6 at fixed metric and take its variation to have compact support so the boundary term vanishes. The variable ",StyleBox["lagrangian",FontFamily->"Courier",FontSize->11]," holds \:2112 for the variation."}],"Text"],
+Cell[TextData[{"Define the kinetic and mass terms separately, then form their sum explicitly. The action integrates \:2112 with the metric volume element. Vary \:03c6 at fixed metric and take its variation to have compact support so the boundary term vanishes. The variable ",StyleBox["lagrangian",FontFamily->"Courier",FontSize->11]," holds \:2112 for the variation."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"lagrangian", "=", RowBox[{RowBox[{RowBox[{"-", FractionBox["1", "2"]}], " ", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}], " ", RowBox[{RowBox[{"CD", "[", "a", "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}]}], "-", RowBox[{FractionBox["1", "2"], " ", SuperscriptBox["m", "2"], " ", SuperscriptBox[RowBox[{"phi", "[", "]"}], "2"]}]}]}], ";", "\[IndentingNewLine]", RowBox[{"Row","[",RowBox[{"{",RowBox[{"\"\[ScriptCapitalL] = \"",",","lagrangian"}],"}"}],"]"}]}]],"Input",CellTags->"lagrangian"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"Lkin", "=", RowBox[{RowBox[{"-", FractionBox["1", "2"]}], " ", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}], " ", RowBox[{RowBox[{"CD", "[", "a", "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}]}]}], ";"}], "\[IndentingNewLine]", RowBox[{RowBox[{"Lmass", "=", RowBox[{RowBox[{"-", FractionBox["1", "2"]}], " ", SuperscriptBox["m", "2"], " ", SuperscriptBox[RowBox[{"phi", "[", "]"}], "2"]}]}], ";"}], "\[IndentingNewLine]", RowBox[{RowBox[{"lagrangian", "=", RowBox[{"Lkin", "+", "Lmass"}]}], ";"}], "\[IndentingNewLine]", TemplateBox[{"\"\[ScriptCapitalL] = \"", "lagrangian"}, "RowDefault"]}]],"Input",CellTags->"lagrangian"],
 
 Cell[BoxData[RowBox[{RowBox[{"assumptions", "=", RowBox[{RowBox[{"m", "\[Element]", TemplateBox[{}, "Reals"]}], "&&", RowBox[{"m", "\[GreaterEqual]", "0"}]}]}], ";"}]],"Input",CellTags->"conditions"],
 
@@ -61,9 +61,9 @@ Cell[TextData[{"The scalar entry records the head phi, the type \"Scalar\" and t
 
 Cell[TextData[{"For several parameters, pass a list of native constant symbols, as in ",StyleBox["RegisterTheory[\"Parameters\", {m, kappa}]",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
-Cell[TextData[{"Store the Lagrangian in the theory and retrieve it with ",StyleBox["TheoryValue[\"Lagrangians\", \"Lagrangian\"]",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{"Store the kinetic term, mass term and their explicitly defined total in the Lagrangians collection. xPlorer does not add them automatically. Retrieve the total with ",StyleBox["TheoryValue[\"Lagrangians\", \"Lagrangian\"]",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Lagrangians\"", ",", RowBox[{"\"Lagrangian\"", "\[Rule]", "lagrangian"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";"}], "\[IndentingNewLine]", RowBox[{"TheoryValue", "[", "\"Lagrangians\"", "]"}]}]],"Input",CellTags->"register_lagrangian_only"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Lagrangians\"", ",", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{RowBox[{"\"Kinetic\"", "\[Rule]", "Lkin"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"\"MassTerm\"", "\[Rule]", "Lmass"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"\"Lagrangian\"", "\[Rule]", "lagrangian"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "}"}]}], "}"}]}], "]"}], ";"}], "\[IndentingNewLine]", RowBox[{"TheoryValue", "[", "\"Lagrangians\"", "]"}]}]],"Input",CellTags->"register_lagrangian_only"],
 
 Cell[TextData[{"Expressions and Lagrangians are separate collections, both available on backgrounds. Register the scalar equation under the key ScalarEq. Its original variable name scalarEq determines its suffixed alias. For a formula entered directly, Head specifies the alias base."}],"Text"],
 
@@ -87,7 +87,7 @@ Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"Association", "[", 
 
 Cell[TextData[{StyleBox["TheoryValue",FontFamily->"Courier",FontSize->11]," retrieves a collection or an individual registry entry. Use ",StyleBox["ShowTheoryKeys[]",FontFamily->"Courier",FontSize->11]," for the top-level keys or ",StyleBox["ShowTheory[]",FontFamily->"Courier",FontSize->11]," for the full restorable registry. TheorySector groups objects by their physical sector."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"ShowTheoryKeys", "[", "]"}], "\[IndentingNewLine]", RowBox[{"Keys", "/@", RowBox[{"TheorySector", "[", "\"Matter\"", "]"}]}]}]],"Input",CellTags->"inspect_registration"],
+Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"ShowTheoryKeys", "[", "]"}], ",", RowBox[{"Keys", "/@", RowBox[{"TheorySector", "[", "\"Matter\"", "]"}]}]}], "}"}]],"Input",CellTags->"inspect_registration"],
 
 Cell[BoxData[RowBox[{"TheoryValue", "[", RowBox[{"\"Lagrangians\"", ",", "\"Lagrangian\""}], "]"}]],"Input",CellTags->"registered_lagrangian"],
 
@@ -111,7 +111,7 @@ Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"BackgroundObject", "[", RowBox[{"\"Sc
 
 Cell[TextData[{StyleBox["EabM",FontFamily->"Courier",FontSize->11]," and ",StyleBox["EabSchw",FontFamily->"Courier",FontSize->11]," retrieve the formula on their respective manifolds. If a shortcut name is occupied, use ",StyleBox["BackgroundExpression",FontFamily->"Courier",FontSize->11]," with the original key. The background lists the conflict under ",StyleBox["\"UnavailableAliases\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"{", RowBox[{"EabM", ",", "EabSchw", ",", RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Expressions\"", ",", "\"Eab\""}], "]"}]}], "}"}], "\[IndentingNewLine]", RowBox[{"{", RowBox[{"lagrangianSchw", ",", RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Lagrangians\"", ",", "\"Lagrangian\""}], "]"}]}], "}"}]}]],"Input",CellTags->"automatic_formulas"],
+Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"EabM", ",", "EabSchw", ",", RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Expressions\"", ",", "\"Eab\""}], "]"}]}], "}"}], ",", RowBox[{"{", RowBox[{"lagrangianSchw", ",", RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Lagrangians\"", ",", "\"Lagrangian\""}], "]"}]}], "}"}]}], "}"}]],"Input",CellTags->"automatic_formulas"],
 
 Cell[TextData[{"Inspect the entries in the Schwarzschild background."}],"Text"],
 
