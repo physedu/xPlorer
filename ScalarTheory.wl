@@ -22,21 +22,20 @@ RegisterTheory["Metric", g];
 RegisterTheory["CovD", CD];
 RegisterTheory["Indices", {a,b,c,d,e,f,i,j}];
 
-RegisterTheory["Field", "Scalar", phi];
-RegisterTheory["Parameter", "Mass", m];
+RegisterTheory["Field", phi, Sector -> "Matter"];
+RegisterTheory["Parameters", m, Name -> "Mass"];
 
-RegisterTheory["Lagrangian", lagrangian];
-RegisterTheory["Expr", "Lagrangian", lagrangian];
-RegisterTheory["Expr", "EulerLagrange", scalarEquation];
-RegisterTheory["Expr", "Metric", g[-a,-b]];
+RegisterTheory["Lagrangians", "Lagrangian" -> lagrangian, Sector -> "Matter"];
+RegisterTheory["Expressions", "EulerLagrange" -> scalarEquation, Sector -> "Matter"];
+RegisterTheory["Expressions", "Metric" -> g[-a,-b], Head -> "metricExpr"];
 
-RegisterTheory["Expr", {
- {"Gradient", CD[-a][phi[]]},
- {"Hessian", CD[-a][CD[-b][phi[]]]}
+RegisterTheory["Expressions", {
+ {"Gradient" -> CD[-a][phi[]], Head -> "gradient"},
+ {"Hessian" -> CD[-a][CD[-b][phi[]]], Head -> "hessian"}
 }];
 
 waveOperator = CD[a][CD[-a][phi[]]];
-RegisterTheory["Expr", waveOperator];
+RegisterTheory["Expressions", "waveOperator" -> waveOperator];
 
 RegisterTheory[<|
  "Assumptions" -> theoryAssumptions,
