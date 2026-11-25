@@ -13,11 +13,11 @@ ClearTheory[];
 RegisterTheory["Metric", g];
 RegisterTheory["CovD", CD];
 RegisterTheory["Indices", {a,b,c,d,e,f,i,j}];
-RegisterTheory["Field", {{"Scalar",phi},{"Vector",A},{"Tensor",S,2,"Symmetric"},{"Tensor",F,2,"Antisymmetric"},{"MetricPert",h}}];
-RegisterTheory["Lagrangian", "Scalar", -CD[-a][phi[]] CD[a][phi[]]/2-mass^2 phi[]^2/2];
-RegisterTheory["Parameter", "Mass", mass];
-RegisterTheory["Expr", "metric", g[-a,-b]];
-RegisterTheory["Expr", "KG", CD[a][CD[-a][phi[]]]-mass^2 phi[]];
+RegisterTheory["Fields", {phi,A,S,F,h}];
+RegisterTheory["Lagrangians", "Scalar" -> -CD[-a][phi[]] CD[a][phi[]]/2-mass^2 phi[]^2/2, Head -> "Lscalar"];
+RegisterTheory["Parameters", mass, Name -> "Mass"];
+RegisterTheory["Expressions", "metric" -> g[-a,-b], Head -> "metricExpr"];
+RegisterTheory["Expressions", "KG" -> CD[a][CD[-a][phi[]]]-mass^2 phi[] , Head -> "KG"];
 testResults = {};
 SetAttributes[assert, HoldAll];
 assert[id_, expression_, expected_] := Module[{actual = expression, target = expected},
