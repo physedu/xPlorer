@@ -1,5 +1,128 @@
 # Design decisions
 
+## Next version: beta.13 registration redesign (agreed direction, 2026-11-25)
+
+Status: design only, not implemented or tested. The author-supplied beta.12 package and didactic notebook are preserved on main (merge commit 05b0b407b9bf4067e152594cecb5ba3eaf706d22). See CHANGELOG.md for the intervening betas. The previous beta.7 recovery record remains historical. The decisions in this section supersede earlier registration-interface choices where they conflict.
+
+### 1. Native tensor metadata
+
+Define mathematical objects with xAct first, then register their symbols with xPlorer. Proposed public syntax:
+
+```wl
+DefTensor[phi[], M];
+DefTensor[A[-a], M];
+DefTensor[F[-a,-b], M, Antisymmetric[{-a,-b}]];
+
+RegisterTheory["Field", phi];
+RegisterTheory["Fields", {A, F}];
+```
+
+Infer rank, slots, index bundles, native symmetry, supported dependencies and effective PrintAs from xAct instead of requiring the user to repeat Scalar, Vector, Tensor, rank or symmetry. Keep those distinctions available internally and in inspection output. Reuse the existing beta.12 metadata-copy machinery wherever possible. Remove the old positional registration forms rather than preserving a parallel legacy interface. Do not confuse discovering metadata with reproducing unsupported structures: reject unsupported properties explicitly.
+
+### 2. Field names and presentation
+
+```wl
+RegisterTheory["Field", phi];
+RegisterTheory["Field", phi, Name -> "matter"];
+RegisterTheory["Field", phi, Name -> "matter",
+  SymbolBase -> "phi", PrintAs -> "\[Phi]"];
+```
+
+These are alternatives, not sequential registrations of the same field. Name defaults to the original symbol name and is the registry key. SymbolBase defaults to Name and is only needed when the generated symbol base should differ from the key. PrintAs is independent of both and inherits the source presentation by default. For SymbolSuffix -> "Schw", the three alternatives generate phiSchw, matterSchw and phiSchw, respectively. Keep beta.12 automatic aliases, collision protection, genuine xAct tensor heads and isolated background contexts.
+
+### 3. Named collections and bulk registration
+
+Organize the theory conceptually into Geometry, Fields, Parameters, Lagrangians, Expressions and Rules. Existing geometry calls need not change solely for this organization. Distinguish registered tensor heads from derived expressions; a field may be an independent variable or an auxiliary tensor. A Lagrangian is a named expression with a distinct purpose.
+
+```wl
+RegisterTheory["Lagrangians", "Gravity" -> Lgrav];
+RegisterTheory["Lagrangians", {
+  "Matter" -> Lmatter,
+  "Vector" -> Lvector,
+  "Total" -> Ltotal
+}];
+RegisterTheory["Expressions", {
+  "MetricEOM" -> Eab,
+  "ScalarEOM" -> Ephi,
+  "StressEnergy" -> Tab
+}];
+RegisterTheory["Parameters", {m, kappa}];
+```
+
+Support individual and multiple registration, including per-item options. Proposed retrieval: TheoryValue["Lagrangians"] and TheoryValue["Lagrangians", "Gravity"]. Define the total Lagrangian explicitly; do not automatically sum all stored terms, because they may represent alternatives or overlapping contributions. Finalize the parameter option grammar during implementation without changing the agreed naming principles.
+
+### 4. Original symbol names for Lagrangians and Expressions (explicit author decision)
+
+The registration key is independent of the name used in a background. If the supplied right-hand side is a named source symbol, use that original symbol as the alias base, not the collection key.
+
+```wl
+Lgrav = RicciScalarCD[]/(2 kappa);
+RegisterTheory["Lagrangians", "Gravity" -> Lgrav];
+CreateBackground["Schwarzschild", SymbolSuffix -> "Schw"];
+LgravSchw
+```
+
+The resulting alias must be LgravSchw, NOT GravitySchw. The key is still "Gravity". Analogously, "MetricEOM" -> Eab generates EabSchw.
+
+If the supplied right-hand side is a direct expression instead of a named source symbol, require an explicit Head option; never silently invent an alias base from the key.
+
+```wl
+RegisterTheory["Lagrangians",
+  "Gravity" -> RicciScalarCD[]/(2 kappa), Head -> "Lgrav"];
+RegisterTheory["Expressions",
+  "RicciSquared" -> RicciCD[a,b] RicciCD[-a,-b], Head -> "R2"];
+```
+
+Both examples are alternatives to named-symbol registration. Head names the desired generated alias base; it does not mean the structural Mathematica Head of an expression (which every expression has). Reject anonymous input without Head with a useful diagnostic. Preserve the syntactic source symbol before evaluating its OwnValue; an assigned Lgrav must not be mistaken for anonymous input. Use held parsing (the current RegisterTheory is HoldAll) and test named, direct and nested bulk input. Resolve and store the expression value separately from the original name.
+
+Proposed mixed bulk syntax:
+
+```wl
+RegisterTheory["Lagrangians", {
+  "Gravity" -> Lgrav,
+  "Matter" -> Lmatter,
+  "Vector" -> Lvector,
+  {"Total" -> Lgrav + Lmatter + Lvector, Head -> "Ltotal"}
+}];
+```
+
+With suffix Schw this generates LgravSchw, LmatterSchw, LvectorSchw and LtotalSchw. Preserve the existing beta.12 distinction between transported aliases and rule-applied retrieval; document how the new Lagrangian aliases are used in later xAct variations. Keep snapshot isolation and protect occupied names across all categories.
+
+### 5. Physical sectors
+
+Sector is optional cross-cutting metadata, not a replacement for collections, and never automatically imposes equations, assumptions, or rules.
+
+```wl
+RegisterTheory["Fields", {
+  {A, Sector -> "EM"},
+  {F, Sector -> "EM"},
+  {phi, Sector -> "Matter"}
+}];
+RegisterTheory["Lagrangians", {
+  {"Maxwell" -> Lem, Sector -> "EM"},
+  {"Scalar" -> Lscalar, Sector -> "Matter"}
+}];
+RegisterTheory["Expressions",
+  "MaxwellEOM" -> EA, Sector -> "EM"];
+TheorySector["EM"]
+```
+
+TheorySector is a proposed query across categories. Multiple-sector membership is a possible extension, not a settled requirement. Do not duplicate mathematical objects merely to classify them.
+
+### 6. Scope and next implementation
+
+Ordinary tensor support is not equivalent to knowing physical spin. Proca and Maxwell can be represented using a vector potential and, optionally, an antisymmetric tensor or a derived field-strength expression. Their physical equations and relations remain explicit. Fierz-Pauli and Kalb-Ramond are further examples of ordinary tensor fields. Preserve the existing xPert metric-perturbation path until automatic detection of its native association has been verified. Additional vector bundles, spinors, tetrads, Clifford algebra, fermionic products and spin connections require separate architecture and validation; do not claim they are supported by generic tensor inference.
+
+Implementation acceptance criteria (proposed engineering checks):
+- Fresh-kernel Get and the revised didactic notebook; no startup helpers or mandatory preference setup.
+- Verify inferred scalar, vector, symmetric, antisymmetric, mixed-index and higher-rank tensor metadata and transport; reject unsupported bundles/metadata without partial mutation.
+- Verify explicit Name/SymbolBase/PrintAs and default native names.
+- Verify named RHS retention even after assignment, required Head for direct expressions, mixed bulk registration, collection lookup and sector queries.
+- Verify suffix generation, alias collision protection, snapshots, deletion/recreation and rule-applied versus transported retrieval. Preserve beta.12 behavior outside the intentional breaking registration change.
+- Update package usages, examples, tests, API guide, and notebook to the new API; no parallel positional legacy interface. Keep English ASCII source, simple Get, and mathematical presentation as agreed.
+- Record actual test environment, exact results and limitations before announcing beta.13. No code, test or release changes are implied by this design document.
+
+
 ## Required behavior
 
 - Optional personalization. Existing straightforward calls remain useful without preference setup.
