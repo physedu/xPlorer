@@ -31,7 +31,7 @@ PresentationOf["Study"]
 BackgroundObject["Study", "phi"]
 ```
 
-Supported presentation keys include field keys, Metric, CovD and primary geometry names. CovD takes the two native connection marker strings; other labels are strings or supported native box structures. Native function-based source labels are resolved by xAct before copying. Indices inherit the source PrintAs; CreateBackground's Indices option selects alternative index labels. Coordinate labels are supplied to DefineChart. Native PrintAs can also be set on an individual returned index or coordinate using With to insert its actual symbol; PrintAs holds its argument, so PrintAs[alias] does not inspect the aliased symbol automatically.
+Supported presentation keys include field keys, Metric, CovD and primary geometry names. CovD takes the two native connection marker strings; other labels are strings or supported native box structures. Native function-based source labels are resolved by xAct before copying. Indices inherit the source PrintAs; CreateBackground's Indices option selects alternative index labels. Coordinate labels are supplied to DefineChart. Choose abstract index labels at background creation. For convenient typing, assign {muDemo,nuDemo}=BackgroundIndices["NamingExample",2]; these are Latin-letter aliases of the actual owned indices and preserve their Greek display. Clear your aliases after deleting the background.
 
 SetXPlorerPreferences sets presentation defaults for future backgrounds; RegisterTheory["Presentation", assoc] sets theory defaults. Background overrides take precedence. SetPresentation changes owned heads only and accepts Automatic to restore defaults. Current background settings do not mutate the source. For connection-specific labels, pass SymbolOfCovD when registering or adding that connection. Full InputForm, Context and SymbolName remain available; bare head display uses interpreted short names and indexed tensors use xAct notation.
 
@@ -44,9 +44,10 @@ Define native tensors before registering them. No legacy positional type argumen
 ```wl
 RegisterTheory["Field", phi, Name -> "matter"];
 RegisterTheory["Fields", {A,F}];
-RegisterTheory["Parameters", m];
-RegisterTheory["Lagrangians", {"Gravity" -> Lgrav, "Matter" -> Lmatter}];
-RegisterTheory["Expressions", "ScalarEq" -> eq];
+RegisterTheory["Parameter", m];
+RegisterTheory["Lagrangian", "Gravity" -> Lgrav];
+RegisterTheory["Lagrangians", {"Matter" -> Lmatter, "Total" -> Ltotal}];
+RegisterTheory["Expression", "ScalarEq" -> eq];
 ShowTheory[]
 ShowTheory["Fields"]
 TheoryValue["Lagrangians","Matter"]
