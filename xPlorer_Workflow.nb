@@ -71,13 +71,21 @@ Cell[BoxData[RowBox[{RowBox[{"CreateBackground", "[", RowBox[{"\"NamingExample\"
 
 Cell[TextData[{"The copied field is phiDemo and the metric is gDemo. The indices muDemo and nuDemo (typed as Greek letters) are printed as Greek indices, not as the original Latin a and b.\n\nThe same applies to derivative indices. If you only know the registration key, ",StyleBox["BackgroundObject[\"NamingExample\",\"ScalarField\"]",FontFamily->"Courier",FontSize->14]," retrieves the same head."}],"Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{"phiDemo", ",", RowBox[{"phiDemo", "[", "]"}], ",", RowBox[{"gDemo", "[", RowBox[{RowBox[{"-", "\[Mu]Demo"}], ",", RowBox[{"-", "\[Nu]Demo"}]}], "]"}], ",", RowBox[{RowBox[{"CDDemo", "[", RowBox[{"-", "\[Rho]Demo"}], "]"}], "[", RowBox[{"phiDemo", "[", "]"}], "]"}]}], "}"}]],"Input",CellTags->"naming_result"],
+Cell[BoxData["phiDemo"],"Input",CellTags->"naming_result_part_1"],
+
+Cell[BoxData[RowBox[{"phiDemo", "[", "]"}]],"Input",CellTags->"naming_result_part_2"],
+
+Cell[BoxData[RowBox[{"gDemo", "[", RowBox[{RowBox[{"-", "\[Mu]Demo"}], ",", RowBox[{"-", "\[Nu]Demo"}]}], "]"}]],"Input",CellTags->"naming_result_part_3"],
+
+Cell[BoxData[RowBox[{RowBox[{"CDDemo", "[", RowBox[{"-", "\[Rho]Demo"}], "]"}], "[", RowBox[{"phiDemo", "[", "]"}], "]"}]],"Input",CellTags->"naming_result_part_4"],
 
 Cell[TextData[{"If typing Greek symbols is inconvenient, retrieve the actual owned indices with BackgroundIndices and assign ordinary Latin-letter aliases.\n\nThese are references to the same abstract indices, not new xAct indices. The following metric and derivative still print with Greek indices."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"muDemo", ",", "nuDemo", ",", "rhoDemo"}], "}"}], "=", RowBox[{"BackgroundIndices", "[", RowBox[{"\"NamingExample\"", ",", "3"}], "]"}]}], ";"}]],"Input",CellTags->"naming_index_aliases_step_1"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"gDemo", "[", RowBox[{RowBox[{"-", "muDemo"}], ",", RowBox[{"-", "nuDemo"}]}], "]"}], ",", RowBox[{RowBox[{"CDDemo", "[", RowBox[{"-", "rhoDemo"}], "]"}], "[", RowBox[{"phiDemo", "[", "]"}], "]"}]}], "}"}]],"Input",CellTags->"naming_index_aliases"],
+Cell[BoxData[RowBox[{"gDemo", "[", RowBox[{RowBox[{"-", "muDemo"}], ",", RowBox[{"-", "nuDemo"}]}], "]"}]],"Input",CellTags->"naming_index_aliases_part_1"],
+
+Cell[BoxData[RowBox[{RowBox[{"CDDemo", "[", RowBox[{"-", "rhoDemo"}], "]"}], "[", RowBox[{"phiDemo", "[", "]"}], "]"}]],"Input",CellTags->"naming_index_aliases_part_2"],
 
 Cell[TextData[{"Clear the three user-defined aliases, close the example and remove its field key. The source scalar \:03c6 is still defined. We will register it below with its default name and label for the three physical backgrounds."}],"Text"],
 
@@ -183,7 +191,9 @@ Cell[TextData[{StyleBox["TheoryValue",FontFamily->"Courier",FontSize->14]," retr
 
 Cell[BoxData[RowBox[{"ShowTheory","[","]"}]],"Input",CellTags->"theory_overview"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"ShowTheoryKeys", "[", "]"}], ",", RowBox[{"Keys", "/@", RowBox[{"TheorySector", "[", "\"Matter\"", "]"}]}]}], "}"}]],"Input",CellTags->"inspect_registration"],
+Cell[BoxData[RowBox[{"ShowTheoryKeys", "[", "]"}]],"Input",CellTags->"inspect_registration_part_1"],
+
+Cell[BoxData[RowBox[{"Keys", "/@", RowBox[{"TheorySector", "[", "\"Matter\"", "]"}]}]],"Input",CellTags->"inspect_registration_part_2"],
 
 Cell[BoxData[RowBox[{"ShowTheory","[","\"Lagrangians\"","]"}]],"Input",CellTags->"theory_lagrangian_view"],
 
@@ -207,15 +217,31 @@ Cell[TextData[{"FLRW uses its tag as its suffix. Schwarzschild uses Schw, so you
 
 Cell[BoxData[RowBox[{RowBox[{"phi1", "=", RowBox[{"BackgroundObject", "[", RowBox[{"\"Schwarzschild\"", ",", "\"phi\""}], "]"}]}], ";"}]],"Input",CellTags->"scalar_alias_step_1"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{"phi1", ",", RowBox[{"phi1", "[", "]"}]}], "}"}]],"Input",CellTags->"scalar_alias"],
+Cell[BoxData["phi1"],"Input",CellTags->"scalar_alias_part_1"],
+
+Cell[BoxData[RowBox[{"phi1", "[", "]"}]],"Input",CellTags->"scalar_alias_part_2"],
 
 Cell[TextData[{"If you know the background tag but want to look up a head or index, use these accessors. If a notebook name is occupied, xPlorer keeps its existing definition and lists it under ",StyleBox["\"UnavailableObjectAliases\"",FontFamily->"Courier",FontSize->14]," in ",StyleBox["ShowBackground",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"BackgroundObject", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Metric\""}], "]"}], ",", RowBox[{"RiemannOf", "[", "\"Schwarzschild\"", "]"}], ",", RowBox[{"BackgroundObject", "[", RowBox[{"\"Schwarzschild\"", ",", "\"phi\""}], "]"}], ",", RowBox[{"First", "[", RowBox[{"BackgroundIndices", "[", RowBox[{"\"Schwarzschild\"", ",", "1"}], "]"}], "]"}]}], "}"}]],"Input",CellTags->"inspect_short_names"],
+Cell[BoxData[RowBox[{"BackgroundObject", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Metric\""}], "]"}]],"Input",CellTags->"inspect_short_names_part_1"],
+
+Cell[BoxData[RowBox[{"RiemannOf", "[", "\"Schwarzschild\"", "]"}]],"Input",CellTags->"inspect_short_names_part_2"],
+
+Cell[BoxData[RowBox[{"BackgroundObject", "[", RowBox[{"\"Schwarzschild\"", ",", "\"phi\""}], "]"}]],"Input",CellTags->"inspect_short_names_part_3"],
+
+Cell[BoxData[RowBox[{"First", "[", RowBox[{"BackgroundIndices", "[", RowBox[{"\"Schwarzschild\"", ",", "1"}], "]"}], "]"}]],"Input",CellTags->"inspect_short_names_part_4"],
 
 Cell[TextData[{StyleBox["EabM",FontFamily->"Courier",FontSize->14]," and ",StyleBox["EabSchw",FontFamily->"Courier",FontSize->14]," retrieve the formula on their respective manifolds. If a shortcut name is occupied, use ",StyleBox["BackgroundExpression",FontFamily->"Courier",FontSize->14]," with the original key.\n\nThe background lists the conflict under ",StyleBox["\"UnavailableAliases\"",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{"EabM", ",", "EabSchw", ",", RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Expressions\"", ",", "\"Eab\""}], "]"}], ",", "lagrangianSchw", ",", RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Lagrangians\"", ",", "\"Lagrangian\""}], "]"}]}], "}"}]],"Input",CellTags->"automatic_formulas"],
+Cell[BoxData["EabM"],"Input",CellTags->"automatic_formulas_part_1"],
+
+Cell[BoxData["EabSchw"],"Input",CellTags->"automatic_formulas_part_2"],
+
+Cell[BoxData[RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Expressions\"", ",", "\"Eab\""}], "]"}]],"Input",CellTags->"automatic_formulas_part_3"],
+
+Cell[BoxData["lagrangianSchw"],"Input",CellTags->"automatic_formulas_part_4"],
+
+Cell[BoxData[RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Lagrangians\"", ",", "\"Lagrangian\""}], "]"}]],"Input",CellTags->"automatic_formulas_part_5"],
 
 Cell[TextData[{"Inspect the entries in the Schwarzschild background."}],"Text"],
 
@@ -231,7 +257,11 @@ Cell[TextData[{"3. Calculate with the abstract tensors"}],"Section"],
 
 Cell[TextData[{"Retrieve the scalar equation on all three manifolds before choosing coordinates."}],"Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{"scalarEqM", ",", "scalarEqSchw", ",", "scalarEqFLRW"}], "}"}]],"Input",CellTags->"formal_equations"],
+Cell[BoxData["scalarEqM"],"Input",CellTags->"formal_equations_part_1"],
+
+Cell[BoxData["scalarEqSchw"],"Input",CellTags->"formal_equations_part_2"],
+
+Cell[BoxData["scalarEqFLRW"],"Input",CellTags->"formal_equations_part_3"],
 
 Cell[TextData[{StyleBox["PortExpression",FontFamily->"Courier",FontSize->14]," takes a formula directly and transfers its heads and indices. Here it returns the abstract gradient on Schwarzschild, with the background rules unapplied."}],"Text"],
 
@@ -253,7 +283,11 @@ Cell[TextData[{"An equivalent calculation is to form the raised gradient on the 
 
 Cell[TextData[{"The copied connection has its own curvature tensors. The Riemann tensor, Ricci tensor and Ricci scalar can be used directly in abstract xAct calculations before choosing coordinates.\n\nNo vacuum equation has been imposed yet."}],"Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"RiemannCDSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}], ",", RowBox[{"-", "cSchw"}], ",", RowBox[{"-", "dSchw"}]}], "]"}], ",", RowBox[{"RicciCDSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}]}], "]"}], ",", RowBox[{"RicciScalarCDSchw", "[", "]"}]}], "}"}]],"Input",CellTags->"riemann_tensor"],
+Cell[BoxData[RowBox[{"RiemannCDSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}], ",", RowBox[{"-", "cSchw"}], ",", RowBox[{"-", "dSchw"}]}], "]"}]],"Input",CellTags->"riemann_tensor_part_1"],
+
+Cell[BoxData[RowBox[{"RicciCDSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}]}], "]"}]],"Input",CellTags->"riemann_tensor_part_2"],
+
+Cell[BoxData[RowBox[{"RicciScalarCDSchw", "[", "]"}]],"Input",CellTags->"riemann_tensor_part_3"],
 
 Cell["Change an individual label with PrintAs, or several labels together with rules. The following calls change presentation only. xAct uses a pair of derivative markers: the first is the postfix separator (|), and the second is the prefix symbol (D).\n\nThese settings do not change the mathematical objects or the registry keys.","Text"],
 
@@ -261,7 +295,11 @@ Cell[BoxData[RowBox[{RowBox[{"SetPresentation","[",RowBox[{"\"Schwarzschild\"","
 
 Cell[BoxData[RowBox[{RowBox[{"SetPresentation","[",RowBox[{"\"Schwarzschild\"",",",RowBox[{"\"phi\"","\[Rule]","\"ψ\""}],",",RowBox[{"\"Metric\"","\[Rule]","\"q\""}],",",RowBox[{"\"CovD\"","\[Rule]",RowBox[{"{",RowBox[{"\"|\"",",","\"D\""}],"}"}]}]}],"]"}], ";"}]],"Input",CellTags->"custom_presentation_step_2"],
 
-Cell[BoxData[RowBox[{"{",RowBox[{RowBox[{"phiSchw","[","]"}],",",RowBox[{"gSchw","[",RowBox[{RowBox[{"-","aSchw"}],",",RowBox[{"-","bSchw"}]}],"]"}],",",RowBox[{RowBox[{"CDSchw","[",RowBox[{RowBox[{"-","aSchw"}]}],"]"}],"[",RowBox[{"phiSchw","[","]"}],"]"}]}],"}"}]],"Input",CellTags->"custom_presentation"],
+Cell[BoxData[RowBox[{"phiSchw","[","]"}]],"Input",CellTags->"custom_presentation_part_1"],
+
+Cell[BoxData[RowBox[{"gSchw","[",RowBox[{RowBox[{"-","aSchw"}],",",RowBox[{"-","bSchw"}]}],"]"}]],"Input",CellTags->"custom_presentation_part_2"],
+
+Cell[BoxData[RowBox[{RowBox[{"CDSchw","[",RowBox[{RowBox[{"-","aSchw"}]}],"]"}],"[",RowBox[{"phiSchw","[","]"}],"]"}]],"Input",CellTags->"custom_presentation_part_3"],
 
 Cell["The customized symbols also appear in the complete rank-two expression.","Text"],
 
@@ -275,7 +313,11 @@ Cell["PrintAs -> Automatic restores the inherited label for each object. This le
 
 Cell[BoxData[RowBox[{RowBox[{"SetPresentation","[",RowBox[{"\"Schwarzschild\"",",",RowBox[{"\"phi\"","\[Rule]","Automatic"}],",",RowBox[{"\"Metric\"","\[Rule]","Automatic"}],",",RowBox[{"\"CovD\"","\[Rule]","Automatic"}]}],"]"}], ";"}]],"Input",CellTags->"reset_presentation_step_1"],
 
-Cell[BoxData[RowBox[{"{",RowBox[{RowBox[{"phiSchw","[","]"}],",",RowBox[{"gSchw","[",RowBox[{RowBox[{"-","aSchw"}],",",RowBox[{"-","bSchw"}]}],"]"}],",",RowBox[{RowBox[{"CDSchw","[",RowBox[{RowBox[{"-","aSchw"}]}],"]"}],"[",RowBox[{"phiSchw","[","]"}],"]"}]}],"}"}]],"Input",CellTags->"reset_presentation"],
+Cell[BoxData[RowBox[{"phiSchw","[","]"}]],"Input",CellTags->"reset_presentation_part_1"],
+
+Cell[BoxData[RowBox[{"gSchw","[",RowBox[{RowBox[{"-","aSchw"}],",",RowBox[{"-","bSchw"}]}],"]"}]],"Input",CellTags->"reset_presentation_part_2"],
+
+Cell[BoxData[RowBox[{RowBox[{"CDSchw","[",RowBox[{RowBox[{"-","aSchw"}]}],"]"}],"[",RowBox[{"phiSchw","[","]"}],"]"}]],"Input",CellTags->"reset_presentation_part_3"],
 
 Cell["Notation and expression views","Subsubsection"],
 
@@ -299,13 +341,17 @@ Cell["Choose a prefix derivative and fraction notation for the session. Both sca
 
 Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", RowBox[{RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}], ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Prefix\""}]}], "]"}], ";"}]],"Input",CellTags->"session_prefix_step_1"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{"scalarEqM", ",", "scalarEqSchw"}], "}"}]],"Input",CellTags->"session_prefix"],
+Cell[BoxData["scalarEqM"],"Input",CellTags->"session_prefix_part_1"],
+
+Cell[BoxData["scalarEqSchw"],"Input",CellTags->"session_prefix_part_2"],
 
 Cell["Override only Schwarzschild: its scalar equation uses postfix notation and a background label. Minkowski keeps the session defaults.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Postfix\""}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "True"}]}], "]"}], ";"}]],"Input",CellTags->"local_postfix_step_1"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{"scalarEqM", ",", "scalarEqSchw"}], "}"}]],"Input",CellTags->"local_postfix"],
+Cell[BoxData["scalarEqM"],"Input",CellTags->"local_postfix_part_1"],
+
+Cell[BoxData["scalarEqSchw"],"Input",CellTags->"local_postfix_part_2"],
 
 Cell["Use postfix application, expr // PrettyExp, to display an expression using its current notation settings. The background is inferred when possible.","Text"],
 
@@ -315,13 +361,17 @@ Cell["For a single output, override the notation with PrettyExp options. Compare
 
 Cell[BoxData[RowBox[{RowBox[{"prettyGradient","=",RowBox[{"gradPhi","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Postfix\""}],",",RowBox[{"ShowBackgroundLabel","\[Rule]","True"}]}],"]"}]}]}], ";"}]],"Input",CellTags->"pretty_gradient_step_1"],
 
-Cell[BoxData[RowBox[{"{",RowBox[{RowBox[{"gradPhi","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Prefix\""}],",",RowBox[{"ShowBackgroundLabel","\[Rule]","False"}]}],"]"}]}],",","prettyGradient"}],"}"}]],"Input",CellTags->"pretty_gradient"],
+Cell[BoxData[RowBox[{"gradPhi","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Prefix\""}],",",RowBox[{"ShowBackgroundLabel","\[Rule]","False"}]}],"]"}]}]],"Input",CellTags->"pretty_gradient_part_1"],
+
+Cell[BoxData["prettyGradient"],"Input",CellTags->"pretty_gradient_part_2"],
 
 Cell["Remove the local overrides with Automatic to inherit session defaults again.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"CovariantStyle", "\[Rule]", "Automatic"}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "Automatic"}]}], "]"}], ";"}]],"Input",CellTags->"restore_local_step_1"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{"scalarEqM", ",", "scalarEqSchw"}], "}"}]],"Input",CellTags->"restore_local"],
+Cell[BoxData["scalarEqM"],"Input",CellTags->"restore_local_part_1"],
+
+Cell[BoxData["scalarEqSchw"],"Input",CellTags->"restore_local_part_2"],
 
 Cell["Reset session preferences to native defaults. This does not remove existing background-specific overrides.","Text"],
 
@@ -416,7 +466,9 @@ Cell["Clear these assumptions afterward so the later curvature calculation uses 
 
 Cell[BoxData[RowBox[{RowBox[{"SetFlatRules","[",RowBox[{"\"Minkowski\""}],"]"}], ";"}]],"Input",CellTags->"flat_rules_step_1"],
 
-Cell[BoxData[RowBox[{"ApplyRules","[",RowBox[{"\"Minkowski\"",",",RowBox[{"{",RowBox[{RowBox[{RowBox[{"RicciScalar","[",RowBox[{"CDM"}],"]"}],"[","]"}],",",RowBox[{RowBox[{"Kretschmann","[",RowBox[{"CDM"}],"]"}],"[","]"}]}],"}"}]}],"]"}]],"Input",CellTags->"flat_rules"],
+Cell[BoxData[RowBox[{"ApplyRules","[",RowBox[{"\"Minkowski\"",",",RowBox[{RowBox[{"RicciScalar","[",RowBox[{"CDM"}],"]"}],"[","]"}]}],"]"}]],"Input",CellTags->"flat_rules_part_1"],
+
+Cell[BoxData[RowBox[{"ApplyRules","[",RowBox[{"\"Minkowski\"",",",RowBox[{RowBox[{"Kretschmann","[",RowBox[{"CDM"}],"]"}],"[","]"}]}],"]"}]],"Input",CellTags->"flat_rules_part_2"],
 
 Cell[BoxData[RowBox[{RowBox[{"ClearRules", "[", "\"Minkowski\"", "]"}], ";"}]],"Input",CellTags->"clear_flat_rules"]
 },Open]],
@@ -620,7 +672,9 @@ Cell[BoxData[RowBox[{RowBox[{"ricciSchw", "=", RowBox[{RowBox[{RowBox[{"RicciSca
 
 Cell[BoxData[RowBox[{RowBox[{"kretschmannSchw", "=", RowBox[{RowBox[{RowBox[{"Kretschmann", "[", "CDSchw", "]"}], "[", "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"schwarzschild_curvature_step_2"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{"ricciSchw", ",", "kretschmannSchw"}], "}"}]],"Input",CellTags->"schwarzschild_curvature"],
+Cell[BoxData["ricciSchw"],"Input",CellTags->"schwarzschild_curvature_part_1"],
+
+Cell[BoxData["kretschmannSchw"],"Input",CellTags->"schwarzschild_curvature_part_2"],
 
 Cell[TextData[{"For component values of a specified metric, this calculation uses xCoba. For symbolic identities among curvature scalars, the separate Invar package provides a database of abstract contractions."}],"Tip"],
 
@@ -646,7 +700,9 @@ Cell[BoxData[RowBox[{RowBox[{"einstein00", "=", RowBox[{"First", "[", RowBox[{Ro
 
 Cell[BoxData[RowBox[{RowBox[{"lagFLRW", "=", RowBox[{"lagrangianFLRW", "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"flrw_geometry_step_2"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{"einstein00", ",", "lagFLRW"}], "}"}]],"Input",CellTags->"flrw_geometry"],
+Cell[BoxData["einstein00"],"Input",CellTags->"flrw_geometry_part_1"],
+
+Cell[BoxData["lagFLRW"],"Input",CellTags->"flrw_geometry_part_2"],
 
 Cell[TextData[{"Checking a solution"}],"Subsection"],
 
@@ -718,13 +774,15 @@ Cell[BoxData[RowBox[{"gCyl","//","MatrixForm"}]],"Input",CellTags->"cylindrical_
 
 Cell[TextData[{"The table gives the correspondence between zero-based component numbers and one-based Mathematica list positions."}],"Text"],
 
-Cell[BoxData[RowBox[{"Grid", "[", RowBox[{RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"\"Cylindrical coordinate\"", ",", "\"t\"", ",", "\"r\"", ",", "\"theta\"", ",", "\"z\""}], "}"}], ",", RowBox[{"{", RowBox[{"\"xCoba component number\"", ",", "0", ",", "1", ",", "2", ",", "3"}], "}"}], ",", RowBox[{"{", RowBox[{"\"Mathematica list position\"", ",", "1", ",", "2", ",", "3", ",", "4"}], "}"}]}], "}"}], ",", RowBox[{"Frame", "\[Rule]", "All"}]}], "]"}]],"Input",CellTags->"chart_positions"],
+Cell["The cylindrical coordinates (t, r, theta, z) have xCoba component numbers 0, 1, 2, 3. Their Mathematica list positions are 1, 2, 3, 4.","Text"],
 
 Cell[TextData[{"Read the radial coefficient with lower indices (\:03b8,\:03b8) and the angular coefficient with lower indices (r,\:03b8). The second derivatives of the coordinate map give \:2212r and 1/r, respectively, even in flat spacetime."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"gammaCyl", "=", RowBox[{"ConnectionMatrixOf", "[", RowBox[{"\"Minkowski\"", ",", "CD", ",", RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}]}], "]"}]}], ";"}]],"Input",CellTags->"cylindrical_connection_step_1"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"gammaCyl", "\[LeftDoubleBracket]", RowBox[{"2", ",", "3", ",", "3"}], "\[RightDoubleBracket]"}], ",", RowBox[{"gammaCyl", "\[LeftDoubleBracket]", RowBox[{"3", ",", "2", ",", "3"}], "\[RightDoubleBracket]"}]}], "}"}]],"Input",CellTags->"cylindrical_connection"],
+Cell[BoxData[RowBox[{"gammaCyl", "\[LeftDoubleBracket]", RowBox[{"2", ",", "3", ",", "3"}], "\[RightDoubleBracket]"}]],"Input",CellTags->"cylindrical_connection_part_1"],
+
+Cell[BoxData[RowBox[{"gammaCyl", "\[LeftDoubleBracket]", RowBox[{"3", ",", "2", ",", "3"}], "\[RightDoubleBracket]"}]],"Input",CellTags->"cylindrical_connection_part_2"],
 
 Cell[TextData[{"Set \:03c6 = x\:00b2 + y\:00b2 in the primary chart. In cylindrical coordinates this is r\:00b2. Its angular Hessian component is 2r\:00b2 because the Levi-Civita connection acts on the gradient."}],"Text"],
 
@@ -734,11 +792,15 @@ Cell[BoxData[RowBox[{RowBox[{"phiCyl", "=", RowBox[{RowBox[{"phiM", "[", "]"}], 
 
 Cell[BoxData[RowBox[{RowBox[{"hessCyl", "=", RowBox[{"hessianM", "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "aM"}], ",", RowBox[{"-", "bM"}]}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"2", ",", "2"}], "}"}], "}"}]}]}], "]"}]}]}], ";"}]],"Input",CellTags->"two_hessian_charts_step_3"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{"phiCyl", ",", "hessCyl"}], "}"}]],"Input",CellTags->"two_hessian_charts"],
+Cell[BoxData["phiCyl"],"Input",CellTags->"two_hessian_charts_part_1"],
+
+Cell[BoxData["hessCyl"],"Input",CellTags->"two_hessian_charts_part_2"],
 
 Cell[TextData[{"Compare the Cartesian wave operator with the trace of the cylindrical Hessian. In cylindrical coordinates the radial and angular terms each contribute 2, giving 4 in either chart."}],"Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"boxPhiM", "//", "ToComponents"}], ",", RowBox[{"Simplify", "[", RowBox[{"Tr", "[", RowBox[{TemplateBox[{"gCyl"}, "Inverse", SyntaxForm -> SuperscriptBox], ".", RowBox[{"hessianM", "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}]}], "]"}]}]}], "]"}], "]"}]}], "}"}]],"Input",CellTags->"trace_both"],
+Cell[BoxData[RowBox[{"boxPhiM", "//", "ToComponents"}]],"Input",CellTags->"trace_both_part_1"],
+
+Cell[BoxData[RowBox[{"Simplify", "[", RowBox[{"Tr", "[", RowBox[{TemplateBox[{"gCyl"}, "Inverse", SyntaxForm -> SuperscriptBox], ".", RowBox[{"hessianM", "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}]}], "]"}]}]}], "]"}], "]"}]],"Input",CellTags->"trace_both_part_2"],
 
 Cell[TextData[{"With ",StyleBox["ApplySpecialization -> False",FontFamily->"Courier",FontSize->14],", the angular component of Eab includes its mass term even when a massless rule is active.\n\nStore the component before restoring the plane-wave profile."}],"Text"],
 
@@ -774,7 +836,9 @@ Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"MinkowskiFields\"", 
 
 Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"field_background"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"Keys", "[", RowBox[{RowBox[{"ShowBackground", "[", "\"Minkowski\"", "]"}], "[", "\"Field\"", "]"}], "]"}], ",", RowBox[{"Keys", "[", RowBox[{RowBox[{"ShowBackground", "[", "\"MinkowskiFields\"", "]"}], "[", "\"Field\"", "]"}], "]"}]}], "}"}]],"Input",CellTags->"field_snapshots"],
+Cell[BoxData[RowBox[{"Keys", "[", RowBox[{RowBox[{"ShowBackground", "[", "\"Minkowski\"", "]"}], "[", "\"Field\"", "]"}], "]"}]],"Input",CellTags->"field_snapshots_part_1"],
+
+Cell[BoxData[RowBox[{"Keys", "[", RowBox[{RowBox[{"ShowBackground", "[", "\"MinkowskiFields\"", "]"}], "[", "\"Field\"", "]"}], "]"}]],"Input",CellTags->"field_snapshots_part_2"],
 
 Cell[TextData[{"Assign the lower components of A in chart order (t,x,y,z) with ",StyleBox["IndexPositions -> {-1}",FontFamily->"Courier",FontSize->14],". Requesting ",StyleBox["A[a]",FontFamily->"Courier",FontSize->14]," raises the index with the Minkowski metric, changing the sign of the time component."}],"Text"],
 
@@ -786,7 +850,11 @@ Cell[BoxData[RowBox[{RowBox[{"Aup", "=", RowBox[{RowBox[{"AMinkowskiFields", "["
 
 Cell[BoxData[RowBox[{RowBox[{"normA", "=", RowBox[{RowBox[{RowBox[{"AMinkowskiFields", "[", "aMinkowskiFields", "]"}], " ", RowBox[{"AMinkowskiFields", "[", RowBox[{"-", "aMinkowskiFields"}], "]"}]}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_4"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{"Adown", ",", "Aup", ",", "normA"}], "}"}]],"Input",CellTags->"vector_values"],
+Cell[BoxData["Adown"],"Input",CellTags->"vector_values_part_1"],
+
+Cell[BoxData["Aup"],"Input",CellTags->"vector_values_part_2"],
+
+Cell[BoxData["normA"],"Input",CellTags->"vector_values_part_3"],
 
 Cell[TextData[{"For further native xCoba work, request Output -> \"CTensor\" to retain the basis and the variance of every tensor slot. The ordinary array remains the default.\n\nNative DefBasis, SetBasisChange, ToBasis and ToCTensor can be used on the owned xAct objects; see Tests/15_NativeInterop.wl and Examples/NativeXCoba.wl for a separate workflow.\n\nNative assignments do not automatically synchronize the managed registry."}],"Text"],
 
@@ -808,7 +876,9 @@ Cell[BoxData[RowBox[{RowBox[{RowBox[{"SMinkowskiFields", "[", RowBox[{RowBox[{"-
 
 Cell[TextData[{StyleBox["FreeIndices",FontFamily->"Courier",FontSize->14]," fixes the order of the array axes. Reversing the free indices transposes the matrix. ",StyleBox["Components",FontFamily->"Courier",FontSize->14]," selects individual entries.\n\nIn the original order, F has entries 2 at (0,1) and \:22122 at (1,0)."}],"Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{RowBox[{"FMinkowskiFields", "[", RowBox[{RowBox[{"-", "aMinkowskiFields"}], ",", RowBox[{"-", "bMinkowskiFields"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "bMinkowskiFields"}], ",", RowBox[{"-", "aMinkowskiFields"}]}], "}"}]}]}], "]"}]}], ",", RowBox[{RowBox[{"FMinkowskiFields", "[", RowBox[{RowBox[{"-", "aMinkowskiFields"}], ",", RowBox[{"-", "bMinkowskiFields"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "1"}], "}"}], ",", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}], "}"}]}]}], "]"}]}]}], "}"}]],"Input",CellTags->"tensor_selection"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"FMinkowskiFields", "[", RowBox[{RowBox[{"-", "aMinkowskiFields"}], ",", RowBox[{"-", "bMinkowskiFields"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "bMinkowskiFields"}], ",", RowBox[{"-", "aMinkowskiFields"}]}], "}"}]}]}], "]"}]}],"//","MatrixForm"}]],"Input",CellTags->"tensor_selection_part_1"],
+
+Cell[BoxData[RowBox[{RowBox[{"FMinkowskiFields", "[", RowBox[{RowBox[{"-", "aMinkowskiFields"}], ",", RowBox[{"-", "bMinkowskiFields"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "1"}], "}"}], ",", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}], "}"}]}]}], "]"}]}]],"Input",CellTags->"tensor_selection_part_2"],
 
 Cell[TextData[{"An independent covariant derivative"}],"Subsection"],
 
@@ -826,7 +896,9 @@ Cell[TextData[{"The default connection is the metric\:2019s Levi-Civita derivati
 
 Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"aDA", ",", "bDA", ",", "cDA", ",", "dDA"}], "}"}], "=", RowBox[{"BackgroundIndices", "[", RowBox[{"\"AffineStudy\"", ",", "4"}], "]"}]}], ";"}]],"Input",CellTags->"formal_affine_step_1"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{RowBox[{RowBox[{"ConnectionOf", "[", RowBox[{"\"AffineStudy\"", ",", "DA"}], "]"}], "[", RowBox[{"-", "aDA"}], "]"}], "[", RowBox[{RowBox[{"BackgroundObject", "[", RowBox[{"\"AffineStudy\"", ",", "\"phi\""}], "]"}], "[", "]"}], "]"}], ",", RowBox[{RowBox[{"RiemannOf", "[", RowBox[{"\"AffineStudy\"", ",", "DA"}], "]"}], "[", RowBox[{RowBox[{"-", "aDA"}], ",", RowBox[{"-", "bDA"}], ",", RowBox[{"-", "cDA"}], ",", "dDA"}], "]"}]}], "}"}]],"Input",CellTags->"formal_affine"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"ConnectionOf", "[", RowBox[{"\"AffineStudy\"", ",", "DA"}], "]"}], "[", RowBox[{"-", "aDA"}], "]"}], "[", RowBox[{RowBox[{"BackgroundObject", "[", RowBox[{"\"AffineStudy\"", ",", "\"phi\""}], "]"}], "[", "]"}], "]"}]],"Input",CellTags->"formal_affine_part_1"],
+
+Cell[BoxData[RowBox[{RowBox[{"RiemannOf", "[", RowBox[{"\"AffineStudy\"", ",", "DA"}], "]"}], "[", RowBox[{RowBox[{"-", "aDA"}], ",", RowBox[{"-", "bDA"}], ",", RowBox[{"-", "cDA"}], ",", "dDA"}], "]"}]],"Input",CellTags->"formal_affine_part_2"],
 
 Cell[TextData[{"Supply the independent connection coefficients in the order {upper output, lower derivative, lower input}. The assignment below sets a single coefficient, \:0393 with upper index t and lower indices (x,t), equal to t, in the Cartesian chart.\n\nYou can also supply the difference from the metric connection using ",StyleBox["ReferenceConnection -> \"Primary\"",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
@@ -856,7 +928,13 @@ Cell[BoxData["riemannDA"],"Input",CellTags->"affine_curvature_component"],
 
 Cell[TextData[{"Compare the same (x,t) entry using CD and DA. The Levi-Civita derivative gives zero for these Cartesian data. ",StyleBox["CheckConnection",FontFamily->"Courier",FontSize->14]," reports the torsion and metric-compatibility residuals for DA."}],"Text"],
 
-Cell[BoxData[RowBox[{"Grid", "[", RowBox[{RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"\"Connection\"", ",", "\"x,t component\""}], "}"}], ",", RowBox[{"{", RowBox[{"\"CD\"", ",", RowBox[{"First", "[", RowBox[{"ToComponents", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"A", "[", RowBox[{"-", "b"}], "]"}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}], "}"}]}]}], "]"}], "]"}]}], "}"}], ",", RowBox[{"{", RowBox[{"\"DA\"", ",", RowBox[{"First", "[", RowBox[{"ToComponents", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{RowBox[{"DA", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"A", "[", RowBox[{"-", "b"}], "]"}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}], "}"}]}]}], "]"}], "]"}]}], "}"}]}], "}"}], ",", RowBox[{"Frame", "\[Rule]", "All"}]}], "]"}]],"Input",CellTags->"compare_affine_component"],
+Cell["Levi-Civita connection (CD):","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{RowBox[{RowBox[{"ConnectionOf","[",RowBox[{"\"AffineStudy\"",",","\"Primary\""}],"]"}],"[",RowBox[{"-","aDA"}],"]","[",RowBox[{"AAffineStudy","[",RowBox[{RowBox[{"-","bDA"}]}],"]"}],"]"}],"//",RowBox[{"ToComponents","[",RowBox[{RowBox[{"FreeIndices","\[Rule]",RowBox[{"{",RowBox[{RowBox[{"-","aDA"}],",",RowBox[{"-","bDA"}]}],"}"}]}],",",RowBox[{"Components","\[Rule]",RowBox[{"{",RowBox[{RowBox[{"{",RowBox[{"1",",","0"}],"}"}]}],"}"}]}]}],"]"}]}],"//","First"}]],"Input",CellTags->"compare_affine_component_part_1"],
+
+Cell["Independent connection (DA):","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{RowBox[{RowBox[{"ConnectionOf","[",RowBox[{"\"AffineStudy\"",",","\"Affine\""}],"]"}],"[",RowBox[{"-","aDA"}],"]","[",RowBox[{"AAffineStudy","[",RowBox[{RowBox[{"-","bDA"}]}],"]"}],"]"}],"//",RowBox[{"ToComponents","[",RowBox[{RowBox[{"FreeIndices","\[Rule]",RowBox[{"{",RowBox[{RowBox[{"-","aDA"}],",",RowBox[{"-","bDA"}]}],"}"}]}],",",RowBox[{"Components","\[Rule]",RowBox[{"{",RowBox[{RowBox[{"{",RowBox[{"1",",","0"}],"}"}]}],"}"}]}]}],"]"}]}],"//","First"}]],"Input",CellTags->"compare_affine_component_part_2"],
 
 Cell[BoxData[RowBox[{"CheckConnection", "[", RowBox[{"\"AffineStudy\"", ",", "\"Affine\""}], "]"}]],"Input",CellTags->"affine_checks"],
 
@@ -868,7 +946,11 @@ Cell[BoxData["diffDA"],"Input",CellTags->"affine_difference"],
 
 Cell[TextData[{"Inspect the manifolds of DA and its copy. In a formula the derivative head selects the connection. ",StyleBox["ComputeGeometry",FontFamily->"Courier",FontSize->14]," calculates the geometry of the metric connection."}],"Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"ManifoldOfCovD", "[", "DA", "]"}], ",", RowBox[{"ManifoldOfCovD", "[", RowBox[{"ConnectionOf", "[", RowBox[{"\"AffineStudy\"", ",", "DA"}], "]"}], "]"}], ",", RowBox[{RowBox[{"ConnectionDifference", "[", RowBox[{"\"AffineStudy\"", ",", "DA", ",", "CD"}], "]"}], "===", "diffDA"}]}], "}"}]],"Input",CellTags->"compare_derivatives"],
+Cell[BoxData[RowBox[{"ManifoldOfCovD", "[", "DA", "]"}]],"Input",CellTags->"compare_derivatives_part_1"],
+
+Cell[BoxData[RowBox[{"ManifoldOfCovD", "[", RowBox[{"ConnectionOf", "[", RowBox[{"\"AffineStudy\"", ",", "DA"}], "]"}], "]"}]],"Input",CellTags->"compare_derivatives_part_2"],
+
+Cell[BoxData[RowBox[{RowBox[{"ConnectionDifference", "[", RowBox[{"\"AffineStudy\"", ",", "DA", ",", "CD"}], "]"}], "===", "diffDA"}]],"Input",CellTags->"compare_derivatives_part_3"],
 
 Cell[TextData[{"Unregister DA to omit it from future backgrounds. Its source definition and the existing affine study remain available."}],"Text"],
 
@@ -884,7 +966,9 @@ Cell[TextData[{"To change a profile or metric in an existing study, call ",Style
 
 Cell[TextData[{"Request the Ricci and Einstein tensors twice. With the same metric and settings, the second call reports both as cached."}],"Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"ComputeGeometry", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}], ",", RowBox[{"ComputeGeometry", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]}], "}"}]],"Input",CellTags->"geometry_reuse"],
+Cell[BoxData[RowBox[{"ComputeGeometry", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_1"],
+
+Cell[BoxData[RowBox[{"ComputeGeometry", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_2"],
 
 Cell[TextData[{StyleBox["SaveResult",FontFamily->"Courier",FontSize->14]," stores a value under a key and ",StyleBox["ResultOf",FontFamily->"Courier",FontSize->14]," retrieves it. Changing a printed label preserves saved results.\n\nChanging a mathematical input invalidates all saved results in that study."}],"Text"],
 
@@ -976,7 +1060,9 @@ Cell[TextData[{"Manual recreation"}],"Subsubsection"],
 
 Cell[BoxData[RowBox[{RowBox[{"DeleteBackground", "[", "\"MinkowskiFields\"", "]"}], ";"}]],"Input",CellTags->"delete_background_step_1"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"KeyExistsQ", "[", RowBox[{"$BG", ",", "\"MinkowskiFields\""}], "]"}], ",", RowBox[{"MetricQ", "[", "oldMetric", "]"}]}], "}"}]],"Input",CellTags->"delete_background"],
+Cell[BoxData[RowBox[{"KeyExistsQ", "[", RowBox[{"$BG", ",", "\"MinkowskiFields\""}], "]"}]],"Input",CellTags->"delete_background_part_1"],
+
+Cell[BoxData[RowBox[{"MetricQ", "[", "oldMetric", "]"}]],"Input",CellTags->"delete_background_part_2"],
 
 Cell[TextData[{"The two False values confirm that xPlorer removed the study and xAct unregistered its old metric. Recreating a background sets up its automatic names again.\n\nRefresh any aliases you assigned yourself."}],"Text"],
 
@@ -1034,5 +1120,5 @@ Cell[TextData[{"The optional ScalarTheory.wl contains the initial scalar definit
  Cell[StyleData["DisplayFormula"], FontSize -> 17],
  Cell[StyleData["Important"], FontSize -> 15, FontWeight -> "Bold", LineSpacing -> {1.2,0}, CellMargins -> {{66,10},{8,8}}, CellFrame -> {{2,0},{0,0}}, CellFrameMargins -> {{10,8},{7,7}}],
  Cell[StyleData["Tip"], FontSize -> 15, FontSlant -> "Italic", LineSpacing -> {1.2,0}, CellMargins -> {{78,10},{8,8}}, CellFrameMargins -> {{10,8},{6,6}}],
- Cell[StyleData["Program"], FontSize -> 15, CellFrame -> {{0.5,0},{0,0}}, CellFrameMargins -> {{10,8},{6,6}}]
+ Cell[StyleData["Program"], FontSize -> 20, FontWeight -> "Bold", LineSpacing -> {1.25,4}, CellFrame -> {{0.5,0},{0,0}}, CellFrameMargins -> {{10,8},{6,6}}]
 },Visible->False,StyleDefinitions->"PrivateStylesheetFormatting.nb"],Saveable->True]
