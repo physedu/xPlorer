@@ -171,9 +171,9 @@ Cell[TextData[{StyleBox["PrintAs -> Automatic",FontFamily->"Courier",FontSize->1
 
 Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "phi", ",", RowBox[{"PrintAs", "\[Rule]", "Automatic"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "g", ",", RowBox[{"PrintAs", "\[Rule]", "Automatic"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "CD", ",", RowBox[{"PrintAs", "\[Rule]", "Automatic"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"KeyTake", "[", RowBox[{RowBox[{RowBox[{"PresentationOf", "[", "\"Schwarzschild\"", "]"}], "[", "\"Effective\"", "]"}], ",", RowBox[{"{", RowBox[{"\"Metric\"", ",", "\"CovD\"", ",", "\"phi\""}], "}"}]}], "]"}]}]],"Input",CellTags->"reset_presentation"],
 
-Cell[TextData[{StyleBox["PrettyExp",FontFamily->"Courier",FontSize->11]," expresses the gradient with the source heads and indices for comparison. Continue the Schwarzschild calculation with ",StyleBox["gradPhi",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{StyleBox["PrettyExp",FontFamily->"Courier",FontSize->11]," creates an interpreted view of the gradient without changing its background heads or indices. Normal recovers the original expression. Continue the Schwarzschild calculation with ",StyleBox["gradPhi",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"PrettyExp", "[", "\"Schwarzschild\"", "]"}], "[", "gradPhi", "]"}]],"Input",CellTags->"pretty_gradient"]
+Cell[BoxData[RowBox[{"gradPhi", "//", "PrettyExp"}]],"Input",CellTags->"pretty_gradient"]
 },Open]],
 
 Cell[CellGroupData[{
@@ -281,11 +281,11 @@ Cell[TextData[{StyleBox["ToComponents",FontFamily->"Courier",FontSize->11]," eva
 
 Cell[BoxData[RowBox[{RowBox[{"eqMink", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "\"ScalarEq\""}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"eqMink", "\[Equal]", "0"}]}]],"Input",CellTags->"minkowski_equation"],
 
-Cell[TextData[{"In native multi-index notation, (2,0,0,0) means two time derivatives. In ",StyleBox["DisplayExpression",FontFamily->"Courier",FontSize->11],", ",StyleBox["\"MultiIndex\"",FontFamily->"Courier",FontSize->11]," keeps the orders explicit, ",StyleBox["\"Fraction\"",FontFamily->"Courier",FontSize->11]," gives a quotient and ",StyleBox["\"Partial\"",FontFamily->"Courier",FontSize->11]," uses a partial-derivative operator. ",StyleBox["\"Prime\"",FontFamily->"Courier",FontSize->11]," gives primes for functions of one argument and native notation for other arities."}],"Text"],
+Cell[TextData[{"In native multi-index notation, (2,0,0,0) means two time derivatives. In ",StyleBox["PrettyExp",FontFamily->"Courier",FontSize->11],", ",StyleBox["\"MultiIndex\"",FontFamily->"Courier",FontSize->11]," keeps the orders explicit, ",StyleBox["\"Fraction\"",FontFamily->"Courier",FontSize->11]," gives a quotient and ",StyleBox["\"Partial\"",FontFamily->"Courier",FontSize->11]," uses a partial-derivative operator. ",StyleBox["\"Prime\"",FontFamily->"Courier",FontSize->11]," gives primes for functions of one argument and native notation for other arities."}],"Text"],
 
-Cell[BoxData[RowBox[{"DisplayExpression", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"eqMink", "\[Equal]", "0"}], ",", RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}]}], "]"}]],"Input",CellTags->"partial_view"],
+Cell[BoxData[RowBox[{"PrettyExp", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"eqMink", "\[Equal]", "0"}], ",", RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}]}], "]"}]],"Input",CellTags->"partial_view"],
 
-Cell[BoxData[RowBox[{RowBox[{"Normal", "[", RowBox[{"DisplayExpression", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"eqMink", "\[Equal]", "0"}]}], "]"}], "]"}], "===", RowBox[{"(", RowBox[{"eqMink", "\[Equal]", "0"}], ")"}]}]],"Input",CellTags->"view_identity"],
+Cell[BoxData[RowBox[{RowBox[{"Normal", "[", RowBox[{"PrettyExp", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"eqMink", "\[Equal]", "0"}]}], "]"}], "]"}], "===", RowBox[{"(", RowBox[{"eqMink", "\[Equal]", "0"}], ")"}]}]],"Input",CellTags->"view_identity"],
 
 Cell[TextData[{StyleBox["Normal",FontFamily->"Courier",FontSize->11]," recovers the underlying equation, which is also retained when the display is copied. To use comma notation throughout Minkowski, set it once with ",StyleBox["SetNotation",FontFamily->"Courier",FontSize->11]," and evaluate ",StyleBox["eqMink",FontFamily->"Courier",FontSize->11]," again. The following cell switches back to fractions."}],"Text"],
 
@@ -293,9 +293,9 @@ Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Minkowski\"", ",", R
 
 Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}]}], "]"}], ";"}]],"Input",CellTags->"automatic_fraction"],
 
-Cell[TextData[{"For abstract covariant derivatives, xAct\:2019s ",StyleBox["$CovDFormat",FontFamily->"Courier",FontSize->11]," selects ",StyleBox["\"Prefix\"",FontFamily->"Courier",FontSize->11]," or ",StyleBox["\"Postfix\"",FontFamily->"Courier",FontSize->11],". To choose the style for one displayed expression, pass ",StyleBox["CovariantStyle",FontFamily->"Courier",FontSize->11]," to ",StyleBox["DisplayExpression",FontFamily->"Courier",FontSize->11],". This overrides the background setting for that view."}],"Text"],
+Cell[TextData[{"For abstract covariant derivatives, xAct\:2019s ",StyleBox["$CovDFormat",FontFamily->"Courier",FontSize->11]," selects ",StyleBox["\"Prefix\"",FontFamily->"Courier",FontSize->11]," or ",StyleBox["\"Postfix\"",FontFamily->"Courier",FontSize->11],". To choose the style for one displayed expression, pass ",StyleBox["CovariantStyle",FontFamily->"Courier",FontSize->11]," to ",StyleBox["PrettyExp",FontFamily->"Courier",FontSize->11],". This overrides the background setting for that view."}],"Text"],
 
-Cell[BoxData[RowBox[{"DisplayExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "gradPhi", ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Postfix\""}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "True"}]}], "]"}]],"Input",CellTags->"covariant_view"],
+Cell[BoxData[RowBox[{"PrettyExp", "[", RowBox[{"\"Schwarzschild\"", ",", "gradPhi", ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Postfix\""}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "True"}]}], "]"}]],"Input",CellTags->"covariant_view"],
 
 Cell[TextData[{"With signature (\:2212,+,+,+), the time and spatial second derivatives enter with opposite signs."}],"Text"],
 
