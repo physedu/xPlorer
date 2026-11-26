@@ -30,7 +30,7 @@ The principal notebook develops a scalar theory on Minkowski, Schwarzschild and 
 - Scoped rules, selective removal, named particularizations and conservative invalidation of saved results.
 - Separate value clearing, registration removal and true dependency-aware deletion of owned fields, charts, connections, metric families or whole backgrounds.
 
-The principal notebook has passed 119/119 input executions, 66/66 expected-result checks and 7/7 workflow-order checks on dev.6. All eight historical groups passed (288 assertion executions including repeated core checks); registration 45/45, inspection 23/23, native interop 20/20, profiles and CTensor 33/33. The front-end appearance and actual .paclet archive/install remain unverified. The 88-input legacy build source is not the current notebook.
+The principal notebook has passed 119/119 input executions, 66/66 expected-result checks and 7/7 workflow-order checks on dev.6. All eight historical groups passed (288 assertion executions including repeated core checks); registration 45/45, inspection 23/23, native interop 20/20, profiles and CTensor 33/33. The author confirmed a successful Desktop paclet build on Windows. The clean builder and actual paclet installation still need Desktop verification; front-end appearance has not been fully reviewed. The 88-input legacy build source is not the current notebook.
 
 See [API_GUIDE.md](API_GUIDE.md), the [Proca example](Examples/Beta13_Proca.wl) and [native xCoba example](Examples/NativeXCoba.wl). [VALIDATION.md](VALIDATION.md) is a historical beta.7 record; current evidence and limitations are in [BETA13_PROGRESS.md](BETA13_PROGRESS.md) and [BETA13_PLAN.md](BETA13_PLAN.md).
 
@@ -61,7 +61,14 @@ PacletDirectoryLoad["/absolute/path/to/xPlorer"];
 Needs["xPlorer`"];
 ```
 
-For a distributable archive, run Tools/BuildPaclet.wl on Mathematica Desktop. Install the resulting .paclet using PacletInstall[path]. The dev.3 staging directory and Needs loading have been verified, including package source, license and citation assets. Actual archive creation was blocked by the remote kernel's Java security policy; Desktop archive installation has not yet been validated. Do not keep both a conflicting traditional installation and a paclet active.
+To build and install a distributable archive, open xPlorer_Workflow.nb in Mathematica Desktop and evaluate:
+
+```wl
+build = Get[FileNameJoin[{NotebookDirectory[], "Tools", "BuildPaclet.wl"}]];
+If[MatchQ[build, _Success], PacletInstall[build["PacletArchive"]]]
+```
+
+The builder stages only PacletInfo.wl, xPlorer.wl, the two Kernel loaders, LICENSE and CITATION.cff in a temporary directory, calls PacletBuild without suppressing warnings, copies the archive to the repository's build directory (replacing an existing same-named archive), and removes the temporary tree. The author successfully built dev.6 with the earlier builder on Windows; that archive remains valid without rebuilding because the runtime files are unchanged. The clean staging and structured failure handling have been tested remotely; final archive creation there remains blocked by Java security policy. The clean builder's successful archive path and Desktop installation still require testing. Do not keep both a conflicting traditional installation and a paclet active. For future releases, distribute the verified archive as a GitHub Release asset so users do not need to build it themselves. No release has been published.
 
 ### Inspect the registered theory
 
