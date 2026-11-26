@@ -27,6 +27,7 @@ Global`$XPlorerWorkflowReport=Module[
      SameQ[First[value],head]&&xAct`xTensor`xTensorQ[head]&&SameQ[SymbolName[head],"matterDemo"]&&SameQ[xAct`xTensor`PrintAs[head],"P"]],
    "naming_setup",stages["Greek index labels on naming example"]=With[{ii=xPlorer`BackgroundIndices["NamingExample",2]},SameQ[Map[Function[ix,With[{s=ix},xAct`xTensor`PrintAs[s]]],ii],{"\[Mu]","\[Nu]"}]],
    "naming_index_aliases",stages["Latin aliases preserve Greek indices"]=SameQ[value,Rest[Global`$XPlorerWorkflowOutputs["naming_result"]][[{2,3}]]],
+   "custom_postfix_marker",stages["Custom postfix marker is rendered"]=With[{v=value},!FreeQ[MakeBoxes[v,StandardForm],"|"]],
    "session_prefix",stages["Session prefix applies to both backgrounds"]=SameQ[printedStyle[#,"CovariantStyle"]& /@ value,{"Prefix","Prefix"}],
    "local_postfix",stages["Background notation overrides only its own output"]=SameQ[printedStyle[#,"CovariantStyle"]& /@ value,{"Prefix","Postfix"}]&&TrueQ[printedStyle[Last[value],"ShowBackgroundLabel"]],
    "pretty_default",stages["Postfix PrettyExp inherits background settings"]=SameQ[styleOf[value,"CovariantStyle"],"Postfix"]&&TrueQ[styleOf[value,"ShowBackgroundLabel"]],
