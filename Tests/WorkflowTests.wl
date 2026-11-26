@@ -32,10 +32,10 @@ Global`$XPlorerWorkflowReport=Module[
    "named_profiles",profileRuns=xPlorer`ShowBackground["Minkowski"]["GeometryRuns"],
    "profile_cached_geometry",stages["Profile switching retains geometry run count"]=SameQ[xPlorer`ShowBackground["Minkowski"]["GeometryRuns"],profileRuns],
    "eab_postfix",stages["Rank two notation preserves expression"]=SameQ[Normal[value],Global`EabSchw]&&SameQ[styleOf[value,"CovariantStyle"],"Postfix"];
-    stages["Eab display has no internal context labels"]=With[{v=value},StringFreeQ[ToString[MakeBoxes[v,StandardForm]/.InterpretationBox[display_,___]:>display,InputForm],"Backgrounds`"]],
+    stages["Eab display has no internal context labels"]=With[{v=value},StringFreeQ[ToString[MakeBoxes[v,StandardForm]//.InterpretationBox[display_,___]:>display,InputForm],"Backgrounds`"]],
    "partial_comma",stages["All five multivariate partial styles preserve equation"]=AllTrue[{"partial_view","partial_multiindex","partial_fraction","partial_partial","partial_comma"},SameQ[Normal[Global`$XPlorerWorkflowOutputs[#]],Global`$XPlorerWorkflowOutputs["minkowski_equation"]]&],
    "native_metric_basis",stages["Native CTensor bases are both covariant"]=With[{bb=xPlorer`BasisOf["Minkowski"]},SameQ[value,{-bb,-bb}]];
-    stages["Chart has clean display without changing identity"]=With[{v=value},StringFreeQ[ToString[MakeBoxes[v,StandardForm]/.InterpretationBox[display_,___]:>display,InputForm],"Backgrounds`"] && !FreeQ[MakeBoxes[v,StandardForm],"chartM"]],
+    stages["Chart has clean display without changing identity"]=With[{v=value},StringFreeQ[ToString[MakeBoxes[v,StandardForm]//.InterpretationBox[display_,___]:>display,InputForm],"Backgrounds`"] && !FreeQ[MakeBoxes[v,StandardForm],"chartM"]],
    "inferred_eab",stages["Inferred Eab agrees with explicit components"]=SameQ[First[value],xPlorer`ToComponents["Schwarzschild",Global`EabSchw]];
     stages["Inferred CTensor options"]=With[{v=xPlorer`ToComponents[Global`EabSchw,xPlorer`Output->"CTensor"]},MatchQ[v,_xAct`xCoba`CTensor]&&SameQ[Part[v,1],First[value]]];
     stages["Ambiguous and abstract inputs require tag"]=And[FailureQ[xPlorer`ToComponents[Global`Eab]],FailureQ[xPlorer`ToComponents[{Global`phiM[],Global`phiSchw[]}]],FailureQ[xPlorer`ToComponents[1]]],
