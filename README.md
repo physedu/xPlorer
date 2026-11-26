@@ -2,11 +2,11 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-> **Development branch: 14.0.0-beta.13-dev.2.** The new registration API is breaking. The original 115-input author notebook and historical regression suite have been migrated and tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
+> **Development branch: 14.0.0-beta.13-dev.3.** The new registration API is breaking. The original 115-input author notebook and historical regression suite have been migrated and tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
 
 xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
-The current experimental version is **14.0.0-beta.13-dev.2**. The preserved baseline on main is beta.12. The default workflow remains a normal Get, theory registration and tagged background creation. Personalization is optional.
+The current experimental version is **14.0.0-beta.13-dev.3**. The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Theory registration and tagged background creation are unchanged. Personalization is optional.
 
 ## Start here
 
@@ -16,7 +16,7 @@ Keep [xPlorer_Workflow.nb](xPlorer_Workflow.nb) beside [xPlorer.wl](xPlorer.wl),
 Get[FileNameJoin[{NotebookDirectory[], "xPlorer.wl"}]];
 ```
 
-The principal notebook develops a scalar theory on Minkowski, Schwarzschild and FLRW, then introduces vectors, tensors, an independent affine connection, perturbations and cleanup. It contains 115 executable input cells, with explanatory prose beside the calculations. The stylesheet inherits light/dark theme colors. ScalarTheory.wl is an optional reusable source recipe; it is not required to run the notebook.
+The principal notebook develops a scalar theory on Minkowski, Schwarzschild and FLRW, then introduces vectors, tensors, an independent affine connection, perturbations and cleanup. It contains 117 executable input cells, with explanatory prose beside the calculations. The stylesheet inherits light/dark theme colors. ScalarTheory.wl is an optional reusable source recipe; it is not required to run the notebook.
 
 ## Features
 
@@ -28,13 +28,49 @@ The principal notebook develops a scalar theory on Minkowski, Schwarzschild and 
 - Scoped rules, selective removal, named particularizations and conservative invalidation of saved results.
 - Separate value clearing, registration removal and true dependency-aware deletion of owned fields, charts, connections, metric families or whole backgrounds.
 
-The principal notebook has passed 115/115 input executions, 65/65 expected-result checks and 6/6 workflow-order checks. The eight historical regression groups also passed (279 assertion executions including repeated core tests). The optional scalar recipe has been checked independently. See BETA13_PROGRESS.md for exact commits and evidence. The front-end appearance, older API guide and loader metadata have not been revalidated. The 88-input legacy build source is not the current notebook.
+The principal notebook has passed 117/117 input executions, 65/65 expected-result checks and 6/6 workflow-order checks on dev.3. The theory inspection and application installation tests passed 18/18; registration (45/45), lifecycle (64/64) and display (34/34) were rerun on dev.3. All eight historical regression groups passed on dev.2 (279 assertion executions including repeated core tests). The optional scalar recipe has been checked independently. See BETA13_PROGRESS.md for exact commits and evidence. The front-end appearance, older API guide and loader metadata have not been revalidated. The 88-input legacy build source is not the current notebook.
 
 For the current registration syntax, use the principal notebook and the [Proca example](Examples/Beta13_Proca.wl). [API_GUIDE.md](API_GUIDE.md) and [VALIDATION.md](VALIDATION.md) are historical beta.7-era documentation; do not use their old positional registration forms with beta.13. Current evidence and limitations are in [BETA13_PROGRESS.md](BETA13_PROGRESS.md).
 
 ## Installation and development
 
-Direct Get needs no installation. The repository also contains a traditional application loader and PacletInfo.wl. See the installation section in API_GUIDE.md for Needs and development paclet loading. xAct is installed separately and is not bundled.
+### Install as a Mathematica application
+
+Download and extract the complete repository, with xAct already installed. In a fresh Mathematica kernel:
+
+```wl
+Get["/absolute/path/to/xPlorer/Install.wl"];
+InstallXPlorer[]
+```
+
+The installer copies the package, loaders, license and citation metadata to `$UserBaseDirectory/Applications/xPlorer`. It refuses to overwrite an existing installation; move the old application to a backup outside Applications before replacing it. Restart the kernel, then in any notebook:
+
+```wl
+Needs["xPlorer`"];
+$XPlorerVersion
+```
+
+The notebook still supports its standalone Get startup. For installed usage, replace its first Get cell with Needs.
+
+### Paclet development and distribution
+
+```wl
+PacletDirectoryLoad["/absolute/path/to/xPlorer"];
+Needs["xPlorer`"];
+```
+
+For a distributable archive, run Tools/BuildPaclet.wl on Mathematica Desktop. Install the resulting .paclet using PacletInstall[path]. The dev.3 staging directory and Needs loading have been verified, including package source, license and citation assets. Actual archive creation was blocked by the remote kernel's Java security policy; Desktop archive installation has not yet been validated. Do not keep both a conflicting traditional installation and a paclet active.
+
+### Inspect the registered theory
+
+```wl
+ShowTheory[]
+ShowTheory["Lagrangians"]
+ShowTheoryKeys[]
+TheoryValue["Lagrangians", "Lagrangian"]
+```
+
+ShowTheory is a read-only native Grid/Column presentation. TheoryValue retrieves usable values. TheorySnapshot[] is the optional raw association for restoration; existing backgrounds capture their own theory automatically. BackgroundObject, automatic suffixed symbols and qualified expression lookup are unchanged. xAct is installed separately and is not bundled.
 
 - [Development plan](DEVELOPMENT_PLAN.md)
 - [Design decisions](DECISIONS.md)
@@ -55,7 +91,7 @@ If you use xPlorer in your research, please cite the version used. GitHub's **Ci
   author  = {Sanz-Romero, Eduardo},
   title   = {xPlorer},
   year    = {2026},
-  version = {14.0.0-beta.13-dev.2},
+  version = {14.0.0-beta.13-dev.3},
   url     = {https://github.com/physedu/xPlorer}
 }
 ```
