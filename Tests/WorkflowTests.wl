@@ -7,7 +7,8 @@ Global`$XPlorerWorkflowReport=Module[
   parseFailures={},compoundFailures={},warnings={},timings={},started=AbsoluteTime[],run,failed,oldFieldName,initiallyAbsent,styleOf,printedStyle,profileRuns},
  initiallyAbsent=!MemberQ[$Packages,"xPlorer`"];
  notebook=Get[FileNameJoin[{directory,"xPlorer_Workflow.nb"}]];
- inputs=Cases[notebook,Cell[BoxData[b_],"Input",CellTags->id_String]:>{id,b},Infinity];
+ (* The two startup cells are alternatives. Test the direct-source path here. *)
+ inputs=DeleteCases[Cases[notebook,Cell[BoxData[b_],"Input",CellTags->id_String]:>{id,b},Infinity],{"load_installed",_}];
  Block[{Print=(Null&)},Needs["xAct`xPert`"];Needs["xAct`xCoba`"]];
  styleOf[view_,key_]:=If[Head[view]===xPlorer`Private`expressionView,view[[2]][key],Missing["Native"]];
  printedStyle[expr_,key_]:=styleOf[xPlorer`Private`notebookPrint[expr],key];
