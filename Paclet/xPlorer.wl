@@ -169,7 +169,7 @@ RegisterTheory[assoc_Association] := ($Theory=Join[$Theory,assoc]; $Theory);
 RegisterTheory["Metric",value_] := ($Theory["Metric"]=value;$Theory);
 RegisterTheory["CovD",value_] := ($Theory["CovD"]=value;$Theory);
 RegisterTheory["Indices",value_List] := ($Theory["Indices"]=value;$Theory);
-RegisterTheory[key:("Title"|"Description"),value_String] := ($Theory[key]=value;$Theory);
+RegisterTheory[key:("Title"|"Description"),value_] := With[{v=value},If[StringQ[v],$Theory[key]=v;$Theory,failure["TheoryInformation","Title and Description must be strings."]]];
 RegisterTheory[key:("Assumptions"|"Conditions"),value_] := ($Theory[key]=value;$Theory);
 b13NativeField[h_Symbol,opts_Association] := Module[
  {g=Lookup[$Theory,"Metric",None],bundle,m,slots,rank,type,key,base,label,sector,pert,idx},
@@ -1004,7 +1004,7 @@ b13TheoryView[t_,section_,detail_] := Module[{a},
  "Connections",b13Table[{"Key","Derivative"},
    KeyValueMap[{#1,#2["Head"]}&,Lookup[t,"Connections",<||>]]],
  "Sectors",b13Table[{"Sector","Fields","Parameters","Lagrangians","Expressions"},
-   Table[Prepend[Map[Function[records,If[records===<||>,0,Column[{Length[records],Row[Riffle[Keys[records],", "]]},Spacings->0.25]]],Values[AssociationMap[
+   Table[Prepend[Map[Function[records,If[records===<||>,0,Column[Join[{Style[Length[records],Bold]},Keys[records]],Spacings->0.25]]],Values[AssociationMap[
     Select[b13Collection[t,#],Lookup[#,"Sector",None]===sector&]&,
     {"Fields","Parameters","Lagrangians","Expressions"}]]],sector],{sector,b13Sectors[t]}]],
  _,failure["TheoryKey","Unknown theory display section.",<|"Key"->section|>]
@@ -1013,7 +1013,7 @@ ShowTheory[] := Module[{t=$Theory,header,sections,extra},
  header=Join[{Style[Lookup[t,"Title","Registered theory"],Bold,20]},
   If[KeyExistsQ[t,"Description"],{Lookup[t,"Description"]},{}],
   (Column[{Style[#,Bold],t[#]},Spacings->0.5]& /@ Select[{"Assumptions","Conditions"},KeyExistsQ[t,#]&])];
- sections=Select[b13Sections,Switch[#,"Geometry",Length[b13Geometry[t]]>0,"Sectors",b13Sectors[t]=!={},_,Length[b13Collection[t,#]]>0]&];
+ sections=Select[b13Sections,Switch[#,"Geometry",Length[b13Geometry[t]]>0,"Sectors",b13Sectors[t]=!={},"Connections",Length[Lookup[t,"Connections",<||>]]>0,_,Length[b13Collection[t,#]]>0]&];
  extra=KeyDrop[b13Metadata[t],{"Title","Description","Assumptions","Conditions"}];
  Column[Join[header,(Column[{Style[#,Bold],b13TheoryView[t,#,False]},Spacings->0.5]& /@ sections),
   If[extra===<||>,{},{Column[{Style["Additional information",Bold],b13KeyTable[extra]}]}]],Spacings->1.3]
