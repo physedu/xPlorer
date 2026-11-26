@@ -31,9 +31,14 @@ Global`$XPlorerWorkflowReport=Module[
    "custom_presentation",stages["Multiple labels applied together"]=SameQ[KeyTake[xPlorer`PresentationOf["Schwarzschild"]["Effective"],{"phi","Metric","CovD"}],<|"phi"->"\[Psi]","Metric"->"q","CovD"->{"|","D"}|>],
    "named_profiles",profileRuns=xPlorer`ShowBackground["Minkowski"]["GeometryRuns"],
    "profile_cached_geometry",stages["Profile switching retains geometry run count"]=SameQ[xPlorer`ShowBackground["Minkowski"]["GeometryRuns"],profileRuns],
-   "eab_postfix",stages["Rank two notation preserves expression"]=SameQ[Normal[value],Global`EabSchw]&&SameQ[styleOf[value,"CovariantStyle"],"Postfix"],
+   "eab_postfix",stages["Rank two notation preserves expression"]=SameQ[Normal[value],Global`EabSchw]&&SameQ[styleOf[value,"CovariantStyle"],"Postfix"];
+    stages["Eab display has no internal context labels"]=With[{v=value},StringFreeQ[ToString[MakeBoxes[v,StandardForm]/.InterpretationBox[display_,___]:>display,InputForm],"Backgrounds`"]],
    "partial_comma",stages["All five multivariate partial styles preserve equation"]=AllTrue[{"partial_view","partial_multiindex","partial_fraction","partial_partial","partial_comma"},SameQ[Normal[Global`$XPlorerWorkflowOutputs[#]],Global`$XPlorerWorkflowOutputs["minkowski_equation"]]&],
-   "native_metric_basis",stages["Native CTensor bases are both covariant"]=With[{bb=xPlorer`BasisOf["Minkowski"]},SameQ[value,{-bb,-bb}]],
+   "native_metric_basis",stages["Native CTensor bases are both covariant"]=With[{bb=xPlorer`BasisOf["Minkowski"]},SameQ[value,{-bb,-bb}]];
+    stages["Chart has clean display without changing identity"]=With[{v=value},StringFreeQ[ToString[MakeBoxes[v,StandardForm]/.InterpretationBox[display_,___]:>display,InputForm],"Backgrounds`"] && !FreeQ[MakeBoxes[v,StandardForm],"chartM"]],
+   "inferred_eab",stages["Inferred Eab agrees with explicit components"]=SameQ[First[value],xPlorer`ToComponents["Schwarzschild",Global`EabSchw]];
+    stages["Inferred CTensor options"]=With[{v=xPlorer`ToComponents[Global`EabSchw,xPlorer`Output->"CTensor"]},MatchQ[v,_xAct`xCoba`CTensor]&&SameQ[Part[v,1],First[value]]];
+    stages["Ambiguous and abstract inputs require tag"]=And[FailureQ[xPlorer`ToComponents[Global`Eab]],FailureQ[xPlorer`ToComponents[{Global`phiM[],Global`phiSchw[]}]],FailureQ[xPlorer`ToComponents[1]]],
    "custom_postfix_marker",stages["Custom postfix marker is rendered"]=With[{v=value},!FreeQ[MakeBoxes[v,StandardForm],"|"]],
    "session_prefix",stages["Session prefix applies to both backgrounds"]=SameQ[printedStyle[#,"CovariantStyle"]& /@ value,{"Prefix","Prefix"}],
    "local_postfix",stages["Background notation overrides only its own output"]=SameQ[printedStyle[#,"CovariantStyle"]& /@ value,{"Prefix","Postfix"}]&&TrueQ[printedStyle[Last[value],"ShowBackgroundLabel"]],
@@ -46,7 +51,9 @@ Global`$XPlorerWorkflowReport=Module[
    "automatic_fraction",stages["Minkowski inherits session fraction again"]=SameQ[printedStyle[value,"PartialStyle"],"Fraction"],
    "radial_prime",stages["Radial equation uses prime notation"]=SameQ[printedStyle[value,"PartialStyle"],"Prime"],
    "radial_restore",stages["Radial equation inherits fraction again"]=SameQ[printedStyle[value,"PartialStyle"],"Fraction"],
-   "register_metadata",stages["Theory registered before backgrounds"]=Keys[xPlorer`$BG]==={},
+   "register_metadata",stages["Theory registered before backgrounds"]=Keys[xPlorer`$BG]==={};
+    stages["Title and description at top"]=With[{v=xPlorer`ShowTheory[]},!FreeQ[First[v][[1]],"Massive scalar field"]&&SameQ[First[v][[2]],"A real massive scalar field minimally coupled to gravity."]];
+    stages["Sector keys visible"]=And@@(!FreeQ[xPlorer`ShowTheory["Sectors"],#]& /@ {"phi","Mass","Kinetic","MassTerm","Lagrangian","Eab","Gradient","Hessian"}),
    "create_manifolds",stages["Three independent manifolds before charts"]=Length[xPlorer`$BG]===3&&
      Length[DeleteDuplicates[Lookup[Values[xPlorer`$BG],"Manifold"]]]===3&&AllTrue[Values[xPlorer`$BG],!KeyExistsQ[#,"Chart"]&],
    "charts",stages["Charts chosen before metric matrices"]=AllTrue[Values[xPlorer`$BG],KeyExistsQ[#,"Chart"]&&!KeyExistsQ[#,"MetricMatrix"]&],
