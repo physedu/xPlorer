@@ -50,8 +50,12 @@ $BG::usage = "$BG stores the backgrounds created by the package.";
 
 SyntaxInformation[RegisterTheory] = <|"ArgumentsPattern" -> {_, ___}|>;
 
-ToComponents::usage = "ToComponents[tag, expressionOrKey, opts] ports an expression and evaluates its components in the background chart.";
+ToComponents::usage = "ToComponents[tag, expressionOrKey, opts] ports an expression and evaluates its components in the background chart. Output -> \"CTensor\" returns a native xCoba CTensor for a complete resolved positive-rank zero-weight tensor array; default Output -> \"Array\".";
 SetFieldComponents::usage = "SetFieldComponents[tag, field, values, opts] assigns scalar/vector/tensor components. A pure Function receives the chart coordinate scalars.";
+RegisterProfile::usage = "RegisterProfile[tag, name, field, values, opts] stores a validated field input without activating it; repeated calls add or replace field/order entries. RegisterProfile[tag, name] captures the currently assigned managed inputs.";
+ActivateProfile::usage = "ActivateProfile[tag, name] overlays a named profile on managed field inputs, preserving fields/orders not specified. Geometry is reused and saved results invalidated.";
+ShowProfiles::usage = "ShowProfiles[tag] returns the stored named field input records.";
+RemoveProfile::usage = "RemoveProfile[tag, name] removes a stored profile without changing active field values.";
 ComputeGeometry::usage = "ComputeGeometry[tag, targets, opts] computes only the requested xCoba geometry and reuses compatible cached results.";
 CheckBackground::usage = "CheckBackground[tag, opts] returns Passed, Failed or Inconclusive checks, including optional metric compatibility and contracted Bianchi tests.";
 PerturbOn::usage = "PerturbOn[tag, expressionOrKey, n, opts] computes the nth variation (or Taylor coefficient when requested), with optional component output.";
@@ -69,7 +73,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package version, authorship, license and project link.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.5";
+$XPlorerVersion = "14.0.0-beta.13-dev.6";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label; the association form changes several labels of owned background objects. Automatic restores the inherited default for a key.";
@@ -646,16 +650,17 @@ storeField[b_, spec_] := Module[{head = spec["Head"], signs = spec["IndexPositio
   expression = head @@ Join[If[spec["Order"] === None, {}, {LI[spec["Order"]]}], MapThread[{#1 #2, #2 b["Basis"]} &, {inds, signs}]];
   guard[Block[{$CVVerbose = False}, If[signs === {}, ComponentValue[expression, spec["Values"]], AllComponentValues[expression, spec["Values"]]]]]
 ];
-replayFields[tag_] := Module[{b = $BG[tag], records, heads, result},
+replayFields[tag_, extraHeads_:{}] := Module[{b = $BG[tag], records, heads, result},
   records = Values[b["FieldComponents"]];
-  heads = DeleteDuplicates[Lookup[records, "Head", {}]];
-  Scan[guard[DeleteTensorValues[#]] &, heads];
+  heads = DeleteDuplicates[Join[Lookup[records, "Head", {}],extraHeads]];
+  result = guard[Scan[DeleteTensorValues,heads]];
+  If[result===$Failed,Return[failure["FieldAssignment","Could not clear existing field values."]]];
   result = storeField[b, #] & /@ records;
   If[MemberQ[result, $Failed], failure["FieldAssignment", "xCoba could not restore the field components."], Null]
 ];
 Options[SetFieldComponents] = {IndexPositions -> Automatic, PerturbationOrderLabel -> 1, Assumptions -> Automatic};
-SetFieldComponents[tag_String, field_Symbol, input_, OptionsPattern[]] := Module[
-  {b = background[tag], fs, vals, signs, order, key, rec, result, ass, tensor, expected, actual},
+fieldComponentRecord[tag_String, field_Symbol, input_, OptionsPattern[SetFieldComponents]] := Module[
+  {b = background[tag], fs, vals, signs, order, ass, tensor, expected, actual},
   If[FailureQ[b], Return[b]];
   If[!KeyExistsQ[b, "Basis"], Return[failure["NoChart", "Define the chart before assigning field components."]]];
   fs = fieldSpec[b, field]; If[FailureQ[fs], Return[fs]];
@@ -675,11 +680,55 @@ SetFieldComponents[tag_String, field_Symbol, input_, OptionsPattern[]] := Module
   If[!AllTrue[Select[actual, First[#] === 0 &], TrueQ[Simplify[Last[#] == 0, Assumptions -> ass]] &] ||
     !AllTrue[GatherBy[Select[actual, First[#] =!= 0 &], First], Function[group, AllTrue[group, TrueQ[Simplify[Last[#] == Last[First[group]], Assumptions -> ass]] &]]],
     Return[failure["FieldSymmetry", "The supplied values conflict with the tensor slot symmetries."]]];
-  key = SymbolName[fs["NewHead"]] <> ":" <> ToString[order];
-  rec = <|"Head" -> fs["NewHead"], "IndexPositions" -> signs, "Order" -> order, "Values" -> vals|>;
-  put[tag, <|"FieldComponents" -> Join[b["FieldComponents"], <|key -> rec|>]|>];
-  result = replayFields[tag]; If[FailureQ[result], put[tag, <|"FieldComponents" -> b["FieldComponents"]|>]; replayFields[tag]; Return[result]];
-  invalidateResults[tag];rec
+  <|"Head" -> fs["NewHead"], "IndexPositions" -> signs, "Order" -> order, "Values" -> vals|>
+];
+fieldRecordKey[rec_] := SymbolName[rec["Head"]] <> ":" <> ToString[rec["Order"]];
+applyFieldRecords[tag_, records_Association] := Module[{b=background[tag],old,heads,result,rollback},
+  If[FailureQ[b],Return[b]];
+  If[!KeyExistsQ[b,"Basis"],Return[failure["NoChart","Define the chart before assigning field components."]]];
+  old=b["FieldComponents"];
+  heads=DeleteDuplicates[Join[Lookup[Values[old],"Head",{}],Lookup[Values[records],"Head",{}]]];
+  If[!AllTrue[heads,xTensorQ],Return[failure["FieldAssignment","A stored field definition no longer exists."]]];
+  put[tag,<|"FieldComponents"->records|>];
+  result=replayFields[tag,heads];
+  If[FailureQ[result],
+    put[tag,<|"FieldComponents"->old|>];rollback=replayFields[tag,heads];
+    If[FailureQ[rollback],invalidateResults[tag];Return[failure["FieldRollback","Field assignment and restoration both failed; inspect native values.",<|"Assignment"->result,"Restoration"->rollback|>]]];
+    Return[result]];
+  invalidateResults[tag];Null
+];
+SetFieldComponents[tag_String,field_Symbol,input_,opts:OptionsPattern[]] := Module[{rec,result},
+  rec=fieldComponentRecord[tag,field,input,opts];If[FailureQ[rec],Return[rec]];
+  result=applyFieldRecords[tag,Append[$BG[tag]["FieldComponents"],fieldRecordKey[rec]->rec]];
+  If[FailureQ[result],result,rec]
+];
+Options[RegisterProfile]=Options[SetFieldComponents];
+RegisterProfile[tag_String,name_String] := Module[{b=background[tag],profiles},
+  If[FailureQ[b],Return[b]];
+  If[StringTrim[name]==="" || b["FieldComponents"]===<||>,Return[failure["Profile","Choose a nonempty name and assign at least one field first."]]];
+  profiles=Append[Lookup[b,"FieldProfiles",<||>],name->b["FieldComponents"]];
+  put[tag,<|"FieldProfiles"->profiles|>];profiles[name]
+];
+RegisterProfile[tag_String,name_String,field_Symbol,input_,opts:OptionsPattern[]] := Module[{b=background[tag],rec,profiles,records},
+  If[FailureQ[b],Return[b]];
+  If[StringTrim[name]==="",Return[failure["Profile","Choose a nonempty profile name."]]];
+  rec=fieldComponentRecord[tag,field,input,opts];If[FailureQ[rec],Return[rec]];
+  profiles=Lookup[b,"FieldProfiles",<||>];
+  records=Append[Lookup[profiles,name,<||>],fieldRecordKey[rec]->rec];
+  put[tag,<|"FieldProfiles"->Append[profiles,name->records]|>];records
+];
+ShowProfiles[tag_String] := Module[{b=background[tag]},If[FailureQ[b],b,Lookup[b,"FieldProfiles",<||>]]];
+ActivateProfile[tag_String,name_String] := Module[{b=background[tag],records,result},
+  If[FailureQ[b],Return[b]];
+  records=Lookup[Lookup[b,"FieldProfiles",<||>],name,Missing[]];
+  If[MissingQ[records],Return[failure["Profile","Choose a registered profile."]]];
+  result=applyFieldRecords[tag,Join[b["FieldComponents"],records]];
+  If[FailureQ[result],result,records]
+];
+RemoveProfile[tag_String,name_String] := Module[{b=background[tag],profiles},
+  If[FailureQ[b],Return[b]];profiles=Lookup[b,"FieldProfiles",<||>];
+  If[!KeyExistsQ[profiles,name],Return[failure["Profile","Choose a registered profile."]]];
+  put[tag,<|"FieldProfiles"->KeyDrop[profiles,name]|>];Null
 ];
 
 geometryNeeded[b_, expr_] := Module[{keys},
@@ -690,7 +739,7 @@ geometryNeeded[b_, expr_] := Module[{keys},
 prepareFieldConfigurations[tag_, expr_] := Module[{b = $BG[tag], atoms, fs, records, result, init},
   atoms = DeleteDuplicates@Cases[expr, x_ /; MatchQ[Unevaluated[x], h_[___]] && MemberQ[Lookup[Values[b["Field"]], "NewHead"], Head[x]], {0, Infinity}];
   Do[
-    fs = fieldSpec[b, Head[atom]]; records = Select[Values[b["FieldComponents"]], # ["Head"] === Head[atom] &];
+    fs = fieldSpec[b, Head[atom]]; records = Select[Values[b["FieldComponents"]], #["Head"] === Head[atom] && If[fs["Type"]==="MetricPert",MemberQ[List@@atom,LI[#["Order"]]],True] &];
     If[records =!= {} && fs["Rank"] > 0,
       init = Head[atom] @@ Join[Select[List @@ atom, MatchQ[#, _LI] &],
         MapThread[{#1 #2, #2 b["Basis"]} &, {indicesFor[b, fs["Rank"]], First[records]["IndexPositions"]}]];
@@ -698,7 +747,7 @@ prepareFieldConfigurations[tag_, expr_] := Module[{b = $BG[tag], atoms, fs, reco
       If[result === $Failed, Return[failure["FieldVariance", "Could not change the field index configuration."]]]
     ], {atom, atoms}]; Null
 ];
-Options[ToComponents] = {OutputChart -> Automatic, FreeIndices -> Automatic, Components -> All, Assumptions -> Automatic,
+Options[ToComponents] = {Output -> "Array", OutputChart -> Automatic, FreeIndices -> Automatic, Components -> All, Assumptions -> Automatic,
   Simplification -> Simplify, ApplySpecialization -> True, StrictComponents -> False, CVSimplify -> Together};
 resolveValues[expr_] := FixedPoint[ToValues, expr, 12];
 coordinateIndexify[expr_, b_] := Module[{held, indices, rules},
@@ -723,9 +772,11 @@ componentAt[expr_, indices_, numbers_] := Module[{held, rules},
   ReleaseHold[held /. rules]
 ];
 ToComponents[tag_String, input_, OptionsPattern[]] := Module[
-  {b = background[tag], ex, inds, actual, basisinds, result, geometry, arr, selected, simp = OptionValue[Simplification], ass, unresolved, rec=None, chart=OptionValue[OutputChart], subset},
+  {b = background[tag], ex, inds, actual, basisinds, result, geometry, arr, selected, simp = OptionValue[Simplification], ass, unresolved, rec=None, chart=OptionValue[OutputChart], subset,output=OptionValue[Output],outbasis},
   If[FailureQ[b], Return[b]];
   If[!KeyExistsQ[b, "MetricMatrix"], Return[failure["NoMetricComponents", "Assign metric components before evaluating components."]]];
+  If[!MemberQ[{"Array","CTensor"},output],Return[failure["ComponentOutput","Choose Array or CTensor."]]];
+  If[output==="CTensor" && OptionValue[Components]=!=All,Return[failure["ComponentOutput","CTensor requires all components, not a selection."]]];
   If[!MemberQ[{Automatic,"Primary"},chart],rec=chartRecord[b,chart];If[FailureQ[rec],Return[rec]]];
   ex = resolve[tag, input]; If[FailureQ[ex], Return[ex]];
   ex = PortExpression[tag, ex]; If[FailureQ[ex], Return[ex]];
@@ -739,6 +790,7 @@ ToComponents[tag_String, input_, OptionsPattern[]] := Module[
     If[!ListQ[inds], Return[failure["FreeIndices", "FreeIndices must be a list."]]];
     inds = List @@ PortExpression[tag, IndexList @@ inds];
     If[Sort[inds] =!= Sort[actual], Return[failure["FreeIndices", "The specified indices must match all free indices exactly."]]]];
+  If[output==="CTensor" && (inds==={} || !AllTrue[inds,AIndexQ] || !TrueQ[WeightOf[ex]===0]),Return[failure["ComponentOutput","CTensor output requires positive rank, abstract free indices and zero tensor weight."]]];
   geometry = ComputeGeometry[tag, geometryNeeded[b, ex], CVSimplify -> OptionValue[CVSimplify]];
   If[FailureQ[geometry], Return[geometry]];
   ex=expandConnections[tag,ex];If[FailureQ[ex],Return[ex]];
@@ -773,8 +825,13 @@ ToComponents[tag_String, input_, OptionsPattern[]] := Module[
     If[subset=!=All,arr=If[inds==={},ConstantArray[arr,Length[subset]],Extract[arr,# + 1]& /@ subset]]];
   arr = If[MemberQ[{Simplify, FullSimplify}, simp], simp[arr, Assumptions -> ass], simp[arr]];
   unresolved = DeleteDuplicates@Cases[arr, x_ /; (MatchQ[Unevaluated[x], h_[___]] && xTensorQ[Head[x]] && !MemberQ[Join[Lookup[b,"Coordinates",{}],If[AssociationQ[rec],rec["Coordinates"],{}]],Head[x]]) || MatchQ[Unevaluated[x], _?CovDQ[_][___]] || MatchQ[Unevaluated[x], _Perturbation], {0, Infinity}];
-  If[TrueQ[OptionValue[StrictComponents]] && unresolved =!= {},
-    failure["UnresolvedComponents", "Some tensor components or derivatives remain symbolic.", <|"Expressions" -> unresolved|>], arr]
+  If[(TrueQ[OptionValue[StrictComponents]] || output==="CTensor") && unresolved =!= {},
+    Return[failure["UnresolvedComponents", "Some tensor components or derivatives remain symbolic.", <|"Expressions" -> unresolved|>]]];
+  If[output==="CTensor",
+    If[Dimensions[arr]=!=ConstantArray[b["Dimension"],Length[inds]],Return[failure["ComponentOutput","CTensor requires a complete component array."]]];
+    outbasis=If[AssociationQ[rec],rec["Chart"],b["Basis"]];
+    Return[CTensor[arr,(If[UpIndexQ[#],outbasis,-outbasis]& /@ inds)]]];
+  arr
 ];
 ToBasisOf[tag_String, expr_] := Module[{b = background[tag]}, If[FailureQ[b], Return[b]]; If[!KeyExistsQ[b,"Basis"],Return[failure["NoChart","Define the chart before converting to its basis."]]]; guard[TraceBasisDummy[ToBasis[b["Basis"]][expr]]]];
 ToValuesOf[tag_String, expr_] := Module[{ex = ToBasisOf[tag, expr]}, If[FailureQ[ex], ex, guard[ToValues[ex]]]];
@@ -1203,6 +1260,7 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  newb["Connections"]=Select[Lookup[newb,"Connections",<||>],CovDQ[#["Head"]]&];
  newb["ConnectionComponents"]=KeyTake[Lookup[newb,"ConnectionComponents",<||>],Keys[newb["Connections"]]];
  newb["FieldComponents"]=Select[newb["FieldComponents"],xTensorQ[#["Head"]]&];
+ newb["FieldProfiles"]=Select[Lookup[newb,"FieldProfiles",<||>],Function[profile,AllTrue[Values[profile],xTensorQ[#["Head"]]&] && !AnyTrue[removed,!FreeQ[profile,#]&]]];
  newb["HeadRules"]=Select[newb["HeadRules"],objectRegisteredQ[Last[#]]&];
  newb["RuleGroups"]=KeyDrop[Lookup[newb,"RuleGroups",<||>],plan["RuleGroupsAffected"]];
  newb["ActiveRuleGroups"]={};
@@ -1215,7 +1273,7 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  ];
  If[MemberQ[deadKeys,"Chart"],
   Scan[If[xTensorQ[#],DeleteTensorValues[#]]&,Lookup[Values[newb["Field"]],"NewHead",{}]];
-  newb["FieldComponents"]=<||>;newb["ConnectionComponents"]=<||>;
+  newb["FieldComponents"]=<||>;newb["FieldProfiles"]=<||>;newb["ConnectionComponents"]=<||>;
   newb=KeyDrop[newb,{"AdditionalCharts","Chart","Basis","Coordinates","CoordinateLabels","MetricMatrix","GeometryPolicy"}]
  ];
  newb["PresentationDefaults"]=KeyDrop[newb["PresentationDefaults"],deadKeys];
@@ -1427,7 +1485,7 @@ recipeObjects[b_] := Join[managedObjects[b],KeyTake[b,{"Christoffel","Torsion","
  Association@Flatten@KeyValueMap[Function[{key,rec},KeyValueMap[("Connection:"<>key<>":"<>#1 -> #2)&,rec["Geometry"]]],Lookup[b,"Connections",<||>]]];
 ReconstructionData[tag_String] := Module[{b=background[tag],inputs},If[FailureQ[b],Return[b]];
  inputs=Association@KeyValueMap[Function[{key,fs},key -> (KeyDrop[#,"Head"]& /@ Select[Values[b["FieldComponents"]],#["Head"]===fs["NewHead"]&])],b["Field"]];
- Join[KeyTake[b,{"Theory","Signature","SymbolSuffix","CoordinateLabels","Coordinates","MetricMatrix","Assumptions","SpecializationRules","RuleGroups","ActiveRuleGroups","PresentationOverrides","Notation","ConnectionComponents"}],
+ Join[KeyTake[b,{"Theory","Signature","SymbolSuffix","CoordinateLabels","Coordinates","MetricMatrix","Assumptions","SpecializationRules","RuleGroups","ActiveRuleGroups","PresentationOverrides","Notation","ConnectionComponents","FieldProfiles"}],
  <|"RecipeVersion"->1,"OriginalTag"->tag,"ChartMaps"->Map[KeyTake[#,{"Labels","Map"}]&,Lookup[b,"AdditionalCharts",<||>]],"Objects"->recipeObjects[b],"Indices"->b["Indices"],"FieldInputs"->inputs,
   "RelativeHeads"->relativeHeads[b]|>]
 ];
@@ -1457,7 +1515,7 @@ RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,c
  If[AnyTrue[Flatten[result],FailureQ],Return[First@Select[Flatten[result],FailureQ]]];
  result=KeyValueMap[SetConnectionComponents[tag,#1,#2["Values"]/.rules,ReferenceConnection->#2["Reference"]]&,Lookup[recipe,"ConnectionComponents",<||>]];
  If[AnyTrue[result,FailureQ],Return[First@Select[result,FailureQ]]];
- put[tag,<|"RuleGroups"->(Lookup[recipe,"RuleGroups",<||>]/.rules),"SpecializationRules"->(Lookup[recipe,"SpecializationRules",{}]/.rules),
+ put[tag,<|"FieldProfiles"->Map[Function[records,Association[(fieldRecordKey[#]->#)& /@ (Values[records]/.rules)]],Lookup[recipe,"FieldProfiles",<||>]],"RuleGroups"->(Lookup[recipe,"RuleGroups",<||>]/.rules),"SpecializationRules"->(Lookup[recipe,"SpecializationRules",{}]/.rules),
    "ActiveRuleGroups"->Lookup[recipe,"ActiveRuleGroups",{}],"Notation"->Lookup[recipe,"Notation",<||>]|>];
  updatePrintHook[];$BG[tag]
 ];
