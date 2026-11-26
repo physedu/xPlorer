@@ -45,9 +45,13 @@ Cell[TextData[{"The copied field is matterDemo and the metric is gDemo. The indi
 
 Cell[BoxData[RowBox[{"{", RowBox[{"matterDemo", ",", RowBox[{"matterDemo", "[", "]"}], ",", RowBox[{"gDemo", "[", RowBox[{RowBox[{"-", "\[Mu]Demo"}], ",", RowBox[{"-", "\[Nu]Demo"}]}], "]"}], ",", RowBox[{RowBox[{"CDDemo", "[", RowBox[{"-", "\[Rho]Demo"}], "]"}], "[", RowBox[{"matterDemo", "[", "]"}], "]"}]}], "}"}]],"Input",CellTags->"naming_result"],
 
-Cell[TextData[{"Close the example and remove its field key. The source scalar \:03c6 is still defined. We will register it below with its default name and label for the three physical backgrounds."}],"Text"],
+Cell[TextData[{"If typing Greek symbols is inconvenient, retrieve the actual owned indices with BackgroundIndices and assign ordinary Latin-letter aliases. These are references to the same abstract indices, not new xAct indices. The following metric and derivative still print with Greek indices."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"DeleteBackground", "[", "\"NamingExample\"", "]"}], ";", RowBox[{"UnregisterTheory", "[", RowBox[{"\"Fields\"", ",", "\"Materia\""}], "]"}], ";", RowBox[{"Keys", "[", RowBox[{"TheoryValue", "[", "\"Fields\"", "]"}], "]"}]}]],"Input",CellTags->"close_naming"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"muDemo", ",", "nuDemo", ",", "rhoDemo"}], "}"}], "=", RowBox[{"BackgroundIndices", "[", RowBox[{"\"NamingExample\"", ",", "3"}], "]"}]}], ";", RowBox[{"{", RowBox[{RowBox[{"gDemo", "[", RowBox[{RowBox[{"-", "muDemo"}], ",", RowBox[{"-", "nuDemo"}]}], "]"}], ",", RowBox[{RowBox[{"CDDemo", "[", RowBox[{"-", "rhoDemo"}], "]"}], "[", RowBox[{"matterDemo", "[", "]"}], "]"}]}], "}"}]}]],"Input",CellTags->"naming_index_aliases"],
+
+Cell[TextData[{"Clear the three user-defined aliases, close the example and remove its field key. The source scalar \:03c6 is still defined. We will register it below with its default name and label for the three physical backgrounds."}],"Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"Clear","[",RowBox[{"muDemo",",","nuDemo",",","rhoDemo"}],"]"}],";",RowBox[{"DeleteBackground", "[", "\"NamingExample\"", "]"}], ";", RowBox[{"UnregisterTheory", "[", RowBox[{"\"Fields\"", ",", "\"Materia\""}], "]"}], ";", RowBox[{"Keys", "[", RowBox[{"TheoryValue", "[", "\"Fields\"", "]"}], "]"}]}]],"Input",CellTags->"close_naming"],
 
 Cell[TextData[{"Register the scalar and its mass"}],"Subsubsection"],
 
