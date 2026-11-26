@@ -684,7 +684,7 @@ Cell[TextData[{"Choose a homogeneous field \:03c6 = q(t) on FLRW."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "q", "]"}], ";"}]],"Input",CellTags->"flrw_field_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{RowBox[{"phiF","[","]"}], ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"q", "[", "t", "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"flrw_field"],
+Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{RowBox[{"phiFLRW","[","]"}], ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"q", "[", "t", "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"flrw_field"],
 
 Cell[BoxData[RowBox[{RowBox[{"eqFLRW", "=", RowBox[{"scalarEqFLRW", "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"flrw_equation_step_1"],
 
