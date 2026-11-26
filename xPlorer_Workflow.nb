@@ -83,11 +83,15 @@ Cell[BoxData[RowBox[{RowBox[{RowBox[{"boxPhi", "=", RowBox[{RowBox[{"CD", "[", "
 
 Cell[TextData[{"Store the assumptions and variational conditions alongside the theory. These entries document the calculation. Pass assumptions to the operations that use them."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"Association", "[", RowBox[{RowBox[{"\"Assumptions\"", "\[Rule]", "assumptions"}], ",", RowBox[{"\"Conditions\"", "\[Rule]", "\"Fixed metric; compactly supported scalar variations\""}]}], "]"}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"theory", "=", RowBox[{"ShowTheory", "[", "]"}]}], ";"}]],"Input",CellTags->"register_metadata"],
+Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"Association", "[", RowBox[{RowBox[{"\"Assumptions\"", "\[Rule]", "assumptions"}], ",", RowBox[{"\"Conditions\"", "\[Rule]", "\"Fixed metric; compactly supported scalar variations\""}]}], "]"}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"theory", "=", RowBox[{"TheorySnapshot", "[", "]"}]}], ";"}]],"Input",CellTags->"register_metadata"],
 
-Cell[TextData[{StyleBox["TheoryValue",FontFamily->"Courier",FontSize->11]," retrieves a collection or an individual registry entry. Use ",StyleBox["ShowTheoryKeys[]",FontFamily->"Courier",FontSize->11]," for the top-level keys or ",StyleBox["ShowTheory[]",FontFamily->"Courier",FontSize->11]," for the full restorable registry. TheorySector groups objects by their physical sector."}],"Text"],
+Cell[TextData[{StyleBox["TheoryValue",FontFamily->"Courier",FontSize->11]," retrieves a collection or an individual registry entry. Use ",StyleBox["ShowTheoryKeys[]",FontFamily->"Courier",FontSize->11]," for the top-level keys or ",StyleBox["TheorySnapshot[]",FontFamily->"Courier",FontSize->11]," for the full restorable registry. ShowTheory[] displays a concise overview. TheorySector groups objects by their physical sector."}],"Text"],
+
+Cell[BoxData[RowBox[{"ShowTheory","[","]"}]],"Input",CellTags->"theory_overview"],
 
 Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"ShowTheoryKeys", "[", "]"}], ",", RowBox[{"Keys", "/@", RowBox[{"TheorySector", "[", "\"Matter\"", "]"}]}]}], "}"}]],"Input",CellTags->"inspect_registration"],
+
+Cell[BoxData[RowBox[{"ShowTheory","[","\"Lagrangians\"","]"}]],"Input",CellTags->"theory_lagrangian_view"],
 
 Cell[BoxData[RowBox[{"TheoryValue", "[", RowBox[{"\"Lagrangians\"", ",", "\"Lagrangian\""}], "]"}]],"Input",CellTags->"registered_lagrangian"],
 
