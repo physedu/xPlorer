@@ -73,15 +73,15 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.9";
+$XPlorerVersion = "14.0.0-beta.13-dev.10";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
-SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label; the association form changes several labels of owned background objects. Automatic restores the inherited default for a key.";
+SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
 PresentationOf::usage = "PresentationOf[tag] reports current labels and their defaults.";
 SetXPlorerPreferences::usage = "SetXPlorerPreferences[PartialStyle -> style] sets the session output style. Label rules set defaults for future backgrounds. SetXPlorerPreferences[] resets the session preferences.";
 BackgroundObject::usage = "BackgroundObject[tag, key] returns the actual field or geometry head. Full InputForm retains its context.";
 
-SetNotation::usage = "SetNotation[tag, association] sets background display defaults; no mathematical data changes.";
+SetNotation::usage = "SetNotation[tag, option -> value, ...] sets background display defaults; no mathematical data changes.";
 PartialStyle::usage = "PartialStyle chooses Native, MultiIndex, Fraction, Partial, Comma or Prime (one argument) for notebook output and explicit views.";
 CovariantStyle::usage = "CovariantStyle chooses Native, Prefix, or Postfix in PrettyExp.";
 ShowBackgroundLabel::usage = "ShowBackgroundLabel adds a background label to an expression view.";
@@ -118,7 +118,7 @@ SymbolBase::usage = "SymbolBase -> name sets the base of a registered field head
 SymbolSuffix::usage = "SymbolSuffix -> \"M\" chooses a readable symbol suffix independently of the background tag.";
 BackgroundExpression::usage = "BackgroundExpression[tag,key] returns the registered formula transported without specialization rules.";
 OutputChart::usage = "OutputChart -> name expresses tensor components in a named chart of the same background.";
-ExpressionText::usage = "ExpressionText[tag,key,format] or ExpressionText[tag,section,key,format] returns InputForm replay code, TeX, TexAct or a mathematical view. The qualified form also accepts {section,key} as the key.";
+ExpressionText::usage = "ExpressionText[tag,key,format] or ExpressionText[tag,section,key,format] returns InputForm replay code, TeX, TexAct or a mathematical view. ExpressionText[expr, \"TeX\"] exports presentation TeX from a calculated expression. The qualified form also accepts {section,key} as the key.";
 Begin["`Private`"]
 
 SetAttributes[RegisterTheory, HoldAll];
@@ -488,6 +488,7 @@ releaseAliases[entries_Association] := Scan[Function[entry,
   With[{owned=entry[[2]]},
     ToExpression[First[entry],InputForm,Function[sym,
       If[OwnValues[sym] === owned, OwnValues[sym]={}],HoldAllComplete]]]],Values[entries]];
+ExpressionText[expr:Except[_String], "TeX"] := presentationTeX[expr];
 ExpressionText[tag_String,key_String,format_String:"InputForm"] :=
  expressionTextFormat[tag,BackgroundExpression[tag,key],{tag,key},format];
 ExpressionText[tag_String,{section_String,key_String},format_String:"InputForm"] :=
@@ -498,7 +499,7 @@ expressionTextFormat[tag_,expr_,args_,format_] := Module[{},
   If[FailureQ[expr],Return[expr]];
   Switch[format,
    "InputForm", "BackgroundExpression["<>StringRiffle[ToString[#,InputForm]& /@ args,", "]<>"]",
-   "TeX", ToString[TeXForm[expr]],
+   "TeX", presentationTeX[expr,tag],
    "TexAct", If[!MemberQ[$Packages,"xAct`TexAct`"],Quiet[Needs["xAct`TexAct`"]]];
      If[MemberQ[$Packages,"xAct`TexAct`"],xAct`TexAct`TexPrint[expr],
        failure["TexAct","Install TexAct to use this export format."]],
@@ -1126,6 +1127,27 @@ expressionView /: MakeBoxes[expressionView[e_,a_,tag_], StandardForm] :=
   ];
 expressionView /: MakeBoxes[expressionView[e_,a_,tag_], TraditionalForm] := MakeBoxes[expressionView[e,a,tag],StandardForm];
 nativeBoxes[e_] := With[{ex=e},MakeBoxes[ex,StandardForm]];
+notationAtom /: MakeBoxes[notationAtom[b_, original_], StandardForm] := b;
+notationAtom /: MakeBoxes[notationAtom[b_, original_], TraditionalForm] := b;
+notationDisplayTree[e_,a_] := Which[
+  MatchQ[e,Derivative[__][_][__]] && a["PartialStyle"]=!="Native",
+    notationAtom[notationBoxes[e,a],e],
+  MatchQ[e,_?CovDQ[_][_]] && a["CovariantStyle"]=!="Native",
+    notationAtom[notationBoxes[e,a],e],
+  AtomQ[e] || xTensorQ[Head[e]] || FreeQ[e,Derivative|_?CovDQ],e,
+  MemberQ[{Plus,Times,Power,Equal,List},Head[e]],Map[notationDisplayTree[#,a]&,e],
+  True,notationAtom[RowBox[{nativeBoxes[Head[e]],"[",RowBox[Riffle[notationBoxes[#,a]& /@ (List@@e),","]],"]"}],e]
+];
+notationGroup[e_,b_] := If[Head[e]===Plus || Head[e]===Times || Head[e]===Equal,RowBox[{"(",b,")"}],b];
+(* TeX is generated from presentation boxes, not private symbol names.
+   Use native TeXForm on RawBoxes; omit the optional background caption. *)
+presentationTeX[e_,tag_:Automatic] := Module[{expr=e,owner,a,boxes},
+  If[MatchQ[expr,_expressionView],a=expr[[2]];expr=Normal[expr],
+    owner=If[tag===Automatic,notationOwner[expr],tag];a=notationSettings[owner]];
+  If[hasGeneratedIndexQ[expr],expr=ScreenDollarIndices[expr]];
+  boxes=notationBoxes[expr,Join[a,<|"ShowBackgroundLabel"->False|>]];
+  With[{b=boxes},ToString[TeXForm[RawBoxes[b]]]]
+];
 notationBoxes[e_,a_] := Module[{orders,args,fn,n,terms,den,body,mark,ix,h=Head[e],items},
   If[(a["PartialStyle"]==="Native" || FreeQ[e,Derivative]) && (a["CovariantStyle"]==="Native" || FreeQ[e,_?CovDQ]),Return[nativeBoxes[e]]];
   If[MatchQ[e,Derivative[__][_][__]] && a["PartialStyle"]=!="Native",
@@ -1145,19 +1167,15 @@ notationBoxes[e_,a_] := Module[{orders,args,fn,n,terms,den,body,mark,ix,h=Head[e
     fn=Head[Head[e]]; ix=First[Head[e]]; body=notationBoxes[First[e],a];
     mark=First[SymbolOfCovD[fn]];
     Return[If[a["CovariantStyle"]==="Postfix",
-      If[UpIndexQ[ix],SuperscriptBox[RowBox[{"(",body,")"}],RowBox[{mark,IndexForm[UpIndex[ix]]}]],SubscriptBox[RowBox[{"(",body,")"}],RowBox[{mark,IndexForm[UpIndex[ix]]}]]],
-      RowBox[{If[UpIndexQ[ix],SuperscriptBox[Last[SymbolOfCovD[fn]],IndexForm[ix]],SubscriptBox[Last[SymbolOfCovD[fn]],IndexForm[UpIndex[ix]]]],"(",body,")"}]]]
+      If[UpIndexQ[ix],SuperscriptBox[notationGroup[First[e],body],RowBox[{mark,IndexForm[UpIndex[ix]]}]],SubscriptBox[notationGroup[First[e],body],RowBox[{mark,IndexForm[UpIndex[ix]]}]]],
+      RowBox[{If[UpIndexQ[ix],SuperscriptBox[Last[SymbolOfCovD[fn]],IndexForm[ix]],SubscriptBox[Last[SymbolOfCovD[fn]],IndexForm[UpIndex[ix]]]],notationGroup[First[e],body]}]]]
   ];
   If[AtomQ[e] || xTensorQ[h] || FreeQ[e,Derivative|_?CovDQ],Return[nativeBoxes[e]]];
-  items=notationBoxes[#,a]& /@ (List@@e);
-  Switch[h,
-    Plus, RowBox[Riffle[(RowBox[{"(",#,")"}]& /@ items)," + "]],
-    Times,RowBox[Riffle[(RowBox[{"(",#,")"}]& /@ items)," "]],
-    Power,SuperscriptBox[RowBox[{"(",items[[1]],")"}],items[[2]]],
-    List,RowBox[{"{",RowBox[Riffle[items,","]],"}"}],
-    Equal,RowBox[Riffle[items," == "]],
-    _,RowBox[{nativeBoxes[h],"[",RowBox[Riffle[items,","]],"]"}]
-  ]
+  (* Delegate operator precedence, signs, fractions and powers to Mathematica.
+     Only the display copy contains inert box atoms. The InterpretationBox
+     and Normal retain the original mathematical expression. *)
+  nativeBoxes[notationDisplayTree[e,a]]
+
 ];
 
 (* Explicit lifecycle operations. Registration never transfers ownership. *)
@@ -1538,6 +1556,7 @@ connectionKey[b_Association,selector_] := Module[{keys},
 ];
 RegisterTheory["Connection",source_Symbol,opts___Rule] := With[{key=SymbolName[source],head=source},RegisterTheory["Connection",key,head,opts]];
 AddConnection[tag_String,source_Symbol,opts:OptionsPattern[]] := AddConnection[tag,SymbolName[source],source,opts];
+SetPresentation[tag_String,rules__Rule] := SetPresentation[tag,Association[{rules}]];
 Options[SetPresentation]={PrintAs->Automatic};
 SetPresentation[tag_String,object:(_Symbol|_String),opts:OptionsPattern[]] := Module[{b=background[tag],key,objects,candidates,heads},
  If[FailureQ[b],Return[b]];
