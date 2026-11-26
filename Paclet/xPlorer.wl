@@ -808,7 +808,7 @@ storeField[b_, spec_] := Module[{head = spec["Head"], signs = spec["IndexPositio
   expression = head @@ Join[If[spec["Order"] === None, {}, {LI[spec["Order"]]}], MapThread[{#1 #2, #2 b["Basis"]} &, {inds, signs}]];
   If[TrueQ[Lookup[spec,"Partial",False]],
    Return[guard[Block[{$CVVerbose=False,$CVReplace=True,$insideManagedCalculation=True},
-    Scan[Function[r,ComponentValue[partialFieldExpression[b,spec,First[r]],Last[r]]],spec["Values"]];Null]]];
+    Scan[Function[r,ComponentValue[partialFieldExpression[b,spec,First[r]],Last[r]]],spec["Values"]];Null]]]];
   guard[Block[{$CVVerbose = False,$insideManagedCalculation=True}, If[signs === {}, ComponentValue[expression, spec["Values"]], AllComponentValues[expression, spec["Values"]]]]]
 ];
 (* Fingerprints describe only native input rule groups, not duplicate arrays.
