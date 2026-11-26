@@ -4,7 +4,7 @@ Global`$XPlorerWorkflowDirectory=DirectoryName[DirectoryName[$InputFileName]];
 Global`$XPlorerWorkflowOutputs=<||>;
 Global`$XPlorerWorkflowReport=Module[
  {directory=Global`$XPlorerWorkflowDirectory,notebook,inputs,stages=<||>,checks,
-  parseFailures={},compoundFailures={},warnings={},timings={},started=AbsoluteTime[],run,failed,oldFieldName,initiallyAbsent,styleOf,printedStyle},
+  parseFailures={},compoundFailures={},warnings={},timings={},started=AbsoluteTime[],run,failed,oldFieldName,initiallyAbsent,styleOf,printedStyle,profileRuns},
  initiallyAbsent=!MemberQ[$Packages,"xPlorer`"];
  notebook=Get[FileNameJoin[{directory,"xPlorer_Workflow.nb"}]];
  inputs=Cases[notebook,Cell[BoxData[b_],"Input",CellTags->id_String]:>{id,b},Infinity];
@@ -27,6 +27,10 @@ Global`$XPlorerWorkflowReport=Module[
      SameQ[First[value],head]&&xAct`xTensor`xTensorQ[head]&&SameQ[SymbolName[head],"matterDemo"]&&SameQ[xAct`xTensor`PrintAs[head],"P"]],
    "naming_setup",stages["Greek index labels on naming example"]=With[{ii=xPlorer`BackgroundIndices["NamingExample",2]},SameQ[Map[Function[ix,With[{s=ix},xAct`xTensor`PrintAs[s]]],ii],{"\[Mu]","\[Nu]"}]],
    "naming_index_aliases",stages["Latin aliases preserve Greek indices"]=SameQ[value,Rest[Global`$XPlorerWorkflowOutputs["naming_result"]][[{2,3}]]],
+   "custom_presentation",stages["Multiple labels applied together"]=SameQ[KeyTake[xPlorer`PresentationOf["Schwarzschild"]["Effective"],{"phi","Metric","CovD"}],<|"phi"->"\[Psi]","Metric"->"q","CovD"->{"|","D"}|>],
+   "named_profiles",profileRuns=xPlorer`ShowBackground["Minkowski"]["GeometryRuns"],
+   "profile_cached_geometry",stages["Profile switching retains geometry run count"]=SameQ[xPlorer`ShowBackground["Minkowski"]["GeometryRuns"],profileRuns],
+   "native_metric_basis",stages["Native CTensor bases are both covariant"]=With[{bb=xPlorer`BasisOf["Minkowski"]},SameQ[value,{-bb,-bb}]],
    "custom_postfix_marker",stages["Custom postfix marker is rendered"]=With[{v=value},!FreeQ[MakeBoxes[v,StandardForm],"|"]],
    "session_prefix",stages["Session prefix applies to both backgrounds"]=SameQ[printedStyle[#,"CovariantStyle"]& /@ value,{"Prefix","Prefix"}],
    "local_postfix",stages["Background notation overrides only its own output"]=SameQ[printedStyle[#,"CovariantStyle"]& /@ value,{"Prefix","Postfix"}]&&TrueQ[printedStyle[Last[value],"ShowBackgroundLabel"]],
