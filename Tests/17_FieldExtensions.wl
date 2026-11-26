@@ -1,0 +1,34 @@
+(* Run in a fresh kernel after loading xPlorer. *)
+Get[FileNameJoin[{DirectoryName[$InputFileName],"Fixture.wl"}]];
+UnregisterTheory["Fields","A"];
+UnregisterTheory["Fields","h"];
+makeBackground["Extension",{"t","x","y","z"},DiagonalMatrix[{-1,1,1,1}]];
+CreateBackground["ExtensionOther"];
+SetFieldComponents[phiExtension[],2];
+ComputeGeometry["Extension",{"Ricci","Einstein"}];
+extensionRuns=ShowBackground["Extension"]["GeometryRuns"];
+extensionMetric=BackgroundObject["Extension","Metric"];
+assert["unregistered-field-rejected",FailureQ[AddField["Extension",A]],True];
+RegisterTheory["Field",A];
+assert["incremental-vector",xTensorQ[AddField["Extension",A]],True];
+assert["other-snapshot-not-synchronized",KeyExistsQ[ShowBackground["ExtensionOther"]["Field"],"A"],False];
+assert["extension-metric-identity",BackgroundObject["Extension","Metric"],extensionMetric];
+assert["extension-scalar-preserved",ToComponents[phiExtension[]],2];
+assert["extension-geometry-cache",ShowBackground["Extension"]["GeometryRuns"],extensionRuns];
+SetFieldComponents[AExtension[-aExtension],{1,2,3,4}];
+assert["expression-variance",ToComponents[AExtension[aExtension]],{-1,2,3,4}];
+assert["duplicate-add-rejected",FailureQ[AddField["Extension",A]],True];
+assert["foreign-abstract-assignment-rejected",FailureQ[SetFieldComponents[A[-a],{1,2,3,4}]],True];
+assert["redundant-variance-rejected",FailureQ[SetFieldComponents[AExtension[-aExtension],{1,2,3,4},IndexPositions->{-1}]],True];
+RegisterTheory["Field",h];
+assert["incremental-metric-perturbation",xTensorQ[AddField["Extension",h]],True];
+SetFieldComponents[hExtension[LI[1],-aExtension,-bExtension],DiagonalMatrix[{0,2,0,0}]];
+SetFieldComponents[hExtension[LI[2],-aExtension,-bExtension],ConstantArray[0,{4,4}]];
+assert["inferred-orders-postfix",gExtension[aExtension,bExtension]//PerturbOn[2]//ToComponents,DiagonalMatrix[{0,8,0,0}]];
+DefineChart["Extension","Scaled",{"T","X","Y","Z"},Function[{tt,xx,yy,zz},{tt,2 xx,yy,zz}]];
+assert["perturbation-output-chart",gExtension[aExtension,bExtension]//PerturbOn[2,Output->"Components",OutputChart->"Scaled"],DiagonalMatrix[{0,2,0,0}]];
+extensionRecipe=ReconstructionData["Extension"];
+assert["extension-recipe-copy",AssociationQ[RecreateBackground["ExtensionCopy",extensionRecipe]],True];
+assert["extension-recipe-vector",ToComponents["ExtensionCopy",A[a]],{-1,2,3,4}];
+assert["extension-recipe-perturbation",gExtensionCopy[aExtensionCopy,bExtensionCopy]//PerturbOn[2]//ToComponents,DiagonalMatrix[{0,8,0,0}]];
+<|"Version"->$XPlorerVersion,"Total"->Length[testResults],"Passed"->Count[Lookup[testResults,"Passed"],True],"Failures"->Select[testResults,!TrueQ[#["Passed"]]&]|>
