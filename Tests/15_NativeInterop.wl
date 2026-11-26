@@ -27,14 +27,14 @@ nativeCT=With[{ch=nativePrimary},ToCTensor[CTensor[{1,2,3,4},{-ch}],{-nativeFram
 assert["native-ctensor-change",nativeCT,CTensor[{1,4,9,16},{-nativeFrame}]];
 nativeBasisExpression=With[{ch=nativePrimary},
  ChangeComponents[AMixed[{-aMixed,-nativeFrame}],AMixed[{-aMixed,-ch}]]];
-assert["native-basis-component",ToValues[AMixed[{2,-nativeFrame}]],9];
+assert["native-basis-component",FixedPoint[ToValues,AMixed[{2,-nativeFrame}],12],9];
 assert["native-to-basis",ToValues[TraceBasisDummy[ToBasis[nativeFrame][AMixed[-aMixed]]]],AMixed[{-aMixed,-nativeFrame}]];
 assert["native-basis-color",BasisColor[nativeFrame],Blue];
 assert["managed-primary-still-correct",ToComponents["Mixed",A[a]],{-1,2,3,4}];
 assert["managed-native-basis-wrapper",ToBasisOf["Mixed",AMixed[-aMixed]],With[{ch=nativePrimary},ToBasis[ch][AMixed[-aMixed]]]];
 assert["managed-native-values-wrapper",ToValuesOf["Mixed",AMixed[{1,-nativePrimary}]],2];
 assert["external-basis-protected",DeletionPlan["Mixed"]["CanDelete"],False];
-assert["native-christoffel-head",ChristoffelOf["Mixed"],Christoffel[ConnectionOf["Mixed"]]];
+assert["native-christoffel-head",xTensorQ[ChristoffelOf["Mixed"]] && ChristoffelOf["Mixed"]===With[{cd=ConnectionOf["Mixed"]},GiveSymbol[Christoffel,cd]],True];
 assert["native-torsion-head",TorsionOf["Mixed"],Torsion[ConnectionOf["Mixed"]]];
 ReplaceRules["Mixed",{mass->2,mass->3}];
 assert["replace-first-match",ApplyRules["Mixed",mass],2];
