@@ -87,3 +87,7 @@ Traditional application installation: Install.wl defines InstallXPlorer[] (defau
 Paclet: metadata and loaders synchronized to dev.3. Named Asset entries include canonical source, license and citation without maintaining duplicate code. Actual PacletBuild staging at d00c22bc11eea670d2a97e28f29cc512beeb5402 contained all five essential paths including metadata. PacletDirectoryLoad on the staged package and Needs loaded dev.3 successfully. Remote Java security policy blocked final .paclet compression (PacletArchive -> $Failed); Tools/BuildPaclet.wl now explicitly reports that failure. Desktop archive building and PacletInstall remain unverified. No release, no merging experimental code to main.
 
 GPL-3.0-or-later, citation and acknowledgements added to both branches before dev.3. CITATION.cff updated to dev.3 on this branch; main remains beta.12. No ORCID or DOI invented.
+
+## dev.4 — static API cleanup and startup banner
+
+Package d28f7412a2f8f2467d0338a57fe294121b0b5785, targeted tests efda587cebb708969936dbbd0cdf773893824038. See [API_AUDIT.md](API_AUDIT.md) for the unused-public-symbol list, removed private leftovers, qualified lookup fixes and AboutXPlorer startup message. No public functions removed. Runtime validation is pending because Wolfram MCP is unavailable even for 1+1. Dev.3 remains the latest validated checkpoint. No release or main merge.
