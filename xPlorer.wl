@@ -1141,12 +1141,14 @@ notationDisplayTree[e_,a_] := Which[
 notationGroup[e_,b_] := If[Head[e]===Plus || Head[e]===Times || Head[e]===Equal,RowBox[{"(",b,")"}],b];
 (* TeX is generated from presentation boxes, not private symbol names.
    Use native TeXForm on RawBoxes; omit the optional background caption. *)
-presentationTeX[e_,tag_:Automatic] := Module[{expr=e,owner,a,boxes},
+presentationTeX[e_,tag_:Automatic] := Module[{expr=e,owner,a,boxes,tex},
+  If[!FreeQ[expr,_Failure|$Failed],Return[failure["ExportExpression","Cannot export a failed calculation."]]];
   If[MatchQ[expr,_expressionView],a=expr[[2]];expr=Normal[expr],
     owner=If[tag===Automatic,notationOwner[expr],tag];a=notationSettings[owner]];
   If[hasGeneratedIndexQ[expr],expr=ScreenDollarIndices[expr]];
   boxes=notationBoxes[expr,Join[a,<|"ShowBackgroundLabel"->False|>]];
-  With[{b=boxes},ToString[TeXForm[RawBoxes[b]]]]
+  tex=With[{b=boxes},Check[ToString[TeXForm[RawBoxes[b]]],$Failed]];
+  If[StringQ[tex],StringReplace[tex,"=="->"="],failure["TeXExport","Mathematica could not convert the presentation boxes to TeX."]]
 ];
 notationBoxes[e_,a_] := Module[{orders,args,fn,n,terms,den,body,mark,ix,h=Head[e],items},
   If[(a["PartialStyle"]==="Native" || FreeQ[e,Derivative]) && (a["CovariantStyle"]==="Native" || FreeQ[e,_?CovDQ]),Return[nativeBoxes[e]]];
