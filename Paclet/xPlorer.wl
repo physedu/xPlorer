@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.24";
+$XPlorerVersion = "14.0.0-beta.13-dev.25";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -1402,10 +1402,11 @@ ToComponents[tag_String, input_, OptionsPattern[]] := Module[
   geometry = ComputeGeometry[tag, geometryNeeded[b, ex], CVSimplify -> OptionValue[CVSimplify]];
   If[FailureQ[geometry], Return[geometry]];
   ex=expandConnections[tag,ex];If[FailureQ[ex],Return[ex]];
-  If[OptionValue[Components]===All && MatchQ[ex,_[__]],fieldRecord=directFieldRecord[$BG[tag],ex]];
+  If[(OptionValue[Components]===All||rec===None) && MatchQ[ex,_[__]],fieldRecord=directFieldRecord[$BG[tag],ex]];
   If[AssociationQ[fieldRecord],
-    result=ensureFieldConfiguration[$BG[tag],fieldRecord,If[UpIndexQ[#],1,-1]& /@ DeleteCases[List@@ex,_LI]];
-    If[FailureQ[result],Return[result]],
+    If[OptionValue[Components]===All,
+     result=ensureFieldConfiguration[$BG[tag],fieldRecord,If[UpIndexQ[#],1,-1]& /@ DeleteCases[List@@ex,_LI]];
+     If[FailureQ[result],Return[result]]],
     ex = guard[ChangeCovD[SeparateMetric[][ex], b["CovD"], PDOfBasis[b["Chart"]]]]];
   If[ex === $Failed, Return[failure["Derivatives", "The covariant derivative could not be expanded."]]];
   ex = guard[coordinateIndexify[ex, b]];
@@ -1426,6 +1427,15 @@ ToComponents[tag_String, input_, OptionsPattern[]] := Module[
       (guard[componentAt[ex, basisinds, #]] & /@ selected)]
   ];
   If[arr === $Failed || !FreeQ[arr, $Failed], Return[failure["ComponentArray", "The component array could not be constructed."]]];
+  (* Direct primary-chart selections are already concrete: prepare only
+     the requested field components, not their complete variance. A sparse
+     source read of a complete array must also generate missing symmetry rules. *)
+  If[AssociationQ[fieldRecord]&&(selected=!=All||
+      (TrueQ[Lookup[fieldRecord,"Partial",False]]&&
+       (If[UpIndexQ[#],1,-1]& /@ DeleteCases[List@@ex,_LI])===fieldRecord["IndexPositions"])),
+   result=guard[Block[{$insideManagedCalculation=True,$CVVerbose=False},prepareManagedRead[arr,{fieldRecord["Head"]}]]];
+   If[result===$Failed,Return[failure["FieldVariance","Could not prepare selected field components."]]];
+   If[FailureQ[result],Return[result]]];
   arr = guard[resolveValues[traceValues[arr]]];
   If[arr === $Failed, Return[failure["ComponentValues", "xCoba could not evaluate component values."]]];
   ass = Replace[OptionValue[Assumptions], Automatic :> Lookup[b, "Assumptions", True]];
