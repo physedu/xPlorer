@@ -9,10 +9,11 @@ Global`$XPlorerSelectedFiles=Lookup[<|
  "ObjectsAndConnections"->{"07_LifecycleObjects.wl","08_Connections.wl"},
  "ComponentsAndRules"->{"09_ConnectionComponents.wl","10_Rules.wl"},
  "Reconstruction"->{"11_Reconstruction.wl"},
- "MetricConnectionCurvature"->{"12_MetricConnectionCurvature.wl"}|>,
+ "MetricConnectionCurvature"->{"12_MetricConnectionCurvature.wl"},
+ "NativeCoordinates"->{"17_NativeCoordinates.wl"}|>,
  If[ValueQ[Global`$XPlorerTestGroup],Global`$XPlorerTestGroup,"Geometry"],Missing[]];
 If[MissingQ[Global`$XPlorerSelectedFiles],
- Failure["TestGroup",<|"MessageTemplate"->"Choose Geometry, Perturbations, Lifecycle, Display, ObjectsAndConnections, ComponentsAndRules, Reconstruction, or MetricConnectionCurvature."|>],
+ Failure["TestGroup",<|"MessageTemplate"->"Choose Geometry, Perturbations, Lifecycle, Display, ObjectsAndConnections, ComponentsAndRules, Reconstruction, MetricConnectionCurvature, or NativeCoordinates."|>],
  Global`$XPlorerGroupPreviousContextPath=$ContextPath;
  $ContextPath=DeleteCases[$ContextPath,"Global`"];
  Begin["XPlorerGroup"<>StringReplace[CreateUUID[],"-"->""]<>"`"];
