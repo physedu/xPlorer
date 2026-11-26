@@ -47,8 +47,14 @@ If[KeyExistsQ[$BG,"Schwarzschild"],
  verify["perturbation-copy",xTensorQ[BackgroundObject["Schwarzschild","hh"]],True];
  original=LgSchw;Lg=123;
  verify["snapshot-value",LgSchw,original];
+ lateEab=cd[-aa][cd[-bb][ph[]]];
+ verify["late-formula-registered",FailureQ[RegisterTheory["Expressions","LateEab"->lateEab]],False];
+ verify["existing-tag-preserves-snapshot",FailureQ[CreateBackground["Schwarzschild",SymbolSuffix->"Schw"]],False];
+ verify["late-formula-absent-from-old-snapshot",FailureQ[BackgroundExpression["Schwarzschild","Expressions","LateEab"]],True];
+ verify["late-alias-absent",OwnValues[lateEabSchw],{}];
  LgSecond=99;
  verify["second-background",FailureQ[CreateBackground["Second"]],False];
+ verify["late-formula-in-new-snapshot",ToCanonical[lateEabSecond-BackgroundExpression["Second","Expressions","LateEab"]],0];
  verify["occupied-alias",LgSecond,99];
  verify["independent-field",SameQ[matterSchw,BackgroundObject["Second","matter"]],False];
  AddRules["Schwarzschild",{mass->2}];
