@@ -50,7 +50,7 @@ $BG::usage = "$BG stores the backgrounds created by the package.";
 
 SyntaxInformation[RegisterTheory] = <|"ArgumentsPattern" -> {_, ___}|>;
 
-ToComponents::usage = "ToComponents[tag, expressionOrKey, opts] ports an expression and evaluates its components in the background chart. ToComponents[ownedExpression, opts] infers a unique background; use an explicit tag for abstract or ambiguous expressions. Output -> \"CTensor\" returns a native xCoba CTensor for a complete resolved positive-rank zero-weight tensor array; default Output -> \"Array\".";
+ToComponents::usage = "ToComponents[tag, expressionOrKey, opts] ports an expression and evaluates its components in the background chart. ToComponents[ownedExpression, opts], ownedExpression // ToComponents and ownedExpression // ToComponents[opts] infer a unique background; use an explicit tag for abstract or ambiguous expressions. Output -> \"CTensor\" returns a native xCoba CTensor for a complete resolved positive-rank zero-weight tensor array; default Output -> \"Array\".";
 SetFieldComponents::usage = "SetFieldComponents[tag, field, values, opts] assigns scalar/vector/tensor components. A pure Function receives the chart coordinate scalars.";
 RegisterProfile::usage = "RegisterProfile[tag, name, field, values, opts] stores a validated field input without activating it; repeated calls add or replace field/order entries. RegisterProfile[tag, name] captures the currently assigned managed inputs.";
 ActivateProfile::usage = "ActivateProfile[tag, name] overlays a named profile on managed field inputs, preserving fields/orders not specified. Geometry is reused and saved results invalidated.";
@@ -73,7 +73,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.11";
+$XPlorerVersion = "14.0.0-beta.13-dev.12";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -782,7 +782,8 @@ componentAt[expr_, indices_, numbers_] := Module[{held, rules},
   rules = MapThread[Rule, {indices, MapThread[List, {numbers, Last /@ indices}]}];
   ReleaseHold[held /. rules]
 ];
-ToComponents[expr:Except[_String],opts:OptionsPattern[]] := Module[{owner=notationOwner[expr]},
+ToComponents[opts:(_Rule|_RuleDelayed)..][expr_] := ToComponents[expr,opts];
+ToComponents[expr:Except[_String|_Rule|_RuleDelayed],opts:OptionsPattern[]] := Module[{owner=notationOwner[expr]},
  If[!StringQ[owner],Return[failure["ComponentBackground","Cannot infer a unique background. Use ToComponents[tag, expression]."]]];
  ToComponents[owner,expr,opts]
 ];
