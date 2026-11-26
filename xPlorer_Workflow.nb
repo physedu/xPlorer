@@ -75,7 +75,7 @@ Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Expressions\"", "
 
 Cell[TextData[{"Define and register a rank-two expression Eab from the Hessian and a mass term. The cell displays the registered formula or a registration Failure; check this before creating backgrounds. Its definition imposes no field equation."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"Eab", "=", RowBox[{RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "b"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}], "]"}], "+", RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"g", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], " " ... , ",", RowBox[{"RicciCDSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}]}], "]"}], ",", RowBox[{"RicciScalarCDSchw", "[", "]"}]}], "}"}]],"Input",CellTags->"register_eab"],
+Cell[BoxData[RowBox[{RowBox[{"Eab", "=", RowBox[{RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "b"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}], "]"}], "+", RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"g", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], " ", RowBox[{"phi", "[", "]"}]}]}]}], ";", RowBox[{"eabRegistration", "=", RowBox[{"RegisterTheory", "[", RowBox[{"\"Expressions\"", ",", RowBox[{"\"Eab\"", "\[Rule]", "Eab"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}]}], ";", RowBox[{"If", "[", RowBox[{RowBox[{"FailureQ", "[", "eabRegistration", "]"}], ",", "eabRegistration", ",", RowBox[{"TheoryValue", "[", RowBox[{"\"Expressions\"", ",", "\"Eab\""}], "]"}]}], "]"}]}]],"Input",CellTags->"register_eab"],
 
 Cell[TextData[{"For a named Wolfram expression, give an explicit lookup key. This registers the wave operator under ",StyleBox["\"boxPhi\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
@@ -103,7 +103,11 @@ Cell[TextData[{"2. Create and inspect independent backgrounds"}],"Section"],
 
 Cell[TextData[{"Create three backgrounds from the registered theory. Each gets its own manifold, metric and fields. The coordinate matrices in section 5 will specify the three geometries."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"CreateBackground", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"M\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"CreateBackground", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"Schw\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"CreateBackground", "[", "\"FLRW\"", "]"}], ";"}]],"Input",CellTags->"create_manifolds"],
+Cell[BoxData[RowBox[{RowBox[{"CreateBackground", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"M\""}]}], "]"}], ";", RowBox[{"CreateBackground", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"Schw\""}]}], "]"}], ";", RowBox[{"CreateBackground", "[", "\"FLRW\"", "]"}], ";"}]],"Input",CellTags->"create_manifolds"],
+
+Cell[TextData[{"Check that Eab is registered in the current theory, is included in the Schwarzschild snapshot and has an installed alias. All three should be True in a fresh kernel. CreateBackground with an existing tag returns the existing snapshot; it does not refresh it. If the second check is False, recreate the study only after preserving any desired data, or restart the kernel and run from the beginning. An alias conflict alone does not remove a registered expression."}],"Text"],
+
+Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"KeyExistsQ", "[", RowBox[{RowBox[{"TheoryValue", "[", "\"Expressions\"", "]"}], ",", "\"Eab\""}], "]"}], ",", RowBox[{"KeyExistsQ", "[", RowBox[{RowBox[{RowBox[{RowBox[{"ShowBackground", "[", "\"Schwarzschild\"", "]"}], "[", "\"Theory\"", "]"}], "[", "\"Formula\"", "]"}], ",", "\"Expressions:Eab\""}], "]"}], ",", RowBox[{"KeyExistsQ", "[", RowBox[{RowBox[{RowBox[{"ShowBackground", "[", "\"Schwarzschild\"", "]"}], "[", "\"ExpressionAliases\"", "]"}], ",", "\"Expressions:Eab\""}], "]"}]}], "}"}]],"Input",CellTags->"snapshot_check"],
 
 Cell[TextData[{"FLRW uses its tag as its suffix. Schwarzschild uses Schw, so you can already type ",StyleBox["phiSchw[]",FontFamily->"Courier",FontSize->11],". To use your own name, retrieve the field by its key and assign it to ",StyleBox["matter1",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
@@ -115,7 +119,7 @@ Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"BackgroundObject", "[", RowBox[{"\"Sc
 
 Cell[TextData[{StyleBox["EabM",FontFamily->"Courier",FontSize->11]," and ",StyleBox["EabSchw",FontFamily->"Courier",FontSize->11]," retrieve the formula on their respective manifolds. If a shortcut name is occupied, use ",StyleBox["BackgroundExpression",FontFamily->"Courier",FontSize->11]," with the original key. The background lists the conflict under ",StyleBox["\"UnavailableAliases\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"EabM", ",", "EabSchw", ",", RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Expressions\"", ",", "\"Eab\""}], "]"}]}], "}"}], ",", RowBox[{"{", RowBox[{"lagrangianSchw", ",", RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Lagrangians\"", ",", "\"Lagrangian\""}], "]"}]}], "}"}]}], "}"}]],"Input",CellTags->"automatic_formulas"],
+Cell[BoxData[RowBox[{"{", RowBox[{"EabM", ",", "EabSchw", ",", RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Expressions\"", ",", "\"Eab\""}], "]"}], ",", "lagrangianSchw", ",", RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Lagrangians\"", ",", "\"Lagrangian\""}], "]"}]}], "}"}]],"Input",CellTags->"automatic_formulas"],
 
 Cell[TextData[{"Inspect the entries in the Schwarzschild background."}],"Text"],
 
@@ -153,7 +157,7 @@ Cell[TextData[{"An equivalent calculation is to form the raised gradient on the 
 
 Cell[TextData[{"The copied connection has its own curvature tensors. The Riemann tensor, Ricci tensor and Ricci scalar can be used directly in abstract xAct calculations before choosing coordinates. No vacuum equation has been imposed yet."}],"Text"],
 
-Cell[BoxData[RowBox[{"RiemannCDSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}], ",", RowBox[{"-", "cSchw"}], ",", RowBox[{"-", "dSchw"}]}], "]"}]],"Input",CellTags->"riemann_tensor"],
+Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"RiemannCDSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}], ",", RowBox[{"-", "cSchw"}], ",", RowBox[{"-", "dSchw"}]}], "]"}], ",", RowBox[{"RicciCDSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}]}], "]"}], ",", RowBox[{"RicciScalarCDSchw", "[", "]"}]}], "}"}]],"Input",CellTags->"riemann_tensor"],
 
 Cell[TextData[{"Change the printed labels in Schwarzschild formulas to psi for the scalar, q for the metric and D for the derivative. This changes presentation only. The scalar\:2019s lookup key remains ",StyleBox["\"phi\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
