@@ -23,7 +23,7 @@ assert["recreated-symbols-are-new", ToString[ShowBackground[tagLife]["Metric"],I
 assert["recreated-fields-have-no-stale-values", FailureQ[ToComponents[tagLife,A[-a],StrictComponents->True]], True];
 assert["double-delete-fails-clearly", (DeleteBackground[tagLife];FailureQ[DeleteBackground[tagLife]]), True];
 (* A two-dimensional example exercises dimension-dependent charts and metrics. *)
-saved4DTheory = ShowTheory[];
+saved4DTheory = TheorySnapshot[];
 DefManifold[sphereSourceM,2,{p,q,u,v}]; DefMetric[1,sphereG[-p,-q],sphereCD];
 ClearTheory[]; RegisterTheory["Metric",sphereG]; RegisterTheory["CovD",sphereCD]; RegisterTheory["Indices",{p,q,u,v}];
 tagSphere = "XPTestSphere" <> StringTake[CreateUUID[],8];
@@ -32,7 +32,7 @@ assert["dimension-is-inferred", ShowBackground[tagSphere]["Dimension"], 2];
 assert["sphere-curvature", ToComponents[tagSphere,RicciScalar[sphereCD][]], 2];
 ClearTheory[];With[{tt=saved4DTheory},RegisterTheory[tt]];
 
-cleanTheory = ShowTheory[];
+cleanTheory = TheorySnapshot[];
 registryCounts = {Length[$Manifolds],Length[$Tensors],Length[$CovDs],Length[$Charts],Length[$Parameters]};
 assert["invalid-native-registration",FailureQ[RegisterTheory["Field",badField]],True];
 (* Inject invalid raw metadata to exercise creation preflight independently of registration. *)
@@ -48,7 +48,7 @@ assert["fully-used-background-removed-from-registry", KeyExistsQ[$BG,tagMink], F
 DefTensor[wrongRank[-a,-b],sourceM];
 RegisterTheory["Field",wrongRank];
 (* Fault injection into a raw snapshot: simulate inconsistent persisted rank. *)
-With[{bad=ShowTheory[]},With[{fields=Join[bad["Field"],<|"wrongRank"->Join[bad["Field"]["wrongRank"],<|"Type"->"Vector","Rank"->1|>]|>]},RegisterTheory[<|"Field"->fields|>]]];
+With[{bad=TheorySnapshot[]},With[{fields=Join[bad["Field"],<|"wrongRank"->Join[bad["Field"]["wrongRank"],<|"Type"->"Vector","Rank"->1|>]|>]},RegisterTheory[<|"Field"->fields|>]]];
 countsBeforeMismatch={Length[$Manifolds],Length[$Tensors],Length[$CovDs],Length[$Parameters]};
 assert["partial-creation-mismatch",FailureQ[CreateBackground["MismatchRollback"]],True];
 assert["partial-creation-cleanup",{Length[$Manifolds],Length[$Tensors],Length[$CovDs],Length[$Parameters]},countsBeforeMismatch];
