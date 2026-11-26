@@ -24,6 +24,7 @@ Global`$XPlorerWorkflowReport=Module[
    "naming_result",stages["Native copied head and independent printed label"]=With[{head=xPlorer`BackgroundObject["NamingExample","Materia"]},
      SameQ[First[value],head]&&xAct`xTensor`xTensorQ[head]&&SameQ[SymbolName[head],"matterDemo"]&&SameQ[xAct`xTensor`PrintAs[head],"P"]],
    "naming_setup",stages["Greek index labels on naming example"]=With[{ii=xPlorer`BackgroundIndices["NamingExample",2]},SameQ[Map[Function[ix,With[{s=ix},xAct`xTensor`PrintAs[s]]],ii],{"\[Mu]","\[Nu]"}]],
+   "naming_index_aliases",stages["Latin aliases preserve Greek indices"]=SameQ[value,Rest[Global`$XPlorerWorkflowOutputs["naming_result"]][[{2,3}]]],
    "register_metadata",stages["Theory registered before backgrounds"]=Keys[xPlorer`$BG]==={},
    "create_manifolds",stages["Three independent manifolds before charts"]=Length[xPlorer`$BG]===3&&
      Length[DeleteDuplicates[Lookup[Values[xPlorer`$BG],"Manifold"]]]===3&&AllTrue[Values[xPlorer`$BG],!KeyExistsQ[#,"Chart"]&],
