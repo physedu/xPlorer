@@ -24,7 +24,7 @@ ClearRules::usage = "ClearRules[tag] removes specialization rules from the backg
 ShowRules::usage = "ShowRules[tag] returns active rules in order. ShowRules[tag, \"Numbered\"] pairs them with their one-based positions.";
 ApplyRules::usage = "ApplyRules[tag, expr] applies the specialization rules stored for tag to expr.";
 UseExpression::usage = "UseExpression[tag,key] or UseExpression[tag,section,key] transports a registered formula and applies active background rules.";
-DefineChart::usage = "DefineChart[tag, labels] defines the primary chart. DefineChart[tag, name, labels, map] defines another chart; map supplies primary coordinates as a function of the new coordinates.";
+DefineChart::usage = "DefineChart[tag, {t[],r[],theta[],varphi[]}] defines the primary chart and exposes suffixed coordinate aliases. DefineChart[tag, name, coordinates, map] defines another chart; map supplies primary coordinates as a function of the new coordinates. Legacy string lists remain temporarily during notebook migration.";
 DeleteBackground::usage = "DeleteBackground[tag] undefines owned xAct objects and removes the background from the registry.";
 ClearBackgrounds::usage = "ClearBackgrounds[] deletes each registered background and its owned xAct objects.";
 SetFlatRules::usage = "SetFlatRules[tag] imposes flat-curvature rules for the connection of the background tag.";
@@ -565,33 +565,52 @@ UseExpression[tag_String, key_Symbol] := UseExpression[tag, SymbolName[Unevaluat
 UseExpression[tag_String,section_String,key_String] := Module[{ex=BackgroundExpression[tag,section,key]},
  If[FailureQ[ex],ex,ApplyRules[tag,ex]]];
 
-DefineChart[tag_String, names_List] := Module[{b = background[tag], chart, coords, result},
+coordinateDeclarationQ[expr_] := !AtomQ[expr] && Length[expr]===0 && Head[Head[expr]]===Symbol;
+coordinateLabels[names_List] := If[AllTrue[names,coordinateDeclarationQ],SymbolName[Head[#]]& /@ names,names];
+(* Aliases are installed transactionally, without replacing user definitions. *)
+installChartAliases[tag_,chart_,coords_,labels_,base_] := Module[{b=$BG[tag],heads,keys,entries=<||>,entry},
+ heads=Prepend[coords,chart];keys=Prepend[(#<>base)& /@ labels,"chart"<>base];
+ If[!DuplicateFreeQ[keys],Return[failure["CoordinateAlias","Coordinate names conflict with the chart name."]]];
+ Do[
+   If[KeyExistsQ[Lookup[b,"ObjectAliases",<||>],keys[[i]]],
+     releaseAliases[entries];Return[failure["CoordinateAlias","A coordinate alias conflicts with a managed object.",<|"Alias"->keys[[i]]|>]]];
+   entry=With[{target=heads[[i]]},installAlias[b["AliasContext"],keys[[i]],HoldComplete[target]]];
+   If[entry===$Failed,releaseAliases[entries];Return[failure["CoordinateAlias","Choose coordinate names whose suffixed symbols are unused.",<|"Alias"->keys[[i]]|>]]];
+   entries[keys[[i]]]=entry,
+   {i,Length[heads]}];
+ put[tag,<|"ObjectAliases"->Join[Lookup[b,"ObjectAliases",<||>],entries]|>];Null
+];
+DefineChart[tag_String, declarations_List] := Module[{b = background[tag], chart, coords, result,names=coordinateLabels[declarations],nativeQ=AllTrue[declarations,coordinateDeclarationQ]},
   If[FailureQ[b], Return[b]];
   If[Length[names] =!= b["Dimension"] || !VectorQ[names, StringQ] || !DuplicateFreeQ[names],
     Return[failure["Coordinates", "Supply distinct coordinate labels matching the dimension."]]];
   If[KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]],
     Return[If[Lookup[b, "CoordinateLabels", {}] === names, b, failure["ChartExists", "The primary chart already exists. Use DefineChart[tag,name,labels,map] to add an output chart."]]]];
-  chart = Symbol[b["Context"] <> "chart"];
-  coords = Table[Symbol[b["Context"] <> "coord" <> ToString[n]], {n, Length[names]}];
+  chart = If[nativeQ,freshOwnedSymbol[b["Context"],"chart"<>b["SymbolSuffix"]],Symbol[b["Context"] <> "chart"]];
+  coords = If[nativeQ,freshOwnedSymbol[b["Context"],#<>b["SymbolSuffix"]]& /@ names,
+     Table[Symbol[b["Context"] <> "coord" <> ToString[n]], {n, Length[names]}]];
   result = guard[With[{ch = chart, mm = b["Manifold"], nums = Range[0, b["Dimension"] - 1], vals = Through[coords[]]},
     DefChart[ch, mm, nums, vals]]];
   If[result === $Failed || !ChartQ[chart], Return[failure["DefineChart", "xCoba could not define the chart."]]];
   MapThread[Function[{s, lab}, With[{ss = s, ll = lab}, PrintAs[ss] ^= ll]], {coords, names}];
   setBareBoxes[chart,"chart"<>b["SymbolSuffix"]];
-  put[tag, <|"Chart" -> chart, "Basis" -> chart, "Coordinates" -> coords, "CoordinateLabels" -> names|>]
+  If[nativeQ,result=installChartAliases[tag,chart,coords,names,b["SymbolSuffix"]];
+    If[FailureQ[result],guard[UndefChart[chart]];Return[result]]];
+  put[tag, <|"Chart" -> chart, "Basis" -> chart, "Coordinates" -> coords, "CoordinateLabels" -> names,"NativeCoordinateSyntax"->nativeQ|>]
 ];
 (* Secondary coordinate charts are native xCoba charts on the owned manifold.
    Maps give the primary coordinates as functions of the target coordinates. *)
-DefineChart[tag_String,name_String,labels_List,map_Function] := Module[
-  {b=background[tag],charts,coords,values,chart,jac,det,n,created,record},
+DefineChart[tag_String,name_String,declarations_List,map_Function] := Module[
+  {b=background[tag],charts,coords,values,chart,jac,det,n,created,record,labels=coordinateLabels[declarations],nativeQ=AllTrue[declarations,coordinateDeclarationQ],base},
   If[FailureQ[b],Return[b]];
   If[!KeyExistsQ[b,"Chart"],Return[failure["NoChart","Define the primary chart first."]]];
   charts=Lookup[b,"AdditionalCharts",<||>]; n=b["Dimension"];
   If[name==="Primary" || KeyExistsQ[charts,name],Return[failure["ChartExists","Choose an unused chart name."]]];
   If[Length[labels]=!=n || !VectorQ[labels,StringQ] || !DuplicateFreeQ[labels],
     Return[failure["Coordinates","Supply one distinct label per dimension."]]];
-  chart=freshOwnedSymbol[b["Context"],"chart"<>safeName[name]];
-  coords=Table[freshOwnedSymbol[b["Context"],"coord"<>safeName[name]<>ToString[i]],{i,n}];
+  base=safeName[name]<>b["SymbolSuffix"];
+  chart=freshOwnedSymbol[b["Context"],If[nativeQ,"chart"<>base,"chart"<>safeName[name]]];
+  coords=If[nativeQ,freshOwnedSymbol[b["Context"],#<>base]& /@ labels,Table[freshOwnedSymbol[b["Context"],"coord"<>safeName[name]<>ToString[i]],{i,n}]];
   With[{ch=chart,mm=b["Manifold"],nums=Range[0,n-1],xs=Through[coords[]]},
     created=guard[DefChart[ch,mm,nums,xs]]];
   If[created===$Failed || !ChartQ[chart],Return[failure["Chart","xCoba could not define this chart."]]];
@@ -601,8 +620,10 @@ DefineChart[tag_String,name_String,labels_List,map_Function] := Module[
   jac=Outer[D,values,Through[coords[]]];det=Simplify[Det[jac]];
   If[TrueQ[det==0],UndefChart[chart];Return[failure["ChartMap","The chart Jacobian is identically singular."]]];
   setBareBoxes[chart,safeName[name]<>b["SymbolSuffix"]];
+  If[nativeQ,created=installChartAliases[tag,chart,coords,labels,base];
+    If[FailureQ[created],guard[UndefChart[chart]];Return[created]]];
   record=<|"Chart"->chart,"Coordinates"->coords,"Labels"->labels,"Map"->map,
-    "Values"->values,"Jacobian"->jac|>;
+    "Values"->values,"Jacobian"->jac,"NativeCoordinateSyntax"->nativeQ|>;
   put[tag,<|"AdditionalCharts"->Append[charts,name->record]|>]; chart
 ];
 chartRecord[b_Failure,_] := b;
@@ -611,7 +632,7 @@ chartRecord[b_Association,name_] := Lookup[Lookup[b,"AdditionalCharts",<||>],nam
 ChartOf[tag_String,"Primary"] := ChartOf[tag];
 CoordinatesOf[tag_String,"Primary"] := CoordinatesOf[tag];
 ChartOf[tag_String,name_String] := Module[{rec=chartRecord[ShowBackground[tag],name]},If[FailureQ[rec],rec,rec["Chart"]]];
-CoordinatesOf[tag_String,name_String] := Module[{rec=chartRecord[ShowBackground[tag],name]},If[FailureQ[rec],rec,rec["Coordinates"]]];
+CoordinatesOf[tag_String,name_String] := Module[{ch=ChartOf[tag,name]},If[FailureQ[ch],ch,Head /@ ScalarsOfChart[ch]]];
 chartPullback[arr_,b_,rec_,indices_] := Module[{jac=rec["Jacobian"],inv,result,axis,transform},
   result=arr/.Thread[coordinateValues[b]->rec["Values"]];
   If[AnyTrue[indices,UpIndexQ],inv=Simplify[Inverse[jac]]];
@@ -620,7 +641,7 @@ chartPullback[arr_,b_,rec_,indices_] := Module[{jac=rec["Jacobian"],inv,result,a
     {axis,Length[indices]}];result
 ];
 ChartOf[tag_String] := getter[tag, "Chart"];
-CoordinatesOf[tag_String] := getter[tag, "Coordinates"];
+CoordinatesOf[tag_String] := Module[{ch=ChartOf[tag]},If[FailureQ[ch],ch,Head /@ ScalarsOfChart[ch]]];
 BasisOf[tag_String] := getter[tag, "Basis"];
 getter[tag_, key_] := Module[{b = background[tag]}, If[FailureQ[b], b, Lookup[b, key, failure["NotInitialized", "The requested background property has not been initialized.", <|"Property" -> key|>]]]];
 
@@ -1396,7 +1417,7 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  If[MemberQ[deadKeys,"Chart"],
   Scan[If[xTensorQ[#],DeleteTensorValues[#]]&,Lookup[Values[newb["Field"]],"NewHead",{}]];
   newb["FieldComponents"]=<||>;newb["FieldProfiles"]=<||>;newb["ConnectionComponents"]=<||>;
-  newb=KeyDrop[newb,{"AdditionalCharts","Chart","Basis","Coordinates","CoordinateLabels","MetricMatrix","GeometryPolicy"}]
+  newb=KeyDrop[newb,{"AdditionalCharts","Chart","Basis","Coordinates","CoordinateLabels","NativeCoordinateSyntax","MetricMatrix","GeometryPolicy"}]
  ];
  newb["PresentationDefaults"]=KeyDrop[newb["PresentationDefaults"],deadKeys];
  newb["PresentationOverrides"]=KeyDrop[newb["PresentationOverrides"],deadKeys];
@@ -1642,10 +1663,11 @@ recipeObjects[b_] := Join[managedObjects[b],KeyTake[b,{"Christoffel","Torsion","
  Association@Flatten@KeyValueMap[Function[{key,rec},KeyValueMap[("Connection:"<>key<>":"<>#1 -> #2)&,rec["Geometry"]]],Lookup[b,"Connections",<||>]]];
 ReconstructionData[tag_String] := Module[{b=background[tag],inputs},If[FailureQ[b],Return[b]];
  inputs=Association@KeyValueMap[Function[{key,fs},key -> (KeyDrop[#,"Head"]& /@ Select[Values[b["FieldComponents"]],#["Head"]===fs["NewHead"]&])],b["Field"]];
- Join[KeyTake[b,{"Theory","Signature","SymbolSuffix","CoordinateLabels","Coordinates","MetricMatrix","Assumptions","SpecializationRules","IndividualRules","RuleGroups","ActiveRuleGroups","PresentationOverrides","Notation","ConnectionComponents","FieldProfiles"}],
- <|"RecipeVersion"->1,"OriginalTag"->tag,"ChartMaps"->Map[KeyTake[#,{"Labels","Map"}]&,Lookup[b,"AdditionalCharts",<||>]],"Objects"->recipeObjects[b],"Indices"->b["Indices"],"FieldInputs"->inputs,
+ Join[KeyTake[b,{"Theory","Signature","SymbolSuffix","CoordinateLabels","Coordinates","NativeCoordinateSyntax","MetricMatrix","Assumptions","SpecializationRules","IndividualRules","RuleGroups","ActiveRuleGroups","PresentationOverrides","Notation","ConnectionComponents","FieldProfiles"}],
+ <|"RecipeVersion"->1,"OriginalTag"->tag,"ChartMaps"->Map[KeyTake[#,{"Labels","Map","NativeCoordinateSyntax"}]&,Lookup[b,"AdditionalCharts",<||>]],"Objects"->recipeObjects[b],"Indices"->b["Indices"],"FieldInputs"->inputs,
   "RelativeHeads"->relativeHeads[b]|>]
 ];
+recipeDeclarations[labels_,native_] := If[TrueQ[native],(Symbol["xPlorer`CoordinateDeclarations`"<>#][]& /@ labels),labels];
 RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,coords,inputs,source,result,relative},
  If[KeyExistsQ[$BG,tag],Return[failure["BackgroundExists","Choose an unused tag or delete the old background first."]]];
  If[Lookup[recipe,"RecipeVersion",None]=!=1 || !AssociationQ[Lookup[recipe,"Theory",None]],Return[failure["Recipe","Supply ReconstructionData captured before deletion."]]];
@@ -1654,8 +1676,8 @@ RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,c
   Return[failure["RecipeScope","Reconstruction of rules on relative-connection tensor heads is not supported; rewrite them using named connections first."]]];
  b=Block[{$Theory=recipe["Theory"]},CreateBackground[tag,SymbolSuffix->If[tag===Lookup[recipe,"OriginalTag",None],Lookup[recipe,"SymbolSuffix",Automatic],Automatic],MetricSignature->Lookup[recipe,"Signature",Automatic],Presentation->Lookup[recipe,"PresentationOverrides",<||>]]];
  If[FailureQ[b],Return[b]];
- If[KeyExistsQ[recipe,"CoordinateLabels"],r=DefineChart[tag,recipe["CoordinateLabels"]];If[FailureQ[r],Return[r]]];
- result=KeyValueMap[DefineChart[tag,#1,#2["Labels"],#2["Map"]]&,Lookup[recipe,"ChartMaps",<||>]];
+ If[KeyExistsQ[recipe,"CoordinateLabels"],r=DefineChart[tag,recipeDeclarations[recipe["CoordinateLabels"],Lookup[recipe,"NativeCoordinateSyntax",False]]];If[FailureQ[r],Return[r]]];
+ result=KeyValueMap[DefineChart[tag,#1,recipeDeclarations[#2["Labels"],Lookup[#2,"NativeCoordinateSyntax",False]],#2["Map"]]&,Lookup[recipe,"ChartMaps",<||>]];
  If[AnyTrue[result,FailureQ],Return[First@Select[result,FailureQ]]];
  b=$BG[tag];old=recipe["Objects"];new=recipeObjects[b];
  rules=Thread[Values@KeyTake[old,Intersection[Keys[old],Keys[new]]] -> Values@KeyTake[new,Intersection[Keys[old],Keys[new]]]];
