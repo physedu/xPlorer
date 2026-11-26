@@ -27,11 +27,11 @@ verify["bulk-formulas",FailureQ[RegisterTheory["Lagrangians",{"Gravity"->Lg,"Mat
 verify["expressions",FailureQ[RegisterTheory["Expressions",{"Gradient"->eq,"Gravity"->eq2}]],False];
 verify["named-value",TheoryValue["Lagrangians","Gravity"],Lg];
 verify["explicit-total",TheoryValue["Lagrangians","Total"],Lg+Lm];
-snapshot=ShowTheory[];
+snapshot=TheorySnapshot[];
 verify["anonymous-missing-head",FailureQ[RegisterTheory["Expressions","Missing"->ph[]^2]],True];
 verify["bad-lagrangian",FailureQ[RegisterTheory["Lagrangians","NotScalar"->av[-aa],Head->"BadL"]],True];
 verify["atomic-bulk",FailureQ[RegisterTheory["Expressions",{{"Good"->ph[]^2,Head->"GoodExpr"},"Bad"->ph[]^3}]],True];
-verify["unchanged-registry",ShowTheory[],snapshot];
+verify["unchanged-registry",TheorySnapshot[],snapshot];
 verify["legacy-rejected",FailureQ[RegisterTheory["Field","Scalar",ph]],True];
 verify["duplicate-field",FailureQ[RegisterTheory["Field",ph,Name->"other"]],True];
 verify["duplicate-option",FailureQ[RegisterTheory["Field",ph,Name->"one",Name->"two"]],True];
