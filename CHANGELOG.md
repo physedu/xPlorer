@@ -129,3 +129,7 @@ Added a portable notebook, 75 regression checks, an MUnit report runner, and an 
 - Capture ordinary native scalar inputs, complete literal arrays in the managed primary chart, and individual edits of complete recorded source configurations. Full native field deletion clears the managed record. No Managed marker required in these cases.
 - Prepare requested native field variances on demand, cache rule fingerprints rather than arrays, and extend ToValues for compound native reads. Guard derived writes through ChangeComponents. Replay affected field heads instead of every registered field on assignment.
 - Integrate literal covariant and contravariant primary-chart MetricInBasis assignments. Propagate failures during forced geometry restoration. Existing setters retained; no packaging changes, no release.
+
+## 14.0.0-beta.13-dev.19 (development)
+
+- Integrate explicit-chart native MetricCompute for the managed primary chart and zero torsion. Recognize native geometry coverage and selectively repair missing TensorValues groups without clearing unrelated xCoba cache entries.

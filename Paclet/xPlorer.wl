@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.18";
+$XPlorerVersion = "14.0.0-beta.13-dev.19";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -680,6 +680,52 @@ $geometryTargets = <|"Metric" -> {"Metric"[-1, -1], "Metric"[1, 1], "DetMetric"[
   "RicciScalar" -> {"RicciScalar"[]}, "Einstein" -> {"Einstein"[-1, -1]},
   "Riemann" -> {"Riemann"[-1, -1, -1, -1], "Riemann"[-1, -1, -1, 1], "Riemann"[-1, -1, 1, 1]},
   "Weyl" -> {"Weyl"[-1, -1, -1, -1]}, "Kretschmann" -> {"Kretschmann"[]}|>;
+(* xCoba 1.3.0 stores ReportCompute pointer caches separately from
+   TensorValues. A cached pointer alone does not recreate deleted rules.
+   Use native cache metadata and native symbolic-head mapping, not a
+   second geometry implementation. Only inspect the managed primary chart. *)
+geometryNativeData[b_] := With[{ch=b["Chart"]},
+ {{b["Metric"],b["CovD"]},{ch,PDOfBasis[ch]},{ch,PDOfBasis[ch]}}];
+nativeGeometryRulePresentQ[spec_,data_] := Module[{head,bases},
+ head=xAct`xCoba`Private`CacheKeySymbolic[spec,data];
+ If[Head[head]===MultiplyHead,head=Last[head]];
+ If[head===Null,Return[True]];
+ If[!xTensorQ[head],Return[False]];
+ bases=xAct`xCoba`Private`signedbases[spec,data[[2,1]]];
+ AnyTrue[TensorValIDs[head],Length[List@@#]===2&&MemberQ[Last[List@@#],bases]&]
+];
+nativeGeometryGroupPresentQ[b_,key_] := AllTrue[$geometryTargets[key],
+ nativeGeometryRulePresentQ[#,geometryNativeData[b]]&];
+repairMissingGeometryCache[b_] := Module[{entries,ch=b["Chart"],g=b["Metric"]},
+ entries=Cases[First/@DownValues[xCobaCacheTable],
+  Verbatim[HoldPattern][xCobaCacheTable["ReportCompute"[obj_,cc_,data_,m_],name_]]:>{obj,cc,data,m,name}];
+ entries=Select[entries,#[[4]]===g&&#[[2]]==={False,False}&&#[[3,2,1]]===ch&&#[[3,3,1]]===ch&];
+ Scan[Function[e,If[!nativeGeometryRulePresentQ[e[[1]],e[[3]]],
+  With[{lhs="ReportCompute"[e[[1]],e[[2]],e[[3]],e[[4]]],name=e[[5]]},ClearxCobaCache[lhs,name]]]],entries];
+ Null
+];
+refreshGeometryCoverage[tag_] := Module[{b=$BG[tag],kept},
+ kept=Select[b["ComputedGeometry"],KeyExistsQ[$geometryTargets,#]&&nativeGeometryGroupPresentQ[b,#]&];
+ If[kept=!=b["ComputedGeometry"],put[tag,<|"ComputedGeometry"->kept|>]];
+ kept
+];
+managedNativeMetricComputeQ[tag_,ch_,opts_List] := Module[{b=Lookup[$BG,tag,<||>]},
+ !TrueQ[$insideManagedCalculation]&&!TrueQ[$insideNativePrintGuard]&&
+ KeyExistsQ[b,"MetricMatrix"]&&ch===b["Chart"]&&Complement[First/@opts,First/@Options[MetricCompute]]==={}
+];
+captureNativeMetricCompute[tag_,ch_,what_,opts___Rule] := Block[{$insideManagedCalculation=True},
+ Module[{b=$BG[tag],result,deps,covered,old,new,seconds},
+  old=refreshGeometryCoverage[tag];
+  repairMissingGeometryCache[b];
+  {seconds,result}=AbsoluteTiming[guard[MetricCompute[b["Metric"],Zero,ch,what,opts]]];
+  If[result===$Failed,Return[failure["GeometryComputation","xCoba could not compute the requested native geometry."]]];
+  deps=xAct`xCoba`Private`Depends[what,{False,False}];
+  covered=Select[Keys[$geometryTargets],Function[k,AllTrue[$geometryTargets[k],MemberQ[deps,#]&]&&nativeGeometryGroupPresentQ[b,k]]];
+  new=Union[old,covered];
+  If[new=!=old,put[tag,<|"ComputedGeometry"->new,"GeometryRuns"->b["GeometryRuns"]+1,"LastGeometrySeconds"->seconds|>]];
+  result
+ ]];
+
 Options[ComputeGeometry] = {CVSimplify -> Together, Assumptions -> Automatic, Verbose -> False, ForceCompute -> False};
 ComputeGeometry[tag_String, targets_: {"Metric"}, OptionsPattern[]] := Module[
   {b = background[tag], wanted, todo, policy, ass, fun = OptionValue[CVSimplify], result, seconds, specs},
@@ -694,8 +740,10 @@ ComputeGeometry[tag_String, targets_: {"Metric"}, OptionsPattern[]] := Module[
     If[result===$Failed,Return[failure["MetricAssignment","Could not restore the metric before recomputation."]]];
     result=replayFields[tag];If[FailureQ[result],Return[result]];
     result=replayConnections[tag];If[FailureQ[result],Return[result]];b = $BG[tag]];
+  refreshGeometryCoverage[tag]; b = $BG[tag];
   todo = Complement[wanted, b["ComputedGeometry"]];
   If[todo === {}, Return[<|"Computed" -> {}, "Cached" -> wanted, "Seconds" -> 0., "MetricRevision" -> b["MetricRevision"]|>]];
+  repairMissingGeometryCache[b];
   specs = Flatten[Lookup[$geometryTargets, todo]];
   {seconds, result} = AbsoluteTiming[guard[MetricCompute[b["Metric"], b["Chart"], specs,
     CVSimplify -> fun, Verbose -> OptionValue[Verbose]]]];
@@ -960,6 +1008,8 @@ installManagedMetricSyntax[tag_,metric_Symbol] := With[{hh=metric,tt=tag},
  hh /: MetricInBasis[hh,input:(_List|_Function),opts___Rule] := managedMetricInput[tt,input,opts];
  hh /: MetricInBasis[hh,basis_,input_List,opts___Rule] /; managedPrimaryMetricArrayQ[tt,basis,input,{opts}] := captureManagedMetricArray[tt,basis,input,opts];
  hh /: MetricCompute[hh,targets:(_String|_List|All),opts___Rule] := managedNativeGeometry[tt,targets,opts];
+ hh /: MetricCompute[hh,ch_,what_,opts___Rule] /; managedNativeMetricComputeQ[tt,ch,{opts}] := captureNativeMetricCompute[tt,ch,what,opts];
+ hh /: MetricCompute[hh,Zero,ch_,what_,opts___Rule] /; managedNativeMetricComputeQ[tt,ch,{opts}] := captureNativeMetricCompute[tt,ch,what,opts];
 ];
 installManagedFieldSyntax[tag_,head_Symbol,rank_Integer] := With[{hh=head,tt=tag,rr=rank},
  If[rr===0,

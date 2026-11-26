@@ -93,3 +93,7 @@ The author reported CopyFile::opset during PacletBuild's internal staging, follo
 ### dev.18 native integration checkpoint
 
 On-demand primary-chart variance storage, native ToValues compound reads, automatic scalar capture, complete literal primary-basis arrays, edits to complete recorded source components, full field-value deletion, and literal primary-chart metric assignments implemented. Next: detect identical assignments without rewriting native rules; avoid restoring unaffected covariant field inputs on metric changes; cover remaining native MetricInBasis and MetricCompute forms and geometry reads, incomplete/sparse component assignments, derivative dependencies, RuleToSet/SetToRule, chart/basis lifecycles, and xCoba calculation entry points before retiring old setters. Verify version-specific performance with symbolic curved metrics and selected components, not only a rank-three numeric case. Only after integration, design a scoped native-experiment bypass with warning and explicit managed restoration.
+
+### dev.19 geometry checkpoint
+
+Native primary-chart MetricCompute with native target specifications and zero torsion, plus selective repair of missing native geometry groups, implemented. Next: geometry query integration and direct edits, policy/metric-change invalidation, native chart and basis lifecycle. Do not equate group existence with an arbitrary rule's mathematical validity.
