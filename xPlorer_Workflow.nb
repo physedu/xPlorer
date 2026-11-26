@@ -149,9 +149,9 @@ Cell[TextData[{"Create three backgrounds from the registered theory. Each gets i
 
 Cell[BoxData[RowBox[{RowBox[{"CreateBackground", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"M\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"CreateBackground", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"Schw\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"CreateBackground", "[", "\"FLRW\"", "]"}], ";"}]],"Input",CellTags->"create_manifolds"],
 
-Cell[TextData[{"FLRW uses its tag as its suffix. Schwarzschild uses Schw, so you can already type ",StyleBox["phiSchw[]",FontFamily->"Courier",FontSize->11],". To use your own name, retrieve the field by its key and assign it to ",StyleBox["matter1",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{"FLRW uses its tag as its suffix. Schwarzschild uses Schw, so you can already type ",StyleBox["phiSchw[]",FontFamily->"Courier",FontSize->11],". To use your own name, retrieve the field by its key and assign it to ",StyleBox["phi1",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"matter1", "=", RowBox[{"BackgroundObject", "[", RowBox[{"\"Schwarzschild\"", ",", "\"phi\""}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{"matter1", ",", RowBox[{"matter1", "[", "]"}]}], "}"}]}]],"Input",CellTags->"scalar_alias"],
+Cell[BoxData[RowBox[{RowBox[{"phi1", "=", RowBox[{"BackgroundObject", "[", RowBox[{"\"Schwarzschild\"", ",", "\"phi\""}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{"phi1", ",", RowBox[{"phi1", "[", "]"}]}], "}"}]}]],"Input",CellTags->"scalar_alias"],
 
 Cell[TextData[{"If you know the background tag but want to look up a head or index, use these accessors. If a notebook name is occupied, xPlorer keeps its existing definition and lists it under ",StyleBox["\"UnavailableObjectAliases\"",FontFamily->"Courier",FontSize->11]," in ",StyleBox["ShowBackground",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
@@ -345,11 +345,11 @@ Cell[TextData[{"The scale factor s(t) is positive. Its derivative determines whe
 
 Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "s", "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetCMetricSystem", "[", RowBox[{"\"FLRW\"", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"]}], "}"}], "]"}]}], "]"}], ",", RowBox[{"Assumptions", "\[Rule]", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"assumptions", "&&", RowBox[{RowBox[{"s", "[", "t", "]"}], ">", "0"}]}]}], "]"}]}]}], "]"}], ";"}]],"Input",CellTags->"flrw_metric"],
 
-Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",","\"Metric\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrices"],
+Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",",RowBox[{"g","[",RowBox[{RowBox[{"-","a"}],",",RowBox[{"-","b"}]}],"]"}]}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrices"],
 
-Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"Schwarzschild\"",",","\"Metric\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrix_schw"],
+Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"Schwarzschild\"",",",RowBox[{"g","[",RowBox[{RowBox[{"-","a"}],",",RowBox[{"-","b"}]}],"]"}]}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrix_schw"],
 
-Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"FLRW\"",",","\"Metric\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrix_flrw"],
+Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"FLRW\"",",",RowBox[{"g","[",RowBox[{RowBox[{"-","a"}],",",RowBox[{"-","b"}]}],"]"}]}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrix_flrw"],
 
 Cell[TextData[{"A general scalar field in Minkowski"}],"Subsection"],
 
