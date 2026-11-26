@@ -1,0 +1,45 @@
+(* Run in a fresh kernel after loading xPlorer; native xCoba interop, not a managed basis API. *)
+Get[FileNameJoin[{DirectoryName[$InputFileName],"Fixture.wl"}]];
+CreateBackground["Native",SymbolSuffix->"Nat"];
+With[{mm=BackgroundObject["Native","Manifold"]},
+ DefChart[nativeCart,mm,{0,1,2,3},{nt[],nx[],ny[],nz[]}]];
+With[{gg=BackgroundObject["Native","Metric"]},
+ MetricInBasis[gg,-nativeCart,DiagonalMatrix[{-1,1,1,1}]];
+ MetricCompute[gg,nativeCart,All]];
+ComponentValue[phiNat[],nx[]^2];
+AllComponentValues[ANat[{-aNat,-nativeCart}],{1,2,3,4}];
+assert["native-metric",ToValues[gNat[{0,-nativeCart},{0,-nativeCart}]],-1];
+assert["native-scalar",ToValues[phiNat[]],nx[]^2];
+assert["native-vector",ToValues[ANat[{1,-nativeCart}]],2];
+assert["native-registry-not-synchronized",FailureQ[ToComponents["Native",phi[]]],True];
+assert["native-chart-not-managed",FailureQ[ChartOf["Native"]],True];
+assert["external-chart-protected",DeletionPlan["Native"]["CanDelete"],False];
+
+makeBackground["Mixed",{"t","x","y","z"},DiagonalMatrix[{-1,1,1,1}],ComputeOnSet->None];
+assert["compute-none",ShowBackground["Mixed"]["ComputedGeometry"],{}];
+SetFieldComponents["Mixed",A,{1,2,3,4}];
+nativePrimary=ChartOf["Mixed"];
+nativeVB=VBundleOfMetric[BackgroundObject["Mixed","Metric"]];
+With[{v=nativeVB,ch=nativePrimary},
+ DefBasis[nativeFrame,v,{0,1,2,3},BasisColor->Blue];
+ SetBasisChange[CTensor[DiagonalMatrix[{1,2,3,4}],{-nativeFrame,ch}]]];
+nativeCT=With[{ch=nativePrimary},ToCTensor[CTensor[{1,2,3,4},{-ch}],{-nativeFrame}]];
+assert["native-ctensor-change",nativeCT,CTensor[{1,4,9,16},{-nativeFrame}]];
+nativeBasisExpression=With[{ch=nativePrimary},
+ ChangeComponents[AMixed[{-aMixed,-nativeFrame}],AMixed[{-aMixed,-ch}]]];
+assert["native-basis-component",ToValues[AMixed[{2,-nativeFrame}]],9];
+assert["native-to-basis",ToValues[TraceBasisDummy[ToBasis[nativeFrame][AMixed[-aMixed]]]],AMixed[{-aMixed,-nativeFrame}]];
+assert["native-basis-color",BasisColor[nativeFrame],Blue];
+assert["managed-primary-still-correct",ToComponents["Mixed",A[a]],{-1,2,3,4}];
+assert["managed-native-basis-wrapper",ToBasisOf["Mixed",AMixed[-aMixed]],With[{ch=nativePrimary},ToBasis[ch][AMixed[-aMixed]]]];
+assert["managed-native-values-wrapper",ToValuesOf["Mixed",AMixed[{1,-nativePrimary}]],2];
+assert["external-basis-protected",DeletionPlan["Mixed"]["CanDelete"],False];
+assert["native-christoffel-head",ChristoffelOf["Mixed"],Christoffel[ConnectionOf["Mixed"]]];
+assert["native-torsion-head",TorsionOf["Mixed"],Torsion[ConnectionOf["Mixed"]]];
+ReplaceRules["Mixed",{mass->2,mass->3}];
+assert["replace-first-match",ApplyRules["Mixed",mass],2];
+ReplaceRules["Mixed",{mass->4}];
+assert["replace-removes-old",ShowRules["Mixed"],{mass->4}];
+assert["clear-backgrounds-protects-external",ListQ[ClearBackgrounds[]]&&KeyExistsQ[$BG,"Mixed"],True];
+(* Native-owned external objects are not automatically deleted. Isolated test kernel. *)
+<|"Version"->$XPlorerVersion,"Total"->Length[testResults],"Passed"->Count[Lookup[testResults,"Passed"],True],"Failures"->Select[testResults,!TrueQ[#["Passed"]]&]|>
