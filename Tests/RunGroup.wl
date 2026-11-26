@@ -1,6 +1,6 @@
 (* Set Global`$XPlorerTestGroup before Get; use a fresh kernel for each group. *)
 Global`$XPlorerTestsDirectory=DirectoryName[$InputFileName];
-If[!MemberQ[$Packages,"xPlorer`"],Get[FileNameJoin[{DirectoryName[Global`$XPlorerTestsDirectory],"xPlorer.wl"}]]];
+If[!MemberQ[$Packages,"xPlorer`"],Get[FileNameJoin[{DirectoryName[Global`$XPlorerTestsDirectory],"Paclet","xPlorer.wl"}]]];
 Global`$XPlorerSelectedFiles=Lookup[<|
  "Geometry"->{"01_Core.wl","02_Geometry.wl"},
  "Perturbations"->{"01_Core.wl","03_Perturbations.wl"},

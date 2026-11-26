@@ -1,6 +1,6 @@
 # Using xPlorer — beta.13-dev.6
 
-The principal worked guide is xPlorer_Workflow.nb. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside xPlorer.wl and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
+The principal worked guide is xPlorer_Workflow.nb. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
 ## Responsibilities and defaults
 
@@ -157,8 +157,8 @@ The relative-connection dependency helper and native label resolver use isolated
 
 ## Installation
 
-Get works directly without installation. For a traditional application, name the downloaded folder xPlorer and place it in FileNameJoin[{$UserBaseDirectory,"Applications"}], then use Needs["xPlorer`"] in a fresh kernel. The Kernel/init.m loader points to the single root package source.
+Get works directly without installation. For a traditional application, use Install.wl or name the Paclet folder xPlorer and place it in FileNameJoin[{$UserBaseDirectory,"Applications"}], then use Needs["xPlorer`"] in a fresh kernel. The Kernel/init.m loader points to the single package source in Paclet/.
 
-PacletInfo.wl declares a kernel extension using the same source. PacletDirectoryLoad["/path/to/xPlorer"] followed by Needs["xPlorer`"] activates a development directory. Tools/BuildPaclet.wl can build a paclet archive with PacletTools. xAct must be installed separately; it is not bundled or automatically downloaded by the package.
+PacletInfo.wl declares a kernel extension using the same source. PacletDirectoryLoad["/path/to/xPlorer/Paclet"] followed by Needs["xPlorer`"] activates a development directory. Tools/BuildPaclet.wl can build a paclet archive with PacletTools. xAct must be installed separately; it is not bundled or automatically downloaded by the package.
 
 Tests/RunTests.wl runs package checks. Tests/WorkflowTests.wl runs actual input boxes from the principal notebook in a fresh kernel. The principal notebook is the source of truth. The historical 88-input Tools builder cannot overwrite it. See BETA13_PROGRESS.md and BETA13_PLAN.md for current execution evidence and limitations.

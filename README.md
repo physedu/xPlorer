@@ -10,10 +10,10 @@ The current experimental version is **14.0.0-beta.13-dev.10** (native arithmetic
 
 ## Start here
 
-Keep [xPlorer_Workflow.nb](xPlorer_Workflow.nb) beside [xPlorer.wl](xPlorer.wl), install xAct, start a fresh Mathematica kernel and evaluate the notebook in order. Its startup is simply:
+Keep [xPlorer_Workflow.nb](xPlorer_Workflow.nb) beside the [Paclet](Paclet/) directory, install xAct, start a fresh Mathematica kernel and evaluate the notebook in order. Its startup is simply:
 
 ```wl
-Get[FileNameJoin[{NotebookDirectory[], "xPlorer.wl"}]];
+Get[FileNameJoin[{NotebookDirectory[], "Paclet", "xPlorer.wl"}]];
 ```
 
 The principal notebook develops a scalar theory on Minkowski, Schwarzschild and FLRW, then introduces vectors, tensors, an independent affine connection, perturbations and cleanup. It contains 142 executable input cells, with explanatory prose beside the calculations. The stylesheet inherits light/dark theme colors. ScalarTheory.wl is an optional reusable source recipe; it is not required to run the notebook.
@@ -68,7 +68,7 @@ build = Get[FileNameJoin[{NotebookDirectory[], "Tools", "BuildPaclet.wl"}]];
 If[MatchQ[build, _Success], PacletInstall[build["PacletArchive"]]]
 ```
 
-The builder stages only PacletInfo.wl, xPlorer.wl, the two Kernel loaders, LICENSE and CITATION.cff in a temporary directory, calls PacletBuild without suppressing warnings, copies the archive to the repository's build directory (replacing an existing same-named archive), and removes the temporary tree. The author successfully built dev.6 with the earlier builder on Windows; that archive remains valid for dev.6. The clean staging and structured failure handling have been tested remotely; final archive creation there remains blocked by Java security policy. The clean builder's successful archive path and Desktop installation still require testing. Do not keep both a conflicting traditional installation and a paclet active. For future releases, distribute the verified archive as a GitHub Release asset so users do not need to build it themselves. No release has been published.
+The builder calls `PacletBuild[source, out]` directly on `Paclet/`, with `build/` as the output directory. No temporary copy or archive transfer is necessary. For future releases, distribute the verified archive as a GitHub Release asset so users do not need to build it themselves. No release has been published. The remote kernel has a Java restriction on producing a real archive; Desktop verification remains necessary. Do not keep both a conflicting traditional installation and a paclet active.
 
 ### Inspect the registered theory
 
@@ -128,3 +128,14 @@ xTensor supplies abstract tensor calculus, xPert supplies perturbative expansion
 - xAct documentation: https://josmar493.dreamhosters.com/
 - xAct discussion group: https://groups.google.com/g/xAct
 - Wolfram paclet layout: https://reference.wolfram.com/language/tutorial/Paclets.html
+
+### Repository layout
+
+- `Paclet/`: the single package implementation, paclet metadata, kernel loaders, license and citation information.
+- `Tests/`: automated mathematical and API regressions, notebook runner and historical reports.
+- `Examples/`: independent scientific examples, including Proca and native xCoba interoperability.
+- `Tools/`: build script and historical notebook-generation utilities.
+- `build/`: generated local archives (ignored by Git; created when building).
+- `xPlorer_Workflow.nb` and `xPlorer_Install.nb`: scientific tutorial and installation guide.
+
+The root `xPlorer.m` is a compatibility loader, not a second implementation. Root license and citation metadata are retained for GitHub; identical copies are included in the distributable folder.

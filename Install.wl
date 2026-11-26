@@ -1,7 +1,7 @@
 (* Install a traditional Mathematica application from a downloaded repository.
    Load this file once, then evaluate InstallXPlorer[].
    An existing installation is never overwritten automatically. *)
-With[{source=DirectoryName[$InputFileName]},
+With[{source=FileNameJoin[{DirectoryName[$InputFileName],"Paclet"}]},
  InstallXPlorer[applicationDirectory_String]:=Module[
   {target=FileNameJoin[{applicationDirectory,"xPlorer"}],files={"xPlorer.wl","LICENSE","CITATION.cff","Kernel/init.m","Kernel/init.wl"},staging,result},
   If[FileExistsQ[target],Return[Failure["AlreadyInstalled",<|"MessageTemplate"->"An xPlorer application already exists. Move it to a backup location before installing another version.","Path"->target|>]]];

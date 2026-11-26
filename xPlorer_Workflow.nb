@@ -4,9 +4,9 @@ Cell[TextData[{"xPlorer - From an abstract theory to physical spacetimes"}],"Tit
 
 Cell[TextData[{"A massive scalar field on Minkowski, Schwarzschild and FLRW backgrounds | beta.13"}],"Subtitle"],
 
-Cell[TextData[{"Place this notebook beside xPlorer.wl. With xAct installed, start a fresh kernel and evaluate the input cells in order with Shift+Enter. Standalone recipes are marked \:201cAlternative\:201d and are for reference."}],"Text"],
+Cell[TextData[{"Keep this notebook beside the Paclet directory. With xAct installed, start a fresh kernel and evaluate the input cells in order with Shift+Enter. Standalone recipes are marked \:201cAlternative\:201d and are for reference."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"Get", "[", RowBox[{"FileNameJoin", "[", RowBox[{"{", RowBox[{RowBox[{"NotebookDirectory", "[", "]"}], ",", "\"xPlorer.wl\""}], "}"}], "]"}], "]"}], ";"}]],"Input",CellTags->"load"],
+Cell[BoxData[RowBox[{RowBox[{"Get", "[", RowBox[{"FileNameJoin", "[", RowBox[{"{", RowBox[{RowBox[{"NotebookDirectory", "[", "]"}], ",", "\"Paclet\"", ",", "\"xPlorer.wl\""}], "}"}], "]"}], "]"}], ";"}]],"Input",CellTags->"load"],
 
 Cell[TextData[{"Set the session preference to display coordinate derivatives as fractions. xPlorer displays contracted indices with short letters. Their internal names are available in InputForm."}],"Text"],
 

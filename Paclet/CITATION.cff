@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use xPlorer in your research, please cite this software and the relevant xAct packages."
+type: software
+title: "xPlorer"
+authors:
+  - family-names: "Sanz-Romero"
+    given-names: "Eduardo"
+version: "14.0.0-beta.13-dev.10"
+license: GPL-3.0-or-later
+repository-code: "https://github.com/physedu/xPlorer"
+url: "https://github.com/physedu/xPlorer"
+abstract: "A Wolfram Language package for reusing abstract xAct theories on independent metric backgrounds, transporting formal expressions and calculating tensor components."
+keywords:
+  - general relativity
+  - tensor calculus
+  - xAct
+  - Wolfram Language
+  - symbolic computation

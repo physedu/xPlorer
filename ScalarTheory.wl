@@ -1,7 +1,7 @@
 (* Optional source recipe for section 1 of the beta.13 principal notebook.
    Start in a fresh kernel. No background or chart is created.
    The standalone naming demonstration is omitted. *)
-Get[FileNameJoin[{DirectoryName[$InputFileName],"xPlorer.wl"}]];
+Get[FileNameJoin[{DirectoryName[$InputFileName],"Paclet","xPlorer.wl"}]];
 
 DefManifold[M,4,{a,b,c,d,e,f,i,j}];
 DefMetric[-1,g[-a,-b],CD];

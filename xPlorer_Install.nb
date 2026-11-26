@@ -2,11 +2,11 @@
 Notebook[{
 Cell["xPlorer — Paclet installation","Title"],
 
-Cell["This notebook builds, installs, verifies and uninstalls xPlorer. Keep it beside PacletInfo.wl and the Tools directory. Install xAct separately first. Evaluate individual input cells with Shift+Enter; do not evaluate the whole notebook, since the final section uninstalls xPlorer.","Text"],
+Cell["This notebook builds, installs, verifies and uninstalls xPlorer. Keep it beside the Paclet and Tools directories. Install xAct separately first. Evaluate individual input cells with Shift+Enter; do not evaluate the whole notebook, since the final section uninstalls xPlorer.","Text"],
 
 Cell["1. Build the paclet","Section"],
 
-Cell["Evaluate this cell to create the distributable archive in the build directory. The clean builder does not include development files.","Text"],
+Cell["Evaluate this cell to create the distributable archive in the build directory. The builder reads the already prepared Paclet directory directly; development files are outside it.","Text"],
 
 Cell[BoxData[RowBox[{"build", "=", RowBox[{"Get", "[", RowBox[{"FileNameJoin", "[", RowBox[{"{", RowBox[{RowBox[{"NotebookDirectory", "[", "]"}], ",", "\"Tools\"", ",", "\"BuildPaclet.wl\""}], "}"}], "]"}], "]"}]}]],"Input",CellTags->"install_4"],
 
