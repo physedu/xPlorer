@@ -1,5 +1,9 @@
 (* ::Package:: *)
 
+(* Copyright (C) 2026 Eduardo Sanz-Romero (PhysEdu)
+   SPDX-License-Identifier: GPL-3.0-or-later
+   See LICENSE for the complete license text. *)
+
 (* xPert installs its own output function when first loaded. Preserve the session printer. *)
 Block[{$PrePrint}, BeginPackage["xPlorer`", {"xAct`xTensor`", "xAct`xPert`", "xAct`xCoba`"}]];
 
