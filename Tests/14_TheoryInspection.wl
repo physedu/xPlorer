@@ -40,5 +40,7 @@ verify["qualified-geometry",TheoryValue["Geometry","Dimension"]===4];
 verify["qualified-export",ExpressionText["ViewStudy",{"Lagrangians","MassTerm"}]=== "BackgroundExpression[\"ViewStudy\", \"Lagrangians\", \"MassTerm\"]"];
 verify["qualified-export-form",StringQ[ExpressionText["ViewStudy","Expressions","Gradient","TeX"]]];
 verify["invalid-collection",FailureQ[BackgroundExpression["ViewStudy","Fields","vphi"]]];
-verify["about",Head[AboutXPlorer[]]===Column && !FreeQ[AboutXPlorer[],"Version "<>$XPlorerVersion]];
+verify["about",Head[AboutXPlorer[]]===Column && !FreeQ[AboutXPlorer[],"Package xPlorer` version "<>$XPlorerVersion]];
+verify["about-separators",With[{lines=First[AboutXPlorer[]]},First[lines]===StringRepeat["-",60]&&Last[lines]===First[lines]]];
+verify["about-native-style",FreeQ[AboutXPlorer[],_Style] && !FreeQ[AboutXPlorer[],_Hyperlink]];
 <|"Version"->$XPlorerVersion,"Passed"->Count[Values[checks],True],"Total"->Length[checks],"Failures"->Keys@Select[checks,#=!=True&]|>
