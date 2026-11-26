@@ -65,3 +65,9 @@ Source 59bc06385545b416e819c18ab5f5e176c5ac89d5 and 4d77cf474fb2a25d8d995f30a6b0
 ## dev.12 — postfix component evaluation throughout the tutorial
 
 Source 2fa3835a83d4e78bbc6c4c7a75355b0b91ce706b adds the operator form expr // ToComponents[opts] for a uniquely owned expression, while keeping explicit-tag transport and direct inferred calls. Notebook 1b8ef6e6987542c8a24610d580a832e6cdbd6874 converts 30 further cells to postfix inference, including matrix, scalar, curvature, tensor, selected components, alternate chart, and CTensor examples. Explicit abstract transport is retained for one metric comparison and affine-source expressions. Actual workflow at that commit: 287/287 selected cells, 74/74 mathematical checks, 33/33 stages; zero warnings, parse errors, malformed compounds or unexpected failures. Every independent instruction remains in its own cell. Desktop build and visual review pending; no release or main merge.
+
+## dev.16 native-integration checkpoint
+
+Completed: native scalar coordinates and aliases; direct profiles; rule/group separation and deactivation; exact cache-key deletion; native metric retrieval; SetBasisChange and ToCTensor integration; structured background inspection; notebook migration and mathematical regression.
+
+Remaining: validate xTras as a mandatory dependency; implement scalar/vector/general tensor perturbation registration; general non-coordinate bases and chart promotion/secondary assignments; migrate historical string declarations before removing compatibility; audit callers before deleting redundant curvature/accessor wrappers; validate front-end display and build paclet. No memory/performance benchmarks at this stage. Retain all organizational capabilities.
