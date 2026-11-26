@@ -1,6 +1,17 @@
 (* Set Global`$XPlorerTestGroup before Get; use a fresh kernel for each group. *)
 Global`$XPlorerTestsDirectory=DirectoryName[$InputFileName];
 If[!MemberQ[$Packages,"xPlorer`"],Get[FileNameJoin[{DirectoryName[Global`$XPlorerTestsDirectory],"Paclet","xPlorer.wl"}]]];
+Global`$XPlorerStandaloneGroups=<|
+ "Registration"->"13_Registration.wl",
+ "RegistrationGeometry"->"13_Registration.wl",
+ "TheoryInspection"->"14_TheoryInspection.wl",
+ "NativeInterop"->"15_NativeInterop.wl",
+ "ProfilesAndCTensor"->"16_ProfilesAndCTensor.wl"|>;
+Global`$XPlorerSelectedGroup=If[ValueQ[Global`$XPlorerTestGroup],Global`$XPlorerTestGroup,"Geometry"];
+If[KeyExistsQ[Global`$XPlorerStandaloneGroups,Global`$XPlorerSelectedGroup],
+ Global`$XPlorerGroupReport=Block[{Print=(Null &),xAct`xPerm`$xpermQ=False,xAct`xCoba`$CVVerbose=False,Global`$B13GeometryTests=(Global`$XPlorerSelectedGroup==="RegistrationGeometry")},
+  Get[FileNameJoin[{Global`$XPlorerTestsDirectory,Global`$XPlorerStandaloneGroups[Global`$XPlorerSelectedGroup]}]]];
+ Global`$XPlorerGroupReport,
 Global`$XPlorerSelectedFiles=Lookup[<|
  "Geometry"->{"01_Core.wl","02_Geometry.wl"},
  "Perturbations"->{"01_Core.wl","03_Perturbations.wl"},
@@ -12,7 +23,7 @@ Global`$XPlorerSelectedFiles=Lookup[<|
  "MetricConnectionCurvature"->{"12_MetricConnectionCurvature.wl"}|>,
  If[ValueQ[Global`$XPlorerTestGroup],Global`$XPlorerTestGroup,"Geometry"],Missing[]];
 If[MissingQ[Global`$XPlorerSelectedFiles],
- Failure["TestGroup",<|"MessageTemplate"->"Choose Geometry, Perturbations, Lifecycle, Display, ObjectsAndConnections, ComponentsAndRules, Reconstruction, or MetricConnectionCurvature."|>],
+ Failure["TestGroup",<|"MessageTemplate"->"Choose Geometry, Perturbations, Lifecycle, Display, ObjectsAndConnections, ComponentsAndRules, Reconstruction, MetricConnectionCurvature, Registration, RegistrationGeometry, TheoryInspection, NativeInterop, or ProfilesAndCTensor."|>],
  Global`$XPlorerGroupPreviousContextPath=$ContextPath;
  $ContextPath=DeleteCases[$ContextPath,"Global`"];
  Begin["XPlorerGroup"<>StringReplace[CreateUUID[],"-"->""]<>"`"];
@@ -24,4 +35,5 @@ If[MissingQ[Global`$XPlorerSelectedFiles],
    "Passed"->Count[Lookup[results,"Passed"],True],"Failures"->Select[results,!TrueQ[#["Passed"]]&]|>];
  End[];$ContextPath=Global`$XPlorerGroupPreviousContextPath;
  Global`$XPlorerGroupReport
+]
 ]
