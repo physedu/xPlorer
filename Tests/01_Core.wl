@@ -57,4 +57,4 @@ SetCMetricSystem[tagMink,DiagonalMatrix[{-1,1,1,1}]];
 UnregisterTheory["Expressions","metric"]; RegisterTheory["Expressions","metric"->2g[-a,-b],Head->"metricExpr"];
 assert["theory-snapshot", ToComponents[tagMink,"metric"], DiagonalMatrix[{-1,1,1,1}]];
 UnregisterTheory["Expressions","metric"]; RegisterTheory["Expressions","metric"->g[-a,-b],Head->"metricExpr"];
-assert["helper-matrix", ExprMatrixOf[tagMink,PortExpression[tagMink,g[-a,-b]]], DiagonalMatrix[{-1,1,1,1}]];
+assert["helper-matrix", ToComponents[tagMink,PortExpression[tagMink,g[-a,-b]]], DiagonalMatrix[{-1,1,1,1}]];
