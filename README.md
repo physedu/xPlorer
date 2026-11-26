@@ -2,11 +2,11 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-> **Development branch: 14.0.0-beta.13-dev.4.** The new registration API is breaking. The original 115-input author notebook and historical regression suite have been migrated and tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
+> **Development branch: 14.0.0-beta.13-dev.6.** The new registration API is breaking. The original 115-input author notebook and historical regression suite have been migrated and tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
 
 xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
-The current experimental version is **14.0.0-beta.13-dev.4** (static audit and startup banner; runtime validation pending). Dev.3 is the latest tested checkpoint. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Theory registration and tagged background creation are unchanged. Personalization is optional.
+The current experimental version is **14.0.0-beta.13-dev.6** (validated API consolidation, native interop, profiles and CTensor output). Dev.6 is the latest tested checkpoint. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Theory registration and tagged background creation are unchanged. Personalization is optional.
 
 ## Start here
 
@@ -16,21 +16,23 @@ Keep [xPlorer_Workflow.nb](xPlorer_Workflow.nb) beside [xPlorer.wl](xPlorer.wl),
 Get[FileNameJoin[{NotebookDirectory[], "xPlorer.wl"}]];
 ```
 
-The principal notebook develops a scalar theory on Minkowski, Schwarzschild and FLRW, then introduces vectors, tensors, an independent affine connection, perturbations and cleanup. It contains 117 executable input cells, with explanatory prose beside the calculations. The stylesheet inherits light/dark theme colors. ScalarTheory.wl is an optional reusable source recipe; it is not required to run the notebook.
+The principal notebook develops a scalar theory on Minkowski, Schwarzschild and FLRW, then introduces vectors, tensors, an independent affine connection, perturbations and cleanup. It contains 119 executable input cells, with explanatory prose beside the calculations. The stylesheet inherits light/dark theme colors. ScalarTheory.wl is an optional reusable source recipe; it is not required to run the notebook.
 
 ## Features
 
 - Independent xAct manifolds, metrics, connections, indices and field copies from a registered theory snapshot.
 - Formal expression transport before introducing coordinates, then xCoba component calculations with explicit tensor axes and component selection.
-- Native PrintAs inheritance, optional local labels, readable internal heads and reversible derivative views.
+- Native PrintAs inheritance, optional local labels, readable internal heads and safe interpreted views via `expr // PrettyExp`.
+- Optional named field profiles and native `CTensor` output with basis and slot variance; ordinary arrays remain the default.
+- Native chart and basis interoperability verified without duplicating xCoba basis machinery. Native edits are not automatically synchronized with managed data.
 - Automatic notebook-context aliases for background objects and indices, e.g. `gSchw`, `CDSchw`, `phiSchw` and `aSchw` after `CreateBackground["Schwarzschild", SymbolSuffix -> "Schw"]`. Occupied names are preserved; `BackgroundObject` remains available for explicit lookup.
 - Named additional connections with their own curvature families and supplied coefficients or differences from the primary derivative.
 - Scoped rules, selective removal, named particularizations and conservative invalidation of saved results.
 - Separate value clearing, registration removal and true dependency-aware deletion of owned fields, charts, connections, metric families or whole backgrounds.
 
-The principal notebook has passed 117/117 input executions, 65/65 expected-result checks and 6/6 workflow-order checks on dev.3. The theory inspection and application installation tests passed 18/18; registration (45/45), lifecycle (64/64) and display (34/34) were rerun on dev.3. All eight historical regression groups passed on dev.2 (279 assertion executions including repeated core tests). The optional scalar recipe has been checked independently. See BETA13_PROGRESS.md for exact commits and evidence. The front-end appearance, older API guide and loader metadata have not been revalidated. The 88-input legacy build source is not the current notebook.
+The principal notebook has passed 119/119 input executions, 66/66 expected-result checks and 7/7 workflow-order checks on dev.6. All eight historical groups passed (288 assertion executions including repeated core checks); registration 45/45, inspection 23/23, native interop 20/20, profiles and CTensor 33/33. The front-end appearance and actual .paclet archive/install remain unverified. The 88-input legacy build source is not the current notebook.
 
-For the current registration syntax, use the principal notebook and the [Proca example](Examples/Beta13_Proca.wl). [API_GUIDE.md](API_GUIDE.md) and [VALIDATION.md](VALIDATION.md) are historical beta.7-era documentation; do not use their old positional registration forms with beta.13. Current evidence and limitations are in [BETA13_PROGRESS.md](BETA13_PROGRESS.md).
+See [API_GUIDE.md](API_GUIDE.md), the [Proca example](Examples/Beta13_Proca.wl) and [native xCoba example](Examples/NativeXCoba.wl). [VALIDATION.md](VALIDATION.md) is a historical beta.7 record; current evidence and limitations are in [BETA13_PROGRESS.md](BETA13_PROGRESS.md) and [BETA13_PLAN.md](BETA13_PLAN.md).
 
 ## Installation and development
 
@@ -72,7 +74,8 @@ TheoryValue["Lagrangians", "Lagrangian"]
 
 ShowTheory is a read-only native Grid/Column presentation. TheoryValue retrieves usable values. TheorySnapshot[] is the optional raw association for restoration; existing backgrounds capture their own theory automatically. BackgroundObject, automatic suffixed symbols and qualified expression lookup are unchanged. xAct is installed separately and is not bundled.
 
-- [Development plan](DEVELOPMENT_PLAN.md)
+- [Current consolidation plan](BETA13_PLAN.md)
+- [Historical development plan](DEVELOPMENT_PLAN.md)
 - [Design decisions](DECISIONS.md)
 - [Current beta.13 recovery checkpoint](BETA13_PROGRESS.md)
 - [Implementation/resumption instruction](IMPLEMENTATION_PROMPT.md)
@@ -91,7 +94,7 @@ If you use xPlorer in your research, please cite the version used. GitHub's **Ci
   author  = {Sanz-Romero, Eduardo},
   title   = {xPlorer},
   year    = {2026},
-  version = {14.0.0-beta.13-dev.4},
+  version = {14.0.0-beta.13-dev.6},
   url     = {https://github.com/physedu/xPlorer}
 }
 ```
