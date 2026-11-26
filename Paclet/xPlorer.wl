@@ -73,7 +73,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.13";
+$XPlorerVersion = "14.0.0-beta.13-dev.14";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -1215,7 +1215,9 @@ notationBoxes[e_,a_] := Module[{orders,args,fn,n,terms,den,body,mark,ix,h=Head[e
 ClearComputedValues[tag_String] := Module[{b=background[tag],r},If[FailureQ[b],Return[b]];
   clearGeometry[tag];
   If[KeyExistsQ[b,"MetricMatrix"],r=guard[MetricInBasis[b["Metric"],-b["Basis"],b["MetricMatrix"]]];If[r===$Failed,Return[failure["ClearValues","Metric values could not be restored."]]]];
-  replayFields[tag];replayConnections[tag];invalidateResults[tag];Null
+  invalidateResults[tag];
+  r=replayFields[tag];If[FailureQ[r],Return[r]];
+  r=replayConnections[tag];If[FailureQ[r],Return[r]];Null
 ];
 ClearFieldComponents[tag_String,field_] := Module[{b=background[tag],fs,records,r},If[FailureQ[b],Return[b]];
   fs=If[StringQ[field],Lookup[b["Field"],field,Missing[]],fieldSpec[b,field]];
@@ -1336,6 +1338,14 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  newb["PresentationDefaults"]=KeyDrop[newb["PresentationDefaults"],deadKeys];
  newb["PresentationOverrides"]=KeyDrop[newb["PresentationOverrides"],deadKeys];
  $BG[tag]=newb;invalidateResults[tag];
+ (* clearGeometry deleted the covariant metric input as well as derived geometry.
+    Restore surviving managed inputs, without recomputing unrelated curvature. *)
+ If[KeyExistsQ[newb,"MetricMatrix"] && KeyExistsQ[newb,"Chart"] && KeyExistsQ[newb,"Metric"],
+  r=guard[MetricInBasis[newb["Metric"],-newb["Basis"],newb["MetricMatrix"]]];
+  If[r===$Failed,Return[failure["PostDeletionRestore","Object deletion completed, but metric inputs could not be restored.",<|"DeletedNames"->names|>]]];
+  r=replayFields[tag];If[FailureQ[r],Return[failure["PostDeletionRestore","Object deletion completed, but surviving field inputs could not be restored.",<|"DeletedNames"->names,"Cause"->r|>]]];
+  r=replayConnections[tag];If[FailureQ[r],Return[failure["PostDeletionRestore","Object deletion completed, but surviving connection inputs could not be restored.",<|"DeletedNames"->names,"Cause"->r|>]]]
+ ];
  <|"DeletedNames"->names,"BackgroundRetained"->True,"RemovedExpressions"->plan["RegisteredExpressions"]|>
 ];
 invalidateResults[tag_] := If[KeyExistsQ[$BG,tag],put[tag,<|"DataRevision"->Lookup[$BG[tag],"DataRevision",0]+1,"SavedResults"-><||>|>]];
