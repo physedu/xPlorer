@@ -20,7 +20,8 @@ Global`$XPlorerWorkflowReport=Module[
   Switch[id,
    "load",stages["Notebook Get loads xPlorer"]=initiallyAbsent&&value===Null&&MemberQ[$Packages,"xPlorer`"],
    "naming_result",stages["Native copied head and independent printed label"]=With[{head=xPlorer`BackgroundObject["NamingExample","Materia"]},
-     SameQ[First[value],head]&&xAct`xTensor`xTensorQ[head]&&SameQ[SymbolName[head],"matterSchw"]&&SameQ[xAct`xTensor`PrintAs[head],"P"]],
+     SameQ[First[value],head]&&xAct`xTensor`xTensorQ[head]&&SameQ[SymbolName[head],"matterDemo"]&&SameQ[xAct`xTensor`PrintAs[head],"P"]],
+   "naming_setup",stages["Greek index labels on naming example"]=With[{ii=xPlorer`BackgroundIndices["NamingExample",2]},SameQ[Map[Function[ix,With[{s=ix},xAct`xTensor`PrintAs[s]]],ii],{"\[Mu]","\[Nu]"}]],
    "register_metadata",stages["Theory registered before backgrounds"]=Keys[xPlorer`$BG]==={},
    "create_manifolds",stages["Three independent manifolds before charts"]=Length[xPlorer`$BG]===3&&
      Length[DeleteDuplicates[Lookup[Values[xPlorer`$BG],"Manifold"]]]===3&&AllTrue[Values[xPlorer`$BG],!KeyExistsQ[#,"Chart"]&],
@@ -32,7 +33,7 @@ Global`$XPlorerWorkflowReport=Module[
  ];
  Block[{xAct`xPerm`$xpermQ=False},Scan[run,inputs];
   checks=Get[FileNameJoin[{directory,"Tests","TutorialChecks.wl"}]]];
- failed=Keys@Select[Global`$XPlorerWorkflowOutputs,FailureQ[#]||#===$Failed&];
+ failed=Keys@Select[Global`$XPlorerWorkflowOutputs,!FreeQ[#,_Failure|$Failed]&];
  <|"Version"->xPlorer`$XPlorerVersion,"Kernel"->System`$Version,
    "InputCells"->Length[inputs],"ExecutedInputs"->Length[timings],"ParseFailures"->parseFailures,
    "WarningCells"->warnings,"ExpectedFailureCells"->Intersection[failed,{"invalidated_result"}],
