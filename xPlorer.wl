@@ -7,7 +7,7 @@
 (* xPert installs its own output function when first loaded. Preserve the session printer. *)
 Block[{$PrePrint}, BeginPackage["xPlorer`", {"xAct`xTensor`", "xAct`xPert`", "xAct`xCoba`"}]];
 
-RegisterTheory::usage = "RegisterTheory[\"Metric\",g], RegisterTheory[\"CovD\",CD], RegisterTheory[\"Indices\",{a,b,...}] register source geometry. RegisterTheory[\"Field\",phi,opts] registers one native tensor; RegisterTheory[\"Fields\",{phi,A,{F,Sector->\"EM\"}}] registers a batch. RegisterTheory[\"Lagrangians\", \"Gravity\"->Lgrav] and RegisterTheory[\"Expressions\",{...}] capture named formulas; anonymous formulas require Head->\"base\". RegisterTheory[\"Parameters\",{m,kappa}] registers shared xAct constants.";
+RegisterTheory::usage = "RegisterTheory[\"Metric\",g], RegisterTheory[\"CovD\",CD], RegisterTheory[\"Indices\",{a,b,...}] register source geometry. RegisterTheory[\"Field\",phi,opts] registers one native tensor; RegisterTheory[\"Fields\",{phi,A,{F,Sector->\"EM\"}}] registers a batch. RegisterTheory[\"Lagrangian\", \"Gravity\"->Lgrav] and RegisterTheory[\"Expression\", \"Equation\"->eq] capture individual named formulas; use \"Lagrangians\" and \"Expressions\" for batches. Anonymous formulas require Head->\"base\". RegisterTheory[\"Parameter\",m] or RegisterTheory[\"Parameters\",{m,kappa}] registers shared xAct constants.";
 ShowTheoryKeys::usage = "ShowTheoryKeys[] lists the logical sections of the current theory.";
 TheorySector::usage = "TheorySector[sector] returns matching field, parameter, lagrangian and expression records without applying rules.";
 Name::usage = "Name -> \"key\" selects the registry key of a field or parameter.";
@@ -73,7 +73,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.8";
+$XPlorerVersion = "14.0.0-beta.13-dev.9";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label; the association form changes several labels of owned background objects. Automatic restores the inherited default for a key.";
@@ -258,6 +258,12 @@ b13Commit[section_,items_List] := Module[{entries,slot,old,all,keys},
 ];
 RegisterTheory["Field",s_Symbol,opts___Rule] :=
  b13Commit["Fields",{HoldComplete[{s,opts}]}];
+RegisterTheory["Parameter",s_Symbol,opts___Rule] :=
+ b13Commit["Parameters",{HoldComplete[{s,opts}]}];
+RegisterTheory["Lagrangian",item_Rule,opts___Rule] :=
+ b13Commit["Lagrangians",{HoldComplete[{item,opts}]}];
+RegisterTheory["Expression",item_Rule,opts___Rule] :=
+ b13Commit["Expressions",{HoldComplete[{item,opts}]}];
 RegisterTheory[section:("Fields"|"Parameters"|"Lagrangians"|"Expressions"),list_List] :=
  b13Commit[section,b13Items[HoldComplete[list]]];
 RegisterTheory[section:("Fields"|"Parameters"|"Lagrangians"|"Expressions"),item_,opts___Rule] :=
