@@ -34,9 +34,9 @@ Cell[BoxData[RowBox[{"{", RowBox[{"xPlorer`$XPlorerVersion", ",", RowBox[{"FindF
 
 Cell["4. Uninstall (optional)","Section"],
 
-Cell["WARNING: evaluate the next cell only to remove installed xPlorer paclets. It removes all installed xPlorer paclet versions, not the source directory, built archive, or xAct. A traditional Applications installation is not removed. Restart the kernel afterward.","Text"],
+Cell["WARNING: evaluate the next cell only to remove installed xPlorer paclets. A confirmation dialog protects against accidental uninstallation. It removes all installed xPlorer paclet versions, not the source directory, built archive, or xAct. A traditional Applications installation is not removed. Restart the kernel afterward.","Text"],
 
-Cell[BoxData[RowBox[{"PacletUninstall", "/@", RowBox[{"PacletFind", "[", "\"xPlorer\"", "]"}]}]],"Input",CellTags->"install_18"],
+Cell[BoxData[RowBox[{"If", "[", RowBox[{RowBox[{"TrueQ", "[", RowBox[{"ChoiceDialog", "[", "\"Uninstall all installed xPlorer paclet versions?\"", "]"}], "]"}], ",", RowBox[{"PacletUninstall", "/@", RowBox[{"PacletFind", "[", "\"xPlorer\"", "]"}]}], ",", "\"Uninstallation cancelled.\""}], "]"}]],"Input",CellTags->"install_18"],
 
 Cell[BoxData[RowBox[{"PacletFind", "[", "\"xPlorer\"", "]"}]],"Input",CellTags->"install_19"]
 }, WindowTitle->"xPlorer - Paclet installation", StyleDefinitions->"Default.nb"]
