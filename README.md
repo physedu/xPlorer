@@ -10,7 +10,7 @@ The current experimental version is **14.0.0-beta.13-dev.10** (native arithmetic
 
 ## Start here
 
-Keep [xPlorer_Workflow.nb](xPlorer_Workflow.nb) beside the [Paclet](Paclet/) directory, install xAct, start a fresh Mathematica kernel and evaluate the notebook in order. Its startup is simply:
+Keep [xPlorer_Workflow.nb](xPlorer_Workflow.nb) beside the [Paclet](Paclet/) directory, install xAct, start a fresh Mathematica kernel and evaluate the notebook in order. Choose one of its two startup cells. For source use:
 
 ```wl
 Get[FileNameJoin[{NotebookDirectory[], "Paclet", "xPlorer.wl"}]];
@@ -52,7 +52,7 @@ Needs["xPlorer`"];
 $XPlorerVersion
 ```
 
-The notebook still supports its standalone Get startup. For installed usage, replace its first Get cell with Needs.
+The notebook still supports its standalone Get startup. For installed usage, evaluate the alternative Needs startup cell instead of Get.
 
 ### Paclet development and distribution
 
