@@ -53,19 +53,39 @@ Cell[TextData[{"Clear the three user-defined aliases, close the example and remo
 
 Cell[BoxData[RowBox[{RowBox[{"Clear","[",RowBox[{"muDemo",",","nuDemo",",","rhoDemo"}],"]"}],";",RowBox[{"DeleteBackground", "[", "\"NamingExample\"", "]"}], ";", RowBox[{"UnregisterTheory", "[", RowBox[{"\"Fields\"", ",", "\"Materia\""}], "]"}], ";", RowBox[{"Keys", "[", RowBox[{"TheoryValue", "[", "\"Fields\"", "]"}], "]"}]}]],"Input",CellTags->"close_naming"],
 
-Cell["Single items and collections","Subsubsection"],
+Cell["Registering theory objects","Subsubsection"],
 
-Cell["Registration conventions: singular names register one item; plural names register a list of items. The collection name is always plural when inspecting, retrieving or unregistering items. Metric, CovD and Indices are geometry settings, not these collections.","Text"],
+Cell["Register existing xAct objects and expressions individually or in groups. Each collection can then be inspected, retrieved or modified independently. The following reference examples are not evaluated; choose the appropriate form for your theory.","Text"],
 
-Cell["Field: RegisterTheory[\"Field\", phi] | Fields: RegisterTheory[\"Fields\", {phi, A}]","Text"],
+Cell[TextData[{StyleBox["Fields",FontWeight->"Bold"]}],"Text"],
 
-Cell["Parameter: RegisterTheory[\"Parameter\", m] | Parameters: RegisterTheory[\"Parameters\", {m, kappa}]","Text"],
+Cell[BoxData[RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "phi"}], "]"}]],"Code",Evaluatable->False,CellTags->"reference_registration_0_0"],
 
-Cell["Lagrangian: RegisterTheory[\"Lagrangian\", \"Kinetic\" -> Lkin] | Lagrangians: RegisterTheory[\"Lagrangians\", {\"Kinetic\" -> Lkin, \"MassTerm\" -> Lmass}]","Text"],
+Cell[BoxData[RowBox[{"RegisterTheory", "[", RowBox[{"\"Fields\"", ",", RowBox[{"{", RowBox[{"phi", ",", "A"}], "}"}]}], "]"}]],"Code",Evaluatable->False,CellTags->"reference_registration_0_1"],
 
-Cell["Expression: RegisterTheory[\"Expression\", \"ScalarEq\" -> scalarEq] | Expressions: RegisterTheory[\"Expressions\", {\"ScalarEq\" -> scalarEq, \"Eab\" -> Eab}]","Text"],
+Cell[TextData[{StyleBox["Parameters",FontWeight->"Bold"]}],"Text"],
 
-Cell["For example, ShowTheory[\"Fields\"], TheoryValue[\"Fields\", \"phi\"] and UnregisterTheory[\"Fields\", \"phi\"] all use the collection name. The examples above are alternatives for reference, not additional cells to execute. The plural registration forms also accept a single item for compatibility.","Text"],
+Cell[BoxData[RowBox[{"RegisterTheory", "[", RowBox[{"\"Parameter\"", ",", "m"}], "]"}]],"Code",Evaluatable->False,CellTags->"reference_registration_1_0"],
+
+Cell[BoxData[RowBox[{"RegisterTheory", "[", RowBox[{"\"Parameters\"", ",", RowBox[{"{", RowBox[{"m", ",", "kappa"}], "}"}]}], "]"}]],"Code",Evaluatable->False,CellTags->"reference_registration_1_1"],
+
+Cell[TextData[{StyleBox["Lagrangians",FontWeight->"Bold"]}],"Text"],
+
+Cell[BoxData[RowBox[{"RegisterTheory", "[", RowBox[{"\"Lagrangian\"", ",", RowBox[{"\"Kinetic\"", "\[Rule]", "Lkin"}]}], "]"}]],"Code",Evaluatable->False,CellTags->"reference_registration_2_0"],
+
+Cell[BoxData[RowBox[{"RegisterTheory", "[", RowBox[{"\"Lagrangians\"", ",", RowBox[{"{", RowBox[{RowBox[{"\"Kinetic\"", "\[Rule]", "Lkin"}], ",", RowBox[{"\"MassTerm\"", "\[Rule]", "Lmass"}]}], "}"}]}], "]"}]],"Code",Evaluatable->False,CellTags->"reference_registration_2_1"],
+
+Cell[TextData[{StyleBox["Expressions",FontWeight->"Bold"]}],"Text"],
+
+Cell[BoxData[RowBox[{"RegisterTheory", "[", RowBox[{"\"Expression\"", ",", RowBox[{"\"ScalarEq\"", "\[Rule]", "scalarEq"}]}], "]"}]],"Code",Evaluatable->False,CellTags->"reference_registration_3_0"],
+
+Cell[BoxData[RowBox[{"RegisterTheory", "[", RowBox[{"\"Expressions\"", ",", RowBox[{"{", RowBox[{RowBox[{"\"ScalarEq\"", "\[Rule]", "scalarEq"}], ",", RowBox[{"\"Eab\"", "\[Rule]", "Eab"}]}], "}"}]}], "]"}]],"Code",Evaluatable->False,CellTags->"reference_registration_3_1"],
+
+Cell[TextData[{StyleBox["Inspecting registered objects",FontWeight->"Bold"]}],"Text"],
+
+Cell[BoxData[RowBox[{"ShowTheory", "[", "\"Fields\"", "]"}]],"Code",Evaluatable->False,CellTags->"reference_registration_4_0"],
+
+Cell[BoxData[RowBox[{"TheoryValue", "[", RowBox[{"\"Fields\"", ",", "\"phi\""}], "]"}]],"Code",Evaluatable->False,CellTags->"reference_registration_4_1"],
 
 Cell[TextData[{"Register the scalar and its mass"}],"Subsubsection"],
 
