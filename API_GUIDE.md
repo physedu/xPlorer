@@ -163,7 +163,7 @@ PacletInfo.wl declares a kernel extension using the same source. PacletDirectory
 
 Tests/RunTests.wl runs package checks. Tests/WorkflowTests.wl runs actual input boxes from the principal notebook in a fresh kernel. The principal notebook is the source of truth. The historical 88-input Tools builder cannot overwrite it. See BETA13_PROGRESS.md and BETA13_PLAN.md for current execution evidence and limitations.
 
-## Inferred background and theory information (dev.11)
+## Inferred background and theory information (dev.11–12)
 
 ```wl
 RegisterTheory["Title", "Massive scalar field"];
@@ -177,7 +177,7 @@ Title and description are optional strings. Assumptions and conditions are recor
 
 ```wl
 EabSchw // ToComponents // MatrixForm
-ToComponents[EabSchw, Output -> "CTensor"]
+EabSchw // ToComponents[Output -> "CTensor"]
 ToComponents["Schwarzschild", Eab]
 ```
 
