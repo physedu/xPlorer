@@ -79,7 +79,7 @@ Cell[BoxData[RowBox[{RowBox[{"Eab", "=", RowBox[{RowBox[{RowBox[{"CD", "[", RowB
 
 Cell[TextData[{"For a named Wolfram expression, give an explicit lookup key. This registers the wave operator under ",StyleBox["\"boxPhi\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"boxPhi", "=", RowBox[{RowBox[{"CD", "[", "a", "]"}], "[", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}], "]"}]}], ";"}], "\[IndentingNewLine]", RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Expressions\"", ",", RowBox[{"\"boxPhi\"", "\[Rule]", "boxPhi"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";"}]}]],"Input",CellTags->"register_named_expression"],
+Cell[BoxData[RowBox[{RowBox[{"boxPhi", "=", RowBox[{RowBox[{"CD", "[", "a", "]"}], "[", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}], "]"}]}], ";", RowBox[{"RegisterTheory", "[", RowBox[{"\"Expressions\"", ",", RowBox[{"\"boxPhi\"", "\[Rule]", "boxPhi"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";"}]],"Input",CellTags->"register_named_expression"],
 
 Cell[TextData[{"Store the assumptions and variational conditions alongside the theory. These entries document the calculation. Pass assumptions to the operations that use them."}],"Text"],
 
@@ -169,7 +169,7 @@ Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\""
 
 Cell[TextData[{StyleBox["PrettyExp",FontFamily->"Courier",FontSize->11]," compares two genuinely different displays of the same gradient: a prefix covariant derivative and a postfix derivative, with a background label on the second. Normal recovers the original mathematical expression. Continue calculations with ",StyleBox["gradPhi",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"prettyGradient", "=", RowBox[{RowBox[{"PrettyExp", "[", RowBox[{RowBox[{"CovariantStyle", "\[Rule]", "\"Postfix\""}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "True"}]}], "]"}], "[", "gradPhi", "]"}]}], ";", TagBox[GridBox[{{"\"Prefix\"", "\"Postfix\""}, {RowBox[{"PrettyExp", "[", RowBox[{"gradPhi", ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Prefix\""}]}], "]"}], "prettyGradient"}}, GridBoxAlignment -> {"Columns" -> {{Left}}}, AutoDelete -> False, GridBoxFrame -> {"Columns" -> {{True}}, "Rows" -> {{True}}}, GridBoxItemSize -> {"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}], "Grid"]}]],"Input",CellTags->"pretty_gradient"]
+Cell[BoxData[RowBox[{RowBox[{"prettyGradient", "=", RowBox[{RowBox[{"PrettyExp", "[", RowBox[{RowBox[{"CovariantStyle", "\[Rule]", "\"Postfix\""}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "True"}]}], "]"}], "[", "gradPhi", "]"}]}], ";", RowBox[{"{", RowBox[{RowBox[{RowBox[{"PrettyExp", "[", RowBox[{"CovariantStyle", "\[Rule]", "\"Prefix\""}], "]"}], "[", "gradPhi", "]"}], ",", "prettyGradient"}], "}"}]}]],"Input",CellTags->"pretty_gradient"]
 },Open]],
 
 Cell[CellGroupData[{
@@ -283,7 +283,7 @@ Cell[BoxData[RowBox[{RowBox[{"eqMink", "=", RowBox[{"ToComponents", "[", RowBox[
 
 Cell[TextData[{"Compare the original derivative orders with fraction notation for the same equation. In native multi-index notation, (2,0,0,0) means two time derivatives. In ",StyleBox["PrettyExp",FontFamily->"Courier",FontSize->11],", ",StyleBox["\"MultiIndex\"",FontFamily->"Courier",FontSize->11]," keeps the orders explicit, ",StyleBox["\"Fraction\"",FontFamily->"Courier",FontSize->11]," gives a quotient and ",StyleBox["\"Partial\"",FontFamily->"Courier",FontSize->11]," uses a partial-derivative operator. ",StyleBox["\"Prime\"",FontFamily->"Courier",FontSize->11]," gives primes for functions of one argument and native notation for other arities."}],"Text"],
 
-Cell[BoxData[TagBox[GridBox[{{"\"Native derivative orders\"", "\"Fraction notation\""}, {RowBox[{"PrettyExp", "[", RowBox[{RowBox[{"eqMink", "\[Equal]", "0"}], ",", RowBox[{"PartialStyle", "\[Rule]", "\"Native\""}]}], "]"}], RowBox[{"PrettyExp", "[", RowBox[{RowBox[{"eqMink", "\[Equal]", "0"}], ",", RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}]}], "]"}]}}, GridBoxAlignment -> {"Columns" -> {{Left}}}, AutoDelete -> False, GridBoxFrame -> {"Columns" -> {{True}}, "Rows" -> {{True}}}, GridBoxItemSize -> {"Columns" -> {{Automatic}}, "Rows" -> {{Automatic}}}], "Grid"]],"Input",CellTags->"partial_view"],
+Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"PrettyExp", "[", RowBox[{RowBox[{"eqMink", "\[Equal]", "0"}], ",", RowBox[{"PartialStyle", "\[Rule]", "\"Native\""}]}], "]"}], ",", RowBox[{"PrettyExp", "[", RowBox[{RowBox[{"eqMink", "\[Equal]", "0"}], ",", RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}]}], "]"}]}], "}"}]],"Input",CellTags->"partial_view"],
 
 Cell[BoxData[RowBox[{RowBox[{"Normal", "[", RowBox[{"PrettyExp", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"eqMink", "\[Equal]", "0"}]}], "]"}], "]"}], "===", RowBox[{"(", RowBox[{"eqMink", "\[Equal]", "0"}], ")"}]}]],"Input",CellTags->"view_identity"],
 
@@ -409,7 +409,7 @@ Cell[TextData[{"6. Extend the theory with vectors, tensors and a connection"}],"
 
 Cell[TextData[{"Define a covector A, a symmetric tensor S and a two-form F on the source manifold, then register them together. xPlorer obtains their slots and symmetries from the native definitions. These three fields are independent in this example."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"DefTensor", "[", RowBox[{RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}], ",", "M"}], "]"}], ";"}], "\[IndentingNewLine]", RowBox[{RowBox[{"DefTensor", "[", RowBox[{RowBox[{"S", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "M", ",", RowBox[{"Symmetric", "[", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}], "]"}]}], "]"}], ";"}], "\[IndentingNewLine]", RowBox[{RowBox[{"DefTensor", "[", RowBox[{RowBox[{"F", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "M", ",", RowBox[{"Antisymmetric", "[", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}], "]"}]}], "]"}], ";"}], "\[IndentingNewLine]", RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Fields\"", ",", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"A", ",", RowBox[{"Sector", "\[Rule]", "\"Vector\""}]}], "}"}], ",", "S", ",", RowBox[{"{", RowBox[{"F", ",", RowBox[{"Sector", "\[Rule]", "\"Vector\""}]}], "}"}]}], "}"}]}], "]"}], ";"}]}]],"Input",CellTags->"extra_fields"],
+Cell[BoxData[RowBox[{RowBox[{"DefTensor", "[", RowBox[{RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}], ",", "M"}], "]"}], ";", RowBox[{"DefTensor", "[", RowBox[{RowBox[{"S", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "M", ",", RowBox[{"Symmetric", "[", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}], "]"}]}], "]"}], ";", RowBox[{"DefTensor", "[", RowBox[{RowBox[{"F", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "M", ",", RowBox[{"Antisymmetric", "[", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}], "]"}]}], "]"}], ";", RowBox[{"RegisterTheory", "[", RowBox[{"\"Fields\"", ",", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"A", ",", RowBox[{"Sector", "\[Rule]", "\"Vector\""}]}], "}"}], ",", "S", ",", RowBox[{"{", RowBox[{"F", ",", RowBox[{"Sector", "\[Rule]", "\"Vector\""}]}], "}"}]}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"extra_fields"],
 
 Cell[TextData[{"The uppercase S denotes the symmetric tensor. To register it on its own, use ",StyleBox["RegisterTheory[\"Field\", S]",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
@@ -509,7 +509,7 @@ Cell[TextData[{"A metric perturbation"}],"Subsection"],
 
 Cell[TextData[{"Define the metric perturbation h with xPert, register its head as an ordinary field registration and create a background. xPlorer detects its native metric-perturbation relationship automatically."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"DefMetricPerturbation", "[", RowBox[{"g", ",", "h", ",", "eps"}], "]"}], ";"}], "\[IndentingNewLine]", RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "h", ",", RowBox[{"Sector", "\[Rule]", "\"Perturbations\""}]}], "]"}], ";"}], "\[IndentingNewLine]", RowBox[{RowBox[{"CreateBackground", "[", "\"MinkowskiPerturbed\"", "]"}], ";"}]}]],"Input",CellTags->"register_perturbation"],
+Cell[BoxData[RowBox[{RowBox[{"DefMetricPerturbation", "[", RowBox[{"g", ",", "h", ",", "eps"}], "]"}], ";", RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "h", ",", RowBox[{"Sector", "\[Rule]", "\"Perturbations\""}]}], "]"}], ";", RowBox[{"CreateBackground", "[", "\"MinkowskiPerturbed\"", "]"}], ";"}]],"Input",CellTags->"register_perturbation"],
 
 Cell[TextData[{StyleBox["PerturbOn",FontFamily->"Courier",FontSize->11]," returns the abstract metric variation by default."}],"Text"],
 
