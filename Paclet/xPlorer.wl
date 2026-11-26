@@ -602,7 +602,7 @@ DefineChart[tag_String, declarations_List] := Module[{b = background[tag], chart
 (* Secondary coordinate charts are native xCoba charts on the owned manifold.
    Maps give the primary coordinates as functions of the target coordinates. *)
 DefineChart[tag_String,name_String,declarations_List,map_Function] := Module[
-  {b=background[tag],charts,coords,values,chart,jac,det,n,created,record,labels=coordinateLabels[declarations],nativeQ=AllTrue[declarations,coordinateDeclarationQ],base},
+  {b=background[tag],charts,coords,values,chart,jac,det,n,created,record,labels=coordinateLabels[declarations],nativeQ=AllTrue[declarations,coordinateDeclarationQ],base,visitors,nativeObjects,newAliases},
   If[FailureQ[b],Return[b]];
   If[!KeyExistsQ[b,"Chart"],Return[failure["NoChart","Define the primary chart first."]]];
   charts=Lookup[b,"AdditionalCharts",<||>]; n=b["Dimension"];
@@ -623,8 +623,17 @@ DefineChart[tag_String,name_String,declarations_List,map_Function] := Module[
   setBareBoxes[chart,safeName[name]<>b["SymbolSuffix"]];
   If[nativeQ,created=installChartAliases[tag,chart,coords,labels,base];
     If[FailureQ[created],guard[UndefChart[chart]];Return[created]]];
+  visitors=Union[VisitorsOf[chart],VisitorsOf[b["Chart"]]];
+  created=guard[SetBasisChange[CTensor[Transpose[jac],{-chart,b["Chart"]}]]];
+  nativeObjects=Select[Complement[Union[VisitorsOf[chart],VisitorsOf[b["Chart"]]],visitors],xTensorQ];
+  If[created===$Failed,
+    clearNativeBasisPair[b["Chart"],chart];
+    Scan[If[xTensorQ[#],guard[DeleteTensorValues[#];UndefTensor[#]]]&,nativeObjects];
+    newAliases=KeyDrop[Lookup[$BG[tag],"ObjectAliases",<||>],Keys[Lookup[b,"ObjectAliases",<||>]]];
+    releaseAliases[newAliases];put[tag,<|"ObjectAliases"->Lookup[b,"ObjectAliases",<||>]|>];
+    guard[UndefChart[chart]];Return[failure["ChartBasisChange","xCoba could not register the change of basis."]]];
   record=<|"Chart"->chart,"Coordinates"->coords,"Labels"->labels,"Map"->map,
-    "Values"->values,"Jacobian"->jac,"NativeCoordinateSyntax"->nativeQ|>;
+    "Values"->values,"Jacobian"->jac,"NativeCoordinateSyntax"->nativeQ,"NativeBasisObjects"->nativeObjects|>;
   put[tag,<|"AdditionalCharts"->Append[charts,name->record]|>]; chart
 ];
 chartRecord[b_Failure,_] := b;
@@ -634,13 +643,27 @@ ChartOf[tag_String,"Primary"] := ChartOf[tag];
 CoordinatesOf[tag_String,"Primary"] := CoordinatesOf[tag];
 ChartOf[tag_String,name_String] := Module[{rec=chartRecord[ShowBackground[tag],name]},If[FailureQ[rec],rec,rec["Chart"]]];
 CoordinatesOf[tag_String,name_String] := Module[{ch=ChartOf[tag,name]},If[FailureQ[ch],ch,Head /@ ScalarsOfChart[ch]]];
-chartPullback[arr_,b_,rec_,indices_] := Module[{jac=rec["Jacobian"],inv,result,axis,transform},
-  result=arr/.Thread[coordinateValues[b]->rec["Values"]];
-  If[AnyTrue[indices,UpIndexQ],inv=Simplify[Inverse[jac]]];
-  Do[transform=If[UpIndexQ[indices[[axis]]],inv,Transpose[jac]];
-    result=Map[Function[slice,Dot[transform,slice]],result,{axis-1}],
-    {axis,Length[indices]}];result
+(* xCoba transforms tensor slots; the chart map substitutes scalar coordinates. *)
+chartPullback[arr_,b_,rec_,indices_] := Module[{source,target,ct,result},
+ If[indices==={},Return[arr/.Thread[coordinateValues[b]->rec["Values"]]]];
+ source=If[UpIndexQ[#],b["Basis"],-b["Basis"]]& /@ indices;
+ target=If[UpIndexQ[#],rec["Chart"],-rec["Chart"]]& /@ indices;
+ ct=guard[ToCTensor[CTensor[arr,source],target]];
+ result=Which[ct===Zero,ConstantArray[0,ConstantArray[b["Dimension"],Length[indices]]],MatchQ[ct,_CTensor],First[ct],True,
+   Return[failure["ChartComponents","xCoba could not transform the tensor components."]]];
+ result/.Thread[coordinateValues[b]->rec["Values"]]
 ];
+(* SetBasisChange installs native pair-specific values and ToCTensor upvalues.
+   Remove only those belonging to the deleted pair, not global Basis values. *)
+clearNativeBasisPair[old_,new_] := Module[{ids,prot},
+ ids=Select[TensorValIDs[Basis],!FreeQ[#,old]&&!FreeQ[#,new]&];
+ Scan[DeleteTensorValues,ids];
+ prot=Unprotect[Basis];
+ UpValues[Basis]=Select[UpValues[Basis],FreeQ[First[#],old]||FreeQ[First[#],new]&];
+ Protect[Evaluate[prot]];Null
+];
+clearManagedBasisPairs[b_] := Scan[Function[rec,If[KeyExistsQ[rec,"NativeBasisObjects"],clearNativeBasisPair[b["Chart"],rec["Chart"]]]],Values@Lookup[b,"AdditionalCharts",<||>]];
+nativeBasisObjects[b_] := Flatten[Lookup[Values@Lookup[b,"AdditionalCharts",<||>],"NativeBasisObjects",{}]];
 ChartOf[tag_String] := getter[tag, "Chart"];
 CoordinatesOf[tag_String] := Module[{ch=ChartOf[tag]},If[FailureQ[ch],ch,Head /@ ScalarsOfChart[ch]]];
 BasisOf[tag_String] := getter[tag, "Basis"];
@@ -929,7 +952,7 @@ ToComponents[tag_String, input_, OptionsPattern[]] := Module[
   If[rec=!=None,
     If[!FreeQ[arr,h_[___] /; xTensorQ[h] && !MemberQ[b["Coordinates"],h]],
       Return[failure["ChartComponents","Supply field components before changing charts."]]];
-    arr=chartPullback[arr,b,rec,inds];
+    arr=chartPullback[arr,b,rec,inds];If[FailureQ[arr],Return[arr]];
     ass=ass/.Thread[coordinateValues[b]->rec["Values"]];
     If[subset=!=All,arr=If[inds==={},ConstantArray[arr,Length[subset]],Extract[arr,# + 1]& /@ subset]]];
   arr = If[MemberQ[{Simplify, FullSimplify}, simp], simp[arr, Assumptions -> ass], simp[arr]];
@@ -1026,12 +1049,14 @@ PerturbOn[tag_String, input_, order_Integer: 1, OptionsPattern[]] := Module[{b =
 ];
 
 ownedObjects[b_] := Module[{roots, relative},
-  roots = DeleteMissing@Join[Lookup[b, {"Manifold", "Metric", "CovD", "Chart", "PerturbationParameter"}], Lookup[Values[b["Field"]], "NewHead", {}],connectionHeads[b],Lookup[Values@Lookup[b,"AdditionalCharts",<||>],"Chart",{}],relativeHeads[b]];
+  roots = DeleteMissing@Join[Lookup[b, {"Manifold", "Metric", "CovD", "Chart", "PerturbationParameter"}], Lookup[Values[b["Field"]], "NewHead", {}],connectionHeads[b],Lookup[Values@Lookup[b,"AdditionalCharts",<||>],"Chart",{}],nativeBasisObjects[b],relativeHeads[b]];
   If[KeyExistsQ[b,"CovD"] && CovDQ[b["CovD"]] && KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]], relative = GiveSymbol[Christoffel, Sequence @@ Sort[{b["CovD"], PDOfBasis[b["Chart"]]}]]; If[xTensorQ[relative], AppendTo[roots, relative]]];
   FixedPoint[DeleteDuplicates@Join[#, Flatten[ServantsOf /@ #]] &, roots]
 ];
 disposeObjects[b_] := Module[{fields, relative, parameter = b["PerturbationParameter"]},
   fields = Reverse[Lookup[Values[b["Field"]], "NewHead", {}]];
+  clearManagedBasisPairs[b];
+  Scan[If[xTensorQ[#],DeleteTensorValues[#];UndefTensor[#]]&,nativeBasisObjects[b]];
   Scan[If[xTensorQ[#], DeleteTensorValues[#]; UndefTensor[#]] &, fields];
   If[KeyExistsQ[b,"CovD"] && CovDQ[b["CovD"]] && KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]],
     relative = GiveSymbol[Christoffel, Sequence @@ Sort[{b["CovD"], PDOfBasis[b["Chart"]]}]];
@@ -1371,7 +1396,7 @@ DeletionPlan[tag_String,key_String:"Background",OptionsPattern[]] := Module[
    roots=Union[roots,Select[{GiveSymbol[Determinant,b["Metric"],b["Chart"]],GiveSymbol[Christoffel,Sequence@@Sort[{b["CovD"],PDOfBasis[b["Chart"]]}]]},xTensorQ]];
    owned=Union[owned,roots]
  ];
- If[key==="Chart",roots=Union[roots,servantClosure[Lookup[Values@Lookup[b,"AdditionalCharts",<||>],"Chart",{}]]]];
+ If[key==="Chart",roots=Union[roots,servantClosure[Join[Lookup[Values@Lookup[b,"AdditionalCharts",<||>],"Chart",{}],nativeBasisObjects[b]]]]];
  roots=Union[roots,Select[relativeHeads[b],Function[h,AnyTrue[roots,!FreeQ[TensorID[h],#]&]]]];
  visitors=visitorClosure[roots];
  external=Union[Complement[visitors,owned],Select[externalRelativeHeads[b],Function[h,AnyTrue[roots,!FreeQ[TensorID[h],#]&]]]];
@@ -1408,6 +1433,7 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  If[KeyExistsQ[b,"MetricMatrix"],clearGeometry[tag]];
  r=guard[Internal`InheritedBlock[{Undef},Unprotect[Undef];
    Undef[s_Symbol /; StringStartsQ[ToString[Unevaluated[s],InputForm],"Removed["]]:=Null;
+   If[key==="Chart",clearManagedBasisPairs[b]];
    Scan[undefOwned,plan["Order"]]
  ]];
  remaining=Select[names,registeredNameQ];
@@ -1578,14 +1604,15 @@ ConnectionMatrixOf[tag_String,key_String] := Module[{b=background[tag],r},If[Fai
 ];
 (* Coordinate connection coefficients acquire the Hessian of the coordinate map. *)
 ConnectionMatrixOf[tag_String,selector_,OutputChart->name_] := Module[
-  {b=background[tag],gamma,rec,jac,coordinates,indices,hessian},
+  {b=background[tag],gamma,rec,jac,coordinates,indices,hessian,transformed},
   If[FailureQ[b],Return[b]];
   gamma=ConnectionMatrixOf[tag,selector];If[FailureQ[gamma] || MemberQ[{Automatic,"Primary"},name],Return[gamma]];
   rec=chartRecord[b,name];If[FailureQ[rec],Return[rec]];
   jac=rec["Jacobian"];coordinates=Through[rec["Coordinates"][]];
   hessian=Table[D[jac[[i,j]],coordinates[[k]]],{i,Length[jac]},{j,Length[jac]},{k,Length[jac]}];
   indices=indicesFor[b,3];
-  Simplify[chartPullback[gamma,b,rec,{indices[[1]],-indices[[2]],-indices[[3]]}]+Inverse[jac].hessian]
+  transformed=chartPullback[gamma,b,rec,{indices[[1]],-indices[[2]],-indices[[3]]}];If[FailureQ[transformed],Return[transformed]];
+ Simplify[transformed+Inverse[jac].hessian]
 ];
 connectionKretschmann[tag_,cc_] := Module[{b=$BG[tag],key,gamma,n,coords,r,lower,mat,inv,flat},
  key=First@Keys@Select[b["Connections"],#["Head"]===cc&];
