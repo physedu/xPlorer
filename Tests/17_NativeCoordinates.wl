@@ -3,7 +3,7 @@ CreateBackground["NativeA",SymbolSuffix->"NA"];
 assert["native-chart",FailureQ[DefineChart["NativeA",{t[],r[],theta[],varphi[]}]],False];
 assert["native-chart-alias",chartNA,ChartOf["NativeA"]];
 assert["native-coordinate-alias",rNA[],ScalarsOfChart[chartNA][[2]]];
-assert["native-coordinate-print",PrintAs[Head[rNA[]]],"r"];
+assert["native-coordinate-print",With[{head=Head[rNA[]]},PrintAs[head]],"r"];
 SetCMetricSystem["NativeA",DiagonalMatrix[{-1,1,1,1}]];
 DefScalarFunction[profileF];
 RegisterProfile["NativeA","Direct",phi,profileF[rNA[]]];
