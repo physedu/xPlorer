@@ -25,6 +25,7 @@ Global`$XPlorerWorkflowReport=Module[
    "create_manifolds",stages["Three independent manifolds before charts"]=Length[xPlorer`$BG]===3&&
      Length[DeleteDuplicates[Lookup[Values[xPlorer`$BG],"Manifold"]]]===3&&AllTrue[Values[xPlorer`$BG],!KeyExistsQ[#,"Chart"]&],
    "charts",stages["Charts chosen before metric matrices"]=AllTrue[Values[xPlorer`$BG],KeyExistsQ[#,"Chart"]&&!KeyExistsQ[#,"MetricMatrix"]&],
+   "ctensor_output",stages["CTensor retains native basis and variance"]=With[{ch=xPlorer`ChartOf["MinkowskiFields"]},SameQ[value,xAct`xCoba`CTensor[{-1,2,3,4},{ch}]]],
    "delete_single_field",stages["Owned field actually undefined"]=!ToExpression[oldFieldName,InputForm,xAct`xTensor`xTensorQ],
    _,Null
   ]
