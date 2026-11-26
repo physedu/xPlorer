@@ -1,0 +1,60 @@
+{
+  "version": "14.0.0-beta.13-dev.17",
+  "sourceCommit": "ea54770b1046e44dea0b2705634cb1384169ac47",
+  "notebookCommit": "d1927b270d2af629408d7677d000a7613b07c1d1",
+  "kernel": "15.0.1 Linux x86-64",
+  "xAct": "1.3.0",
+  "groups": {
+    "ManagedNativeSyntax": [
+      13,
+      13
+    ],
+    "Reconstruction": [
+      20,
+      20
+    ],
+    "NativeInterop": [
+      23,
+      23
+    ],
+    "FieldExtensions": [
+      16,
+      16
+    ],
+    "Geometry": [
+      49,
+      49
+    ],
+    "Perturbations": [
+      48,
+      48
+    ],
+    "Lifecycle": [
+      64,
+      64
+    ]
+  },
+  "workflow": {
+    "inputs": [
+      365,
+      365
+    ],
+    "math": [
+      84,
+      84
+    ],
+    "stages": [
+      33,
+      33
+    ],
+    "parse": 0,
+    "malformed": 0,
+    "warnings": 0,
+    "unexpectedFailures": 0
+  },
+  "EinsteinScalar": [
+    6,
+    6
+  ],
+  "notRetested": "Other historical groups, Desktop rendering and real paclet archive creation/installation remain unverified for dev.17."
+}
