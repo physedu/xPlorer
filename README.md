@@ -2,11 +2,11 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-> **Development branch: 14.0.0-beta.13-dev.10.** The new registration API is breaking. The original 115-input author notebook and historical regression suite have been migrated and tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
+> **Development branch: 14.0.0-beta.13-dev.11.** The new registration API is breaking. The original 115-input author notebook and historical regression suite have been migrated and tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
 
 xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
-The current experimental version is **14.0.0-beta.13-dev.10** (native arithmetic formatting, clean TeX export and revised workflow). The calculation engine is unchanged; dev.10 updates presentation and export. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Single-item registration now supports Field, Parameter, Lagrangian and Expression, with plural batch and collection names. Existing plural single-item calls remain accepted; background creation semantics are unchanged. Personalization is optional.
+The current experimental version is **14.0.0-beta.13-dev.11** (inferred background component evaluation, theory information, readable sector and chart displays, and revised workflow). The component calculation engine is unchanged. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Single-item registration now supports Field, Parameter, Lagrangian and Expression, with plural batch and collection names. Existing plural single-item calls remain accepted; background creation semantics are unchanged. Personalization is optional.
 
 ## Start here
 
@@ -16,7 +16,7 @@ Keep [xPlorer_Workflow.nb](xPlorer_Workflow.nb) beside the [Paclet](Paclet/) dir
 Get[FileNameJoin[{NotebookDirectory[], "Paclet", "xPlorer.wl"}]];
 ```
 
-The principal notebook develops a scalar theory on Minkowski, Schwarzschild and FLRW, then introduces vectors, tensors, an independent affine connection, perturbations and cleanup. It contains 142 executable input cells, with explanatory prose beside the calculations. The stylesheet inherits light/dark theme colors. ScalarTheory.wl is an optional reusable source recipe; it is not required to run the notebook.
+The principal notebook develops a scalar theory on Minkowski, Schwarzschild and FLRW, then introduces vectors, tensors, an independent affine connection, perturbations and cleanup. It contains 288 executable input cells, including two alternative startup cells (choose only one), with explanatory prose beside the calculations. The stylesheet inherits light/dark theme colors. ScalarTheory.wl is an optional reusable source recipe; it is not required to run the notebook.
 
 ## Features
 
@@ -30,7 +30,7 @@ The principal notebook develops a scalar theory on Minkowski, Schwarzschild and 
 - Scoped rules, selective removal, named particularizations and conservative invalidation of saved results.
 - Separate value clearing, registration removal and true dependency-aware deletion of owned fields, charts, connections, metric families or whole backgrounds.
 
-The principal notebook has passed 142/142 input executions, 72/72 expected-result checks and 24/24 workflow-order and presentation checks on dev.10, after author Desktop feedback. No malformed compound inputs or unexpected nested Failure results. All eight historical groups passed (288 assertion executions including repeated core checks); display 55/55 (dev.10), registration 56/56 (dev.9) and inspection 25/25 (dev.8), native interop 20/20, profiles and CTensor 33/33. The author confirmed a successful Desktop paclet build on Windows. The clean builder and actual paclet installation still need Desktop verification; front-end appearance has not been fully reviewed. The 88-input legacy build source is not the current notebook.
+The dev.11 workflow passed 287/287 selected input executions, 74/74 mathematical checks and 33/33 workflow and display checks, without warnings, parse errors or unexpected failures. The display group passed 55/55, theory inspection 25/25, and profiles/CTensor 33/33. Historical regression results are recorded in BETA13_PROGRESS.md. Desktop front-end appearance, actual paclet build and installation still require verification. The 88-input legacy build source is not the current notebook.
 
 See [API_GUIDE.md](API_GUIDE.md), the [Proca example](Examples/Beta13_Proca.wl) and [native xCoba example](Examples/NativeXCoba.wl). [VALIDATION.md](VALIDATION.md) is a historical beta.7 record; current evidence and limitations are in [BETA13_PROGRESS.md](BETA13_PROGRESS.md) and [BETA13_PLAN.md](BETA13_PLAN.md).
 
@@ -101,7 +101,7 @@ If you use xPlorer in your research, please cite the version used. GitHub's **Ci
   author  = {Sanz-Romero, Eduardo},
   title   = {xPlorer},
   year    = {2026},
-  version = {14.0.0-beta.13-dev.10},
+  version = {14.0.0-beta.13-dev.11},
   url     = {https://github.com/physedu/xPlorer}
 }
 ```
@@ -139,3 +139,7 @@ xTensor supplies abstract tensor calculus, xPert supplies perturbative expansion
 - `xPlorer_Workflow.nb` and `xPlorer_Install.nb`: scientific tutorial and installation guide.
 
 The root `xPlorer.m` is a compatibility loader, not a second implementation. Root license and citation metadata are retained for GitHub; identical copies are included in the distributable folder.
+
+### Inferred component evaluation and theory information
+
+An owned expression has a unique background: `EabSchw // ToComponents // MatrixForm`. The explicit `ToComponents["Schwarzschild", Eab]` remains necessary for abstract expressions. Ambiguous or owner-free expressions require an explicit tag. Options work with either form. Register optional Title, Description, Assumptions and Conditions individually; they document the theory, not automatic simplification assumptions. Sector overviews show both counts and registered keys.
