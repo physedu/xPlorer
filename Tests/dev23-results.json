@@ -79,5 +79,70 @@
       20
     ]
   },
-  "notRetested": "Other historical groups, optional xTras example, desktop rendering and archive creation/installation."
+  "notRetested": "Optional xTras example, desktop rendering and archive creation/installation.",
+  "additionalRegression": {
+    "testedCommit": "72c6c72aa09021fd6586d95cff3cee71ea4dbe0b",
+    "groups": {
+      "Registration": [
+        56,
+        56
+      ],
+      "RegistrationGeometry": [
+        48,
+        48
+      ],
+      "Display": [
+        55,
+        55
+      ],
+      "MetricConnectionCurvature": [
+        6,
+        6
+      ],
+      "TheoryInspection": [
+        25,
+        25
+      ],
+      "ComponentsAndRules": [
+        24,
+        24
+      ],
+      "NativeInterop": [
+        23,
+        23
+      ],
+      "ProfilesAndCTensor": [
+        33,
+        33
+      ],
+      "FieldExtensions": [
+        16,
+        16
+      ],
+      "Lifecycle": [
+        64,
+        64
+      ],
+      "FieldCache": [
+        23,
+        23
+      ],
+      "Perturbations": [
+        48,
+        48
+      ],
+      "ObjectsAndConnections": [
+        45,
+        45
+      ],
+      "Reconstruction": [
+        20,
+        20
+      ],
+      "SelectiveInvalidation": [
+        13,
+        13
+      ]
+    }
+  }
 }
