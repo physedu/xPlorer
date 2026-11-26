@@ -105,3 +105,7 @@ Standard primary-chart geometry reads and recorded field query preparation share
 ### dev.21 selective invalidation checkpoint
 
 Preserve unchanged native field source groups on metric change; exact repeat managed field assignments are no-ops when source fingerprints agree. Correct LI-aware native fingerprints. Next: identical metric assignment and native metric-component edits, native geometry derivative cleanup, independent connection invalidation, remaining sparse/partial inputs, alternate geometry variance, RuleToSet and chart/basis lifecycles. Continue native integration before a scoped bypass.
+
+### dev.22 native metric edits checkpoint
+
+Exact repeat metric inputs and individual primary-chart covariant/contravariant metric writes integrated and validated. Vanishing-tensor component-hook warnings fixed. Next: geometry derivative cleanup and native alternate variance, independent connection dependencies, sparse/partial field inputs and additional native write signatures, RuleToSet state, native chart/basis lifecycles. The scoped native experiment bypass is still deferred.

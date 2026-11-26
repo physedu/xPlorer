@@ -141,3 +141,7 @@ Added a portable notebook, 75 regression checks, an MUnit report runner, and an 
 ## 14.0.0-beta.13-dev.21 (development)
 
 - Preserve unchanged native authoritative field groups on metric changes; invalidate derived ValIDs without reinstalling original fields. Exact repeated managed field assignment is a no-op if source rules still match. Include LI labels in source and derived fingerprints and verify deleted perturbation variances are rebuilt.
+
+## 14.0.0-beta.13-dev.22 (development)
+
+- Stage native covariant/contravariant metric-component edits and validate before replacing the managed metric. Preserve geometry and revisions on exact repeated metric assignments with matching native fingerprints. Skip component hooks on identically vanishing tensors.

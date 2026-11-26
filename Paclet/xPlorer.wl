@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.21";
+$XPlorerVersion = "14.0.0-beta.13-dev.22";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -649,12 +649,33 @@ signatureStatus[mat_, expected_, ass_] := Module[{values, signs, result},
   ];
   Which[TrueQ[result], "Passed", TrueQ[result === False], "Failed", True, "Inconclusive"]
 ];
+(* Fingerprints of both native metric groups permit an exact-repeat no-op.
+   Only a managed assignment or a calculation starting from a known native
+   source can refresh these stamps. Never adopt an unknown manual edit. *)
+nativeMetricState[b_] := Module[{ch=b["Basis"],g=b["Metric"]},
+ Map[Function[raw,If[MissingQ[raw],raw,Hash[raw,"SHA256"]]],
+  {nativeRuleGroup[g,{-ch,-ch}],nativeRuleGroup[g,{ch,ch}]}]];
+recordNativeMetricState[tag_] := (put[tag,<|"NativeMetricState"->nativeMetricState[$BG[tag]]|>];Null);
+nativeMetricCurrentQ[b_] := Module[{known=Lookup[b,"NativeMetricState",Missing[]]},
+ ListQ[known]&&Length[known]===2&&IntegerQ[First[known]]&&known===nativeMetricState[b]];
+refreshNativeMetricState[tag_,before_] := Module[{b=$BG[tag],known,after},
+ known=Lookup[b,"NativeMetricState",Missing[]];after=nativeMetricState[b];
+ If[ListQ[known]&&Length[known]===2&&IntegerQ[First[known]]&&First[known]===First[before]&&
+  First[after]===First[before]&&(Last[known]===Last[before]||MissingQ[Last[before]]),
+  put[tag,<|"NativeMetricState"->after|>]];
+ Null
+];
+
 Options[SetCMetricSystem] = {ComputeOnSet -> {"Metric"}, Assumptions -> True, CVSimplify -> Together, Verbose -> False};
 SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background[tag], mat, det, result, ass = OptionValue[Assumptions], sym},
   If[FailureQ[b], Return[b]];
   If[!KeyExistsQ[b, "Chart"], Return[failure["NoChart", "Define the chart before assigning a metric."]]];
   ass = profile[ass, b];
   mat = profile[input, b];
+  If[SameQ[Lookup[b,"MetricMatrix",Missing[]],mat]&&SameQ[Lookup[b,"Assumptions",Missing[]],ass]&&nativeMetricCurrentQ[b],
+   If[OptionValue[ComputeOnSet]=!=None,
+    result=ComputeGeometry[tag,OptionValue[ComputeOnSet],CVSimplify->OptionValue[CVSimplify],Assumptions->ass,Verbose->OptionValue[Verbose]];
+    If[FailureQ[result],Return[result]]];Return[$BG[tag]]];
   If[Dimensions[mat] =!= {b["Dimension"], b["Dimension"]}, Return[failure["MetricDimensions", "The metric matrix must match the background dimension."]]];
   sym = Simplify[mat == Transpose[mat], Assumptions -> ass];
   If[!TrueQ[sym], Return[failure["MetricSymmetry", "Metric symmetry must be verifiable under the supplied assumptions."]]];
@@ -666,6 +687,7 @@ SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background
   If[result === $Failed, Return[failure["MetricAssignment", "xCoba could not assign the metric."]]];
   put[tag, <|"MetricMatrix" -> mat, "MetricRevision" -> b["MetricRevision"] + 1,
     "Assumptions" -> ass|>];
+  recordNativeMetricState[tag];
   result = invalidateMetricFieldValues[tag]; If[FailureQ[result], Return[result]];
   result = replayConnections[tag];If[FailureQ[result],Return[result]];invalidateResults[tag];
   If[OptionValue[ComputeOnSet] =!= None,
@@ -723,11 +745,12 @@ managedNativeMetricComputeQ[tag_,ch_,opts_List] := Module[{b=Lookup[$BG,tag,<||>
  KeyExistsQ[b,"MetricMatrix"]&&ch===b["Chart"]&&Complement[First/@opts,First/@Options[MetricCompute]]==={}
 ];
 captureNativeMetricCompute[tag_,ch_,what_,opts___Rule] := Block[{$insideManagedCalculation=True},
- Module[{b=$BG[tag],result,deps,covered,old,new,seconds},
+ Module[{b=$BG[tag],result,deps,covered,old,new,seconds,before},
   old=refreshGeometryCoverage[tag];
-  repairMissingGeometryCache[b];
+  repairMissingGeometryCache[b];before=nativeMetricState[b];
   {seconds,result}=AbsoluteTiming[guard[MetricCompute[b["Metric"],Zero,ch,what,opts]]];
   If[result===$Failed,Return[failure["GeometryComputation","xCoba could not compute the requested native geometry."]]];
+  refreshNativeMetricState[tag,before];
   deps=xAct`xCoba`Private`Depends[what,{False,False}];
   covered=Select[Keys[$geometryTargets],Function[k,AllTrue[$geometryTargets[k],MemberQ[deps,#]&]&&nativeGeometryGroupPresentQ[b,k]]];
   new=Union[old,covered];
@@ -737,7 +760,7 @@ captureNativeMetricCompute[tag_,ch_,what_,opts___Rule] := Block[{$insideManagedC
 
 Options[ComputeGeometry] = {CVSimplify -> Together, Assumptions -> Automatic, Verbose -> False, ForceCompute -> False};
 ComputeGeometry[tag_String, targets_: {"Metric"}, OptionsPattern[]] := Module[
-  {b = background[tag], wanted, todo, policy, ass, fun = OptionValue[CVSimplify], result, seconds, specs},
+  {b = background[tag], wanted, todo, policy, ass, fun = OptionValue[CVSimplify], result, seconds, specs,before},
   If[FailureQ[b], Return[b]];
   If[!KeyExistsQ[b, "MetricMatrix"], Return[failure["NoMetricComponents", "Assign the metric matrix first."]]];
   wanted = If[targets === All, Keys[$geometryTargets], Flatten[{targets}]];
@@ -747,16 +770,18 @@ ComputeGeometry[tag_String, targets_: {"Metric"}, OptionsPattern[]] := Module[
   If[TrueQ[OptionValue[ForceCompute]] || (KeyExistsQ[b, "GeometryPolicy"] && b["GeometryPolicy"] =!= policy),
     clearGeometry[tag];result=guard[MetricInBasis[b["Metric"], -b["Basis"], b["MetricMatrix"]]];
     If[result===$Failed,Return[failure["MetricAssignment","Could not restore the metric before recomputation."]]];
+    recordNativeMetricState[tag];
     result=replayFields[tag];If[FailureQ[result],Return[result]];
     result=replayConnections[tag];If[FailureQ[result],Return[result]];b = $BG[tag]];
   refreshGeometryCoverage[tag]; b = $BG[tag];
   todo = Complement[wanted, b["ComputedGeometry"]];
   If[todo === {}, Return[<|"Computed" -> {}, "Cached" -> wanted, "Seconds" -> 0., "MetricRevision" -> b["MetricRevision"]|>]];
-  repairMissingGeometryCache[b];
+  repairMissingGeometryCache[b];before=nativeMetricState[b];
   specs = Flatten[Lookup[$geometryTargets, todo]];
   {seconds, result} = AbsoluteTiming[guard[MetricCompute[b["Metric"], b["Chart"], specs,
     CVSimplify -> fun, Verbose -> OptionValue[Verbose]]]];
   If[result === $Failed, Return[failure["GeometryComputation", "xCoba could not compute the requested geometry."]]];
+  refreshNativeMetricState[tag,before];
   put[tag, <|"ComputedGeometry" -> Union[b["ComputedGeometry"], wanted], "GeometryPolicy" -> policy,
     "GeometryRuns" -> b["GeometryRuns"] + 1, "LastGeometrySeconds" -> seconds|>];
   <|"Computed" -> todo, "Cached" -> Complement[wanted, todo], "Seconds" -> seconds, "MetricRevision" -> b["MetricRevision"]|>
@@ -1060,7 +1085,7 @@ managedPrimaryMetricArrayQ[tag_,basis_,input_,opts_List] := Module[{b=Lookup[$BG
  TrueQ[$CVReplace] && Complement[First/@opts,First/@Options[MetricInBasis]]==={}
 ];
 captureManagedMetricArray[tag_,basis_,input_,opts___Rule] := Block[{$insideManagedCalculation=True},
- Module[{b=$BG[tag],mat,lower,r,fun,inv,metric},
+ Module[{b=$BG[tag],mat,lower,r,fun,inv,metric,other,known,requested},
   metric=b["Metric"];mat=If[VectorQ[input],DiagonalMatrix[input],input];
   fun=CVSimplify/.Join[{opts},Options[MetricInBasis]];
   inv=Inverse/.Join[{opts},Options[MetricInBasis]];
@@ -1068,22 +1093,61 @@ captureManagedMetricArray[tag_,basis_,input_,opts___Rule] := Block[{$insideManag
   If[lower===$Failed,Return[failure["MetricAssignment","The contravariant metric could not be inverted."]]];
   r=SetCMetricSystem[tag,lower,Assumptions->Lookup[b,"Assumptions",True],ComputeOnSet->None];
   If[FailureQ[r],Return[r]];
-  (* For an upper input, retain the precise supplied upper matrix; for a
-     lower input, native Inverse->True installs its upper inverse. *)
+  (* Preserve an already identical native group. An inverse requested but
+     absent still requires the native installation. *)
   If[basis===b["Basis"]||TrueQ[inv],
-   r=guard[MetricInBasis[metric,basis,mat,Inverse->inv,CVSimplify->fun]];
-   If[r===$Failed,Return[failure["MetricAssignment","The native metric inverse assignment failed."]]];Return[r]];
+   known=guard[ToValues[ComponentArray[metric,{basis,basis}],metric]];
+   other=If[TrueQ[inv],guard[ToValues[ComponentArray[metric,{-basis,-basis}],metric]],None];
+   requested=If[TrueQ[inv],guard[fun[Inverse[mat]]],None];
+   If[known=!=mat||other=!=requested,
+    r=guard[MetricInBasis[metric,basis,mat,Inverse->inv,CVSimplify->fun]];
+    If[r===$Failed,Return[failure["MetricAssignment","The native metric inverse assignment failed."]]];
+    recordNativeMetricState[tag];Return[r]]];
+  recordNativeMetricState[tag];
   ComponentValue[ComponentArray[metric,{basis,basis}]]
+ ]];
+managedMetricComponentQ[tag_,expr_] := Module[{b=Lookup[$BG,tag,<||>],signs},
+ If[TrueQ[$insideManagedCalculation]||TrueQ[$insideNativePrintGuard]||!KeyExistsQ[b,"MetricMatrix"],Return[False]];
+ signs=managedPrimaryIndices[b,expr,CIndexQ];
+ MemberQ[{{-1,-1},{1,1}},signs]
+];
+captureManagedMetricComponent[tag_,expr_,input_] := Block[{$insideManagedCalculation=True},
+ Module[{b=$BG[tag],metric,signs,basis,stage,r,mat},
+  metric=b["Metric"];signs=managedPrimaryIndices[b,expr,CIndexQ];basis=First[signs] b["Basis"];
+  If[!nativeGeometryRulePresentQ["Metric"[-1,-1],geometryNativeData[b]],
+   Return[failure["MetricInput","Restore a complete managed metric before editing one component."]]];
+  If[signs==={1,1}&&!nativeGeometryRulePresentQ["Metric"[1,1],geometryNativeData[b]],
+   r=captureNativeMetricCompute[tag,b["Chart"],"Metric"[1,1],CVSimplify->managedReadPolicy[b]];
+   If[FailureQ[r],Return[r]]];
+  (* Stage the native write on a localized metric symbol. Failed validation
+     leaves the original metric rules and geometry untouched. *)
+  stage=guard[With[{hh=metric},Internal`InheritedBlock[{hh},
+   r=ComponentValue[expr,input];
+   {r,ToValues[ComponentArray[hh,{basis,basis}],hh]}
+  ]]];
+  If[stage===$Failed||!MatchQ[stage,{_Rule,_List}],Return[failure["MetricInput","The native component assignment could not be staged."]]];
+  mat=Last[stage];
+  If[!FreeQ[mat,metric],Return[failure["MetricInput","The staged metric is incomplete."]]];
+  r=captureManagedMetricArray[tag,basis,mat,CVSimplify->managedReadPolicy[b]];
+  If[FailureQ[r],r,First[stage]]
  ]];
 
 installManagedMetricSyntax[tag_,metric_Symbol] := With[{hh=metric,tt=tag},
  hh /: MetricInBasis[hh,input:(_List|_Function),opts___Rule] := managedMetricInput[tt,input,opts];
+ hh /: ComponentValue[e:hh[___],value_] /; managedMetricComponentQ[tt,e] := captureManagedMetricComponent[tt,e,value];
  hh /: MetricInBasis[hh,basis_,input_List,opts___Rule] /; managedPrimaryMetricArrayQ[tt,basis,input,{opts}] := captureManagedMetricArray[tt,basis,input,opts];
  hh /: MetricCompute[hh,targets:(_String|_List|All),opts___Rule] := managedNativeGeometry[tt,targets,opts];
  hh /: MetricCompute[hh,ch_,what_,opts___Rule] /; managedNativeMetricComputeQ[tt,ch,{opts}] := captureNativeMetricCompute[tt,ch,what,opts];
  hh /: MetricCompute[hh,Zero,ch_,what_,opts___Rule] /; managedNativeMetricComputeQ[tt,ch,{opts}] := captureNativeMetricCompute[tt,ch,what,opts];
 ];
-installManagedFieldSyntax[tag_,head_Symbol,rank_Integer] := With[{hh=head,tt=tag,rr=rank},
+(* Vanishing xTensors evaluate to zero even while a tagged pattern is
+   being installed. They have no independent component input to manage. *)
+vanishingOwnedFieldQ[tag_,head_,rank_] := Module[{b=$BG[tag],fs},
+ fs=fieldSpec[b,head];If[FailureQ[fs],Return[False]];
+ TrueQ[(head@@Join[If[fs["Type"]==="MetricPert",{LI[1]},{}],
+  MapThread[Times,{fs["IndexPositions"],indicesFor[b,rank]}]])===0]
+];
+installManagedFieldSyntax[tag_,head_Symbol,rank_Integer] := If[!vanishingOwnedFieldQ[tag,head,rank],With[{hh=head,tt=tag,rr=rank},
  If[rr===0,
   hh /: ComponentValue[e:hh[],value_] /; (!TrueQ[$insideManagedCalculation] && KeyExistsQ[$BG[tt],"Chart"]) := captureManagedScalar[tt,e,value];
   hh /: ComponentValue[e:hh[],value_,Managed->True] := SetFieldComponents[e,value],
@@ -1094,7 +1158,7 @@ installManagedFieldSyntax[tag_,head_Symbol,rank_Integer] := With[{hh=head,tt=tag
  hh /: ChangeComponents[e:hh[___],init_,args___] /; !TrueQ[$insideManagedCalculation] := Block[{$insideManagedCalculation=True},ChangeComponents[e,init,args]];
  hh /: DeleteTensorValues[hh] /; (!TrueQ[$insideManagedCalculation] && !TrueQ[$insideNativePrintGuard] && KeyExistsQ[$BG[tt],"Chart"]) := ClearFieldComponents[tt,hh];
  hh /: DeleteTensorValues[hh,Managed->True] := ClearFieldComponents[tt,hh];
-];
+]];
 
 Options[RegisterProfile]=Options[SetFieldComponents];
 RegisterProfile[tag_String,name_String] := Module[{b=background[tag],profiles},
@@ -1591,7 +1655,7 @@ notationBoxes[e_,a_] := Module[{orders,args,fn,n,terms,den,body,mark,ix,h=Head[e
 (* Explicit lifecycle operations. Registration never transfers ownership. *)
 ClearComputedValues[tag_String] := Module[{b=background[tag],r},If[FailureQ[b],Return[b]];
   clearGeometry[tag];
-  If[KeyExistsQ[b,"MetricMatrix"],r=guard[MetricInBasis[b["Metric"],-b["Basis"],b["MetricMatrix"]]];If[r===$Failed,Return[failure["ClearValues","Metric values could not be restored."]]]];
+  If[KeyExistsQ[b,"MetricMatrix"],r=guard[MetricInBasis[b["Metric"],-b["Basis"],b["MetricMatrix"]]];If[r===$Failed,Return[failure["ClearValues","Metric values could not be restored."]]];recordNativeMetricState[tag]];
   invalidateResults[tag];
   r=replayFields[tag];If[FailureQ[r],Return[r]];
   r=replayConnections[tag];If[FailureQ[r],Return[r]];Null
