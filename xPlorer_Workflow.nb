@@ -1042,7 +1042,7 @@ Cell["Work with MinkowskiFields, the existing vector and tensor study. The goal 
 
 Cell["8.1. Clear derived values without changing the model","Subsubsection"],
 
-Cell["The time-time metric entry is still -4 from the preceding example. The covector A has lower components (1, 2, 3, 4), so its raised time component is -1/4.","Text"],
+Cell["The preceding example restored the standard Minkowski metric. The covector A has lower components (1, 2, 3, 4), so its raised time component is -1.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"MetricMatrixOf","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"lifecycle_initial_metric"],
 
@@ -1154,9 +1154,8 @@ Cell["The metric and raised vector agree with the values before deletion. Any al
 
 Cell["8.7. Change the restored study without recreating it","Subsubsection"],
 
-Cell["There is no need to delete the background just to change its inputs. Restore the standard Minkowski metric and give the vector new lower components.","Text"],
+Cell["There is no need to delete the background just to change its inputs. Keep the restored metric and give the vector new lower components.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem","[",RowBox[{"\"MinkowskiFields\"",",",RowBox[{"DiagonalMatrix","[",RowBox[{RowBox[{"{",RowBox[{RowBox[{"-","1"}],",","1",",","1",",","1"}],"}"}]}],"]"}]}],"]"}],";"}]],"Input",CellTags->"lifecycle_reset_metric"],
 
 Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "A", ",", RowBox[{"{", RowBox[{"5", ",", "0", ",", "0", ",", "0"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"fresh_vector_step_1"],
 
