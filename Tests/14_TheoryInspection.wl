@@ -42,5 +42,5 @@ verify["qualified-export-form",StringQ[ExpressionText["ViewStudy","Expressions",
 verify["invalid-collection",FailureQ[BackgroundExpression["ViewStudy","Fields","vphi"]]];
 verify["about",Head[AboutXPlorer[]]===Column && !FreeQ[AboutXPlorer[],"Package xPlorer` version "<>$XPlorerVersion]];
 verify["about-separators",With[{lines=First[AboutXPlorer[]]},First[lines]===StringRepeat["-",60]&&Last[lines]===First[lines]]];
-verify["about-native-style",FreeQ[AboutXPlorer[],_Style] && !FreeQ[AboutXPlorer[],_Hyperlink]];
+verify["about-native-style",VectorQ[First[AboutXPlorer[]],StringQ] && FreeQ[AboutXPlorer[],_Style|_Hyperlink] && !StringContainsQ[StringRiffle[First[AboutXPlorer[]]," "],"github",IgnoreCase->True]];
 <|"Version"->$XPlorerVersion,"Passed"->Count[Values[checks],True],"Total"->Length[checks],"Failures"->Keys@Select[checks,#=!=True&]|>
