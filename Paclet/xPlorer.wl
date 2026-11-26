@@ -73,7 +73,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.12";
+$XPlorerVersion = "14.0.0-beta.13-dev.13";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -272,8 +272,23 @@ RegisterTheory[section:("Fields"|"Parameters"|"Lagrangians"|"Expressions"),item_
  b13Commit[section,{HoldComplete[{item,opts}]}];
 (* Backgrounds own their symbols. All public operations return Failure on invalid input. *)
 failure[code_, message_, data_: <||>] := Failure[code, Join[<|"MessageTemplate" -> message|>, data]];
+(* Clean only the presentation of native xAct Print arguments inside managed calls.
+   Never rename symbols, change their contexts, suppress messages, or change raw results. *)
+cleanNativePrintArgument[e_] := Module[{raw,clean},
+ raw=If[StringQ[e],e,ToString[e,InputForm]];
+ clean=StringReplace[raw,RegularExpression["xPlorer`Backgrounds`B[0-9]+`"]->""];
+ If[raw===clean,e,clean]
+];
 SetAttributes[guard, HoldAll];
-guard[body_] := Check[Catch[Catch[body], _, Function[{v, t}, $Failed]], $Failed];
+guard[body_] := If[TrueQ[$insideNativePrintGuard],
+ Check[Catch[Catch[body], _, Function[{v,t},$Failed]],$Failed],
+ With[{sink=Print},
+  Block[{$insideNativePrintGuard=True,
+    Print=Function[Null,Block[{Print},sink@@(cleanNativePrintArgument /@ {##})]]},
+   Check[Catch[Catch[body], _, Function[{v,t},$Failed]],$Failed]
+  ]
+ ]
+];
 background[tag_] := Lookup[$BG, tag, failure["UnknownBackground", "The background does not exist.", <|"Tag" -> tag|>]];
 If[!IntegerQ[$BackgroundCounter], $BackgroundCounter = 0];
 put[tag_, assoc_Association] := ($BG[tag] = Join[$BG[tag], assoc]);
