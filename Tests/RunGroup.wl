@@ -16,7 +16,8 @@ Global`$XPlorerStandaloneGroups=<|
  "GeometryRead"->"23_GeometryRead.wl",
  "SelectiveInvalidation"->"24_SelectiveInvalidation.wl",
  "MetricEdits"->"25_MetricEdits.wl",
- "GeometryVariance"->"26_GeometryVariance.wl"|>;
+ "GeometryVariance"->"26_GeometryVariance.wl",
+ "SparseInputs"->"27_SparseInputs.wl"|>;
 Global`$XPlorerSelectedGroup=If[ValueQ[Global`$XPlorerTestGroup],Global`$XPlorerTestGroup,"Geometry"];
 If[KeyExistsQ[Global`$XPlorerStandaloneGroups,Global`$XPlorerSelectedGroup],
  Global`$XPlorerGroupReport=Block[{Print=(Null &),xAct`xPerm`$xpermQ=False,xAct`xCoba`$CVVerbose=False,Global`$B13GeometryTests=(Global`$XPlorerSelectedGroup==="RegistrationGeometry")},
@@ -33,7 +34,7 @@ Global`$XPlorerSelectedFiles=Lookup[<|
  "MetricConnectionCurvature"->{"12_MetricConnectionCurvature.wl"}|>,
  If[ValueQ[Global`$XPlorerTestGroup],Global`$XPlorerTestGroup,"Geometry"],Missing[]];
 If[MissingQ[Global`$XPlorerSelectedFiles],
- Failure["TestGroup",<|"MessageTemplate"->"Choose Geometry, Perturbations, Lifecycle, Display, ObjectsAndConnections, ComponentsAndRules, Reconstruction, MetricConnectionCurvature, Registration, RegistrationGeometry, TheoryInspection, NativeInterop, ProfilesAndCTensor, FieldExtensions, SecondaryChartNative, ManagedNativeSyntax, FieldCache, NativeRead, NativeGeometry, GeometryRead, SelectiveInvalidation, MetricEdits, or GeometryVariance."|>],
+ Failure["TestGroup",<|"MessageTemplate"->"Choose Geometry, Perturbations, Lifecycle, Display, ObjectsAndConnections, ComponentsAndRules, Reconstruction, MetricConnectionCurvature, Registration, RegistrationGeometry, TheoryInspection, NativeInterop, ProfilesAndCTensor, FieldExtensions, SecondaryChartNative, ManagedNativeSyntax, FieldCache, NativeRead, NativeGeometry, GeometryRead, SelectiveInvalidation, MetricEdits, GeometryVariance, or SparseInputs."|>],
  Global`$XPlorerGroupPreviousContextPath=$ContextPath;
  $ContextPath=DeleteCases[$ContextPath,"Global`"];
  Begin["XPlorerGroup"<>StringReplace[CreateUUID[],"-"->""]<>"`"];
