@@ -68,7 +68,7 @@ build = Get[FileNameJoin[{NotebookDirectory[], "Tools", "BuildPaclet.wl"}]];
 If[MatchQ[build, _Success], PacletInstall[build["PacletArchive"]]]
 ```
 
-The builder calls `PacletBuild[source, out]` directly on `Paclet/`, with `build/` as the output directory. No temporary copy or archive transfer is necessary. For future releases, distribute the verified archive as a GitHub Release asset so users do not need to build it themselves. No beta.13 release has been published. The remote kernel has a Java restriction on producing a real archive; Desktop verification remains necessary. Do not keep both a conflicting traditional installation and a paclet active.
+The builder calls the native `CreatePacletArchive[source, out]` directly on the prepared `Paclet/` directory, with `build/` as the output directory. This avoids PacletBuild's redundant staging copies, which failed on the author's Windows kernel. The corrected archive path still needs Desktop verification. For future releases, distribute the verified archive as a GitHub Release asset so users do not need to build it themselves. No beta.13 release has been published. The remote kernel has a Java restriction on producing a real archive; Desktop verification remains necessary. Do not keep both a conflicting traditional installation and a paclet active.
 
 ### Inspect the registered theory
 

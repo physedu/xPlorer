@@ -6,7 +6,7 @@ Cell["This notebook builds, installs, verifies and uninstalls xPlorer. Keep it b
 
 Cell["1. Build the paclet","Section"],
 
-Cell["Evaluate this cell to create the distributable archive in the build directory. The builder reads the already prepared Paclet directory directly; development files are outside it.","Text"],
+Cell["Evaluate this cell to create the distributable archive in the build directory. The builder archives the already prepared Paclet directory using CreatePacletArchive; development files are outside it.","Text"],
 
 Cell[BoxData[RowBox[{"build", "=", RowBox[{"Get", "[", RowBox[{"FileNameJoin", "[", RowBox[{"{", RowBox[{RowBox[{"NotebookDirectory", "[", "]"}], ",", "\"Tools\"", ",", "\"BuildPaclet.wl\""}], "}"}], "]"}], "]"}]}]],"Input",CellTags->"install_4"],
 

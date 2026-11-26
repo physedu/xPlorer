@@ -80,3 +80,7 @@ Source 2fa3835a83d4e78bbc6c4c7a75355b0b91ce706b adds the operator form expr // T
 - [ ] Continue private implementation audit (forced geometry replay failures and partial AddField cleanup) and explicit coverage of RicciOf, EinsteinOf and WeylOf; do not remove useful helpers based on static references.
 - [ ] Release readiness and compatibility scope; do not merge main or publish beta.13 until author review and required checks.
 
+
+### Windows archive regression
+
+The author reported CopyFile::opset during PacletBuild's internal staging, followed by FileHash and missing metadata errors. The last confirmed Windows archive build was dev.6. Use the native CreatePacletArchive directly on the prepared Paclet directory; do not mark the archive or installation as verified until the author confirms the corrected build. No change to the scientific package or notebook.
