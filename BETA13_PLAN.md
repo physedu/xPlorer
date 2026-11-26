@@ -65,3 +65,18 @@ Source 59bc06385545b416e819c18ab5f5e176c5ac89d5 and 4d77cf474fb2a25d8d995f30a6b0
 ## dev.12 — postfix component evaluation throughout the tutorial
 
 Source 2fa3835a83d4e78bbc6c4c7a75355b0b91ce706b adds the operator form expr // ToComponents[opts] for a uniquely owned expression, while keeping explicit-tag transport and direct inferred calls. Notebook 1b8ef6e6987542c8a24610d580a832e6cdbd6874 converts 30 further cells to postfix inference, including matrix, scalar, curvature, tensor, selected components, alternate chart, and CTensor examples. Explicit abstract transport is retained for one metric comparison and affine-source expressions. Actual workflow at that commit: 287/287 selected cells, 74/74 mathematical checks, 33/33 stages; zero warnings, parse errors, malformed compounds or unexpected failures. Every independent instruction remains in its own cell. Desktop build and visual review pending; no release or main merge.
+
+## dev.15/dev.16 consolidation checkpoint
+
+- [x] Incremental AddField, expression-based SetFieldComponents, LI inference and postfix PerturbOn; dedicated group FieldExtensions now 16/16.
+- [x] Optional Einstein-scalar example with native VarD/VarL, 6/6 on dev.16.
+- [x] Correct reconstruction of customized display indices and secondary chart references, same-tag and separate copy; 20/20 reconstruction.
+- [x] Re-run all 8 historical groups, 7 standalone group selectors (including two registration branches and two new groups), actual 365-cell notebook, startup and optional Einstein-scalar; exact results in BETA13_PROGRESS.md and Tests/dev16-results.json.
+- [x] Harden paclet builder and test error paths; verify temporary traditional application and development-directory Needs loading.
+- [x] Establish experimentally the boundary between native edits and managed replay, and a scalar capture example using existing API.
+- [x] Study native secondary-chart geometry using MetricInBasis and MetricCompute; 3/3 feasibility assertions.
+- [ ] Primary chart promotion: no implementation yet. Require explicit locally invertible transition (inverse supplied or validated), composition of other chart maps, transformation of all managed inputs and assumptions, connection handling, cache invalidation, dependency preflight and rollback. See DECISIONS.md.
+- [ ] Verify actual archive build, installation, uninstall and Desktop rendering of dev.16; remote Java compression remains blocked.
+- [ ] Continue private implementation audit (forced geometry replay failures and partial AddField cleanup) and explicit coverage of RicciOf, EinsteinOf and WeylOf; do not remove useful helpers based on static references.
+- [ ] Release readiness and compatibility scope; do not merge main or publish beta.13 until author review and required checks.
+

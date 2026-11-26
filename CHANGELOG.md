@@ -1,4 +1,14 @@
-# Development history through beta.12
+# Development history
+
+## 14.0.0-beta.13-dev.16 - 26 November 2026
+
+- Preserve custom abstract index choices and remap secondary-chart identities in reconstruction recipes.
+- Expose standalone beta.13 regression groups, persist incremental field and native secondary-chart feasibility checks, and harden paclet builder failure handling.
+- Verify managed/native scalar replay boundary with an explicit capture path using existing setters.
+- Synchronize package and distribution metadata. Full commit-specific evidence in BETA13_PROGRESS.md and Tests/dev16-results.json.
+- No new public API, primary-chart promotion, Desktop verification, binary archive installation or beta.13 release.
+
+## Historical development through beta.12
 
 Retrospective from the exported development conversation, 6–25 November 2026. Test counts below are historical reports, not newly rerun tests. No independent source snapshots or tags are fabricated for intermediate versions.
 

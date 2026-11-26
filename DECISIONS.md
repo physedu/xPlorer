@@ -159,3 +159,18 @@ Prior naming-hook and PrintAs experiments are feasibility evidence only. They do
 - A single root source supports Get, a traditional Kernel/init.m loader and a kernel paclet extension. Development directory loading is verified; no binary paclet release is claimed.
 
 Choose routine reversible details autonomously; record rationale and compatibility impact. Ask only for material unresolved scope choices. Do not describe illustrative future syntax as an implemented API.
+
+## dev.16 - reconstruction, native ownership and primary-chart promotion
+
+Retain RecipeVersion 1 and extend recipes with the original DisplayIndices input plus secondary-chart and coordinate head identities. Older version-1 recipes still load with default display indices and only remap identities they actually store. A managed recipe is not a kernel snapshot. In particular it cannot restore undocumented native definitions, external bases, arbitrary notebook variables or cached results.
+
+Managed records are authoritative during replay. Native ComponentValue/AllComponentValues assignments can be used in calculations, but may be overwritten when values are cleared, a profile is activated or metric data are changed. Verified scalar capture: read a resolved primary-chart value with ToValues and explicitly assign it through SetFieldComponents before recording ReconstructionData. For tensors use native xCoba extraction with the desired variance and basis, then record the resolved primary-chart array. Do not silently import every native value; derived values and explicitly supplied inputs are not interchangeable. No new public capture API is introduced.
+
+Do not implement primary-chart promotion by simply changing the Chart/Basis registry fields. DefineChart currently records a one-way map from secondary coordinates to primary coordinates; xPlorer's OutputChart performs a tensor pullback, not general native chart synchronization. Native secondary-chart MetricInBasis and MetricCompute were verified for a cylindrical metric and its nonzero Christoffel coefficient while leaving the managed Cartesian metric unchanged. A future primary promotion must:
+- Verify a local inverse and nondegenerate Jacobian under explicit domain assumptions; do not assume a global inverse or choose a branch.
+- Transform the metric, field/profile inputs with variance and LI order, and any connection inputs. An independent connection's coefficients have an inhomogeneous transformation, unlike a difference of connections.
+- Rebase all other chart maps and coordinate-dependent assumptions/rules, preserve owned identities and guard external native dependents.
+- Invalidate derived caches/results and use native xCoba to rebuild geometry; preflight unsupported data before mutation and report incomplete restoration explicitly.
+- Compare nontrivial curved and nonlinear chart cases and round trips before exposing a public operation.
+
+This is a proposed design contract, not implemented or generally validated. No new public API in dev.16.

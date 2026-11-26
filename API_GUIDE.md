@@ -161,7 +161,7 @@ Get works directly without installation. For a traditional application, use Inst
 
 PacletInfo.wl declares a kernel extension using the same source. PacletDirectoryLoad["/path/to/xPlorer/Paclet"] followed by Needs["xPlorer`"] activates a development directory. Tools/BuildPaclet.wl can build a paclet archive with PacletTools. xAct must be installed separately; it is not bundled or automatically downloaded by the package.
 
-Tests/RunTests.wl runs package checks. Tests/WorkflowTests.wl runs actual input boxes from the principal notebook in a fresh kernel. The principal notebook is the source of truth. The historical 88-input Tools builder cannot overwrite it. See BETA13_PROGRESS.md and BETA13_PLAN.md for current execution evidence and limitations.
+Tests/RunTests.wl runs the historical groups 01-12. For all current bounded groups use Tests/RunGroup.wl in separate fresh kernels with the selected group name (including Registration, RegistrationGeometry, TheoryInspection, NativeInterop, ProfilesAndCTensor, FieldExtensions and SecondaryChartNative). Tests/PacletBuildTests.wl tests deterministic builder failures without installing a package. Tests/WorkflowTests.wl runs actual input boxes from the principal notebook in a fresh kernel. The principal notebook is the source of truth. The historical 88-input Tools builder cannot overwrite it. See BETA13_PROGRESS.md and BETA13_PLAN.md for current execution evidence and limitations.
 
 ## Inferred background and theory information (dev.11–12)
 
@@ -186,3 +186,20 @@ Background inference uses owned symbol identities. Owner-free or multi-backgroun
 ## Extending existing backgrounds (dev.15)
 
 Register a native source field, then `AddField["Minkowski", A]` to copy only that field. Existing metrics, charts and managed values are retained; other snapshots and registered formulas are not synchronized. Adding a registered metric perturbation also installs its native xPert relationship. `SetFieldComponents[AM[-aM], {1,2,3,4}]` or `SetFieldComponents[hM[LI[2],-aM,-bM], ConstantArray[0,{4,4}]]` infer the background, variance and order. The expression must use distinct owned abstract indices; component assignments use the primary chart. Only Assumptions is an additional option for this overload. `gM[aM,bM] // PerturbOn[2] // ToComponents` computes a variation, not a truncated Taylor series. `PerturbOn[2, Output -> "Components", OutputChart -> "Cylindrical"]` can combine the calculation and chart conversion. Secondary chart assignments and primary-chart promotion are not implemented. Optional `Examples/EinsteinScalar.wl` uses native xTras VarL with a scalar Lagrangian (no extra determinant factor).
+
+## Reconstruction and native value ownership (dev.16)
+
+ReconstructionData now preserves the managed display-index input and old identities of secondary charts and coordinate heads. RecreateBackground maps these to the new background when restoring managed rules and records. Older recipes without the new metadata cannot recover the missing identities or index customization. Source xAct definitions must remain alive; cached results and arbitrary external definitions are not saved.
+
+If a native xCoba assignment deliberately replaces a managed scalar, record the resolved primary-chart value before saving a managed recipe:
+
+```wl
+nativeValue = ToValues[phiM[]];
+SetFieldComponents[phiM[], nativeValue];
+```
+
+This explicit operation uses the normal managed assignment interface. For a tensor first obtain a resolved primary-chart array with its known slot variance through native xCoba. Native edits without managed assignment can be lost when replay restores declared inputs. No automatic import, native snapshot or arbitrary rollback is promised.
+
+OutputChart remains a choice of output coordinates, not a change of the primary chart. Native MetricInBasis and MetricCompute can compute geometry in a secondary chart after supplying its metric; the study in Tests/18_SecondaryChartNative.wl verifies a cylindrical Christoffel coefficient. Native secondary assignments are not synchronized into the managed recipe. Primary promotion is a deferred design, particularly because of inverse coordinate maps, independent connections and stored rules/profiles.
+
+Build with Tools/BuildPaclet.wl or the separate installer notebook. The builder validates the complete distributable payload and returns Failure if a real archive was not produced. In the remote kernel directory loading and traditional application loading pass, but Java archive compression is restricted. Verify archive build and installation locally before distribution.

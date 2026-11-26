@@ -2,7 +2,7 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-> **Development branch: 14.0.0-beta.13-dev.16.** The new registration API is breaking. The original 115-input author notebook and historical regression suite have been migrated and tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
+> **Development branch: 14.0.0-beta.13-dev.16.** The new registration API is breaking. The current 365-selected-input scientific notebook and all bounded regression groups have been tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
 
 xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
@@ -57,7 +57,7 @@ The notebook still supports its standalone Get startup. For installed usage, eva
 ### Paclet development and distribution
 
 ```wl
-PacletDirectoryLoad["/absolute/path/to/xPlorer"];
+PacletDirectoryLoad["/absolute/path/to/xPlorer/Paclet"];
 Needs["xPlorer`"];
 ```
 
@@ -68,7 +68,7 @@ build = Get[FileNameJoin[{NotebookDirectory[], "Tools", "BuildPaclet.wl"}]];
 If[MatchQ[build, _Success], PacletInstall[build["PacletArchive"]]]
 ```
 
-The builder calls `PacletBuild[source, out]` directly on `Paclet/`, with `build/` as the output directory. No temporary copy or archive transfer is necessary. For future releases, distribute the verified archive as a GitHub Release asset so users do not need to build it themselves. No release has been published. The remote kernel has a Java restriction on producing a real archive; Desktop verification remains necessary. Do not keep both a conflicting traditional installation and a paclet active.
+The builder calls `PacletBuild[source, out]` directly on `Paclet/`, with `build/` as the output directory. No temporary copy or archive transfer is necessary. For future releases, distribute the verified archive as a GitHub Release asset so users do not need to build it themselves. No beta.13 release has been published. The remote kernel has a Java restriction on producing a real archive; Desktop verification remains necessary. Do not keep both a conflicting traditional installation and a paclet active.
 
 ### Inspect the registered theory
 
@@ -149,3 +149,18 @@ The dev.14 lifecycle tutorial passed 363/363 selected input cells, 82/82 mathema
 ### Extending an existing study (dev.15)
 
 `AddField[tag, source]` copies a registered source field into an existing background without rebuilding its geometry. `SetFieldComponents[ownedTensorExpression, values]` infers the owner, variance and perturbation label, using the primary chart. `expr // PerturbOn[n] // ToComponents` selects the local xPert parameter and computes the nth variation. The explicit forms remain available. See `Examples/EinsteinScalar.wl` for optional xTras action variation (run in a fresh kernel). xTras is not a mandatory dependency. Dev.15: 365/365 selected tutorial inputs, 84/84 mathematical checks, 33/33 stages; 12/12 focused checks of field addition, inference and reconstruction, and 6/6 Einstein-scalar checks.
+
+### Reconstruction and verification (dev.16)
+
+Managed recipes now preserve customized abstract index labels and rebind recorded secondary-chart coordinates and chart identities. No new scientific API was introduced. Native edits remain outside managed replay unless explicitly recorded with existing setters.
+
+The exact dev.16 source checkpoint passed the 365-cell workflow, 84 mathematical checks, 33 stages, all eight historical regression groups, the registration/inspection/native/profile groups, and the optional Einstein-scalar example. The additional FieldExtensions and SecondaryChartNative groups passed 16/16 and 3/3. See [Tests/dev16-results.json](Tests/dev16-results.json) for commit-specific evidence.
+
+For targeted tests, start a fresh kernel per group:
+
+```wl
+$XPlorerTestGroup = "FieldExtensions";
+Get["/path/to/xPlorer/Tests/RunGroup.wl"]
+```
+
+The runner supports the existing historical groups and the new standalone groups. The traditional application and development-directory Needs paths were verified; actual paclet archive compression still fails remotely due to Java security restrictions. The Desktop notebook appearance and archive installation/uninstallation must be verified locally. Primary-chart promotion remains a design task, not a supported operation.

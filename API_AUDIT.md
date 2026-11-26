@@ -34,3 +34,11 @@ Next: update historical API guide; add explicit coverage for retained unreferenc
 ## Resolution in dev.5/dev.6 (2026-11-26)
 
 All three redundant accessors removed; DisplayExpression merged into safe PrettyExp, with old reverse mapping removed. Missing chart guard and tests for retained functions. Native xCoba interop tested without new basis API. Profiles and optional CTensor added in dev.6, tested with historical suite and canonical notebook. See BETA13_PLAN.md and BETA13_PROGRESS.md for exact commits and remaining limitations. Historical reference counts above are not current dev.6 counts.
+
+## dev.16 static reference refresh (2026-11-26)
+
+At f621caa1d71136428aa158221a70825d9bffd340, scanned all 98 usage-declared public symbols (including options and variables) against 30 text sources: principal notebook, ScalarTheory, three Examples and 25 test/runner sources. Counts are lexical references, not executed coverage. Three helpers have no explicit reference in those sources: RicciOf, EinsteinOf, WeylOf. They return native geometry heads, with named connection overloads; retain them for convenient inspection and add explicit tests instead of removing them solely for low reference counts.
+
+Not explicitly referenced in the principal notebook: RicciOf, RicciScalarOf, EinsteinOf, WeylOf, ChristoffelOf, ChartOf, BasisOf, CheckBackground, ToBasisOf, ToValuesOf, PerturbationOrderLabel, Checks, ComputeOnSet, ForceCompute, AboutXPlorer, $XPlorerVersion, Presentation, PresentationOf, TorsionOf, ReplaceRules. Several are options or deliberate programmatic/technical interfaces. Existing tests cover many of these; absence in the tutorial does not imply lack of utility.
+
+Focused private review covered recipe remapping, chart records, field record replay, field extension and cache invalidation. Two reproduced reconstruction defects fixed in dev.16. Review candidates not yet established as runtime failures: ComputeGeometry forced/policy-change replay branch does not propagate every replay failure; AddField guarded native creation does not implement full rollback on partial native failure. Do not claim transactional guarantees or remove public symbols. Further private audit and error injection remain pending.
