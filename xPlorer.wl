@@ -71,7 +71,7 @@ PerturbationForm::usage = "PerturbationForm is Variation (nth derivative) or Tay
 ApplySpecialization::usage = "ApplySpecialization controls whether background specialization rules are applied.";
 StrictComponents::usage = "StrictComponents -> True returns Failure when tensor components or covariant derivatives remain unresolved.";
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
-AboutXPlorer::usage = "AboutXPlorer[] displays the package version, authorship, license and project link.";
+AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
 $XPlorerVersion = "14.0.0-beta.13-dev.8";
 
@@ -1564,8 +1564,6 @@ aboutXPlorerLines[] := Module[{separator=StringRepeat["-",60]},{
  "A package for reusing abstract xAct theories on independent geometric",
  "backgrounds, transporting tensor expressions and computing components.",
  "Built on xTensor, xCoba and xPert.",
- "Documentation, examples and source code:",
- Hyperlink["https://github.com/physedu/xPlorer","https://github.com/physedu/xPlorer"],
  "This software comes with ABSOLUTELY NO WARRANTY. See LICENSE for details.",
  separator
 }];
