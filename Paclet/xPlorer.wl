@@ -41,7 +41,7 @@ ChartOf::usage = "ChartOf[tag] returns the chart symbol stored for the backgroun
 CoordinatesOf::usage = "CoordinatesOf[tag] returns the coordinate symbols stored for the background tag.";
 BasisOf::usage = "BasisOf[tag] returns the basis symbol stored for the background tag.";
 SetCMetricSystem::usage = "SetCMetricSystem[tag, mat, opts] assigns the matrix mat as components of the already existing background metric in the coordinated chart/basis of tag using xCoba MetricInBasis, then computes the objects selected by ComputeOnSet (metric and inverse by default).";
-MetricMatrixOf::usage = "MetricMatrixOf[tag] returns the matrix used in SetCMetricSystem for the background tag.";
+MetricMatrixOf::usage = "MetricMatrixOf[tag] reads the currently assigned covariant metric components from xCoba in the primary basis, without changing geometry or caches.";
 ShowTheory::usage = "ShowTheory[] displays a compact theory overview. ShowTheory[section] displays details for Geometry, Fields, Parameters, Lagrangians, Expressions, Connections, Sectors, Assumptions, Conditions or Metadata. Optional Title and Description appear at the top. Use TheorySnapshot[] for restorable data.";
 TheorySnapshot::usage = "TheorySnapshot[] returns the raw restorable theory association. Restore with With[{snapshot = saved}, RegisterTheory[snapshot]] after ClearTheory[]. Source xAct definitions must remain alive.";
 TheoryValue::usage = "TheoryValue[section] returns a logical collection; TheoryValue[section,key] returns one registered item.";
@@ -74,7 +74,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.15";
+$XPlorerVersion = "14.0.0-beta.13-dev.16";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -106,10 +106,11 @@ ReferenceConnection::usage = "ReferenceConnection is Coordinates for coordinate 
 ConnectionMatrixOf::usage = "ConnectionMatrixOf[tag, key] returns coefficients in order {output, derivative, input}. Use OutputChart -> name for coordinate coefficients in another chart.";
 CheckConnection::usage = "CheckConnection[tag, key] computes torsion-free and metric-compatibility residuals without assuming Levi-Civita identities.";
 ReplaceRules::usage = "ReplaceRules[tag, rules] replaces the active rules. ReplaceAll uses the first matching rule.";
-RemoveRules::usage = "RemoveRules[tag, positions] removes distinct one-based rule positions shown by ShowRules.";
+RemoveRules::usage = "RemoveRules[tag, positions] removes distinct one-based effective rule positions shown by ShowRules, editing the corresponding active group or independent rules.";
 SetRuleGroup::usage = "SetRuleGroup[tag, name, rules] defines a named group; active groups are refreshed when edited.";
-ShowRuleGroups::usage = "ShowRuleGroups[tag] returns named rule lists.";
-ActivateRuleGroups::usage = "ActivateRuleGroups[tag, names] replaces the active rules by the groups in the specified first-match order.";
+ShowRuleGroups::usage = "ShowRuleGroups[tag] returns named rule lists. ShowRuleGroups[tag, \"Status\"] also reports active groups, independent rules, effective rules and exact left-hand-side conflicts.";
+ActivateRuleGroups::usage = "ActivateRuleGroups[tag, names] selects named groups in first-match order, followed by independent rules.";
+DeactivateRuleGroups::usage = "DeactivateRuleGroups[tag, names] deactivates selected groups without deleting their definitions or independent rules.";
 RemoveRuleGroup::usage = "RemoveRuleGroup[tag, name] removes the group and refreshes active rules when needed.";
 SaveResult::usage = "SaveResult[tag, key, value] stores a result until the next managed mathematical change. Display changes retain it.";
 ResultOf::usage = "ResultOf[tag, key] retrieves a saved result, or returns Failure after invalidation.";
@@ -416,7 +417,7 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
     "SourceManifold" -> srcm, "SourceBundle" -> VBundleOfMetric[srcg], "Manifold" -> m,
     "Metric" -> g, "CovD" -> cd, "Signature" -> sig, "Indices" -> inds, "BaseIndices" -> base,
     "DisplayIndices" -> display, "Field" -> fields, "HeadRules" -> rules,
-    "IndexRules" -> Thread[base -> inds], "SpecializationRules" -> {},
+    "IndexRules" -> Thread[base -> inds], "SpecializationRules" -> {}, "IndividualRules" -> {},
     "MetricRevision" -> 0, "ComputedGeometry" -> {}, "GeometryRuns" -> 0,
     "FieldComponents" -> <||>, "PerturbationHead" -> perturbHead, "PerturbationParameter" -> parameter|>, geo];
   put[tag,<|"Connections"-><|"Primary"-><|"Head"->cd,"OldHead"->srccd,"Geometry"->connectionGeometry[cd],"Torsion"->False,"Curvature"->True,"Metric"->g|>|>|>];
@@ -472,7 +473,7 @@ PortExpression[tag_String, expr_] := Module[{bg = background[tag], held, indices
 
 AddRules[tag_String, rules_List] := Module[{bg = background[tag]}, If[FailureQ[bg], Return[bg]];
   If[!AllTrue[rules, MatchQ[#, _Rule | _RuleDelayed] &], Return[failure["Rules", "Supply a list of rules."]]];
-  put[tag, <|"SpecializationRules" -> Join[bg["SpecializationRules"], rules],"ActiveRuleGroups"->{}|>];invalidateResults[tag];$BG[tag]];
+  refreshRules[tag,<|"IndividualRules"->Join[individualRules[bg],rules]|>];$BG[tag]];
 ClearRules[tag_String] := ReplaceRules[tag,{}];
 ShowRules[tag_String] := Module[{b = background[tag]}, If[FailureQ[b], b, b["SpecializationRules"]]];
 ApplyRules[tag_String, expr_] := Module[{b = background[tag]}, If[FailureQ[b], b, expr /. b["SpecializationRules"]]];
@@ -627,8 +628,10 @@ clearGeometry[tag_] := Module[{b = $BG[tag], heads, cached, positions, owned},
   If[!KeyExistsQ[b,"Metric"] || !MetricQ[b["Metric"]],Return[Null]];
   owned = DeleteMissing[Lookup[b, {"Metric", "CovD", "Chart"}]];
   cached = DownValues[xCobaCacheTable];
-  positions = Select[Range[Length[cached]], Function[pos, AnyTrue[owned, !FreeQ[cached[[pos]], #] &]]];
-  If[positions =!= {}, With[{pp = List /@ positions}, ClearxCobaCache[pp]]];
+  positions = Select[cached, Function[rule, AnyTrue[owned, !FreeQ[rule, #] &]]];
+  (* Unset exact native cache keys, without clearing other backgrounds. *)
+  Scan[Function[held, held /. HoldComplete[l_, name_] :> ClearxCobaCache[l, name]],
+    Cases[positions, Verbatim[RuleDelayed][Verbatim[HoldPattern][xCobaCacheTable[l_, name_]], _] :> HoldComplete[l, name]]];
   heads = DeleteDuplicates@Join[{b["Metric"]}, Values[allGeometry[b["CovD"], b["Metric"]]],
     If[KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]], {GiveSymbol[Christoffel, Sequence @@ Sort[{b["CovD"], PDOfBasis[b["Chart"]]}]], GiveSymbol[Determinant, b["Metric"], b["Chart"]]}, {}]];
   Scan[If[xTensorQ[#], guard[DeleteTensorValues[#]]] &, heads];
@@ -669,7 +672,12 @@ SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background
     If[FailureQ[result], Return[result]]];
   $BG[tag]
 ];
-MetricMatrixOf[tag_String] := getter[tag, "MetricMatrix"];
+MetricMatrixOf[tag_String] := Module[{b=background[tag],mat},
+ If[FailureQ[b],Return[b]];
+ If[!KeyExistsQ[b,"Metric"] || !KeyExistsQ[b,"Basis"],Return[failure["NoMetricComponents","Define a metric and chart first."]]];
+ mat=guard[resolveValues[ComponentArray[b["Metric"],{-b["Basis"],-b["Basis"]}]]];
+ If[mat===$Failed || !FreeQ[mat,b["Metric"]],failure["NoMetricComponents","The native covariant metric components are incomplete."],mat]
+];
 
 $geometryTargets = <|"Metric" -> {"Metric"[-1, -1], "Metric"[1, 1], "DetMetric"[]},
   "Christoffel" -> {"Christoffel"[1, -1, -1]}, "Ricci" -> {"Ricci"[-1, -1]},
@@ -1375,9 +1383,11 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  newb["FieldProfiles"]=Select[Lookup[newb,"FieldProfiles",<||>],Function[profile,AllTrue[Values[profile],xTensorQ[#["Head"]]&] && !AnyTrue[removed,!FreeQ[profile,#]&]]];
  newb["HeadRules"]=Select[newb["HeadRules"],objectRegisteredQ[Last[#]]&];
  newb["RuleGroups"]=KeyDrop[Lookup[newb,"RuleGroups",<||>],plan["RuleGroupsAffected"]];
- newb["ActiveRuleGroups"]={};
+ newb["ActiveRuleGroups"]=Select[Lookup[b,"ActiveRuleGroups",{}],KeyExistsQ[newb["RuleGroups"],#]&];
  newb["Theory"]=KeyDrop[newb["Theory"],plan["RegisteredSections"]];
- newb["SpecializationRules"]=Delete[b["SpecializationRules"],List /@ plan["RulePositions"]];
+ With[{offset=Length[b["SpecializationRules"]]-Length[individualRules[b]]},
+   newb["IndividualRules"]=removeRulePositions[individualRules[b],Select[plan["RulePositions"],#>offset&]-offset]];
+ newb["SpecializationRules"]=effectiveRules[newb];
  With[{tt=Join[newb["Theory"],<|"Field"->KeyTake[Lookup[newb["Theory"],"Field",<||>],Keys[newb["Field"]]],"Connections"->KeyTake[Lookup[newb["Theory"],"Connections",<||>],Keys[newb["Connections"]]],"Formula"->KeyDrop[Lookup[b["Theory"],"Formula",<||>],plan["RegisteredExpressions"]]|>]},newb["Theory"]=tt];
  If[MemberQ[deadKeys,"Metric"],
   newb=KeyDrop[newb,Join[{"Christoffel","Riemann","Ricci","RicciScalar","Einstein","Weyl","TFRicci","Kretschmann","Epsilon","DetMetric"},{"Metric","CovD","MetricMatrix","GeometryPolicy"}]];
@@ -1570,29 +1580,56 @@ CheckConnection[tag_String,key_String,OptionsPattern[]] := Module[{b=background[
  <|"Connection"->key,"TorsionFree"->arrayZeroCheck[tor,ass],"MetricCompatible"->arrayZeroCheck[compat,ass],
    "IdentityScope"->If[key==="Primary","Levi-Civita checks also available through CheckBackground","General connection: no metric Bianchi or Ricci-symmetry assumption"]|>
 ];
+(* Groups and independent rules remain separate. Named groups take precedence in the selected order. *)
+individualRules[b_] := Lookup[b,"IndividualRules",If[Lookup[b,"ActiveRuleGroups",{}]==={},Lookup[b,"SpecializationRules",{}],{}]];
+effectiveRules[b_] := Join[Flatten[Lookup[Lookup[b,"RuleGroups",<||>],Lookup[b,"ActiveRuleGroups",{}]],1],individualRules[b]];
+refreshRules[tag_,updates_Association] := Module[{old=$BG[tag],next,eff},
+ next=Join[old,updates];eff=effectiveRules[next];
+ put[tag,Join[updates,<|"SpecializationRules"->eff|>]];
+ If[!SameQ[eff,old["SpecializationRules"]],invalidateResults[tag]];eff
+];
 ReplaceRules[tag_String,rules_List] := Module[{b=background[tag]},If[FailureQ[b],Return[b]];
  If[!AllTrue[rules,MatchQ[#,_Rule|_RuleDelayed]&],Return[failure["Rules","Supply a list of rules."]]];
- put[tag,<|"SpecializationRules"->rules,"ActiveRuleGroups"->{}|>];invalidateResults[tag];rules
+ refreshRules[tag,<|"IndividualRules"->rules,"ActiveRuleGroups"->{}|>]
 ];
-RemoveRules[tag_String,positions_List] := Module[{b=background[tag]},If[FailureQ[b],Return[b]];
+removeRulePositions[rules_,positions_] := If[positions==={},rules,Delete[rules,List /@ positions]];
+RemoveRules[tag_String,positions_List] := Module[{b=background[tag],groups,names,offset=0,count,local,manual},
+ If[FailureQ[b],Return[b]];
  If[!DuplicateFreeQ[positions] || !VectorQ[positions,IntegerQ[#]&&1<=#<=Length[b["SpecializationRules"]]&],Return[failure["RulePositions","Use distinct one-based positions from ShowRules."]]];
- ReplaceRules[tag,Delete[b["SpecializationRules"],List /@ positions]]
+ groups=Lookup[b,"RuleGroups",<||>];names=Lookup[b,"ActiveRuleGroups",{}];
+ Do[count=Length[groups[name]];local=Select[positions,offset<#<=offset+count&]-offset;
+   groups[name]=removeRulePositions[groups[name],local];offset+=count,{name,names}];
+ manual=removeRulePositions[individualRules[b],Select[positions,#>offset&]-offset];
+ refreshRules[tag,<|"RuleGroups"->groups,"IndividualRules"->manual|>]
 ];
 SetRuleGroup[tag_String,name_String,rules_List] := Module[{b=background[tag],a},If[FailureQ[b],Return[b]];
- If[!AllTrue[rules,MatchQ[#,_Rule|_RuleDelayed]&],Return[failure["Rules","Supply a list of rules."]]];
- a=Join[Lookup[b,"RuleGroups",<||>],<|name->rules|>];put[tag,<|"RuleGroups"->a|>];
- If[MemberQ[Lookup[b,"ActiveRuleGroups",{}],name],ActivateRuleGroups[tag,b["ActiveRuleGroups"]]];a
+ If[StringTrim[name]==="" || !AllTrue[rules,MatchQ[#,_Rule|_RuleDelayed]&],Return[failure["Rules","Supply a nonempty group name and a list of rules."]]];
+ a=Join[Lookup[b,"RuleGroups",<||>],<|name->rules|>];refreshRules[tag,<|"RuleGroups"->a|>];a
 ];
 ShowRuleGroups[tag_String] := Module[{b=background[tag]},If[FailureQ[b],b,Lookup[b,"RuleGroups",<||>]]];
-ActivateRuleGroups[tag_String,names_List] := Module[{b=background[tag],a,r},If[FailureQ[b],Return[b]];
+heldRuleLHS[Verbatim[Rule][l_,r_]]:=HoldComplete[l];
+heldRuleLHS[Verbatim[RuleDelayed][l_,r_]]:=HoldComplete[l];
+heldRuleRHS[Verbatim[Rule][l_,r_]]:=HoldComplete[r];
+heldRuleRHS[Verbatim[RuleDelayed][l_,r_]]:=HoldComplete[r];
+ShowRuleGroups[tag_String,"Status"] := Module[{b=background[tag],r},If[FailureQ[b],Return[b]];
+ r=b["SpecializationRules"];
+ <|"Groups"->Lookup[b,"RuleGroups",<||>],"Active"->Lookup[b,"ActiveRuleGroups",{}],"Individual"->individualRules[b],"Effective"->r,
+ "Conflicts"->Select[GatherBy[r,heldRuleLHS],Length[DeleteDuplicates[heldRuleRHS /@ #]]>1&]|>
+];
+ActivateRuleGroups[tag_String,names_List] := Module[{b=background[tag],a},If[FailureQ[b],Return[b]];
  a=Lookup[b,"RuleGroups",<||>];
  If[!VectorQ[names,StringQ] || !DuplicateFreeQ[names] || Complement[names,Keys[a]]=!={},Return[failure["RuleGroups","Select existing distinct group names in desired first-match order."]]];
- r=Flatten[Lookup[a,names],1];ReplaceRules[tag,r];put[tag,<|"ActiveRuleGroups"->names|>];r
+ refreshRules[tag,<|"ActiveRuleGroups"->names|>]
+];
+DeactivateRuleGroups[tag_String,names_List] := Module[{b=background[tag],a},If[FailureQ[b],Return[b]];
+ a=Lookup[b,"RuleGroups",<||>];
+ If[!VectorQ[names,StringQ] || Complement[names,Keys[a]]=!={},Return[failure["RuleGroups","Select existing group names."]]];
+ ActivateRuleGroups[tag,Select[Lookup[b,"ActiveRuleGroups",{}],!MemberQ[names,#]&]]
 ];
 RemoveRuleGroup[tag_String,name_String] := Module[{b=background[tag],a,names},If[FailureQ[b],Return[b]];
  a=Lookup[b,"RuleGroups",<||>];If[!KeyExistsQ[a,name],Return[failure["RuleGroups","Unknown rule group."]]];
- put[tag,<|"RuleGroups"->KeyDrop[a,name]|>];names=DeleteCases[Lookup[b,"ActiveRuleGroups",{}],name];
- If[MemberQ[Lookup[b,"ActiveRuleGroups",{}],name],ActivateRuleGroups[tag,names]];Null
+ names=DeleteCases[Lookup[b,"ActiveRuleGroups",{}],name];
+ refreshRules[tag,<|"RuleGroups"->KeyDrop[a,name],"ActiveRuleGroups"->names|>];Null
 ];
 SaveResult[tag_String,key_String,value_] := Module[{b=background[tag]},If[FailureQ[b],Return[b]];
  put[tag,<|"SavedResults"->Join[Lookup[b,"SavedResults",<||>],<|key->value|>]|>];value
@@ -1605,7 +1642,7 @@ recipeObjects[b_] := Join[managedObjects[b],KeyTake[b,{"Christoffel","Torsion","
  Association@Flatten@KeyValueMap[Function[{key,rec},KeyValueMap[("Connection:"<>key<>":"<>#1 -> #2)&,rec["Geometry"]]],Lookup[b,"Connections",<||>]]];
 ReconstructionData[tag_String] := Module[{b=background[tag],inputs},If[FailureQ[b],Return[b]];
  inputs=Association@KeyValueMap[Function[{key,fs},key -> (KeyDrop[#,"Head"]& /@ Select[Values[b["FieldComponents"]],#["Head"]===fs["NewHead"]&])],b["Field"]];
- Join[KeyTake[b,{"Theory","Signature","SymbolSuffix","CoordinateLabels","Coordinates","MetricMatrix","Assumptions","SpecializationRules","RuleGroups","ActiveRuleGroups","PresentationOverrides","Notation","ConnectionComponents","FieldProfiles"}],
+ Join[KeyTake[b,{"Theory","Signature","SymbolSuffix","CoordinateLabels","Coordinates","MetricMatrix","Assumptions","SpecializationRules","IndividualRules","RuleGroups","ActiveRuleGroups","PresentationOverrides","Notation","ConnectionComponents","FieldProfiles"}],
  <|"RecipeVersion"->1,"OriginalTag"->tag,"ChartMaps"->Map[KeyTake[#,{"Labels","Map"}]&,Lookup[b,"AdditionalCharts",<||>]],"Objects"->recipeObjects[b],"Indices"->b["Indices"],"FieldInputs"->inputs,
   "RelativeHeads"->relativeHeads[b]|>]
 ];
@@ -1635,7 +1672,7 @@ RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,c
  If[AnyTrue[Flatten[result],FailureQ],Return[First@Select[Flatten[result],FailureQ]]];
  result=KeyValueMap[SetConnectionComponents[tag,#1,#2["Values"]/.rules,ReferenceConnection->#2["Reference"]]&,Lookup[recipe,"ConnectionComponents",<||>]];
  If[AnyTrue[result,FailureQ],Return[First@Select[result,FailureQ]]];
- put[tag,<|"FieldProfiles"->Map[Function[records,Association[(fieldRecordKey[#]->#)& /@ (Values[records]/.rules)]],Lookup[recipe,"FieldProfiles",<||>]],"RuleGroups"->(Lookup[recipe,"RuleGroups",<||>]/.rules),"SpecializationRules"->(Lookup[recipe,"SpecializationRules",{}]/.rules),
+ put[tag,<|"FieldProfiles"->Map[Function[records,Association[(fieldRecordKey[#]->#)& /@ (Values[records]/.rules)]],Lookup[recipe,"FieldProfiles",<||>]],"RuleGroups"->(Lookup[recipe,"RuleGroups",<||>]/.rules),"SpecializationRules"->(Lookup[recipe,"SpecializationRules",{}]/.rules),"IndividualRules"->(individualRules[recipe]/.rules),
    "ActiveRuleGroups"->Lookup[recipe,"ActiveRuleGroups",{}],"Notation"->Lookup[recipe,"Notation",<||>]|>];
  updatePrintHook[];$BG[tag]
 ];
