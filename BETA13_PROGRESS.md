@@ -1,6 +1,6 @@
 # beta.13 development checkpoint
 
-Date: 2026-11-25. Branch: beta13-registration-dev. This is **14.0.0-beta.13-dev.2**, not a release. Main remains the author-supplied beta.12.
+Date: 2026-11-25. Branch: beta13-registration-dev. Current checkpoint is **14.0.0-beta.13-dev.3**, not a release. Earlier dev.2 evidence is retained below. Main remains the author-supplied beta.12.
 
 Validated package commit: ef5ccab0f661aabb1a67df54a24658b4d9d75fa8 (xPlorer.wl blob 73ea50f628b0890ba489f34270f33b38372b84a3).
 Proca example correction: b7644d8ebd0949425d108b3cd4445d57016eb45f.
@@ -11,7 +11,7 @@ Proca example correction: b7644d8ebd0949425d108b3cd4445d57016eb45f.
 - Name, SymbolBase, PrintAs and single-sector classification; bulk registration with validation before registry mutation.
 - Shared constant-symbol Parameters; numerical specialization remains a background rule.
 - Named Lagrangians and Expressions with held RHS name extraction, explicit Head for anonymous formulas, zero-weight scalar validation for Lagrangians, no automatically summed Total.
-- One internal Formula map with qualified IDs, public collection/value access and TheorySector. ShowTheory remains a raw restorable snapshot at this checkpoint.
+- One internal Formula map with qualified IDs, public collection/value access and TheorySector. ShowTheory was a raw restorable snapshot in dev.2; dev.3 separates presentation from TheorySnapshot.
 - Formal aliases use source symbol names, not registry keys. BackgroundExpression[tag,section,key] and UseExpression[tag,section,key] support qualified lookup. ToComponents accepts {section,key}. Unqualified lookup fails on ambiguous keys. Existing occupied notebook symbols are protected.
 - Formula deletion and alias release now follow individual registered dependencies, not whole Lagrangian sections.
 
@@ -27,8 +27,8 @@ Initial dev.1 registration/lifecycle group passed 43/45. FindFreeIndices has Hol
 
 ## Open work (do not release yet)
 
-- The actual author notebook, regression suite and optional ScalarTheory.wl recipe are migrated and validated; see checkpoints below. Still update API_GUIDE, loader metadata, and decide whether to reauthor the historical Tools build sources. The legacy 88-input builder is now guarded against overwriting the current notebook.
-- Finalize public inspection (grouped Geometry/collections versus raw snapshot) and audit raw Association restore validation. Strengthen source-definition preflight on later redefinition, unsupported native properties and dependency tests; registration does not freeze all live xAct definitions.
+- The actual author notebook, regression suite and optional ScalarTheory.wl recipe are migrated and validated; see checkpoints below. Still update API_GUIDE and decide whether to reauthor the historical Tools build sources. Loader metadata is updated in dev.3. The legacy 88-input builder is now guarded against overwriting the current notebook.
+- Public inspection is implemented in dev.3 below; still audit raw Association restore validation. Strengthen source-definition preflight on later redefinition, unsupported native properties and dependency tests; registration does not freeze all live xAct definitions.
 - Audit qualified ExpressionText/export and validate unknown collection arguments. Currently SetFieldComponents uses a source/copied tensor symbol, not a string key. Keep native semantics rather than assume every public operation supports every selector.
 - Extend tests for density rejection, extra bundles, SymbolBase/PrintAs, alias collisions with geometry, parameter duplicate source names and additional connections. Sector is a single string; no auto-active theory Rules or multi-sector membership in this checkpoint.
 - Historical perturbation calculations, FLRW and additional connections are now rerun in the evening checkpoint below. Actual notebook execution is now validated in the checkpoint below; front-end rendering remains pending. Spinors/tetrads/Clifford algebra remain outside this ordinary-tensor implementation.
@@ -75,3 +75,15 @@ Optional ScalarTheory.wl was aligned with the notebook's initial theory and inde
 The historical Tools/tutorial_cells.json and input/formula box caches remain beta.7 authoring sources (88 inputs). Do not regenerate the current notebook from them. Tools/build_notebook.py now requires an explicit --legacy-output destination and refuses the canonical notebook path. The actual xPlorer_Workflow.nb is the source of truth until the authoring sources are rebuilt.
 
 Package code itself is unchanged from dev.2; no release or merge to main. Next: harden the registration/inspection API, finish documentation, metadata and edge-case testing, and check visual layout in Mathematica Desktop.
+
+## dev.3 — theory inspection and installation (2026-11-26)
+
+Package commit 505a423a568325703c89fccc6a128c36645bc327 (blob 7c8a8302210c6e77cf427d1df3892fe60161d77d). ShowTheory[] returns a native compact Column of Grid sections, no registry mutation; ShowTheory[section] shows detail, including actual formula values for Lagrangians and Expressions. Geometry, Fields, Parameters, Lagrangians, Expressions, Connections, Sectors and Metadata are supported; unknown sections return Failure. No external GUI or dynamic state. TheoryValue gains Geometry, Metadata and Sectors views. ShowTheoryKeys[], TheorySector, BackgroundObject, BackgroundExpression and suffixed aliases retained. TheorySnapshot[] explicitly returns the old raw association; optional for manual restore, not needed for normal work. Tests and notebook snapshot calls migrated. The unknown UnregisterTheory section no longer evaluates Keys on a Failure.
+
+Notebook commit 0e115142e3cb4a7048e942878a0bbabaef7a2ece: 117/117 actual cells, 65/65 expected results, six temporal stages true, zero parse failures, zero warning cells, zero unexpected Failure cells. New views evaluate to native Column and Grid. Visual Desktop rendering remains unverified. At f649050aa5f8d137173f874b4ed7129e438bf95d, Registration 45/45, Lifecycle 64/64, Display 34/34, and dedicated TheoryInspection 18/18 passed; other regression groups last run on dev.2.
+
+Traditional application installation: Install.wl defines InstallXPlorer[] (default user Applications directory) and optional explicit application directory. Copies only package, two kernel loaders, license and citation; stages files before renaming; existing installation refused. Verified in temporary Applications directory in Wolfram MCP using Needs, 18/18 inspection checks, and repeated installation refused. User's actual Desktop installation has not been performed. Instructions in README.md.
+
+Paclet: metadata and loaders synchronized to dev.3. Named Asset entries include canonical source, license and citation without maintaining duplicate code. Actual PacletBuild staging at d00c22bc11eea670d2a97e28f29cc512beeb5402 contained all five essential paths including metadata. PacletDirectoryLoad on the staged package and Needs loaded dev.3 successfully. Remote Java security policy blocked final .paclet compression (PacletArchive -> $Failed); Tools/BuildPaclet.wl now explicitly reports that failure. Desktop archive building and PacletInstall remain unverified. No release, no merging experimental code to main.
+
+GPL-3.0-or-later, citation and acknowledgements added to both branches before dev.3. CITATION.cff updated to dev.3 on this branch; main remains beta.12. No ORCID or DOI invented.
