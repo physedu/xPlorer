@@ -454,7 +454,7 @@ Cell["A native CTensor stores a component array and the signed bases of its slot
 
 Cell["Request CTensor output directly from xPlorer. The two negative basis signs indicate covariant slots.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"metricCTensor","=",RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",",RowBox[{"g","[",RowBox[{RowBox[{"-","a"}],",",RowBox[{"-","b"}]}],"]"}],",",RowBox[{"Output","\[Rule]","\"CTensor\""}]}],"]"}]}], ";"}]],"Input",CellTags->"native_metric_data_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"metricCTensor","=",RowBox[{RowBox[{"gM","[",RowBox[{RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"Output","\[Rule]","\"CTensor\""}]}], "]"}]}]}], ";"}]],"Input",CellTags->"native_metric_data_step_1"],
 
 Cell[BoxData[RowBox[{RowBox[{"Part","[",RowBox[{"metricCTensor",",","1"}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"native_metric_data"],
 
@@ -504,7 +504,7 @@ Cell["An already transported expression carries its background. The explicit for
 Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"Schwarzschild\"",",",RowBox[{"g","[",RowBox[{RowBox[{"-","a"}],",",RowBox[{"-","b"}]}],"]"}]}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"inferred_metric_check"],
 
 
-Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"FLRW\"",",",RowBox[{"g","[",RowBox[{RowBox[{"-","a"}],",",RowBox[{"-","b"}]}],"]"}]}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrix_flrw"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"gFLRW","[",RowBox[{RowBox[{"-","aFLRW"}],",",RowBox[{"-","bFLRW"}]}],"]"}], "//", "ToComponents"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrix_flrw"],
 
 Cell[TextData[{"A general scalar field in Minkowski"}],"Subsection"],
 
@@ -516,7 +516,7 @@ Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"Minkowski\"",
 
 Cell[TextData[{StyleBox["ToComponents",FontFamily->"Courier",FontSize->14]," evaluates the registered equation with the chart, metric and field profile, expanding its covariant derivatives with xCoba."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"eqMink", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "\"ScalarEq\""}], "]"}]}], ";"}]],"Input",CellTags->"minkowski_equation_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"eqMink", "=", RowBox[{"scalarEqM", "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"minkowski_equation_step_1"],
 
 Cell[BoxData[RowBox[{"eqMink", "\[Equal]", "0"}]],"Input",CellTags->"minkowski_equation"],
 
@@ -557,7 +557,7 @@ Cell[BoxData[TagBox[FormBox[RowBox[{RowBox[{RowBox[{"-", TagBox[FractionBox[RowB
 
 Cell[TextData[{"Evaluate the registered Lagrangian with the same Minkowski profile."}],"Text"],
 
-Cell[BoxData[RowBox[{"lagMink", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "\"Lagrangian\""}], "]"}]}]],"Input",CellTags->"minkowski_lagrangian"],
+Cell[BoxData[RowBox[{"lagMink", "=", RowBox[{"lagrangianM", "//", "ToComponents"}]}]],"Input",CellTags->"minkowski_lagrangian"],
 
 Cell[TextData[{"A static radial field in Schwarzschild"}],"Subsection"],
 
@@ -567,7 +567,7 @@ Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "u", "]"}], ";"}]],"Input
 
 Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"Schwarzschild\"", ",", "phi", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "r", ",", "theta", ",", "varphi"}], "}"}], ",", RowBox[{"u", "[", "r", "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"schwarzschild_field"],
 
-Cell[BoxData[RowBox[{RowBox[{"eqSchw", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Schwarzschild\"", ",", "\"ScalarEq\""}], "]"}]}], ";"}]],"Input",CellTags->"schwarzschild_equation_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"eqSchw", "=", RowBox[{"scalarEqSchw", "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"schwarzschild_equation_step_1"],
 
 Cell[BoxData[RowBox[{"eqSchw", "\[Equal]", "0"}]],"Input",CellTags->"schwarzschild_equation"],
 
@@ -616,9 +616,9 @@ Cell[TextData[{"Curvature of the Schwarzschild exterior"}],"Subsection"],
 
 Cell[TextData[{"In the Schwarzschild exterior the Ricci scalar vanishes, while the Kretschmann invariant is 48 Mbh\:00b2/r\:2076. The latter detects curvature even in vacuum."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"ricciSchw", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{RowBox[{"RicciScalar", "[", "CD", "]"}], "[", "]"}]}], "]"}]}], ";"}]],"Input",CellTags->"schwarzschild_curvature_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"ricciSchw", "=", RowBox[{RowBox[{RowBox[{"RicciScalar", "[", "CDSchw", "]"}], "[", "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"schwarzschild_curvature_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"kretschmannSchw", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{RowBox[{"Kretschmann", "[", "CD", "]"}], "[", "]"}]}], "]"}]}], ";"}]],"Input",CellTags->"schwarzschild_curvature_step_2"],
+Cell[BoxData[RowBox[{RowBox[{"kretschmannSchw", "=", RowBox[{RowBox[{RowBox[{"Kretschmann", "[", "CDSchw", "]"}], "[", "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"schwarzschild_curvature_step_2"],
 
 Cell[BoxData[RowBox[{"{", RowBox[{"ricciSchw", ",", "kretschmannSchw"}], "}"}]],"Input",CellTags->"schwarzschild_curvature"],
 
@@ -632,7 +632,7 @@ Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "q", "]"}], ";"}]],"Input
 
 Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"FLRW\"", ",", "phi", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"q", "[", "t", "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"flrw_field"],
 
-Cell[BoxData[RowBox[{RowBox[{"eqFLRW", "=", RowBox[{"ToComponents", "[", RowBox[{"\"FLRW\"", ",", "\"ScalarEq\""}], "]"}]}], ";"}]],"Input",CellTags->"flrw_equation_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"eqFLRW", "=", RowBox[{"scalarEqFLRW", "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"flrw_equation_step_1"],
 
 Cell[BoxData[RowBox[{"eqFLRW", "\[Equal]", "0"}]],"Input",CellTags->"flrw_equation"],
 
@@ -642,9 +642,9 @@ Cell[BoxData[TagBox[FormBox[RowBox[{RowBox[{RowBox[{SuperscriptBox["m", "2"], " 
 
 Cell[TextData[{"The connection contributes the term proportional to the expansion rate s\:2032/s. Evaluate the homogeneous scalar Lagrangian and the time-time Einstein component.\n\nChart positions start at zero, so ",StyleBox["Components -> {{0,0}}",FontFamily->"Courier",FontSize->14]," selects that single entry."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"einstein00", "=", RowBox[{"First", "[", RowBox[{"ToComponents", "[", RowBox[{"\"FLRW\"", ",", RowBox[{RowBox[{"Einstein", "[", "CD", "]"}], "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"0", ",", "0"}], "}"}], "}"}]}]}], "]"}], "]"}]}], ";"}]],"Input",CellTags->"flrw_geometry_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"einstein00", "=", RowBox[{"First", "[", RowBox[{RowBox[{RowBox[{"Einstein", "[", "CDFLRW", "]"}], "[", RowBox[{RowBox[{"-", "aFLRW"}], ",", RowBox[{"-", "bFLRW"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"0", ",", "0"}], "}"}], "}"}]}]}], "]"}]}], "]"}]}], ";"}]],"Input",CellTags->"flrw_geometry_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"lagFLRW", "=", RowBox[{"ToComponents", "[", RowBox[{"\"FLRW\"", ",", "\"Lagrangian\""}], "]"}]}], ";"}]],"Input",CellTags->"flrw_geometry_step_2"],
+Cell[BoxData[RowBox[{RowBox[{"lagFLRW", "=", RowBox[{"lagrangianFLRW", "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"flrw_geometry_step_2"],
 
 Cell[BoxData[RowBox[{"{", RowBox[{"einstein00", ",", "lagFLRW"}], "}"}]],"Input",CellTags->"flrw_geometry"],
 
@@ -658,7 +658,7 @@ Cell[BoxData[RowBox[{RowBox[{"DefConstantSymbol", "[", "k", "]"}], ";"}]],"Input
 
 Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"Minkowski\"", ",", "phi", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"Cos", "[", RowBox[{RowBox[{"omega", " ", "t"}], "-", RowBox[{"k", " ", "z"}]}], "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"plane_wave_step_3"],
 
-Cell[BoxData[RowBox[{RowBox[{"waveResidual", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "\"ScalarEq\""}], "]"}]}], ";"}]],"Input",CellTags->"plane_wave_step_4"],
+Cell[BoxData[RowBox[{RowBox[{"waveResidual", "=", RowBox[{"scalarEqM", "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"plane_wave_step_4"],
 
 Cell[BoxData["waveResidual"],"Input",CellTags->"plane_wave"],
 
@@ -678,25 +678,25 @@ Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{"ShowProfiles","[",RowBox[{"\"Mi
 
 Cell["Before switching: inspect the plane wave and its d'Alembertian.","Text"],
 
-Cell[BoxData[RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",",RowBox[{"phi","[","]"}]}],"]"}]],"Input",CellTags->"profile_wave_before"],
+Cell[BoxData[RowBox[{RowBox[{"phiM","[","]"}], "//", "ToComponents"}]],"Input",CellTags->"profile_wave_before"],
 
-Cell[BoxData[RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",","boxPhi"}],"]"}]],"Input",CellTags->"profile_wave_box_before"],
+Cell[BoxData[RowBox[{"boxPhiM", "//", "ToComponents"}]],"Input",CellTags->"profile_wave_box_before"],
 
 Cell["Activate the quadratic transverse profile. xCoba clears the previous component values, not the tensor definition. The wave operator now returns 4.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"ActivateProfile","[",RowBox[{"\"Minkowski\"",",","\"Radial\""}],"]"}], ";"}]],"Input",CellTags->"profile_activate_radial_step_1"],
 
-Cell[BoxData[RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",",RowBox[{"phi","[","]"}]}],"]"}]],"Input",CellTags->"profile_activate_radial"],
+Cell[BoxData[RowBox[{RowBox[{"phiM","[","]"}], "//", "ToComponents"}]],"Input",CellTags->"profile_activate_radial"],
 
-Cell[BoxData[RowBox[{"profileBox","=",RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",","boxPhi"}],"]"}]}]],"Input",CellTags->"profile_radial_box"],
+Cell[BoxData[RowBox[{"profileBox","=",RowBox[{"boxPhiM", "//", "ToComponents"}]}]],"Input",CellTags->"profile_radial_box"],
 
 Cell["Restore the plane wave and inspect the same quantities. The geometry is reused.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"ActivateProfile","[",RowBox[{"\"Minkowski\"",",","\"PlaneWave\""}],"]"}], ";"}]],"Input",CellTags->"profile_restore_wave_step_1"],
 
-Cell[BoxData[RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",",RowBox[{"phi","[","]"}]}],"]"}]],"Input",CellTags->"profile_restore_wave"],
+Cell[BoxData[RowBox[{RowBox[{"phiM","[","]"}], "//", "ToComponents"}]],"Input",CellTags->"profile_restore_wave"],
 
-Cell[BoxData[RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",","boxPhi"}],"]"}]],"Input",CellTags->"profile_wave_box_after"],
+Cell[BoxData[RowBox[{"boxPhiM", "//", "ToComponents"}]],"Input",CellTags->"profile_wave_box_after"],
 
 Cell[BoxData[RowBox[{"ComputeGeometry","[",RowBox[{"\"Minkowski\"",",",RowBox[{"{",RowBox[{"\"Metric\""}],"}"}]}],"]"}]],"Input",CellTags->"profile_cached_geometry"],
 
@@ -708,9 +708,9 @@ Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"Minkowski\"", ",", "
 
 Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"tCyl", ",", "rCyl", ",", "thetaCyl", ",", "zCyl"}], "}"}], "=", RowBox[{"Through", "[", RowBox[{RowBox[{"CoordinatesOf", "[", RowBox[{"\"Minkowski\"", ",", "\"Cylindrical\""}], "]"}], "[", "]"}], "]"}]}], ";"}]],"Input",CellTags->"second_chart"],
 
-Cell[TextData[{"MetricMatrixOf returns the originally assigned matrix in the primary Cartesian chart. ToComponents with OutputChart evaluates the same metric in cylindrical coordinates.\n\nThe angular entry is r\:00b2."}],"Text"],
+Cell[TextData[{"MetricMatrixOf returns the originally assigned matrix in the primary Cartesian chart. Use // ToComponents[OutputChart -> \"Cylindrical\"] to evaluate the same metric in cylindrical coordinates.\n\nThe angular entry is r\:00b2."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"gCyl","=",RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",",RowBox[{"g","[",RowBox[{RowBox[{"-","a"}],",",RowBox[{"-","b"}]}],"]"}],",",RowBox[{"OutputChart","\[Rule]","\"Cylindrical\""}]}],"]"}]}], ";"}]],"Input",CellTags->"two_metric_charts_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"gCyl","=",RowBox[{RowBox[{"gM","[",RowBox[{RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"OutputChart","\[Rule]","\"Cylindrical\""}]}], "]"}]}]}], ";"}]],"Input",CellTags->"two_metric_charts_step_1"],
 
 Cell[BoxData[RowBox[{RowBox[{"MetricMatrixOf","[",RowBox[{"\"Minkowski\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"two_metric_charts"],
 
@@ -730,19 +730,19 @@ Cell[TextData[{"Set \:03c6 = x\:00b2 + y\:00b2 in the primary chart. In cylindri
 
 Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"Minkowski\"", ",", "phi", ",", RowBox[{SuperscriptBox["xM", "2"], "+", SuperscriptBox["yM", "2"]}]}], "]"}], ";"}]],"Input",CellTags->"two_hessian_charts_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"phiCyl", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"phi", "[", "]"}], ",", RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}]}], "]"}]}], ";"}]],"Input",CellTags->"two_hessian_charts_step_2"],
+Cell[BoxData[RowBox[{RowBox[{"phiCyl", "=", RowBox[{RowBox[{"phiM", "[", "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}]}], "]"}]}]}], ";"}]],"Input",CellTags->"two_hessian_charts_step_2"],
 
-Cell[BoxData[RowBox[{RowBox[{"hessCyl", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "\"Hessian\"", ",", RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"2", ",", "2"}], "}"}], "}"}]}]}], "]"}]}], ";"}]],"Input",CellTags->"two_hessian_charts_step_3"],
+Cell[BoxData[RowBox[{RowBox[{"hessCyl", "=", RowBox[{"hessianM", "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "aM"}], ",", RowBox[{"-", "bM"}]}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"2", ",", "2"}], "}"}], "}"}]}]}], "]"}]}]}], ";"}]],"Input",CellTags->"two_hessian_charts_step_3"],
 
 Cell[BoxData[RowBox[{"{", RowBox[{"phiCyl", ",", "hessCyl"}], "}"}]],"Input",CellTags->"two_hessian_charts"],
 
 Cell[TextData[{"Compare the Cartesian wave operator with the trace of the cylindrical Hessian. In cylindrical coordinates the radial and angular terms each contribute 2, giving 4 in either chart."}],"Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "boxPhi"}], "]"}], ",", RowBox[{"Simplify", "[", RowBox[{"Tr", "[", RowBox[{TemplateBox[{"gCyl"}, "Inverse", SyntaxForm -> SuperscriptBox], ".", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "\"Hessian\"", ",", RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}]}], "]"}]}], "]"}], "]"}]}], "}"}]],"Input",CellTags->"trace_both"],
+Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"boxPhiM", "//", "ToComponents"}], ",", RowBox[{"Simplify", "[", RowBox[{"Tr", "[", RowBox[{TemplateBox[{"gCyl"}, "Inverse", SyntaxForm -> SuperscriptBox], ".", RowBox[{"hessianM", "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}]}], "]"}]}]}], "]"}], "]"}]}], "}"}]],"Input",CellTags->"trace_both"],
 
 Cell[TextData[{"With ",StyleBox["ApplySpecialization -> False",FontFamily->"Courier",FontSize->14],", the angular component of Eab includes its mass term even when a massless rule is active.\n\nStore the component before restoring the plane-wave profile."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"eabCyl", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "EabM", ",", RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"2", ",", "2"}], "}"}], "}"}]}], ",", RowBox[{"ApplySpecialization", "\[Rule]", "False"}]}], "]"}]}], ";"}]],"Input",CellTags->"general_cyl_equation_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"eabCyl", "=", RowBox[{"EabM", "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "aM"}], ",", RowBox[{"-", "bM"}]}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"2", ",", "2"}], "}"}], "}"}]}], ",", RowBox[{"ApplySpecialization", "\[Rule]", "False"}]}], "]"}]}]}], ";"}]],"Input",CellTags->"general_cyl_equation_step_1"],
 
 Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"Minkowski\"", ",", "phi", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"Cos", "[", RowBox[{RowBox[{"omega", " ", "t"}], "-", RowBox[{"k", " ", "z"}]}], "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"general_cyl_equation_step_2"],
 
@@ -780,17 +780,17 @@ Cell[TextData[{"Assign the lower components of A in chart order (t,x,y,z) with "
 
 Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "A", ",", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}], ",", RowBox[{"IndexPositions", "\[Rule]", RowBox[{"{", RowBox[{"-", "1"}], "}"}]}]}], "]"}], ";"}]],"Input",CellTags->"vector_values_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"Adown", "=", RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}]}], "]"}]}], ";"}]],"Input",CellTags->"vector_values_step_2"],
+Cell[BoxData[RowBox[{RowBox[{"Adown", "=", RowBox[{RowBox[{"AMinkowskiFields", "[", RowBox[{"-", "aMinkowskiFields"}], "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_2"],
 
-Cell[BoxData[RowBox[{RowBox[{"Aup", "=", RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"A", "[", "a", "]"}]}], "]"}]}], ";"}]],"Input",CellTags->"vector_values_step_3"],
+Cell[BoxData[RowBox[{RowBox[{"Aup", "=", RowBox[{RowBox[{"AMinkowskiFields", "[", "aMinkowskiFields", "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_3"],
 
-Cell[BoxData[RowBox[{RowBox[{"normA", "=", RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{RowBox[{"A", "[", "a", "]"}], " ", RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}]}]}], "]"}]}], ";"}]],"Input",CellTags->"vector_values_step_4"],
+Cell[BoxData[RowBox[{RowBox[{"normA", "=", RowBox[{RowBox[{RowBox[{"AMinkowskiFields", "[", "aMinkowskiFields", "]"}], " ", RowBox[{"AMinkowskiFields", "[", RowBox[{"-", "aMinkowskiFields"}], "]"}]}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_4"],
 
 Cell[BoxData[RowBox[{"{", RowBox[{"Adown", ",", "Aup", ",", "normA"}], "}"}]],"Input",CellTags->"vector_values"],
 
 Cell[TextData[{"For further native xCoba work, request Output -> \"CTensor\" to retain the basis and the variance of every tensor slot. The ordinary array remains the default.\n\nNative DefBasis, SetBasisChange, ToBasis and ToCTensor can be used on the owned xAct objects; see Tests/15_NativeInterop.wl and Examples/NativeXCoba.wl for a separate workflow.\n\nNative assignments do not automatically synchronize the managed registry."}],"Text"],
 
-Cell[BoxData[RowBox[{"ctA", "=", RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"A", "[", "a", "]"}], ",", RowBox[{"Output", "\[Rule]", "\"CTensor\""}]}], "]"}]}]],"Input",CellTags->"ctensor_output"],
+Cell[BoxData[RowBox[{"ctA", "=", RowBox[{RowBox[{"AMinkowskiFields", "[", "aMinkowskiFields", "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"Output", "\[Rule]", "\"CTensor\""}]}], "]"}]}]}]],"Input",CellTags->"ctensor_output"],
 
 Cell[TextData[{"The contraction is \:22121 + 4 + 9 + 16 = 28. To retrieve the same covector with its abstract lower index, use ",StyleBox["PortExpression",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
@@ -804,11 +804,11 @@ Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFiel
 
 Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "F", ",", "Fmatrix"}], "]"}], ";"}]],"Input",CellTags->"tensor_values_step_3"],
 
-Cell[BoxData[RowBox[{RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"S", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}]}], "]"}],"//","MatrixForm"}]],"Input",CellTags->"tensor_values"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"SMinkowskiFields", "[", RowBox[{RowBox[{"-", "aMinkowskiFields"}], ",", RowBox[{"-", "bMinkowskiFields"}]}], "]"}], "//", "ToComponents"}],"//","MatrixForm"}]],"Input",CellTags->"tensor_values"],
 
 Cell[TextData[{StyleBox["FreeIndices",FontFamily->"Courier",FontSize->14]," fixes the order of the array axes. Reversing the free indices transposes the matrix. ",StyleBox["Components",FontFamily->"Courier",FontSize->14]," selects individual entries.\n\nIn the original order, F has entries 2 at (0,1) and \:22122 at (1,0)."}],"Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"F", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "b"}], ",", RowBox[{"-", "a"}]}], "}"}]}]}], "]"}], ",", RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"F", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "1"}], "}"}], ",", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}], "}"}]}]}], "]"}]}], "}"}]],"Input",CellTags->"tensor_selection"],
+Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{RowBox[{"FMinkowskiFields", "[", RowBox[{RowBox[{"-", "aMinkowskiFields"}], ",", RowBox[{"-", "bMinkowskiFields"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "bMinkowskiFields"}], ",", RowBox[{"-", "aMinkowskiFields"}]}], "}"}]}]}], "]"}]}], ",", RowBox[{RowBox[{"FMinkowskiFields", "[", RowBox[{RowBox[{"-", "aMinkowskiFields"}], ",", RowBox[{"-", "bMinkowskiFields"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "1"}], "}"}], ",", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}], "}"}]}]}], "]"}]}]}], "}"}]],"Input",CellTags->"tensor_selection"],
 
 Cell[TextData[{"An independent covariant derivative"}],"Subsection"],
 
@@ -900,7 +900,7 @@ Cell[TextData[{"Change the metric\:2019s time-time entry to \:22124. The covecto
 
 Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "4"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"change_metric_step_1"],
 
-Cell[BoxData[RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"A", "[", "a", "]"}]}], "]"}]],"Input",CellTags->"change_metric"],
+Cell[BoxData[RowBox[{RowBox[{"AMinkowskiFields", "[", "aMinkowskiFields", "]"}], "//", "ToComponents"}]],"Input",CellTags->"change_metric"],
 
 Cell[TextData[{"The next lookup should return a Failure because the saved norm was computed with the old metric. Recalculate it before saving it again.\n\nA value assigned to an ordinary notebook variable retains its old value until you reevaluate the assignment."}],"Text"],
 
@@ -992,7 +992,7 @@ Cell[TextData[{"The recreated background starts with an empty field-component re
 
 Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "A", ",", RowBox[{"{", RowBox[{"5", ",", "0", ",", "0", ",", "0"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"fresh_vector_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"Aup", "=", RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"A", "[", "a", "]"}]}], "]"}]}], ";"}]],"Input",CellTags->"fresh_vector_step_2"],
+Cell[BoxData[RowBox[{RowBox[{"Aup", "=", RowBox[{RowBox[{"AMinkowskiFields", "[", "aMinkowskiFields", "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"fresh_vector_step_2"],
 
 Cell[BoxData["Aup"],"Input",CellTags->"fresh_vector"],
 
