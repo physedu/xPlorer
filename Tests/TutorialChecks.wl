@@ -1,4 +1,4 @@
-(* Expected results for the actual 115-input beta.13 workflow.
+(* Expected results for the actual beta.13 workflow.
    Loaded only after the notebook; stored cell outputs are checked directly. *)
 Module[{o=Global`$XPlorerWorkflowOutputs,sector},
  sector=TheorySector["Matter"];
@@ -20,10 +20,12 @@ Module[{o=Global`$XPlorerWorkflowOutputs,sector},
  "Native rank-two alias" -> TrueQ[ToCanonical[EabSchw-BackgroundExpression["Schwarzschild","Expressions","Eab"]]==0],
  "Direct and transported gradient" -> SameQ[o["direct_gradient"],o["transport_gradient"]],
  "Registered gradient" -> SameQ[o["saved_gradient"],o["transport_gradient"]],
- "Riemann is a tensor head" -> xTensorQ[o["riemann_head"]],
+ "Riemann is a tensor head" -> xTensorQ[Head[First[o["riemann_tensor"]]]],
+ "Eab copied at creation" -> SameQ[o["snapshot_check"],{True,True,True}],
  "Raised gradient" -> TrueQ[ToCanonical[gradPhiUp-PortExpression["Schwarzschild",CD[a][phi[]]]]==0],
  "Named profiles" -> SameQ[o["named_profiles"],{{"PlaneWave","Radial"},4,True}],
- "Pretty expression" -> SameQ[Normal[o["pretty_gradient"]],o["transport_gradient"]],
+ "Pretty expression" -> SameQ[Normal[prettyGradient],o["transport_gradient"]],
+ "Massless scalar contraction" -> SameQ[o["massless_contraction"],{True,True}],
  "Massless local rule" -> FreeQ[o["massless_rules"],m] && !FreeQ[scalarEqM,m],
  "Alias not specialized" -> SameQ[o["alias_specialization"],{False,True,True}],
  "Rules on existing alias" -> TrueQ[ToCanonical[o["apply_rules"]-o["massless_rules"]]==0],
