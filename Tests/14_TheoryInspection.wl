@@ -36,4 +36,9 @@ verify["field-object",BackgroundObject["ViewStudy","vphi"]===vphiView];
 verify["formula-value",BackgroundExpression["ViewStudy","Lagrangians","MassTerm"]===LviewView];
 verify["unknown-unregister",FailureQ[UnregisterTheory["Unknown"]]];
 verify["view-retains-background",KeyExistsQ[$BG,"ViewStudy"]];
+verify["qualified-geometry",TheoryValue["Geometry","Dimension"]===4];
+verify["qualified-export",ExpressionText["ViewStudy",{"Lagrangians","MassTerm"}]=== "BackgroundExpression[\"ViewStudy\", \"Lagrangians\", \"MassTerm\"]"];
+verify["qualified-export-form",StringQ[ExpressionText["ViewStudy","Expressions","Gradient","TeX"]]];
+verify["invalid-collection",FailureQ[BackgroundExpression["ViewStudy","Fields","vphi"]]];
+verify["about",Head[AboutXPlorer[]]===Column && !FreeQ[AboutXPlorer[],"Version "<>$XPlorerVersion]];
 <|"Version"->$XPlorerVersion,"Passed"->Count[Values[checks],True],"Total"->Length[checks],"Failures"->Keys@Select[checks,#=!=True&]|>
