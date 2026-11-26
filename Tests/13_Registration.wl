@@ -27,6 +27,14 @@ verify["bulk-formulas",FailureQ[RegisterTheory["Lagrangians",{"Gravity"->Lg,"Mat
 verify["expressions",FailureQ[RegisterTheory["Expressions",{"Gradient"->eq,"Gravity"->eq2}]],False];
 verify["named-value",TheoryValue["Lagrangians","Gravity"],Lg];
 verify["explicit-total",TheoryValue["Lagrangians","Total"],Lg+Lm];
+DefConstantSymbol[extraMass]; extraL=-extraMass^2 ph[]^2/2; extraExpr=cd[-aa][ph[]];
+verify["single-parameter",FailureQ[RegisterTheory["Parameter",extraMass]],False];
+verify["single-lagrangian",FailureQ[RegisterTheory["Lagrangian","ExtraL"->extraL]],False];
+verify["single-expression",FailureQ[RegisterTheory["Expression","ExtraExpr"->extraExpr]],False];
+verify["single-parameter-collection",TheoryValue["Parameters","extraMass"],extraMass];
+verify["single-lagrangian-collection",TheoryValue["Lagrangians","ExtraL"],extraL];
+verify["single-expression-collection",TheoryValue["Expressions","ExtraExpr"],extraExpr];
+UnregisterTheory["Expressions","ExtraExpr"]; UnregisterTheory["Lagrangians","ExtraL"]; UnregisterTheory["Parameters","extraMass"];
 snapshot=TheorySnapshot[];
 verify["anonymous-missing-head",FailureQ[RegisterTheory["Expressions","Missing"->ph[]^2]],True];
 verify["bad-lagrangian",FailureQ[RegisterTheory["Lagrangians","NotScalar"->av[-aa],Head->"BadL"]],True];
