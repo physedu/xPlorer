@@ -4,14 +4,16 @@ Global`$XPlorerWorkflowDirectory=DirectoryName[DirectoryName[$InputFileName]];
 Global`$XPlorerWorkflowOutputs=<||>;
 Global`$XPlorerWorkflowReport=Module[
  {directory=Global`$XPlorerWorkflowDirectory,notebook,inputs,stages=<||>,checks,
-  parseFailures={},warnings={},timings={},started=AbsoluteTime[],run,failed,oldFieldName,initiallyAbsent},
+  parseFailures={},compoundFailures={},warnings={},timings={},started=AbsoluteTime[],run,failed,oldFieldName,initiallyAbsent},
  initiallyAbsent=!MemberQ[$Packages,"xPlorer`"];
  notebook=Get[FileNameJoin[{directory,"xPlorer_Workflow.nb"}]];
  inputs=Cases[notebook,Cell[BoxData[b_],"Input",CellTags->id_String]:>{id,b},Infinity];
  Block[{Print=(Null&)},Needs["xAct`xPert`"];Needs["xAct`xCoba`"]];
- run[cell_]:=Module[{id=First[cell],b=Last[cell],seconds,value},
+ run[cell_]:=Module[{id=First[cell],b=Last[cell],seconds,value,parsed},
   If[id==="delete_single_field",oldFieldName=ToString[xPlorer`BackgroundObject["MinkowskiFields","S"],InputForm]];
-  If[Quiet[ToExpression[b,StandardForm,HoldComplete]]===$Failed,AppendTo[parseFailures,id]];
+  parsed=Quiet[ToExpression[b,StandardForm,HoldComplete]];
+  If[parsed===$Failed,AppendTo[parseFailures,id]];
+  If[MatchQ[parsed,HoldComplete[_Times]]&&!FreeQ[parsed,_CompoundExpression],AppendTo[compoundFailures,id]];
   {seconds,value}=AbsoluteTiming[Check[
     Block[{NotebookDirectory=Function[directory],Print=(Null&)},ToExpression[b,StandardForm]],
     AppendTo[warnings,id];$Failed]];
@@ -35,7 +37,7 @@ Global`$XPlorerWorkflowReport=Module[
   checks=Get[FileNameJoin[{directory,"Tests","TutorialChecks.wl"}]]];
  failed=Keys@Select[Global`$XPlorerWorkflowOutputs,!FreeQ[#,_Failure|$Failed]&];
  <|"Version"->xPlorer`$XPlorerVersion,"Kernel"->System`$Version,
-   "InputCells"->Length[inputs],"ExecutedInputs"->Length[timings],"ParseFailures"->parseFailures,
+   "InputCells"->Length[inputs],"ExecutedInputs"->Length[timings],"ParseFailures"->parseFailures,"MalformedCompoundCells"->compoundFailures,
    "WarningCells"->warnings,"ExpectedFailureCells"->Intersection[failed,{"invalidated_result"}],
    "UnexpectedFailureCells"->DeleteCases[failed,"invalidated_result"],
    "Stages"->stages,"Checks"->checks,"Passed"->Count[Values[checks],True],
