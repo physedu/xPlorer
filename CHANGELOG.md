@@ -118,3 +118,8 @@ Added geometry-on-demand, scoped cache invalidation, retained field assignments 
 Added dependency-ordered deletion, recreation of tags, protection of external dependents, and rollback of failed creation. Linked metric perturbations to xPert and distinguished variations from Taylor coefficients.
 
 Added a portable notebook, 75 regression checks, an MUnit report runner, and an execution record.
+
+## 14.0.0-beta.13-dev.17 (development)
+
+- Owned metric shorthand with native MetricInBasis and MetricCompute; owned full-field array shorthand with AllComponentValues. Scalar ComponentValue and full DeleteTensorValues support explicit Managed -> True. No global xCoba definitions changed.
+- Retain current managed setters and native explicit-basis behavior. Update scientific guide examples without adding test cells. No package installer changes.

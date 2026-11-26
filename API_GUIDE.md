@@ -1,4 +1,4 @@
-# Using xPlorer — beta.13-dev.6
+# Using xPlorer — beta.13-dev.17
 
 The principal worked guide is xPlorer_Workflow.nb. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
@@ -203,3 +203,20 @@ This explicit operation uses the normal managed assignment interface. For a tens
 OutputChart remains a choice of output coordinates, not a change of the primary chart. Native MetricInBasis and MetricCompute can compute geometry in a secondary chart after supplying its metric; the study in Tests/18_SecondaryChartNative.wl verifies a cylindrical Christoffel coefficient. Native secondary assignments are not synchronized into the managed recipe. Primary promotion is a deferred design, particularly because of inverse coordinate maps, independent connections and stored rules/profiles.
 
 Build with Tools/BuildPaclet.wl or the separate installer notebook. The builder validates the complete distributable payload and returns Failure if a real archive was not produced. In the remote kernel directory loading and traditional application loading pass, but Java archive compression is restricted. Verify archive build and installation locally before distribution.
+
+## Native xCoba shorthand (dev.17)
+
+The following overloads belong to the copied xAct objects themselves (UpValues), not to the global xCoba functions. They use the existing managed setters and computation path. The original native signatures, including two-argument scalar ComponentValue and explicit-basis AllComponentValues/MetricInBasis/MetricCompute, retain their native behavior. No automatic import of derived values is attempted.
+
+```wl
+MetricInBasis[gSchw, matrix, Assumptions -> domain]
+MetricCompute[gSchw, {"Ricci", "Einstein"}]
+ComponentValue[phiSchw[], u[rSchw], Managed -> True]
+AllComponentValues[ASchw[-aSchw], {v[rSchw],0,0,0}]
+AllComponentValues[hSchw[LI[2],-aSchw,-bSchw], perturbationMatrix]
+DeleteTensorValues[ASchw, Managed -> True]
+```
+
+Here rSchw is the actual coordinate scalar, e.g. CoordinatesOf["Schwarzschild"][[2]][]. The metric overload accepts a full matrix, a diagonal list or a Function yielding a full matrix. It uses the managed primary chart and checks supported options. The geometry overload accepts managed target names or All, not native MetricCompute slot specifications. The full-field array overload requires distinct abstract indices, and xPert LI when relevant; it preserves the supplied variance/order and performs existing symmetry checks. Managed scalar assignment and full-field deletion require the explicit marker because their original native signatures also occur in internal computations. These forms return the corresponding managed setter/report result, not a native component rule. A single tensor component or an external/secondary basis assignment remains native-only; do not assume it becomes a managed recipe. Existing SetFieldComponents, SetCMetricSystem and ComputeGeometry remain available while this migration is evaluated.
+
+No new mandatory xTras dependency. Use native VarD/VarL and xTensor geometry heads; xPlorer continues to own expression transport, snapshots, isolation and replay. No global Unprotect or interception of native calls.

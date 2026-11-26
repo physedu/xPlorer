@@ -185,3 +185,7 @@ No package release or main merge. Notebook mathematical content unchanged; actua
 ## Windows packaging regression (dev.16)
 
 The author reported CopyFile::opset (OverwriteTarget) during PacletBuild staging on Windows, followed by missing staged files and PacletArchive failure. The direct-source layout introduced in 8dcd972 still invoked PacletBuild's internal copy stage. The previous failure-path tests did not verify a successful archive. The builder now uses System`CreatePacletArchive on the prepared Paclet directory, retains the six-file preflight and Success["PacletBuild", <|"PacletArchive" -> path|>] interface, and does not change scientific code or workflow. A real direct CreatePacletArchive probe on WL 15.0.1 Linux also hit the remote Java SecurityException, so Windows build/install remains unverified. No release or main merge.
+
+## dev.17 native-first prototype
+
+Source candidate ea54770b1046e44dea0b2705634cb1384169ac47. WL 15.0.1 Linux xAct 1.3.0, fresh kernels: new ManagedNativeSyntax 13/13, Reconstruction 20/20, NativeInterop 23/23, FieldExtensions 16/16, Geometry 49/49, Perturbations 48/48, Lifecycle 64/64; pre-edit actual notebook 365/365 input executions, 84/84 checks, 33/33 stages, zero parse/malformed/warning/unexpected failure cells. Initial NativeInterop and FieldExtensions harness calls omitted Fixture.wl, then reran with it and passed. Native xCoba DownValues unchanged; no global redefinitions. Updated guide is a separate candidate and needs its own workflow execution. No packaging changes, no release.

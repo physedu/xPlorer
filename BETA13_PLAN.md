@@ -84,3 +84,8 @@ Source 2fa3835a83d4e78bbc6c4c7a75355b0b91ce706b adds the operator form expr // T
 ### Windows archive regression
 
 The author reported CopyFile::opset during PacletBuild's internal staging, followed by FileHash and missing metadata errors. The last confirmed Windows archive build was dev.6. Use the native CreatePacletArchive directly on the prepared Paclet directory; do not mark the archive or installation as verified until the author confirms the corrected build. No change to the scientific package or notebook.
+
+### Native API consolidation
+
+- Implement and validate owned-head overloads before removing redundant public functions. Preserve all original xAct signatures, especially internally generated ComponentValue values. Prototype succeeded without global function changes.
+- Next investigate automatic coordinate aliases (including notebook's existing scalar aliases and collision/lifetime behavior), inference of CovD and original indices from the native metric, explicit-basis managed input and partial component semantics, native chart transitions, and safe cache invalidation. Do not add a competing basis or tensor engine. Retain the current setters until migration and regression tests pass. No changes to packaging.

@@ -174,3 +174,7 @@ Do not implement primary-chart promotion by simply changing the Chart/Basis regi
 - Compare nontrivial curved and nonlinear chart cases and round trips before exposing a public operation.
 
 This is a proposed design contract, not implemented or generally validated. No new public API in dev.16.
+
+## dev.17 — extend native operations locally, not globally
+
+Use UpValues on copied metric and field heads for disjoint managed shorthand signatures. Do not unprotect or alter global ComponentValue, AllComponentValues, MetricInBasis, MetricCompute or DeleteTensorValues. The two-argument scalar setter is also called by xCoba internals, so require Managed -> True to identify deliberate inputs; the same marker distinguishes full managed deletion from cache clearing. Positive-rank abstract-index array assignment and metric-without-basis calls infer the primary chart. Keep explicit native signatures unchanged. Existing setters remain as tested implementation paths until user-facing migration is complete. Managed partial components, native explicit-basis capture, native chart registration and general basis changes require separate design; do not register computed values automatically. Geometry getters already supplied by xTensor need no replacement. xTras remains optional.

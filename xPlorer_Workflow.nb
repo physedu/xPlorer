@@ -496,9 +496,9 @@ Cell[TextData[{"For example, ",StyleBox["xM^2",FontFamily->"Courier",FontSize->1
 
 Cell[TextData[{"Minkowski spacetime"}],"Subsection"],
 
-Cell[TextData[{"Supply the constant metric matrix in chart order {t,x,y,z}. ",StyleBox["SetCMetricSystem",FontFamily->"Courier",FontSize->14]," assigns it to the copied metric through xCoba and prepares the inverse and determinant.\n\nFurther geometry is computed on request."}],"Text"],
+Cell[TextData[{"Supply the constant metric matrix in chart order {t,x,y,z}. ",StyleBox["MetricInBasis",FontFamily->"Courier",FontSize->14]," accepts the copied metric and infers its managed primary chart when the basis is omitted. xCoba stores the components; xPlorer remembers the input. The original explicit-basis xCoba syntax remains available. Further geometry is computed on request."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}], ",", RowBox[{"Assumptions", "\[Rule]", "assumptions"}]}], "]"}], ";"}]],"Input",CellTags->"minkowski_metric"],
+Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gM", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}], ",", RowBox[{"Assumptions", "\[Rule]", "assumptions"}]}], "]"}], ";"}]],"Input",CellTags->"minkowski_metric"],
 
 Cell[TextData[{"Inspect the metric as an xCoba component tensor"}],"Subsection"],
 
@@ -537,7 +537,7 @@ Cell[TextData[{"For a coordinate-dependent metric, supply a function whose argum
 
 Cell[BoxData[RowBox[{RowBox[{"DefConstantSymbol", "[", "Mbh", "]"}], ";"}]],"Input",CellTags->"schwarzschild_metric_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "r", ",", "theta", ",", "varphi"}], "}"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", RowBox[{"(", RowBox[{"1", "-", FractionBox[RowBox[{"2", " ", "Mbh"}], "r"]}], ")"}]}], ",", FractionBox["1", RowBox[{"1", "-", FractionBox[RowBox[{"2", " ", "Mbh"}], "r"]}]], ",", SuperscriptBox["r", "2"], ",", RowBox[{SuperscriptBox["r", "2"], " ", SuperscriptBox[RowBox[{"Sin", "[", "theta", "]"}], "2"]}]}], "}"}], "]"}]}], "]"}], ",", RowBox[{"Assumptions", "\[Rule]", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "r", ",", "theta", ",", "varphi"}], "}"}], ",", RowBox[{"assumptions", "&&", RowBox[{"Mbh", ">", "0"}], "&&", RowBox[{"r", ">", RowBox[{"2", " ", "Mbh"}]}], "&&", RowBox[{"0", "<", "theta", "<", "\[Pi]"}]}]}], "]"}]}]}], "]"}], ";"}]],"Input",CellTags->"schwarzschild_metric"],
+Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gSchw", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "r", ",", "theta", ",", "varphi"}], "}"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", RowBox[{"(", RowBox[{"1", "-", FractionBox[RowBox[{"2", " ", "Mbh"}], "r"]}], ")"}]}], ",", FractionBox["1", RowBox[{"1", "-", FractionBox[RowBox[{"2", " ", "Mbh"}], "r"]}]], ",", SuperscriptBox["r", "2"], ",", RowBox[{SuperscriptBox["r", "2"], " ", SuperscriptBox[RowBox[{"Sin", "[", "theta", "]"}], "2"]}]}], "}"}], "]"}]}], "]"}], ",", RowBox[{"Assumptions", "\[Rule]", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "r", ",", "theta", ",", "varphi"}], "}"}], ",", RowBox[{"assumptions", "&&", RowBox[{"Mbh", ">", "0"}], "&&", RowBox[{"r", ">", RowBox[{"2", " ", "Mbh"}]}], "&&", RowBox[{"0", "<", "theta", "<", "\[Pi]"}]}]}], "]"}]}]}], "]"}], ";"}]],"Input",CellTags->"schwarzschild_metric"],
 
 Cell[TextData[{"Spatially flat FLRW"}],"Subsection"],
 
@@ -545,7 +545,7 @@ Cell[TextData[{"The scale factor s(t) is positive. Its derivative determines whe
 
 Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "s", "]"}], ";"}]],"Input",CellTags->"flrw_metric_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem", "[", RowBox[{"\"FLRW\"", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"]}], "}"}], "]"}]}], "]"}], ",", RowBox[{"Assumptions", "\[Rule]", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"assumptions", "&&", RowBox[{RowBox[{"s", "[", "t", "]"}], ">", "0"}]}]}], "]"}]}]}], "]"}], ";"}]],"Input",CellTags->"flrw_metric"],
+Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gFLRW", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"]}], "}"}], "]"}]}], "]"}], ",", RowBox[{"Assumptions", "\[Rule]", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"assumptions", "&&", RowBox[{RowBox[{"s", "[", "t", "]"}], ">", "0"}]}]}], "]"}]}]}], "]"}], ";"}]],"Input",CellTags->"flrw_metric"],
 
 Cell[BoxData[RowBox[{RowBox[{RowBox[{"gM","[",RowBox[{RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],"//","ToComponents"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrices"],
 
@@ -560,11 +560,11 @@ Cell[BoxData[RowBox[{RowBox[{RowBox[{"gFLRW","[",RowBox[{RowBox[{"-","aFLRW"}],"
 
 Cell[TextData[{"A general scalar field in Minkowski"}],"Subsection"],
 
-Cell[TextData[{"Assign a general scalar profile on Minkowski. The function receives all four chart coordinates and returns ",StyleBox["PhiM[t,x,y,z]",FontFamily->"Courier",FontSize->14],", printed as \:03c6.\n\nField profiles are local to the selected background."}],"Text"],
+Cell[TextData[{"Assign a general scalar profile using the actual chart coordinates. ",StyleBox["ComponentValue",FontFamily->"Courier",FontSize->14]," is native xCoba. ",StyleBox["Managed -> True",FontFamily->"Courier",FontSize->14]," explicitly marks this as a user-supplied input to preserve on reconstruction; native two-argument assignments and internally computed values are not automatically captured. Field profiles are local to the selected background."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", RowBox[{"PhiM",",",RowBox[{"PrintAs","\[Rule]","\"\[Phi]\""}]}], "]"}], ";"}]],"Input",CellTags->"minkowski_field_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"Minkowski\"", ",", "phi", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"PhiM", "[", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"minkowski_field"],
+Cell[BoxData[RowBox[{RowBox[{"ComponentValue","[",RowBox[{RowBox[{"phiM","[","]"}],",",RowBox[{"PhiM","[",RowBox[{"tM",",","xM",",","yM",",","zM"}],"]"}],",",RowBox[{"Managed","\[Rule]","True"}]}],"]"}],";"}]],"Input",CellTags->"minkowski_field"],
 
 Cell[TextData[{StyleBox["ToComponents",FontFamily->"Courier",FontSize->14]," evaluates the registered equation with the chart, metric and field profile, expanding its covariant derivatives with xCoba."}],"Text"],
 
@@ -617,7 +617,7 @@ Cell[TextData[{"Choose a static radial profile \:03c6 = u(r) on Schwarzschild. S
 
 Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "u", "]"}], ";"}]],"Input",CellTags->"schwarzschild_field_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{RowBox[{"phiSchw","[","]"}], ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "r", ",", "theta", ",", "varphi"}], "}"}], ",", RowBox[{"u", "[", "r", "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"schwarzschild_field"],
+Cell[BoxData[RowBox[{RowBox[{"ComponentValue","[",RowBox[{RowBox[{"phiSchw","[","]"}],",",RowBox[{"u","[","rSchw","]"}],",",RowBox[{"Managed","\[Rule]","True"}]}],"]"}],";"}]],"Input",CellTags->"schwarzschild_field"],
 
 Cell[BoxData[RowBox[{RowBox[{"eqSchw", "=", RowBox[{"scalarEqSchw", "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"schwarzschild_equation_step_1"],
 
@@ -684,7 +684,7 @@ Cell[TextData[{"Choose a homogeneous field \:03c6 = q(t) on FLRW."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "q", "]"}], ";"}]],"Input",CellTags->"flrw_field_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{RowBox[{"phiFLRW","[","]"}], ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"q", "[", "t", "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"flrw_field"],
+Cell[BoxData[RowBox[{RowBox[{"ComponentValue","[",RowBox[{RowBox[{"phiFLRW","[","]"}],",",RowBox[{"q","[","tF","]"}],",",RowBox[{"Managed","\[Rule]","True"}]}],"]"}],";"}]],"Input",CellTags->"flrw_field"],
 
 Cell[BoxData[RowBox[{RowBox[{"eqFLRW", "=", RowBox[{"scalarEqFLRW", "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"flrw_equation_step_1"],
 
@@ -834,15 +834,15 @@ Cell[BoxData[RowBox[{RowBox[{"CreateBackground", "[", "\"MinkowskiFields\"", "]"
 
 Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"{", RowBox[{"\"t\"", ",", "\"x\"", ",", "\"y\"", ",", "\"z\""}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"field_background_step_2"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"field_background"],
+Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gMinkowskiFields", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"field_background"],
 
 Cell[BoxData[RowBox[{"Keys", "[", RowBox[{RowBox[{"ShowBackground", "[", "\"Minkowski\"", "]"}], "[", "\"Field\"", "]"}], "]"}]],"Input",CellTags->"field_snapshots_part_1"],
 
 Cell[BoxData[RowBox[{"Keys", "[", RowBox[{RowBox[{"ShowBackground", "[", "\"MinkowskiFields\"", "]"}], "[", "\"Field\"", "]"}], "]"}]],"Input",CellTags->"field_snapshots_part_2"],
 
-Cell[TextData[{"Assign the lower components of A in chart order (t,x,y,z) with ",StyleBox["IndexPositions -> {-1}",FontFamily->"Courier",FontSize->14],". Requesting ",StyleBox["A[a]",FontFamily->"Courier",FontSize->14]," raises the index with the Minkowski metric, changing the sign of the time component."}],"Text"],
+Cell[TextData[{"Assign the lower components of A in chart order (t,x,y,z) using ",StyleBox["AllComponentValues",FontFamily->"Courier",FontSize->14],". With abstract indices on an owned field, xPlorer infers the primary chart and remembers the supplied variance. The original explicit-basis xCoba syntax is unchanged. Requesting the upper vector raises the index with the Minkowski metric."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents","[",RowBox[{RowBox[{"AMinkowskiFields","[",RowBox[{RowBox[{"-","aMinkowskiFields"}]}],"]"}],",",RowBox[{"{",RowBox[{"1",",","2",",","3",",","4"}],"}"}]}],"]"}],";"}]],"Input",CellTags->"vector_values_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues","[",RowBox[{RowBox[{"AMinkowskiFields","[",RowBox[{RowBox[{"-","aMinkowskiFields"}]}],"]"}],",",RowBox[{"{",RowBox[{"1",",","2",",","3",",","4"}],"}"}]}],"]"}],";"}]],"Input",CellTags->"vector_values_step_1"],
 
 Cell[BoxData[RowBox[{RowBox[{"Adown", "=", RowBox[{RowBox[{"AMinkowskiFields", "[", RowBox[{"-", "aMinkowskiFields"}], "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_2"],
 
@@ -868,9 +868,9 @@ Cell[TextData[{"Assign matrices with the declared rank and symmetry. xPlorer che
 
 Cell[BoxData[RowBox[{RowBox[{"Fmatrix", "=", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "2", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"-", "2"}], ",", "0", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}]}], "}"}]}], ";"}]],"Input",CellTags->"tensor_values_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{RowBox[{"SMinkowskiFields","[",RowBox[{RowBox[{"-","aMinkowskiFields"}],",",RowBox[{"-","bMinkowskiFields"}]}],"]"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"tensor_values_step_2"],
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"SMinkowskiFields","[",RowBox[{RowBox[{"-","aMinkowskiFields"}],",",RowBox[{"-","bMinkowskiFields"}]}],"]"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"tensor_values_step_2"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{RowBox[{"FMinkowskiFields","[",RowBox[{RowBox[{"-","aMinkowskiFields"}],",",RowBox[{"-","bMinkowskiFields"}]}],"]"}], ",", "Fmatrix"}], "]"}], ";"}]],"Input",CellTags->"tensor_values_step_3"],
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"FMinkowskiFields","[",RowBox[{RowBox[{"-","aMinkowskiFields"}],",",RowBox[{"-","bMinkowskiFields"}]}],"]"}], ",", "Fmatrix"}], "]"}], ";"}]],"Input",CellTags->"tensor_values_step_3"],
 
 Cell[BoxData[RowBox[{RowBox[{RowBox[{"SMinkowskiFields", "[", RowBox[{RowBox[{"-", "aMinkowskiFields"}], ",", RowBox[{"-", "bMinkowskiFields"}]}], "]"}], "//", "ToComponents"}],"//","MatrixForm"}]],"Input",CellTags->"tensor_values"],
 
@@ -906,7 +906,7 @@ Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"AffineStudy\"", ",",
 
 Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates_step_2"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{RowBox[{"AAffineStudy","[",RowBox[{RowBox[{"-","aDA"}]}],"]"}], ",", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates_step_3"],
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"AAffineStudy","[",RowBox[{RowBox[{"-","aDA"}]}],"]"}], ",", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates_step_3"],
 
 Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"tA", ",", "xA", ",", "yA", ",", "zA"}], "}"}], "=", RowBox[{"Through", "[", RowBox[{RowBox[{"CoordinatesOf", "[", "\"AffineStudy\"", "]"}], "[", "]"}], "]"}]}], ";"}]],"Input",CellTags->"affine_coordinates_step_4"],
 
@@ -962,13 +962,13 @@ Cell[TextData[{"Use ",StyleBox["StrictComponents -> True",FontFamily->"Courier",
 Cell[CellGroupData[{
 Cell[TextData[{"7. Change a calculation and reuse previous work"}],"Section"],
 
-Cell[TextData[{"To change a profile or metric in an existing study, call ",StyleBox["SetFieldComponents",FontFamily->"Courier",FontSize->14]," or ",StyleBox["SetCMetricSystem",FontFamily->"Courier",FontSize->14]," again with the new input."}],"Text"],
+Cell[TextData[{"To change a managed field or metric, assign the new input with the same commands. ",StyleBox["MetricCompute",FontFamily->"Courier",FontSize->14]," can infer the chart of an owned metric when passed a list of geometry target names. ",StyleBox["ToComponents",FontFamily->"Courier",FontSize->14]," already calculates the geometry it needs."}],"Text"],
 
 Cell[TextData[{"Request the Ricci and Einstein tensors twice. With the same metric and settings, the second call reports both as cached."}],"Text"],
 
-Cell[BoxData[RowBox[{"ComputeGeometry", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_1"],
+Cell[BoxData[RowBox[{"MetricCompute", "[", RowBox[{"gMinkowskiFields", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_1"],
 
-Cell[BoxData[RowBox[{"ComputeGeometry", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_2"],
+Cell[BoxData[RowBox[{"MetricCompute", "[", RowBox[{"gMinkowskiFields", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_2"],
 
 Cell[TextData[{StyleBox["SaveResult",FontFamily->"Courier",FontSize->14]," stores a value under a key and ",StyleBox["ResultOf",FontFamily->"Courier",FontSize->14]," retrieves it. Changing a printed label preserves saved results.\n\nChanging a mathematical input invalidates all saved results in that study."}],"Text"],
 
@@ -982,7 +982,7 @@ Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"MinkowskiFields\
 
 Cell[TextData[{"Change the metric\:2019s time-time entry to \:22124. The covector still has lower time component 1, so raising its index now gives \:22121/4.\n\nChanging the metric also invalidates its cached curvature."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "4"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"change_metric_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gMinkowskiFields", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "4"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"change_metric_step_1"],
 
 Cell[BoxData[RowBox[{RowBox[{"AMinkowskiFields", "[", "aMinkowskiFields", "]"}], "//", "ToComponents"}]],"Input",CellTags->"change_metric"],
 
@@ -992,7 +992,7 @@ Cell[BoxData[RowBox[{"ResultOf", "[", RowBox[{"\"MinkowskiFields\"", ",", "\"Vec
 
 Cell[TextData[{"Restore the Minkowski metric."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"restore_metric"],
+Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gMinkowskiFields", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"restore_metric"],
 
 Cell["Metric perturbations on an existing background","Subsection"],
 
@@ -1018,9 +1018,9 @@ Cell[BoxData[RowBox[{"delta2Abstract","=",RowBox[{RowBox[{"gM","[",RowBox[{"aM",
 
 Cell["Assign components of hM with LI[1] and LI[2]. LI labels the order; the remaining two abstract indices select the variance. The assignment uses the primary chart, not an output chart. xCoba computes other index configurations as required.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents","[",RowBox[{RowBox[{"hM","[",RowBox[{RowBox[{"LI","[",RowBox[{"1"}],"]"}],",",RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],",",RowBox[{"DiagonalMatrix","[",RowBox[{RowBox[{"{",RowBox[{"0",",",SuperscriptBox["tM","2"],",","0",",","0"}],"}"}]}],"]"}]}],"]"}],";"}]],"Input",CellTags->"perturbation_profile_step_3"],
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues","[",RowBox[{RowBox[{"hM","[",RowBox[{RowBox[{"LI","[",RowBox[{"1"}],"]"}],",",RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],",",RowBox[{"DiagonalMatrix","[",RowBox[{RowBox[{"{",RowBox[{"0",",",SuperscriptBox["tM","2"],",","0",",","0"}],"}"}]}],"]"}]}],"]"}],";"}]],"Input",CellTags->"perturbation_profile_step_3"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents","[",RowBox[{RowBox[{"hM","[",RowBox[{RowBox[{"LI","[",RowBox[{"2"}],"]"}],",",RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],",",RowBox[{"ConstantArray","[",RowBox[{"0",",",RowBox[{"{",RowBox[{"4",",","4"}],"}"}]}],"]"}]}],"]"}],";"}]],"Input",CellTags->"perturbation_profile_step_4"],
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues","[",RowBox[{RowBox[{"hM","[",RowBox[{RowBox[{"LI","[",RowBox[{"2"}],"]"}],",",RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],",",RowBox[{"ConstantArray","[",RowBox[{"0",",",RowBox[{"{",RowBox[{"4",",","4"}],"}"}]}],"]"}]}],"]"}],";"}]],"Input",CellTags->"perturbation_profile_step_4"],
 
 Cell[BoxData[RowBox[{RowBox[{"tP","=","tM"}],";"}]],"Input",CellTags->"perturbation_profile"],
 
@@ -1064,15 +1064,15 @@ Cell[BoxData[RowBox[{RowBox[{"AMinkowskiFields","[",RowBox[{"aMinkowskiFields"}]
 
 Cell["Compute the Ricci and Einstein tensors twice. The second request uses the cached geometry.","Text"],
 
-Cell[BoxData[RowBox[{"ComputeGeometry","[",RowBox[{"\"MinkowskiFields\"",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_compute_first"],
+Cell[BoxData[RowBox[{"MetricCompute","[",RowBox[{"gMinkowskiFields",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_compute_first"],
 
-Cell[BoxData[RowBox[{"ComputeGeometry","[",RowBox[{"\"MinkowskiFields\"",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_compute_cached"],
+Cell[BoxData[RowBox[{"MetricCompute","[",RowBox[{"gMinkowskiFields",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_compute_cached"],
 
 Cell["ClearComputedValues removes derived values. It retains the metric and managed field inputs and invalidates saved results. The next geometry request computes the cleared quantities again.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"ClearComputedValues","[",RowBox[{"\"MinkowskiFields\""}],"]"}],";"}]],"Input",CellTags->"clear_vector_input_step_2"],
 
-Cell[BoxData[RowBox[{"ComputeGeometry","[",RowBox[{"\"MinkowskiFields\"",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_recompute"],
+Cell[BoxData[RowBox[{"MetricCompute","[",RowBox[{"gMinkowskiFields",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_recompute"],
 
 Cell[BoxData[RowBox[{RowBox[{"AMinkowskiFields","[",RowBox[{"aMinkowskiFields"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_after_clear_geometry"],
 
@@ -1171,7 +1171,7 @@ Cell["8.7. Change the restored study without recreating it","Subsubsection"],
 Cell["There is no need to delete the background just to change its inputs. Keep the restored metric and give the vector new lower components.","Text"],
 
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{RowBox[{"AMinkowskiFields","[",RowBox[{RowBox[{"-","aMinkowskiFields"}]}],"]"}], ",", RowBox[{"{", RowBox[{"5", ",", "0", ",", "0", ",", "0"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"fresh_vector_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"AMinkowskiFields","[",RowBox[{RowBox[{"-","aMinkowskiFields"}]}],"]"}], ",", RowBox[{"{", RowBox[{"5", ",", "0", ",", "0", ",", "0"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"fresh_vector_step_1"],
 
 Cell[BoxData[RowBox[{RowBox[{"Aup", "=", RowBox[{RowBox[{"AMinkowskiFields", "[", "aMinkowskiFields", "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"fresh_vector_step_2"],
 
