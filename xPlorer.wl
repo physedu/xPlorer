@@ -43,7 +43,8 @@ SetCMetricSystem::usage = "SetCMetricSystem[tag, mat, opts] assigns the matrix m
 CMetricOf::usage = "CMetricOf[tag] returns the xCoba component metric stored for the background tag.";
 ComponentCovDOf::usage = "ComponentCovDOf[tag] returns the xCoba component covariant derivative stored for the background tag.";
 MetricMatrixOf::usage = "MetricMatrixOf[tag] returns the matrix used in SetCMetricSystem for the background tag.";
-ShowTheory::usage = "ShowTheory[] returns the internal $Theory association used by the package.";
+ShowTheory::usage = "ShowTheory[] displays a compact theory overview. ShowTheory[section] displays details for Geometry, Fields, Parameters, Lagrangians, Expressions, Connections, Sectors or Metadata. Use TheorySnapshot[] for restorable data.";
+TheorySnapshot::usage = "TheorySnapshot[] returns the raw restorable theory association. Restore with With[{snapshot = saved}, RegisterTheory[snapshot]] after ClearTheory[]. Source xAct definitions must remain alive.";
 TheoryValue::usage = "TheoryValue[section] returns a logical collection; TheoryValue[section,key] returns one registered item.";
 
 $BG::usage = "$BG stores the backgrounds created by the package.";
@@ -70,7 +71,7 @@ ApplySpecialization::usage = "ApplySpecialization controls whether background sp
 StrictComponents::usage = "StrictComponents -> True returns Failure when tensor components or covariant derivatives remain unresolved.";
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.2";
+$XPlorerVersion = "14.0.0-beta.13-dev.3";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label; the association form changes several labels of owned background objects. Automatic restores the inherited default for a key.";
@@ -940,7 +941,51 @@ ChristoffelOf[tag_String] := getter[tag, "Christoffel"];
 BackgroundIndices[tag_String, n_: Automatic] := Module[{b = background[tag]}, If[FailureQ[b], Return[b]];
   If[n === Automatic, b["Indices"], If[IntegerQ[n] && 0 <= n <= Length[b["Indices"]], Take[b["Indices"], n], failure["IndexCount", "Invalid number of indices."]]]];
 ShowBackground[tag_String] := background[tag];
-ShowTheory[] := $Theory;
+(* Presentation is deliberately separate from the registry and mathematical access. *)
+TheorySnapshot[] := $Theory;
+b13Sections = {"Geometry","Fields","Parameters","Lagrangians","Expressions","Connections","Sectors","Metadata"};
+b13Geometry[t_] := Module[{a=KeyTake[t,{"Metric","CovD","Indices"}],g=Lookup[t,"Metric",None],m},
+ If[TrueQ[MetricQ[g]],m=BaseOfVBundle[VBundleOfMetric[g]];
+  a=Join[<|"Manifold"->m,"Dimension"->DimOfManifold[m]|>,a]];a];
+b13Metadata[t_] := KeyDrop[t,{"Metric","CovD","Indices","Field","Parameter","Formula","Connections"}];
+b13Sectors[t_] := Sort@DeleteDuplicates@Cases[
+ Flatten[Values[b13Collection[t,#]]& /@ {"Fields","Parameters","Lagrangians","Expressions"},1],
+ a_Association /; StringQ[Lookup[a,"Sector",None]] :> a["Sector"]];
+b13SectorLabel[a_] := Replace[Lookup[a,"Sector",None],None->"-"];
+b13Table[headers_,rows_] := Grid[
+ Prepend[If[rows==={}, {Join[{"(none)"},ConstantArray["",Length[headers]-1]]},rows],Style[#,Bold]& /@ headers],
+ Alignment->Left,Spacings->{2,0.7},Dividers->{None,{False,True}}];
+b13KeyTable[a_] := b13Table[{"Property","Value"},KeyValueMap[{#1,#2}&,a]];
+b13TheoryView[t_,section_,detail_] := Module[{a},
+ Switch[section,
+ "Geometry",b13KeyTable[b13Geometry[t]],
+ "Metadata",b13KeyTable[b13Metadata[t]],
+ "Fields",a=b13Collection[t,section];
+  b13Table[{"Key","Tensor","Type","Rank","Symbol base","Sector"},
+   KeyValueMap[{#1,#2["Head"],#2["Type"],#2["Rank"],#2["SymbolBase"],b13SectorLabel[#2]}&,a]],
+ "Parameters",b13Table[{"Key","Symbol","Sector"},
+   KeyValueMap[{#1,#2["Value"],b13SectorLabel[#2]}&,b13Collection[t,section]]],
+ "Lagrangians"|"Expressions",a=b13Collection[t,section];
+  If[TrueQ[detail],b13Table[{"Key","Alias base","Sector","Expression"},
+    KeyValueMap[{#1,#2["AliasBase"],b13SectorLabel[#2],#2["Value"]}&,a]],
+   b13Table[{"Key","Alias base","Sector"},
+    KeyValueMap[{#1,#2["AliasBase"],b13SectorLabel[#2]}&,a]]],
+ "Connections",b13Table[{"Key","Derivative"},
+   KeyValueMap[{#1,#2["Head"]}&,Lookup[t,"Connections",<||>]]],
+ "Sectors",b13Table[{"Sector","Fields","Parameters","Lagrangians","Expressions"},
+   Table[Prepend[Map[Length,Values[AssociationMap[
+    Select[b13Collection[t,#],Lookup[#,"Sector",None]===sector&]&,
+    {"Fields","Parameters","Lagrangians","Expressions"}]]],sector],{sector,b13Sectors[t]}]],
+ _,failure["TheoryKey","Unknown theory display section.",<|"Key"->section|>]
+ ]];
+ShowTheory[] := Column[Prepend[
+ (Column[{Style[#,Bold],b13TheoryView[$Theory,#,False]},Spacings->0.5]& /@ b13Sections),
+ Style["Registered theory",Bold,16]],Spacings->1.3];
+ShowTheory[section_String] := b13TheoryView[$Theory,section,True];
+
+TheoryValue["Geometry"] := b13Geometry[$Theory];
+TheoryValue["Metadata"] := b13Metadata[$Theory];
+TheoryValue["Sectors"] := b13Sectors[$Theory];
 TheoryValue[key_String] := b13Values[$Theory,key];
 TheoryValue[section_String,key_String] := Module[{a=b13Values[$Theory,section]},
  If[FailureQ[a],a,If[AssociationQ[a],Lookup[a,key,failure["TheoryKey","The registered item does not exist."]],failure["TheoryKey","Not a collection."]]]];
@@ -1112,9 +1157,10 @@ UnregisterTheory[section_String,key_String,OptionsPattern[]] := Module[
  ];
  $Theory[slot]=KeyDrop[a,id];$Theory
 ];
-UnregisterTheory[section_String] := Module[{keys=Keys[b13Collection[$Theory,section]],snapshot=$Theory,result},
+UnregisterTheory[section_String] := Module[{keys,snapshot=$Theory,result},
  If[!MemberQ[{"Fields","Parameters","Lagrangians","Expressions"},section],
   Return[If[KeyExistsQ[$Theory,section],KeyDropFrom[$Theory,section];$Theory,failure["TheoryKey","Unknown section."]]]];
+ keys=Keys[b13Collection[$Theory,section]];
  Do[result=UnregisterTheory[section,k];If[FailureQ[result],$Theory=snapshot;Return[result]],{k,keys}];$Theory];
 registeredNameQ[name_String] := Names[name] =!= {} && TrueQ[ToExpression[name,InputForm,objectRegisteredQ]];
 objectRegisteredQ[s_] := TrueQ[xTensorQ[s] || CovDQ[s] || ChartQ[s] || MetricQ[s] || ManifoldQ[s] || ParameterQ[s]];
