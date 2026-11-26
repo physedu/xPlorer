@@ -2,11 +2,11 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-> **Development branch: 14.0.0-beta.13-dev.7.** The new registration API is breaking. The original 115-input author notebook and historical regression suite have been migrated and tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
+> **Development branch: 14.0.0-beta.13-dev.8.** The new registration API is breaking. The original 115-input author notebook and historical regression suite have been migrated and tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
 
 xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
-The current experimental version is **14.0.0-beta.13-dev.7** (xAct-style startup banner). Mathematical implementation is unchanged from the fully regression-tested dev.6 checkpoint. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Theory registration and tagged background creation are unchanged. Personalization is optional.
+The current experimental version is **14.0.0-beta.13-dev.8** (concise scientific startup message in xAct style). Mathematical implementation is unchanged from the fully regression-tested dev.6 checkpoint. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Theory registration and tagged background creation are unchanged. Personalization is optional.
 
 ## Start here
 
@@ -68,7 +68,7 @@ build = Get[FileNameJoin[{NotebookDirectory[], "Tools", "BuildPaclet.wl"}]];
 If[MatchQ[build, _Success], PacletInstall[build["PacletArchive"]]]
 ```
 
-The builder stages only PacletInfo.wl, xPlorer.wl, the two Kernel loaders, LICENSE and CITATION.cff in a temporary directory, calls PacletBuild without suppressing warnings, copies the archive to the repository's build directory (replacing an existing same-named archive), and removes the temporary tree. The author successfully built dev.6 with the earlier builder on Windows; that archive remains valid for dev.6. Rebuild and install dev.7 if you want the updated startup banner. The clean staging and structured failure handling have been tested remotely; final archive creation there remains blocked by Java security policy. The clean builder's successful archive path and Desktop installation still require testing. Do not keep both a conflicting traditional installation and a paclet active. For future releases, distribute the verified archive as a GitHub Release asset so users do not need to build it themselves. No release has been published.
+The builder stages only PacletInfo.wl, xPlorer.wl, the two Kernel loaders, LICENSE and CITATION.cff in a temporary directory, calls PacletBuild without suppressing warnings, copies the archive to the repository's build directory (replacing an existing same-named archive), and removes the temporary tree. The author successfully built dev.6 with the earlier builder on Windows; that archive remains valid for dev.6. The clean staging and structured failure handling have been tested remotely; final archive creation there remains blocked by Java security policy. The clean builder's successful archive path and Desktop installation still require testing. Do not keep both a conflicting traditional installation and a paclet active. For future releases, distribute the verified archive as a GitHub Release asset so users do not need to build it themselves. No release has been published.
 
 ### Inspect the registered theory
 
@@ -101,7 +101,7 @@ If you use xPlorer in your research, please cite the version used. GitHub's **Ci
   author  = {Sanz-Romero, Eduardo},
   title   = {xPlorer},
   year    = {2026},
-  version = {14.0.0-beta.13-dev.7},
+  version = {14.0.0-beta.13-dev.8},
   url     = {https://github.com/physedu/xPlorer}
 }
 ```
