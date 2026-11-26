@@ -1,6 +1,6 @@
 (* Loaded after Fixture.wl in an isolated context. *)
 With[{ss=phi},PrintAs[ss]^="m"];
-sourceFormulaSnapshot=ShowTheory[]["Formula"];
+sourceFormulaSnapshot=TheorySnapshot[]["Formula"];
 UnregisterTheory["Fields","phi",Cascade->True];
 RegisterTheory["Field",phi];
 With[{f=sourceFormulaSnapshot},RegisterTheory[<|"Formula"->f|>]];
@@ -29,6 +29,6 @@ SetPresentation["FunctionPrint",<|"pretty"->SubscriptBox["M","1"]|>];
 assert["boxed-label-override",With[{hh=BackgroundObject["FunctionPrint","pretty"]},PrintAs[hh]],SubscriptBox["M","1"]];
 DeleteBackground["FunctionPrint"];UnregisterTheory["Fields","pretty"];UndefTensor[pretty];
 
-beforeReserved=ShowTheory[];
+beforeReserved=TheorySnapshot[];
 assert["reserved-field-key-protected",FailureQ[RegisterTheory["Field",phi,Name->"Metric"]],True];
 ClearTheory[];With[{tt=beforeReserved},RegisterTheory[tt]];
