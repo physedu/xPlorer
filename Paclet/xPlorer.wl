@@ -931,8 +931,34 @@ managedNativeGeometry[tag_,targets_,opts___Rule] := Module[{args={opts}},
  If[Complement[First/@args,First/@Options[ComputeGeometry]]=!={},Return[failure["GeometryOptions","Use managed geometry calculation options."]]];
  ComputeGeometry[tag,targets,opts]
 ];
+(* Native explicit primary-chart metric assignment. Keep the native rule-array
+   return and the optional inverse; the managed metric is always covariant. *)
+managedPrimaryMetricArrayQ[tag_,basis_,input_,opts_List] := Module[{b=Lookup[$BG,tag,<||>]},
+ !TrueQ[$insideManagedCalculation] && !TrueQ[$insideNativePrintGuard] &&
+ KeyExistsQ[b,"Chart"] && MemberQ[{b["Basis"],-b["Basis"]},basis] &&
+ MemberQ[{{b["Dimension"]},{b["Dimension"],b["Dimension"]}},Dimensions[input]] &&
+ TrueQ[$CVReplace] && Complement[First/@opts,First/@Options[MetricInBasis]]==={}
+];
+captureManagedMetricArray[tag_,basis_,input_,opts___Rule] := Block[{$insideManagedCalculation=True},
+ Module[{b=$BG[tag],mat,lower,r,fun,inv,metric},
+  metric=b["Metric"];mat=If[VectorQ[input],DiagonalMatrix[input],input];
+  fun=CVSimplify/.Join[{opts},Options[MetricInBasis]];
+  inv=Inverse/.Join[{opts},Options[MetricInBasis]];
+  lower=If[basis===-b["Basis"],mat,guard[fun[Inverse[mat]]]];
+  If[lower===$Failed,Return[failure["MetricAssignment","The contravariant metric could not be inverted."]]];
+  r=SetCMetricSystem[tag,lower,Assumptions->Lookup[b,"Assumptions",True],ComputeOnSet->None];
+  If[FailureQ[r],Return[r]];
+  (* For an upper input, retain the precise supplied upper matrix; for a
+     lower input, native Inverse->True installs its upper inverse. *)
+  If[basis===b["Basis"]||TrueQ[inv],
+   r=guard[MetricInBasis[metric,basis,mat,Inverse->inv,CVSimplify->fun]];
+   If[r===$Failed,Return[failure["MetricAssignment","The native metric inverse assignment failed."]]];Return[r]];
+  ComponentValue[ComponentArray[metric,{basis,basis}]]
+ ]];
+
 installManagedMetricSyntax[tag_,metric_Symbol] := With[{hh=metric,tt=tag},
  hh /: MetricInBasis[hh,input:(_List|_Function),opts___Rule] := managedMetricInput[tt,input,opts];
+ hh /: MetricInBasis[hh,basis_,input_List,opts___Rule] /; managedPrimaryMetricArrayQ[tt,basis,input,{opts}] := captureManagedMetricArray[tt,basis,input,opts];
  hh /: MetricCompute[hh,targets:(_String|_List|All),opts___Rule] := managedNativeGeometry[tt,targets,opts];
 ];
 installManagedFieldSyntax[tag_,head_Symbol,rank_Integer] := With[{hh=head,tt=tag,rr=rank},

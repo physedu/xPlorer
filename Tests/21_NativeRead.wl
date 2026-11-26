@@ -15,5 +15,9 @@ ChangeComponents[AN[{aN,ch}],AN[{-aN,-ch}]];checks["Native transformation not ca
 recipe=ReconstructionData["N"];RecreateBackground["Copy",recipe];checks["Explicit native input reconstructs"]=ToComponents["Copy",A[a]]==={-4,9,10,11};
 DeleteTensorValues[AN];checks["Full native deletion clears managed source"]=!AnyTrue[Values[ShowBackground["N"]["FieldComponents"]],#["Head"]===AN&]&&ToValues[AN[{0,ch}]]===AN[{0,ch}];
 ClearComputedValues["N"];checks["Deleted source not resurrected"]=ToValues[AN[{0,ch}]]===AN[{0,ch}];
+nativeMetric=MetricInBasis[gN,-ch,{-4,1,1,1},Inverse->True];checks["Explicit covariant metric captured"]=MatrixQ[nativeMetric,MatchQ[#,_Rule]&]&&MetricMatrixOf["N"]===DiagonalMatrix[{-4,1,1,1}];
+AllComponentValues[AN[-aN],{8,9,10,11}];checks["Native read after explicit metric"]=ToValues[AN[{0,ch}]]===-2;
+nativeInverse=MetricInBasis[gN,ch,{-1/8,1,1,1},Inverse->True];checks["Explicit contravariant metric captured"]=MatrixQ[nativeInverse,MatchQ[#,_Rule]&]&&MetricMatrixOf["N"]===DiagonalMatrix[{-8,1,1,1}]&&ToValues[AN[{0,ch}]]===-1;
+checks["Other metric unchanged"]=MetricMatrixOf["O"]===DiagonalMatrix[{-1,1,1,1}];
 checks["Cleanup"]=And@@(SameQ[DeleteBackground[#],Null]& /@ {"N","O","Copy"});
 <|"Total"->Length[checks],"Passed"->Count[Values[checks],True],"Failures"->Keys@Select[checks,#=!=True&]|>
