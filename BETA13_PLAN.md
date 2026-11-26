@@ -37,3 +37,7 @@ Author screenshot confirms the original dev.6 builder returned Success and creat
 ## Presentation follow-up: dev.7
 
 Author Desktop output confirms dev.6 loads and shows the banner. Replaced the styled title with native xAct-style printed lines (source 1b5b23ba75ca776a55a51520f83723a9d20bc226). Tested double Get, inspection 25/25 and actual notebook 119/119, 66/66 results, 7/7 stages at cba6f0b4dd2c40df5cce40019cb0b57dcfa35882. Mathematics unchanged. Desktop dev.7 visual/build/install check remains pending; no release or main merge.
+
+## Public-facing startup text (dev.8)
+
+The author requested a permanent scientific package welcome message suitable for public distribution, without development-specific instructions, promotional wording or repository link. Final source commit 84ee5a291fad25af77299dabdfa1c105fc2e8a4d, metadata synchronized at 12e5bedf49511c74233ec578df1692831f10efdf. Version remains dynamically read from $XPlorerVersion; the text does not assume a final release number. Plain xAct-style lines describe abstract theory reuse on independent geometric backgrounds, tensor-expression transport, component calculations, dependencies, copyright, GPL v3-or-later and warranty disclaimer. AboutXPlorer[] returns the same content. Remote double-Get test at 12e5bedf49511c74233ec578df1692831f10efdf prints the banner once; inspection 25/25, including plain strings, no styles/hyperlinks or GitHub in the banner. Mathematical source unchanged; full notebook last rerun on dev.7. Desktop visual review pending. No release or main merge.
