@@ -144,5 +144,58 @@
         13
       ]
     }
+  },
+  "additionalSourceSelectionRegression": {
+    "testedCommit": "fe4a8397434ce164b435aa585d5874e1aae1c760",
+    "identicalSourceBlob": "a800330abcb7a81f280239de0990f169c274b2d7",
+    "groups": {
+      "GeometryVariance": [
+        14,
+        14
+      ],
+      "NativeGeometry": [
+        12,
+        12
+      ],
+      "GeometryRead": [
+        13,
+        13
+      ],
+      "MetricEdits": [
+        13,
+        13
+      ],
+      "SelectiveInvalidation": [
+        13,
+        13
+      ],
+      "NativeRead": [
+        22,
+        22
+      ],
+      "SecondaryChartNative": [
+        3,
+        3
+      ]
+    },
+    "workflow": {
+      "inputs": [
+        365,
+        365
+      ],
+      "math": [
+        84,
+        84
+      ],
+      "stages": [
+        33,
+        33
+      ],
+      "warnings": 0,
+      "unexpectedFailures": 0,
+      "parse": 0,
+      "malformed": 0,
+      "seconds": 19.074329
+    }
   }
 }

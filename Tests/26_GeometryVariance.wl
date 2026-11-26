@@ -19,6 +19,8 @@ calls=0;Internal`InheritedBlock[{ChangeComponents},Unprotect[ChangeComponents];
  ChangeComponents[f_,i_,args___] /; !TrueQ[countingCC] := Block[{countingCC=True},calls++;ChangeComponents[f,i,args]];
  Protect[ChangeComponents];r2=ToValues[ri[{0,ch},{0,ch}]]];
 checks["Repeated native variance avoids conversion"]=calls===0&&r2===r0;
+sourceSpec=xPlorer`Private`chooseGeometrySource[ShowBackground["N"],ri,{1,1},{"Ricci"[-1,-1]}];
+checks["Cached geometry source is a native specification"]=sourceSpec==="Ricci"[-1,-1];
 DeleteTensorValues[ri,{{ch,ch}}];checks["Deleted raised geometry rebuilt"]=ToValues[ri[{0,ch},{0,ch}]]===r0;
 (* A standard source plus native transformation must support another Riemann variance. *)
 rr=ToValues[rm[{0,ch},{1,ch},{0,ch},{1,ch}]];
