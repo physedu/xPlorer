@@ -41,5 +41,19 @@ assert["replace-first-match",ApplyRules["Mixed",mass],2];
 ReplaceRules["Mixed",{mass->4}];
 assert["replace-removes-old",ShowRules["Mixed"],{mass->4}];
 assert["clear-backgrounds-protects-external",ListQ[ClearBackgrounds[]]&&KeyExistsQ[$BG,"Mixed"],True];
+(* Managed inputs remain authoritative when native values are replayed. *)
+makeBackground["NativeReplay",{"t","x","y","z"},DiagonalMatrix[{-1,1,1,1}]];
+SetFieldComponents["NativeReplay",phi,1];
+nativeReplayHead=BackgroundObject["NativeReplay","phi"];
+With[{hh=nativeReplayHead},DeleteTensorValues[hh];ComponentValue[hh[],9]];
+assert["native-edit-visible",ToValues[phiNativeReplay[]],9];
+ClearComputedValues["NativeReplay"];
+assert["managed-replay-overwrites-native",ToValues[phiNativeReplay[]],1];
+With[{hh=nativeReplayHead},DeleteTensorValues[hh];ComponentValue[hh[],9]];
+capturedNative=ToValues[phiNativeReplay[]];
+SetFieldComponents[phiNativeReplay[],capturedNative];
+nativeRecipe=ReconstructionData["NativeReplay"];
+RecreateBackground["NativeReplayCopy",nativeRecipe];
+assert["explicit-managed-capture",ToComponents["NativeReplayCopy",phi[]],9];
 (* Native-owned external objects are not automatically deleted. Isolated test kernel. *)
 <|"Version"->$XPlorerVersion,"Total"->Length[testResults],"Passed"->Count[Lookup[testResults,"Passed"],True],"Failures"->Select[testResults,!TrueQ[#["Passed"]]&]|>
