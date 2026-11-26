@@ -73,7 +73,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package version, authorship, license and project link.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.6";
+$XPlorerVersion = "14.0.0-beta.13-dev.7";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label; the association form changes several labels of owned background objects. Automatic restores the inherited default for a key.";
@@ -1554,16 +1554,20 @@ CheckConnection[tag_String,selector_Symbol,opts:OptionsPattern[]] := Module[{b=b
 
 RegisterTheory[args___] := failure["Registration", "Unsupported registration arguments."];
 
-AboutXPlorer[] := Column[{
- Style["xPlorer",Bold,20],
- Style["Abstract theories. Independent backgrounds.",Italic],
- "Version "<>$XPlorerVersion,
- "Copyright \[Copyright] 2026 Eduardo Sanz-Romero (PhysEdu)",
- "Released under the GNU General Public License v3 or later.",
- "Powered by xAct: xTensor, xCoba, xPert",
- Hyperlink["github.com/physedu/xPlorer","https://github.com/physedu/xPlorer"]
- },Spacings->0.55];
+(* Match the plain-text startup conventions of the xAct packages. *)
+aboutXPlorerLines[] := Module[{separator=StringRepeat["-",60]},{
+ separator,
+ "Package xPlorer` version "<>$XPlorerVersion,
+ "Copyright (C) 2026 Eduardo Sanz-Romero (PhysEdu), under the GNU General Public License.",
+ separator,
+ "Abstract theories. Independent backgrounds.",
+ "Powered by xAct: xTensor, xCoba, xPert.",
+ "This package comes with ABSOLUTELY NO WARRANTY. See LICENSE for details.",
+ Hyperlink["github.com/physedu/xPlorer","https://github.com/physedu/xPlorer"],
+ separator
+}];
+AboutXPlorer[] := Column[aboutXPlorerLines[],Spacings->0.5];
 updatePrintHook[];
-If[!TrueQ[$startupShown],$startupShown=True;Print[AboutXPlorer[]]];
+If[!TrueQ[$startupShown],$startupShown=True;Scan[Print,aboutXPlorerLines[]]];
 End[];
 EndPackage[];
