@@ -1023,7 +1023,47 @@ chooseGeometrySource[b_,head_,signs_,specs_] := Module[{candidates,data,stored,r
  First@SortBy[If[valid==={},candidates,valid],Count[MapThread[SameQ,{List@@#,signs}],False]&]
 ];
 
-prepareManagedRead[expr_,list_] := Module[{owners=managedReadOwners[list],atoms,b,tag,rec,signs,r,requests=<||>,key,georequests=<||>,specs,sp},
+(* Selected concrete field reads use native SeparateMetric and TraceBasisDummy.
+   The native source and target rules remain authoritative. Do not mark the
+   entire target configuration complete when computing one coordinate tuple. *)
+fieldSourceEquivalentQ[b_,rec_,signs_] := Module[{source=fieldNativeBases[b,rec,rec["IndexPositions"]],target=fieldNativeBases[b,rec,signs]},
+ AnyTrue[TensorValIDs[rec["Head"]],Length[List@@#]===2&&MemberQ[Last[List@@#],source]&&MemberQ[Last[List@@#],target]&]];
+singleFieldStamp[b_,rec_,can_] := Module[{ch=b["Basis"],gg=b["Metric"]},
+ Hash[{nativeInputStamp[b,rec],nativeRuleGroup[gg,{-ch,-ch}],nativeRuleGroup[gg,{ch,ch}],
+   ToValues[can,rec["Head"]]},"SHA256"]];
+ensureSelectedFieldComponent[b_,rec_,atom_] := Module[
+ {can=ToCanonical[atom],signs,tag=b["Tag"],key,fullKey,fullStamp,stamps,stamp,target,ix,changed,separated,selected,value,r,head=rec["Head"],sourceAtoms},
+ If[can===0,ComponentValue[atom];Return[Null]];
+ If[Head[can]===Times&&First[can]===-1,can=-can];
+ If[Head[can]=!=head,Return[failure["FieldVariance","Could not canonicalize requested component."]]];
+ signs=managedPrimaryIndices[b,can,CIndexQ];
+ If[signs===None,Return[failure["FieldVariance","Could not determine requested component variance."]]];
+ If[signs===rec["IndexPositions"]||fieldSourceEquivalentQ[b,rec,signs],ComponentValue[atom];Return[Null]];
+ fullKey=fieldRecordKey[rec]<>":"<>ToString[signs,InputForm];
+ fullStamp=Lookup[Lookup[b,"NativeVarianceStamps",<||>],fullKey,Missing[]];
+ If[IntegerQ[fullStamp]&&fullStamp===nativeVarianceStamp[b,rec,signs],
+  ComponentValue[atom];Return[Null]];
+ key=fieldRecordKey[rec]<>":"<>ToString[List@@can,InputForm];
+ stamps=Lookup[b,"NativeSingleComponentStamps",<||>];
+ stamp=singleFieldStamp[b,rec,can];
+ If[Lookup[stamps,key,Missing[]]===stamp,ComponentValue[atom];Return[Null]];
+ target=fieldBasisExpression[b,rec,signs];ix=DeleteCases[List@@target,_LI];
+ changed=Pick[ix,MapThread[UnsameQ,{signs,rec["IndexPositions"]}],True];
+ r=guard[Block[{$insideManagedCalculation=True,$CVVerbose=False,$CVReplace=True},
+   separated=Fold[SeparateMetric[Automatic,b["Basis"]][#1,#2]&,target,changed];
+   selected=componentAt[separated,ix,First/@DeleteCases[List@@can,_LI]];
+   value=traceValues[selected];
+   sourceAtoms=DeleteDuplicates@Cases[value,e:_[___]/;Head[e]===head&&AllTrue[DeleteCases[List@@e,_LI],CIndexQ],{0,Infinity}];
+   Scan[ComponentValue,sourceAtoms];
+   value=$CCSimplify[resolveValues[value]];
+   ComponentValue[can,value];
+   ComponentValue[atom]
+ ]];
+ If[r===$Failed,Return[failure["FieldVariance","xCoba could not evaluate the selected field component."]]];
+ put[tag,<|"NativeSingleComponentStamps"->Append[stamps,key->singleFieldStamp[$BG[tag],rec,can]]|>];Null
+];
+
+prepareManagedRead[expr_,list_] := Module[{owners=managedReadOwners[list],atoms,b,tag,rec,signs,r,requests=<||>,key,georequests=<||>,specs,sp,singleRequests={},selectedGroups={},group},
  atoms=DeleteDuplicates@Cases[expr,e:_[___]/;KeyExistsQ[owners,Head[e]],{0,Infinity}];
  Do[tag=owners[Head[atom]];b=$BG[tag];
   If[!KeyExistsQ[b,"MetricMatrix"],Continue[]];
@@ -1045,8 +1085,19 @@ prepareManagedRead[expr_,list_] := Module[{owners=managedReadOwners[list],atoms,
     If[TrueQ[Lookup[rec,"Partial",False]]&&AllTrue[DeleteCases[List@@atom,_LI],CIndexQ],
      ComponentValue[atom]];
     Continue[]];
+  If[AllTrue[DeleteCases[List@@atom,_LI],CIndexQ],
+   AppendTo[singleRequests,{tag,rec,atom,signs}];Continue[]];
   key={tag,fieldRecordKey[rec],signs};requests[key]={tag,rec,signs}
  ,{atom,atoms}];
+ (* A genuinely complete component array, or an explicit basis-index
+    request for that variance, is still a native full-configuration request. *)
+ Do[tag=group[[1,1]];rec=group[[1,2]];signs=group[[1,4]];
+  key={tag,fieldRecordKey[rec],signs};
+  If[KeyExistsQ[requests,key],Continue[]];
+  If[Length[group]===$BG[tag]["Dimension"]^Length[signs],
+   requests[key]={tag,rec,signs},AppendTo[selectedGroups,group]]
+ ,{group,GatherBy[singleRequests,{#[[1]],fieldRecordKey[#[[2]]],#[[4]]}&]}];
+ singleRequests=Flatten[selectedGroups,1];
  Do[b=$BG[tag];r=captureNativeMetricCompute[tag,b["Chart"],georequests[tag],CVSimplify->managedReadPolicy[b]];
   If[FailureQ[r],Return[r]],{tag,Keys[georequests]}];
  Do[b=$BG[req[[1]]];
@@ -1054,6 +1105,11 @@ prepareManagedRead[expr_,list_] := Module[{owners=managedReadOwners[list],atoms,
    r=ComputeGeometry[req[[1]],{"Metric"},CVSimplify->managedReadPolicy[b]];If[FailureQ[r],Return[r]]];
   r=ensureFieldConfiguration[$BG[req[[1]]],req[[2]],req[[3]]];If[FailureQ[r],Return[r]]
  ,{req,Values[requests]}];
+ Do[b=$BG[req[[1]]];
+  If[!MemberQ[b["ComputedGeometry"],"Metric"]||!nativeGeometryGroupPresentQ[b,"Metric"],
+   r=ComputeGeometry[req[[1]],{"Metric"},CVSimplify->managedReadPolicy[b]];If[FailureQ[r],Return[r]]];
+  r=ensureSelectedFieldComponent[$BG[req[[1]]],req[[2]],req[[3]]];If[FailureQ[r],Return[r]]
+ ,{req,singleRequests}];
  Null
 ];
 managedNativeRead[expr_,list_,f_] := Block[{$insideManagedCalculation=True},
