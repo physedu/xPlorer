@@ -17,7 +17,7 @@ ClearTheory::usage = "ClearTheory[] resets $Theory to an empty association.";
 
 CreateBackground::usage = "CreateBackground[tag] creates a background from $Theory. Use CreateBackground[tag, Indices -> Automatic] to reuse theory indices or CreateBackground[tag, Indices -> {...}] to choose a background-specific index list. Free suffixed names in the calling context refer directly to the created objects, indices and registered expressions. Use SymbolSuffix for the symbol names, PrintAs for the metric label and MetricSignature for its signature.";
 PortExpression::usage = "PortExpression[tag, expr] ports an abstract expression expr to the background tag.";
-PrettyExp::usage = "PrettyExp[tag][expr] rewrites a background expression to the original abstract notation for display only.";
+PrettyExp::usage = "PrettyExp[expr, opts], expr // PrettyExp, expr // PrettyExp[tag], expr // PrettyExp[opts], or PrettyExp[tag, expr, opts] creates an interpreted presentation view. Normal returns the original expression. Infer a unique background when possible; otherwise use session defaults.";
 AddRules::usage = "AddRules[tag, rules] adds specialization rules to the background tag.";
 ClearRules::usage = "ClearRules[tag] removes specialization rules from the background tag.";
 ShowRules::usage = "ShowRules[tag] returns active rules in order. ShowRules[tag, \"Numbered\"] pairs them with their one-based positions.";
@@ -40,8 +40,6 @@ ChartOf::usage = "ChartOf[tag] returns the chart symbol stored for the backgroun
 CoordinatesOf::usage = "CoordinatesOf[tag] returns the coordinate symbols stored for the background tag.";
 BasisOf::usage = "BasisOf[tag] returns the basis symbol stored for the background tag.";
 SetCMetricSystem::usage = "SetCMetricSystem[tag, mat, opts] assigns the matrix mat as components of the already existing background metric in the coordinated chart/basis of tag using xCoba MetricInBasis, then computes the objects selected by ComputeOnSet (metric and inverse by default).";
-CMetricOf::usage = "CMetricOf[tag] returns the xCoba component metric stored for the background tag.";
-ComponentCovDOf::usage = "ComponentCovDOf[tag] returns the xCoba component covariant derivative stored for the background tag.";
 MetricMatrixOf::usage = "MetricMatrixOf[tag] returns the matrix used in SetCMetricSystem for the background tag.";
 ShowTheory::usage = "ShowTheory[] displays a compact theory overview. ShowTheory[section] displays details for Geometry, Fields, Parameters, Lagrangians, Expressions, Connections, Sectors or Metadata. Use TheorySnapshot[] for restorable data.";
 TheorySnapshot::usage = "TheorySnapshot[] returns the raw restorable theory association. Restore with With[{snapshot = saved}, RegisterTheory[snapshot]] after ClearTheory[]. Source xAct definitions must remain alive.";
@@ -59,7 +57,6 @@ CheckBackground::usage = "CheckBackground[tag, opts] returns Passed, Failed or I
 PerturbOn::usage = "PerturbOn[tag, expressionOrKey, n, opts] computes the nth variation (or Taylor coefficient when requested), with optional component output.";
 ToBasisOf::usage = "ToBasisOf[tag, expr] converts to the background basis and traces basis dummies.";
 ToValuesOf::usage = "ToValuesOf[tag, expr] evaluates values in the background basis.";
-ExprMatrixOf::usage = "ExprMatrixOf[tag, expr] is the compatibility alias for ToComponents on rank-two expressions.";
 FreeIndices::usage = "FreeIndices specifies the ordered free abstract indices of a component result.";
 Components::usage = "Components -> All or a list of coordinate-number tuples selects the component output.";
 IndexPositions::usage = "IndexPositions specifies +1 or -1 for each tensor slot; Automatic preserves the declared variance.";
@@ -72,7 +69,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package version, authorship, license and project link.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.4";
+$XPlorerVersion = "14.0.0-beta.13-dev.5";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label; the association form changes several labels of owned background objects. Automatic restores the inherited default for a key.";
@@ -80,10 +77,9 @@ PresentationOf::usage = "PresentationOf[tag] reports current labels and their de
 SetXPlorerPreferences::usage = "SetXPlorerPreferences[PartialStyle -> style] sets the session output style. Label rules set defaults for future backgrounds. SetXPlorerPreferences[] resets the session preferences.";
 BackgroundObject::usage = "BackgroundObject[tag, key] returns the actual field or geometry head. Full InputForm retains its context.";
 
-DisplayExpression::usage = "DisplayExpression[tag, expr, opts] creates a reversible interpreted view. Normal returns the original expression; copying the boxes retains the mathematical expression.";
 SetNotation::usage = "SetNotation[tag, association] sets background display defaults; no mathematical data changes.";
 PartialStyle::usage = "PartialStyle chooses Native, MultiIndex, Fraction, Partial, Comma or Prime (one argument) for notebook output and explicit views.";
-CovariantStyle::usage = "CovariantStyle chooses Native, Prefix, or Postfix in DisplayExpression.";
+CovariantStyle::usage = "CovariantStyle chooses Native, Prefix, or Postfix in PrettyExp.";
 ShowBackgroundLabel::usage = "ShowBackgroundLabel adds a background label to an expression view.";
 
 ClearComputedValues::usage = "ClearComputedValues[tag] clears derived geometry and restores declared metric/field inputs.";
@@ -413,11 +409,7 @@ PortExpression[tag_String, expr_] := Module[{bg = background[tag], held, indices
   output = guard[ReplaceDummies[ReleaseHold[held]]];
   If[output === $Failed, failure["PortExpression", "The expression could not be transferred consistently."], output]
 ];
-PrettyExp[tag_String][expr_] := Module[{bg = background[tag], held},
-  If[FailureQ[bg], Return[bg]];
-  held = With[{ex = expr}, HoldComplete[ex]];
-  ReleaseHold[held /. (Reverse /@ bg["HeadRules"]) /. (Reverse /@ bg["IndexRules"])]
-];
+
 AddRules[tag_String, rules_List] := Module[{bg = background[tag]}, If[FailureQ[bg], Return[bg]];
   If[!AllTrue[rules, MatchQ[#, _Rule | _RuleDelayed] &], Return[failure["Rules", "Supply a list of rules."]]];
   put[tag, <|"SpecializationRules" -> Join[bg["SpecializationRules"], rules],"ActiveRuleGroups"->{}|>];invalidateResults[tag];$BG[tag]];
@@ -500,7 +492,7 @@ expressionTextFormat[tag_,expr_,args_,format_] := Module[{},
    "TexAct", If[!MemberQ[$Packages,"xAct`TexAct`"],Quiet[Needs["xAct`TexAct`"]]];
      If[MemberQ[$Packages,"xAct`TexAct`"],xAct`TexAct`TexPrint[expr],
        failure["TexAct","Install TexAct to use this export format."]],
-   "View", DisplayExpression[tag,expr],
+   "View", PrettyExp[tag,expr],
    _,failure["ExportFormat","Choose InputForm, TeX, TexAct, or View."]]
 ];
 ShowRules[tag_String,"Numbered"] := Module[{rules=ShowRules[tag]},
@@ -606,7 +598,7 @@ SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background
   result = guard[MetricInBasis[b["Metric"], -b["Basis"], mat]];
   If[result === $Failed, Return[failure["MetricAssignment", "xCoba could not assign the metric."]]];
   put[tag, <|"MetricMatrix" -> mat, "MetricRevision" -> b["MetricRevision"] + 1,
-    "CMetric" -> b["Metric"], "ComponentCovD" -> b["CovD"], "Assumptions" -> ass|>];
+    "Assumptions" -> ass|>];
   result = replayFields[tag]; If[FailureQ[result], Return[result]];
   result = replayConnections[tag];If[FailureQ[result],Return[result]];invalidateResults[tag];
   If[OptionValue[ComputeOnSet] =!= None,
@@ -614,8 +606,6 @@ SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background
     If[FailureQ[result], Return[result]]];
   $BG[tag]
 ];
-CMetricOf[tag_String] := getter[tag, "CMetric"];
-ComponentCovDOf[tag_String] := getter[tag, "ComponentCovD"];
 MetricMatrixOf[tag_String] := getter[tag, "MetricMatrix"];
 
 $geometryTargets = <|"Metric" -> {"Metric"[-1, -1], "Metric"[1, 1], "DetMetric"[]},
@@ -786,9 +776,8 @@ ToComponents[tag_String, input_, OptionsPattern[]] := Module[
   If[TrueQ[OptionValue[StrictComponents]] && unresolved =!= {},
     failure["UnresolvedComponents", "Some tensor components or derivatives remain symbolic.", <|"Expressions" -> unresolved|>], arr]
 ];
-ToBasisOf[tag_String, expr_] := Module[{b = background[tag]}, If[FailureQ[b], b, guard[TraceBasisDummy[ToBasis[b["Basis"]][expr]]]]];
+ToBasisOf[tag_String, expr_] := Module[{b = background[tag]}, If[FailureQ[b], Return[b]]; If[!KeyExistsQ[b,"Basis"],Return[failure["NoChart","Define the chart before converting to its basis."]]]; guard[TraceBasisDummy[ToBasis[b["Basis"]][expr]]]];
 ToValuesOf[tag_String, expr_] := Module[{ex = ToBasisOf[tag, expr]}, If[FailureQ[ex], ex, guard[ToValues[ex]]]];
-ExprMatrixOf[tag_String, expr_] := ToComponents[tag, expr];
 
 zeroCheck[expr_, ass_] := Module[{simp = Simplify[expr, Assumptions -> ass]},
   Which[TrueQ[simp == 0], "Passed", TrueQ[Simplify[simp != 0, Assumptions -> ass]], "Failed", True, "Inconclusive"]];
@@ -1022,13 +1011,17 @@ hasGeneratedIndexQ[e_] := !FreeQ[e, i_Symbol /; StringContainsQ[SymbolName[i],"$
 automaticView[e_List] := automaticView /@ e;
 automaticView[Row[items_List, rest___]] := Row[automaticView /@ items, rest];
 automaticView[Grid[items_List, rest___]] := Grid[automaticView[items], rest];
-automaticView[e_] := Module[{owners,style},
+notationOwner[e_] := Module[{owners},
+  owners=Select[Keys[$BG],Function[t,!FreeQ[e,s_Symbol /; Context[s] === $BG[t]["Context"]]]];
+  If[Length[owners]===1,First[owners],None]
+];
+notationSettings[tag_] := Join[$notationDefaults,$sessionNotation,
+  If[StringQ[tag],Lookup[$BG[tag],"Notation",<||>],<||>]];
+automaticView[e_] := Module[{tag,style},
   If[!FreeQ[e,_expressionView] || !MatchQ[e,_Plus|_Times|_Power|_Equal|_Scalar|_?xTensorQ[___]|_?CovDQ[_][_]|Derivative[__][_][__]],Return[e]];
   If[!FreeQ[e,Derivative|_?CovDQ],
-    owners=Select[Keys[$BG],Function[t, !FreeQ[e,s_Symbol /; Context[s] === $BG[t]["Context"]]]];
-    If[Length[owners]===1,
-      style=Join[$notationDefaults,$sessionNotation,Lookup[$BG[First[owners]],"Notation",<||>]];
-      If[style =!= $notationDefaults,Return[expressionView[e,style,First[owners]]]]]];
+    tag=notationOwner[e];style=notationSettings[tag];
+    If[style =!= $notationDefaults,Return[expressionView[e,style,tag]]]];
   If[hasGeneratedIndexQ[e],expressionView[e,$notationDefaults,None],e]
 ];
 notebookPrint[e_] := If[$previousPrint === ScreenDollarIndices,
@@ -1047,18 +1040,24 @@ SetNotation[tag_String, a_Association] := Module[{b=background[tag],overrides}, 
   overrides=Select[Join[Lookup[b,"Notation",<||>],a],#=!=Automatic&];
   If[Complement[Keys[a],Keys[$notationDefaults]]=!={} || !validNotation[overrides],Return[failure["Notation","Unknown notation setting."]]];
   put[tag,<|"Notation" -> overrides|>]; updatePrintHook[]; $BG[tag]["Notation"]];
-Options[DisplayExpression] = {PartialStyle -> Automatic, CovariantStyle -> Automatic, ShowBackgroundLabel -> Automatic};
-DisplayExpression[tag_String, expr_, OptionsPattern[]] := Module[{b=background[tag],a,local},
-  If[FailureQ[b],Return[b]];
+Options[PrettyExp] = {PartialStyle -> Automatic, CovariantStyle -> Automatic, ShowBackgroundLabel -> Automatic};
+prettyView[tag_, input_, opts:OptionsPattern[PrettyExp]] := Module[{b,a,local,expr=input},
+  If[MatchQ[expr,_expressionView],expr=Normal[expr]];
+  If[StringQ[tag],b=background[tag];If[FailureQ[b],Return[b]]];
+  If[Complement[First /@ Flatten[{opts}],First /@ Options[PrettyExp]]=!={},Return[failure["Notation","Unknown notation option."]]];
   local=Select[<|"PartialStyle"->OptionValue[PartialStyle],"CovariantStyle"->OptionValue[CovariantStyle],"ShowBackgroundLabel"->OptionValue[ShowBackgroundLabel]|>,# =!= Automatic &];
-  a=Join[$notationDefaults,$sessionNotation,Lookup[b,"Notation",<||>],local];
+  a=Join[notationSettings[tag],local];
   If[!validNotation[a],Return[failure["Notation","Unknown notation setting."]]];
   expressionView[expr,a,tag]
 ];
+PrettyExp[tag_String, expr:Except[_Rule|_RuleDelayed], opts:OptionsPattern[]] := prettyView[tag,expr,opts];
+PrettyExp[tag_String][expr_] := prettyView[tag,expr];
+PrettyExp[opts:(_Rule|_RuleDelayed)..][expr_] := prettyView[notationOwner[expr],expr,opts];
+PrettyExp[expr:Except[_String|_Rule|_RuleDelayed], opts:OptionsPattern[]] := prettyView[notationOwner[expr],expr,opts];
 expressionView /: Normal[expressionView[e_,_,_]] := e;
 expressionView /: MakeBoxes[expressionView[e_,a_,tag_], StandardForm] :=
   With[{body=notationBoxes[If[hasGeneratedIndexQ[e],ScreenDollarIndices[e],e],a]},
-    If[TrueQ[a["ShowBackgroundLabel"]],
+    If[StringQ[tag] && TrueQ[a["ShowBackgroundLabel"]],
       InterpretationBox[RowBox[{StyleBox[tag,FontWeight->Bold],": ",body}],e],
       InterpretationBox[body,e]]
   ];
@@ -1211,13 +1210,13 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  newb["SpecializationRules"]=Delete[b["SpecializationRules"],List /@ plan["RulePositions"]];
  With[{tt=Join[newb["Theory"],<|"Field"->KeyTake[Lookup[newb["Theory"],"Field",<||>],Keys[newb["Field"]]],"Connections"->KeyTake[Lookup[newb["Theory"],"Connections",<||>],Keys[newb["Connections"]]],"Formula"->KeyDrop[Lookup[b["Theory"],"Formula",<||>],plan["RegisteredExpressions"]]|>]},newb["Theory"]=tt];
  If[MemberQ[deadKeys,"Metric"],
-  newb=KeyDrop[newb,Join[{"Christoffel","Riemann","Ricci","RicciScalar","Einstein","Weyl","TFRicci","Kretschmann","Epsilon","DetMetric"},{"Metric","CovD","MetricMatrix","CMetric","ComponentCovD","GeometryPolicy"}]];
+  newb=KeyDrop[newb,Join[{"Christoffel","Riemann","Ricci","RicciScalar","Einstein","Weyl","TFRicci","Kretschmann","Epsilon","DetMetric"},{"Metric","CovD","MetricMatrix","GeometryPolicy"}]];
   newb["GeometryState"]="AbstractWithoutMetric";
  ];
  If[MemberQ[deadKeys,"Chart"],
   Scan[If[xTensorQ[#],DeleteTensorValues[#]]&,Lookup[Values[newb["Field"]],"NewHead",{}]];
   newb["FieldComponents"]=<||>;newb["ConnectionComponents"]=<||>;
-  newb=KeyDrop[newb,{"AdditionalCharts","Chart","Basis","Coordinates","CoordinateLabels","MetricMatrix","CMetric","ComponentCovD","GeometryPolicy"}]
+  newb=KeyDrop[newb,{"AdditionalCharts","Chart","Basis","Coordinates","CoordinateLabels","MetricMatrix","GeometryPolicy"}]
  ];
  newb["PresentationDefaults"]=KeyDrop[newb["PresentationDefaults"],deadKeys];
  newb["PresentationOverrides"]=KeyDrop[newb["PresentationOverrides"],deadKeys];
