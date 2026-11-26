@@ -11,7 +11,9 @@ Author-approved direction: xPlorer complements xAct; native xTensor/xCoba/xPert/
 - [x] Evaluate named profile sets (multiple fields, stored variance, activation, atomic rollback, cached geometry reuse); implement only if validated. Existing SetFieldComponents replaces current profile.
 - [x] Evaluate native ToCTensor integration (possible Output -> "CTensor"); preserve current array default, rank, basis, variance, reject partial arrays/unsupported inputs. No redundant API without need.
 - [x] Migrate actual notebook and tests, API guide, README/version/paclet/citation; retain native Mathematica boxes.
-- [ ] Verify Desktop rendering and actual .paclet archive installation (remote Java archive restriction).
+- [x] Build dev.6 paclet in Mathematica Desktop (author's Windows build).
+- [x] Implement clean staging builder and verify its staging/failure handling remotely.
+- [ ] Verify clean builder success, Desktop paclet installation/loading and rendering.
 - [x] Full regression on immutable commits, report actual results.
 - [ ] Release readiness, including real Desktop check; no main merge or release.
 
@@ -27,3 +29,7 @@ Historical evidence in BETA13_PROGRESS.md and API_AUDIT.md. Each completed task 
 - Output -> "CTensor" supports complete resolved positive-rank zero-weight tensor arrays, in primary or selected output chart. Default Array unchanged. Native xCoba handles changes of basis. No managed general-basis API and no automatic synchronization of external native edits: the native-only chart workflow deliberately remains unmanaged. Do not assume every mixed native operation is safe.
 - Native example in Examples/NativeXCoba.wl and canonical notebook new examples; API guide and metadata updated. Historical validation/Tools sources remain historical.
 - Traditional temporary application installation and double-Get banner confirmed. Actual .paclet archive still fails explicitly due Java SecurityException; GUI check pending. Keep main unchanged.
+
+## Desktop build follow-up
+
+Author screenshot confirms the original dev.6 builder returned Success and created an archive on Windows. Clean staging builder commit 5df780b6c681423fb807add826b709425098931d changes tooling only, not package payload or version. Remote staging no longer emits excluded-development-file warnings; missing-input and cleanup checks pass. Archive compression remains blocked remotely. Preserve the existing author-built archive, verify installation and payload before attaching it to a future release. No main merge or release.
