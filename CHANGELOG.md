@@ -123,3 +123,9 @@ Added a portable notebook, 75 regression checks, an MUnit report runner, and an 
 
 - Owned metric shorthand with native MetricInBasis and MetricCompute; owned full-field array shorthand with AllComponentValues. Scalar ComponentValue and full DeleteTensorValues support explicit Managed -> True. No global xCoba definitions changed.
 - Retain current managed setters and native explicit-basis behavior. Update scientific guide examples without adding test cells. No package installer changes.
+
+## 14.0.0-beta.13-dev.18 (development)
+
+- Capture ordinary native scalar inputs, complete literal arrays in the managed primary chart, and individual edits of complete recorded source configurations. Full native field deletion clears the managed record. No Managed marker required in these cases.
+- Prepare requested native field variances on demand, cache rule fingerprints rather than arrays, and extend ToValues for compound native reads. Guard derived writes through ChangeComponents. Replay affected field heads instead of every registered field on assignment.
+- Integrate literal covariant and contravariant primary-chart MetricInBasis assignments. Propagate failures during forced geometry restoration. Existing setters retained; no packaging changes, no release.

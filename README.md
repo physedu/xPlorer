@@ -165,13 +165,13 @@ Get["/path/to/xPlorer/Tests/RunGroup.wl"]
 
 The runner supports the existing historical groups and the new standalone groups. The traditional application and development-directory Needs paths were verified; actual paclet archive compression still fails remotely due to Java security restrictions. The Desktop notebook appearance and archive installation/uninstallation must be verified locally. Primary-chart promotion remains a design task, not a supported operation.
 
-### Native xCoba syntax (dev.17)
+### Integrated native xCoba syntax (dev.18)
 
 ```wl
 MetricInBasis[gSchw, matrix];
-ComponentValue[phiSchw[], profile, Managed -> True];
+ComponentValue[phiSchw[], profile];
 AllComponentValues[ASchw[-aSchw], array];
 scalarEqSchw // ToComponents
 ```
 
-The shorthand uses the existing managed registry while leaving native xCoba definitions untouched. See the [API guide](API_GUIDE.md#native-xcoba-shorthand-dev17) for the distinction between managed and ordinary native assignment. Existing setters remain available. No change to archive construction or xTras dependency.
+The extensions use native xCoba storage and transformations. Scalar and complete primary-chart field inputs are captured automatically within the documented scope. Requested variance configurations are prepared on demand and reused; ToValues can read them directly. The original native definitions are retained; one conditional ToValues rule covers compound reads. See the [API guide](API_GUIDE.md#integrated-native-xcoba-operations-dev18) for exact boundaries. Existing setters remain available. No change to archive construction or xTras dependency.

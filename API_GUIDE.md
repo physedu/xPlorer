@@ -1,4 +1,4 @@
-# Using xPlorer — beta.13-dev.17
+# Using xPlorer — beta.13-dev.18
 
 The principal worked guide is xPlorer_Workflow.nb. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
@@ -198,25 +198,32 @@ nativeValue = ToValues[phiM[]];
 SetFieldComponents[phiM[], nativeValue];
 ```
 
-This explicit operation uses the normal managed assignment interface. For a tensor first obtain a resolved primary-chart array with its known slot variance through native xCoba. Native edits without managed assignment can be lost when replay restores declared inputs. No automatic import, native snapshot or arbitrary rollback is promised.
+This explicit operation uses the normal managed assignment interface. For a tensor first obtain a resolved primary-chart array with its known slot variance through native xCoba. Native edits outside the integrated dev.18 input signatures below can be lost when replay restores declared inputs. No general native snapshot or arbitrary rollback is promised.
 
 OutputChart remains a choice of output coordinates, not a change of the primary chart. Native MetricInBasis and MetricCompute can compute geometry in a secondary chart after supplying its metric; the study in Tests/18_SecondaryChartNative.wl verifies a cylindrical Christoffel coefficient. Native secondary assignments are not synchronized into the managed recipe. Primary promotion is a deferred design, particularly because of inverse coordinate maps, independent connections and stored rules/profiles.
 
 Build with Tools/BuildPaclet.wl or the separate installer notebook. The builder validates the complete distributable payload and returns Failure if a real archive was not produced. In the remote kernel directory loading and traditional application loading pass, but Java archive compression is restricted. Verify archive build and installation locally before distribution.
 
-## Native xCoba shorthand (dev.17)
-
-The following overloads belong to the copied xAct objects themselves (UpValues), not to the global xCoba functions. They use the existing managed setters and computation path. The original native signatures, including two-argument scalar ComponentValue and explicit-basis AllComponentValues/MetricInBasis/MetricCompute, retain their native behavior. No automatic import of derived values is attempted.
+## Integrated native xCoba operations (dev.18)
 
 ```wl
 MetricInBasis[gSchw, matrix, Assumptions -> domain]
 MetricCompute[gSchw, {"Ricci", "Einstein"}]
-ComponentValue[phiSchw[], u[rSchw], Managed -> True]
+ComponentValue[phiSchw[], u[rSchw]]
 AllComponentValues[ASchw[-aSchw], {v[rSchw],0,0,0}]
 AllComponentValues[hSchw[LI[2],-aSchw,-bSchw], perturbationMatrix]
-DeleteTensorValues[ASchw, Managed -> True]
+ToValues[ASchw[{0,ChartOf["Schwarzschild"]}]]
+DeleteTensorValues[ASchw]
 ```
 
-Here rSchw is the actual coordinate scalar, e.g. CoordinatesOf["Schwarzschild"][[2]][]. The metric overload accepts a full matrix, a diagonal list or a Function yielding a full matrix. It uses the managed primary chart and checks supported options. The geometry overload accepts managed target names or All, not native MetricCompute slot specifications. The full-field array overload requires distinct abstract indices, and xPert LI when relevant; it preserves the supplied variance/order and performs existing symmetry checks. Managed scalar assignment and full-field deletion require the explicit marker because their original native signatures also occur in internal computations. These forms return the corresponding managed setter/report result, not a native component rule. A single tensor component or an external/secondary basis assignment remains native-only; do not assume it becomes a managed recipe. Existing SetFieldComponents, SetCMetricSystem and ComputeGeometry remain available while this migration is evaluated.
+Here rSchw is the actual coordinate scalar, e.g. CoordinatesOf["Schwarzschild"][[2]][]. MetricInBasis shorthand accepts a full matrix, a diagonal list or a Function yielding a full matrix. Explicit native MetricInBasis with a literal full matrix or diagonal list and the signed primary basis is also managed when $CVReplace is True. The authoritative stored metric is covariant; contravariant input is inverted. Native rule-array return and Inverse/CVSimplify options are supported within this scope. MetricCompute shorthand takes managed target names or All.
 
-No new mandatory xTras dependency. Use native VarD/VarL and xTensor geometry heads; xPlorer continues to own expression transport, snapshots, isolation and replay. No global Unprotect or interception of native calls.
+Complete literal arrays with explicit primary-chart basis indices also register inputs when $CVReplace is True. Scalar ComponentValue and full DeleteTensorValues on a managed field no longer need Managed -> True. A legacy marker remains available during development. For an individual component, the integrated write path requires an existing complete source record in the same primary-chart variance; it updates the record from the actual native array and invalidates affected head rules. It does not choose a new authoritative variance or fill unspecified entries with zero.
+
+ToValues checks requested explicit primary-chart component configurations, including those in sums and lists. It can calculate the requested variance using native ChangeComponents and reuse native rules when their fingerprints match. The general abstract expression path and selected high-rank components still use the existing ToComponents expansion path. Direct native ChangeComponents runs with an internal calculation guard so its derived array writes are not recorded as physical inputs. Replays are scoped to affected field heads; a metric change still conservatively restores recorded fields. The fingerprints are metadata, not copies of numerical tensors. No eager calculation of all 2^rank combinations and no arbitrary rank cutoff. A single native read may currently prepare a complete requested variance.
+
+Most extensions are owned-head UpValues. ToValues adds one conditional rule to its native list-dispatch signature to cover compound expressions; the original four rules are retained, and unrelated expressions follow the original path. This is a scoped extension, not a second tensor engine. Standard native queries, scalar assignment return rules, CVReplace behavior for scalar and existing recorded source-component writes, and explicit array return rules are preserved in the tested cases. The shorthand returns managed reports as before. No global interception of all xAct methods is claimed.
+
+**Current boundaries:** new incomplete individual-component assignments, assignments to other variances without a complete source record, external/secondary bases, nonliteral native metric input and CVReplace=False metric writes, explicit native MetricCompute specifications, derivative-only edits, RuleToSet state, and native chart/basis creation or destruction are not fully synchronized with the managed registry. Such inputs may remain native-only and can be lost when replay restores declared inputs. Do not mix independent authoritative input configurations. The native read integration only prepares registered complete primary-chart fields. Existing managed setters remain available. No change to archive construction or xTras dependency.
+
+A possible future scoped native-experiment mode is deferred until these integration boundaries are resolved. It must warn that managed records are frozen, restrict the scope to a named background, and distinguish managed replay from arbitrary kernel rollback.
