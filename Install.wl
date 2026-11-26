@@ -16,7 +16,7 @@ With[{source=DirectoryName[$InputFileName]},
    If[!AllTrue[files,FileExistsQ[FileNameJoin[{staging,#}]]&],$Failed,RenameDirectory[staging,target]],$Failed];
   If[result===$Failed,If[DirectoryQ[staging],DeleteDirectory[staging,DeleteContents->True]];
    Return[Failure["InstallFailed",<|"Path"->target|>]]];
-  <|"Installed"->target,"Next"->"Restart the kernel and evaluate Needs[\"xPlorer\u0060\"] (xAct must be installed separately)."|>
+  <|"Installed"->target,"Next"->"Restart the kernel and evaluate Needs[\"xPlorer`\"] (xAct must be installed separately)."|>
  ];
 ];
 InstallXPlorer[]:=InstallXPlorer[FileNameJoin[{$UserBaseDirectory,"Applications"}]];
