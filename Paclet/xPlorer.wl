@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.22";
+$XPlorerVersion = "14.0.0-beta.13-dev.23";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -627,14 +627,28 @@ CoordinatesOf[tag_String] := getter[tag, "Coordinates"];
 BasisOf[tag_String] := getter[tag, "Basis"];
 getter[tag_, key_] := Module[{b = background[tag]}, If[FailureQ[b], b, Lookup[b, key, failure["NotInitialized", "The requested background property has not been initialized.", <|"Property" -> key|>]]]];
 
-clearGeometry[tag_] := Module[{b = $BG[tag], heads, cached, positions, owned},
+(* Native MetricCompute also stores independent imploded derivative heads,
+   not just derivative ValIDs attached to the original metric/curvature. *)
+$nativeGeometryDerivativeSpecs={"DMetric"[-1,-1,-1],"DDMetric"[-1,-1,-1,-1],"CDRiemann"[-1,-1,-1,-1,-1]};
+nativeGeometryChartData[b_,ch_] := {{b["Metric"],b["CovD"]},{ch,PDOfBasis[ch]},{ch,PDOfBasis[ch]}};
+nativeGeometrySpecHead[spec_,data_] := Module[{h=xAct`xCoba`Private`CacheKeySymbolic[spec,data]},
+ If[Head[h]===MultiplyHead,Last[h],h]];
+nativeGeometryDerivativeHeads[b_,ch_] := nativeGeometrySpecHead[#,nativeGeometryChartData[b,ch]]& /@ $nativeGeometryDerivativeSpecs;
+nativeReportEntries[cached_List] := Cases[First/@cached,
+ Verbatim[HoldPattern][xCobaCacheTable["ReportCompute"[obj_,cc_,data_,m_],name_]]:>{obj,cc,data,m,name}];
+clearGeometry[tag_] := Module[{b = $BG[tag], heads, cached, positions, owned,charts,entries},
   If[!KeyExistsQ[b,"Metric"] || !MetricQ[b["Metric"]],Return[Null]];
   owned = DeleteMissing[Lookup[b, {"Metric", "CovD", "Chart"}]];
   cached = DownValues[xCobaCacheTable];
   positions = Select[Range[Length[cached]], Function[pos, AnyTrue[owned, !FreeQ[cached[[pos]], #] &]]];
-  If[positions =!= {}, With[{pp = List /@ positions}, ClearxCobaCache[pp]]];
+  entries=Select[nativeReportEntries[cached],#[[4]]===b["Metric"]&];
+  charts=Select[DeleteDuplicates@Join[DeleteMissing[Lookup[b,{"Chart"}]],
+   Lookup[Values[Lookup[b,"AdditionalCharts",<||>]],"Chart",{}]],ChartQ];
   heads = DeleteDuplicates@Join[{b["Metric"]}, Values[allGeometry[b["CovD"], b["Metric"]]],
-    If[KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]], {GiveSymbol[Christoffel, Sequence @@ Sort[{b["CovD"], PDOfBasis[b["Chart"]]}]], GiveSymbol[Determinant, b["Metric"], b["Chart"]]}, {}]];
+   Flatten[Function[ch,Join[{GiveSymbol[Christoffel,Sequence@@Sort[{b["CovD"],PDOfBasis[ch]}]],GiveSymbol[Determinant,b["Metric"],ch]},
+     nativeGeometryDerivativeHeads[b,ch]]] /@ charts],
+   nativeGeometrySpecHead[#[[1]],#[[3]]]& /@ entries];
+  If[positions =!= {}, With[{pp = List /@ positions}, ClearxCobaCache[pp]]];
   Scan[If[xTensorQ[#], guard[DeleteTensorValues[#]]] &, heads];
   $BG[tag]=KeyDrop[$BG[tag],"GeometryPolicy"];
   put[tag, <|"ComputedGeometry" -> {}|>];
@@ -706,11 +720,9 @@ $geometryTargets = <|"Metric" -> {"Metric"[-1, -1], "Metric"[1, 1], "DetMetric"[
    TensorValues. A cached pointer alone does not recreate deleted rules.
    Use native cache metadata and native symbolic-head mapping, not a
    second geometry implementation. Only inspect the managed primary chart. *)
-geometryNativeData[b_] := With[{ch=b["Chart"]},
- {{b["Metric"],b["CovD"]},{ch,PDOfBasis[ch]},{ch,PDOfBasis[ch]}}];
+geometryNativeData[b_] := nativeGeometryChartData[b,b["Chart"]];
 nativeGeometryRulePresentQ[spec_,data_] := Module[{head,bases,ids,rules,parts,dim},
- head=xAct`xCoba`Private`CacheKeySymbolic[spec,data];
- If[Head[head]===MultiplyHead,head=Last[head]];
+ head=nativeGeometrySpecHead[spec,data];
  If[head===Null,Return[True]];
  If[!xTensorQ[head],Return[False]];
  bases=xAct`xCoba`Private`signedbases[spec,data[[2,1]]];
@@ -728,8 +740,7 @@ nativeGeometryRulePresentQ[spec_,data_] := Module[{head,bases,ids,rules,parts,di
 nativeGeometryGroupPresentQ[b_,key_] := AllTrue[$geometryTargets[key],
  nativeGeometryRulePresentQ[#,geometryNativeData[b]]&];
 repairMissingGeometryCache[b_] := Module[{entries,ch=b["Chart"],g=b["Metric"]},
- entries=Cases[First/@DownValues[xCobaCacheTable],
-  Verbatim[HoldPattern][xCobaCacheTable["ReportCompute"[obj_,cc_,data_,m_],name_]]:>{obj,cc,data,m,name}];
+ entries=nativeReportEntries[DownValues[xCobaCacheTable]];
  entries=Select[entries,#[[4]]===g&&#[[2]]==={False,False}&&#[[3,2,1]]===ch&&#[[3,3,1]]===ch&];
  Scan[Function[e,If[!nativeGeometryRulePresentQ[e[[1]],e[[3]]],
   With[{lhs="ReportCompute"[e[[1]],e[[2]],e[[3]],e[[4]]],name=e[[5]]},ClearxCobaCache[lhs,name]]]],entries];
@@ -976,17 +987,34 @@ managedNativeReadRecords[b_,expr_] := Select[Values[b["FieldComponents"]],
  If[#["Order"]===None,FreeQ[expr,_LI],MemberQ[List@@expr,LI[#["Order"]]]]&];
 (* Explicit primary-chart geometry reads. The available native spec
    determines variance: do not compute all variances just to read one. *)
-geometryReadSpecs[b_] := Module[{heads,groups},
+geometryReadSpecs[b_] := Module[{heads,groups,extra,data},
  If[!KeyExistsQ[b,"Chart"]||!KeyExistsQ[b,"MetricMatrix"],Return[<||>]];
  heads=Join[KeyTake[b,{"Metric","Riemann","Ricci","RicciScalar","Einstein","Weyl","Kretschmann"}],
  <|"Christoffel"->GiveSymbol[Christoffel,Sequence@@Sort[{b["CovD"],PDOfBasis[b["Chart"]]}]],
    "DetMetric"->GiveSymbol[Determinant,b["Metric"],b["Chart"]]|>];
- Association@KeyValueMap[Function[{k,h},h->$geometryTargets[k]],heads]
+ data=geometryNativeData[b];
+ extra=Association@Cases[({nativeGeometrySpecHead[#,data],#}& /@ $nativeGeometryDerivativeSpecs),{h_?xTensorQ,sp_}:>(h->{sp})];
+ Join[Association@KeyValueMap[Function[{k,h},h->$geometryTargets[k]],heads],extra]
 ];
 managedReadOwners[list_List] := Association@Flatten[Function[b,
  (#->b["Tag"]& /@ Intersection[list,Join[Lookup[Values[Lookup[b,"Field",<||>]],"NewHead",{}],Keys[geometryReadSpecs[b]]]])] /@ Values[$BG]];
 managedReadHeads[list_List] := Keys[managedReadOwners[list]];
 managedReadPolicy[b_] := First[Lookup[b,"GeometryPolicy",{Together,True}]];
+(* Native standard geometry specifications are authoritative. For another
+   variance, reuse a valid previously converted source where possible, then
+   choose the closest already available standard configuration. *)
+geometryVarianceRecord[head_,spec_] := <|"Head"->head,"IndexPositions"->List@@spec,"Order"->None|>;
+chooseGeometrySource[b_,head_,signs_,specs_] := Module[{candidates,data,stored,rec,valid},
+ candidates=Select[specs,Length[List@@#]===Length[signs]&];If[candidates==={},Return[None]];
+ data=geometryNativeData[b];rec=geometryVarianceRecord[head,First[candidates]];
+ stored=Lookup[Lookup[b,"NativeVarianceStamps",<||>],fieldRecordKey[rec]<>":"<>ToString[signs,InputForm],Missing[]];
+ valid=Select[candidates,nativeGeometryRulePresentQ[#,data]&];
+ If[IntegerQ[stored],
+  rec=SelectFirst[valid,stored===nativeVarianceStamp[b,geometryVarianceRecord[head,#],signs]&,None];
+  If[rec=!=None,Return[rec]]];
+ First@SortBy[If[valid==={},candidates,valid],Count[MapThread[SameQ,{List@@#,signs}],False]&]
+];
+
 prepareManagedRead[expr_,list_] := Module[{owners=managedReadOwners[list],atoms,b,tag,rec,signs,r,requests=<||>,key,georequests=<||>,specs,sp},
  atoms=DeleteDuplicates@Cases[expr,e:_[___]/;KeyExistsQ[owners,Head[e]],{0,Infinity}];
  Do[tag=owners[Head[atom]];b=$BG[tag];
@@ -996,6 +1024,11 @@ prepareManagedRead[expr_,list_] := Module[{owners=managedReadOwners[list],atoms,
   specs=Lookup[geometryReadSpecs[b],Head[atom],{}];
   If[specs=!={},
    sp=SelectFirst[specs,List@@#===signs&,None];
+   If[sp===None&&signs=!={},
+    sp=chooseGeometrySource[b,Head[atom],signs,specs];
+    If[sp=!=None,
+     rec=geometryVarianceRecord[Head[atom],sp];
+     key={tag,fieldRecordKey[rec],signs};requests[key]={tag,rec,signs}]];
    If[sp=!=None&&!nativeGeometryRulePresentQ[sp,geometryNativeData[b]],
     georequests[tag]=Union[Lookup[georequests,tag,{}],{sp}]];
    Continue[]];

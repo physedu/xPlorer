@@ -2,11 +2,11 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-> **Development branch: 14.0.0-beta.13-dev.22.** The new registration API is breaking. Dev.22 integrates native primary-chart metric component edits and exact repeat metric inputs; see exact validation checkpoints. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
+> **Development branch: 14.0.0-beta.13-dev.23.** The new registration API is breaking. Dev.23 extends lazy native geometry variance and invalidates imploded geometry derivative rules; see exact validation checkpoints. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
 
 xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
-The current experimental version is **14.0.0-beta.13-dev.22** (inferred background component evaluation, theory information, readable sector and chart displays, and revised workflow). The component calculation engine is unchanged. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Single-item registration now supports Field, Parameter, Lagrangian and Expression, with plural batch and collection names. Existing plural single-item calls remain accepted; background creation semantics are unchanged. Personalization is optional.
+The current experimental version is **14.0.0-beta.13-dev.23** (inferred background component evaluation, theory information, readable sector and chart displays, and revised workflow). The component calculation engine is unchanged. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Single-item registration now supports Field, Parameter, Lagrangian and Expression, with plural batch and collection names. Existing plural single-item calls remain accepted; background creation semantics are unchanged. Personalization is optional.
 
 ## Start here
 
@@ -101,7 +101,7 @@ If you use xPlorer in your research, please cite the version used. GitHub's **Ci
   author  = {Sanz-Romero, Eduardo},
   title   = {xPlorer},
   year    = {2026},
-  version = {14.0.0-beta.13-dev.22},
+  version = {14.0.0-beta.13-dev.23},
   url     = {https://github.com/physedu/xPlorer}
 }
 ```
@@ -191,3 +191,7 @@ When a managed metric changes, complete recorded field source groups whose nativ
 ### Metric component edits and exact-repeat metric inputs (dev.22)
 
 Native `ComponentValue` can edit a component of a complete managed covariant or contravariant metric in its primary chart. A locally staged native assignment is validated before installation; invalid metric data are rejected without overwriting the original metric rules. An exact repeated managed metric assignment with matching native fingerprints retains existing geometry and revisions. The native inverse is prepared only when needed. Identically vanishing tensors retain their native zero behavior without component hooks.
+
+### Lazy geometry variance and imploded derivatives (dev.23)
+
+Native readers prepare nonstandard primary-chart geometry variances with xCoba ChangeComponents from an available standard native configuration. Repeated reads reuse matching fingerprints. Metric changes clear native imploded metric/curvature derivative rules as well as ordinary geometry rules, retaining their tensor definitions. Defined native imploded derivative heads are included in primary-chart lazy reads. This is not a general derivative or secondary-chart synchronization engine.

@@ -145,3 +145,7 @@ Added a portable notebook, 75 regression checks, an MUnit report runner, and an 
 ## 14.0.0-beta.13-dev.22 (development)
 
 - Stage native covariant/contravariant metric-component edits and validate before replacing the managed metric. Preserve geometry and revisions on exact repeated metric assignments with matching native fingerprints. Skip component hooks on identically vanishing tensors.
+
+## 14.0.0-beta.13-dev.23 (development)
+
+- Prepare nonstandard primary-chart geometry variances through native ChangeComponents and reuse matching rule fingerprints. Invalidate separate native imploded derivative rule groups on metric changes, retaining tensor definitions and enabling lazy primary-chart queries.

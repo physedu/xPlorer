@@ -109,3 +109,7 @@ Preserve unchanged native field source groups on metric change; exact repeat man
 ### dev.22 native metric edits checkpoint
 
 Exact repeat metric inputs and individual primary-chart covariant/contravariant metric writes integrated and validated. Vanishing-tensor component-hook warnings fixed. Next: geometry derivative cleanup and native alternate variance, independent connection dependencies, sparse/partial field inputs and additional native write signatures, RuleToSet state, native chart/basis lifecycles. The scoped native experiment bypass is still deferred.
+
+### dev.23 geometry variance checkpoint
+
+Nonstandard primary-chart geometry variances use native lazy conversion; known native imploded derivative rules are invalidated with geometry and can be queried lazily. Next: partial field inputs, remaining native mutation signatures, independent connection dependencies, RuleToSet state, native chart/basis lifecycle and eventual scoped native experiment mode.
