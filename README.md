@@ -1,5 +1,7 @@
 # xPlorer
 
+[![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
+
 xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
 Current version: **14.0.0-beta.12**. The default workflow remains a normal Get, theory registration and tagged background creation. Personalization is optional.
@@ -40,9 +42,35 @@ Direct Get needs no installation. The repository also contains a traditional app
 
 Each important validated stage is preserved in Git history. Read PROGRESS.md before continuing work so completed stages are not repeated.
 
-## Background and author
+## Author and citation
 
-Developed by **Eduardo Sanz Romero**, in the context of research with Gonzalo J. Olmo and the Grupo de Gravedad y Campos: http://uv-qg.es/ . The goal is a reusable research tool for moving from formal theories to concrete background calculations.
+Developed by **Eduardo Sanz-Romero** ([PhysEdu](https://github.com/physedu)) as a reusable research tool for moving from formal theories to concrete background calculations.
+
+If you use xPlorer in your research, please cite the version used. GitHub's **Cite this repository** option reads [CITATION.cff](CITATION.cff).
+
+```bibtex
+@software{sanz_romero_xplorer_2026,
+  author  = {Sanz-Romero, Eduardo},
+  title   = {xPlorer},
+  year    = {2026},
+  version = {14.0.0-beta.12},
+  url     = {https://github.com/physedu/xPlorer}
+}
+```
+
+Please also cite the relevant xAct packages independently. Their documentation and citation guidance are available through the [xAct project](https://www.xact.es/).
+
+## Acknowledgements
+
+I thank Gonzalo J. Olmo for motivating the research problem of particularizing abstract theories on different metric backgrounds, and acknowledge the research context of the [Grupo de Gravedad y Campos](http://uv-qg.es/).
+
+I also acknowledge José M. Martín-García and the developers of xAct, including the authors of xTensor, xCoba and xPert, whose work makes xPlorer possible.
+
+## License
+
+Copyright (C) 2026 Eduardo Sanz-Romero (PhysEdu).
+
+xPlorer is released under the GNU General Public License, version 3 or (at your option) any later version (**GPL-3.0-or-later**). See [LICENSE](LICENSE) for the full license text. xAct is a separately installed dependency with its own license and copyright notices.
 
 xTensor supplies abstract tensor calculus, xPert supplies perturbative expansions, and xCoba supplies bases and components. Xplorer organizes and connects these operations; it does not replace their mathematics or solve boundary conditions automatically.
 
