@@ -182,3 +182,7 @@ ToComponents["Schwarzschild", Eab]
 ```
 
 Background inference uses owned symbol identities. Owner-free or multi-background expressions require an explicit tag. A zero or simplified-away owned expression cannot identify its background. Chart display labels are presentation-only; the actual xCoba chart identity remains private and independent.
+
+## Extending existing backgrounds (dev.15)
+
+Register a native source field, then `AddField["Minkowski", A]` to copy only that field. Existing metrics, charts and managed values are retained; other snapshots and registered formulas are not synchronized. Adding a registered metric perturbation also installs its native xPert relationship. `SetFieldComponents[AM[-aM], {1,2,3,4}]` or `SetFieldComponents[hM[LI[2],-aM,-bM], ConstantArray[0,{4,4}]]` infer the background, variance and order. The expression must use distinct owned abstract indices; component assignments use the primary chart. Only Assumptions is an additional option for this overload. `gM[aM,bM] // PerturbOn[2] // ToComponents` computes a variation, not a truncated Taylor series. `PerturbOn[2, Output -> "Components", OutputChart -> "Cylindrical"]` can combine the calculation and chart conversion. Secondary chart assignments and primary-chart promotion are not implemented. Optional `Examples/EinsteinScalar.wl` uses native xTras VarL with a scalar Lagrangian (no extra determinant factor).
