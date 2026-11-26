@@ -35,4 +35,4 @@ RegisterTheory["Expressions",{
  {"boxPhi"->boxPhi,Sector->"Matter"}}];
 RegisterTheory[<|"Assumptions"->assumptions,
  "Conditions"->"Fixed metric; compactly supported scalar variations"|>];
-scalarTheory=ShowTheory[];
+scalarTheory=TheorySnapshot[];
