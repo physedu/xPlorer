@@ -6,5 +6,5 @@ PacletObject[<|
  "Creator" -> "Eduardo Sanz-Romero",
  "License" -> "GPL-3.0-or-later",
  "Extensions" -> {{"Kernel", "Root" -> "Kernel", "Context" -> {"xPlorer`"}},
-  {"Asset", "Root" -> ".", "Assets" -> {"xPlorer.wl", "LICENSE", "CITATION.cff"}}}
+  {"Asset", "Root" -> ".", "Assets" -> {{"Source", "xPlorer.wl"}, {"License", "LICENSE"}, {"Citation", "CITATION.cff"}}}}
 |>]
