@@ -137,3 +137,7 @@ Added a portable notebook, 75 regression checks, an MUnit report runner, and an 
 ## 14.0.0-beta.13-dev.20 (development)
 
 - Prepare requested standard primary-chart geometry in native ToValues, ComponentValue and AllComponentValues. Share the lazy native field read path; recognize incomplete/identity-only geometry rule groups. Keep TensorValues introspection and abstract reads unchanged.
+
+## 14.0.0-beta.13-dev.21 (development)
+
+- Preserve unchanged native authoritative field groups on metric changes; invalidate derived ValIDs without reinstalling original fields. Exact repeated managed field assignment is a no-op if source rules still match. Include LI labels in source and derived fingerprints and verify deleted perturbation variances are rebuilt.

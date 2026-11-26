@@ -101,3 +101,7 @@ Native primary-chart MetricCompute with native target specifications and zero to
 ### dev.20 native query checkpoint
 
 Standard primary-chart geometry reads and recorded field query preparation share a native read path. Next: selective metric-update invalidation and exact repeat input assignments, remaining native mutation signatures and partial inputs, alternate geometry variance, RuleToSet, chart and basis lifecycle. No experiment bypass until integration is stronger.
+
+### dev.21 selective invalidation checkpoint
+
+Preserve unchanged native field source groups on metric change; exact repeat managed field assignments are no-ops when source fingerprints agree. Correct LI-aware native fingerprints. Next: identical metric assignment and native metric-component edits, native geometry derivative cleanup, independent connection invalidation, remaining sparse/partial inputs, alternate geometry variance, RuleToSet and chart/basis lifecycles. Continue native integration before a scoped bypass.

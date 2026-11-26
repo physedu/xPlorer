@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.20";
+$XPlorerVersion = "14.0.0-beta.13-dev.21";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -666,7 +666,7 @@ SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background
   If[result === $Failed, Return[failure["MetricAssignment", "xCoba could not assign the metric."]]];
   put[tag, <|"MetricMatrix" -> mat, "MetricRevision" -> b["MetricRevision"] + 1,
     "Assumptions" -> ass|>];
-  result = replayFields[tag]; If[FailureQ[result], Return[result]];
+  result = invalidateMetricFieldValues[tag]; If[FailureQ[result], Return[result]];
   result = replayConnections[tag];If[FailureQ[result],Return[result]];invalidateResults[tag];
   If[OptionValue[ComputeOnSet] =!= None,
     result = ComputeGeometry[tag, OptionValue[ComputeOnSet], CVSimplify -> OptionValue[CVSimplify], Assumptions -> ass, Verbose -> OptionValue[Verbose]];
@@ -772,6 +772,37 @@ storeField[b_, spec_] := Module[{head = spec["Head"], signs = spec["IndexPositio
   expression = head @@ Join[If[spec["Order"] === None, {}, {LI[spec["Order"]]}], MapThread[{#1 #2, #2 b["Basis"]} &, {inds, signs}]];
   guard[Block[{$CVVerbose = False,$insideManagedCalculation=True}, If[signs === {}, ComponentValue[expression, spec["Values"]], AllComponentValues[expression, spec["Values"]]]]]
 ];
+(* Fingerprints describe only native input rule groups, not duplicate arrays.
+   A replay records the actual stored source; a later metric change can keep
+   a complete unchanged source group and discard only other ValIDs. *)
+fieldNativeBases[b_,rec_,signs_] := Join[If[rec["Order"]===None,{},{LI[rec["Order"]]}],signs b["Basis"]];
+nativeInputStamp[b_,rec_] := Module[{raw=nativeRuleGroup[rec["Head"],fieldNativeBases[b,rec,rec["IndexPositions"]]]},
+ If[MissingQ[raw],raw,Hash[raw,"SHA256"]]];
+nativeInputCurrentQ[b_,rec_] := Module[{stamp=Lookup[Lookup[b,"NativeInputStamps",<||>],fieldRecordKey[rec],Missing[]]},
+ IntegerQ[stamp]&&stamp===nativeInputStamp[b,rec]];
+recordNativeInputStamps[tag_,heads_List] := Module[{b=$BG[tag],recs,stamps},
+ stamps=KeyTake[Lookup[b,"NativeInputStamps",<||>],Keys[b["FieldComponents"]]];
+ recs=Select[Values[b["FieldComponents"]],MemberQ[heads,#["Head"]]&];
+ Scan[Function[rec,stamps[fieldRecordKey[rec]]=nativeInputStamp[b,rec]],recs];
+ put[tag,<|"NativeInputStamps"->stamps|>];Null
+];
+invalidateMetricFieldValues[tag_] := Module[{b=$BG[tag],groups,rec,head,bases,ids,drop,r,fallback={}},
+ groups=GatherBy[Values[b["FieldComponents"]],#["Head"]&];
+ Do[rec=First[group];head=rec["Head"];
+  (* LI labels are part of native ValIDs; preserve each authoritative
+     source configuration, including different variances at different orders. *)
+  If[!AllTrue[group,nativeInputCurrentQ[b,#]&],
+   AppendTo[fallback,head];Continue[]];
+  bases=fieldNativeBases[b,#,#["IndexPositions"]]& /@ group;
+  ids=TensorValIDs[head];
+  drop=Select[ids,Function[id,!(Length[List@@id]===2&&AnyTrue[bases,MemberQ[Last[List@@id],#]&])]];
+  r=guard[Block[{$insideManagedCalculation=True},Scan[DeleteTensorValues,drop]]];
+  If[r===$Failed,Return[failure["FieldInvalidation","Could not invalidate derived field rules after metric change."]]]
+ ,{group,groups}];
+ If[fallback=!={},r=replayFields[tag,fallback];If[FailureQ[r],Return[r]]];
+ Null
+];
+
 replayFields[tag_, selection_:All] := Module[{b = $BG[tag], records, heads, result},
   records = Values[b["FieldComponents"]];
   heads = If[selection===All,DeleteDuplicates[Lookup[records,"Head",{}]],DeleteDuplicates[selection]];
@@ -779,7 +810,8 @@ replayFields[tag_, selection_:All] := Module[{b = $BG[tag], records, heads, resu
   result = guard[Block[{$insideManagedCalculation=True},Scan[DeleteTensorValues,heads]]];
   If[result===$Failed,Return[failure["FieldAssignment","Could not clear existing field values."]]];
   result = storeField[b, #] & /@ records;
-  If[MemberQ[result, $Failed], failure["FieldAssignment", "xCoba could not restore the field components."], Null]
+  If[MemberQ[result, $Failed], Return[failure["FieldAssignment", "xCoba could not restore the field components."]]];
+  recordNativeInputStamps[tag,heads];Null
 ];
 Options[SetFieldComponents] = {IndexPositions -> Automatic, PerturbationOrderLabel -> 1, Assumptions -> Automatic};
 fieldComponentRecord[tag_String, field_Symbol, input_, OptionsPattern[SetFieldComponents]] := Module[
@@ -810,12 +842,13 @@ fieldRecordKey[rec_] := SymbolName[rec["Head"]] <> ":" <> ToString[rec["Order"]]
 dependentFieldHeads[records_,heads_] := FixedPoint[Function[affected,
  DeleteDuplicates@Join[affected,Lookup[Select[Values[records],Function[r,
   AnyTrue[affected,!FreeQ[r["Values"],#]&]]],"Head",{}]]],DeleteDuplicates[heads]];
-applyFieldRecords[tag_, records_Association, explicitHeads_:{}] := Module[{b=background[tag],old,heads,result,rollback,changed},
+applyFieldRecords[tag_, records_Association, explicitHeads_:{}] := Module[{b=background[tag],old,heads,result,rollback,changed,repeated},
   If[FailureQ[b],Return[b]];
   If[!KeyExistsQ[b,"Basis"],Return[failure["NoChart","Define the chart before assigning field components."]]];
   old=b["FieldComponents"];
   changed=Select[Union[Keys[old],Keys[records]],Lookup[old,#,Missing[]]=!=Lookup[records,#,Missing[]]&];
-  heads=dependentFieldHeads[Join[old,records],Join[explicitHeads,Lookup[Values@KeyTake[old,changed],"Head",{}],Lookup[Values@KeyTake[records,changed],"Head",{}]]];
+  repeated=Select[explicitHeads,Function[h,AnyTrue[Select[Values[records],#["Head"]===h&],!nativeInputCurrentQ[b,#]&]]];
+  heads=dependentFieldHeads[Join[old,records],Join[repeated,Lookup[Values@KeyTake[old,changed],"Head",{}],Lookup[Values@KeyTake[records,changed],"Head",{}]]];
   If[heads==={},Return[Null]];
   If[!AllTrue[heads,xTensorQ],Return[failure["FieldAssignment","A stored field definition no longer exists."]]];
   put[tag,<|"FieldComponents"->records|>];
@@ -866,6 +899,7 @@ captureManagedScalar[tag_,expr_,input_] := Block[{$insideManagedCalculation=True
   ids=Select[TensorValIDs[head],Length[List@@#]>2&];
   status=guard[Scan[DeleteTensorValues,ids]];
   put[tag,<|"FieldComponents"->If[MissingQ[rec],KeyDrop[b["FieldComponents"],key],Append[b["FieldComponents"],key->rec]]|>];
+  recordNativeInputStamps[tag,{head}];
   invalidateResults[tag];
   If[status===$Failed,Return[failure["ScalarDerivativeCache","The scalar was assigned, but stored derivatives could not be cleared."]]];
   affected=DeleteCases[dependentFieldHeads[$BG[tag]["FieldComponents"],{head}],head];
@@ -883,7 +917,7 @@ nativeRuleGroup[head_,bases_List] := Module[{ids},
  ids=Select[TensorValIDs[head],Length[List@@#]===2&&MemberQ[Last[List@@#],bases]&];
  If[Length[ids]===1,TensorValues@@First[ids],Missing["NativeRules"]]];
 nativeVarianceStamp[b_,rec_,signs_] := Module[{ch=b["Basis"],hh=rec["Head"],gg=b["Metric"]},
- Hash[{nativeRuleGroup[hh,rec["IndexPositions"] ch],nativeRuleGroup[hh,signs ch],
+ Hash[{nativeRuleGroup[hh,fieldNativeBases[b,rec,rec["IndexPositions"]]],nativeRuleGroup[hh,fieldNativeBases[b,rec,signs]],
        nativeRuleGroup[gg,{-ch,-ch}],nativeRuleGroup[gg,{ch,ch}]},"SHA256"]];
 ensureFieldConfiguration[b_,rec_,signs_] := Module[{target,init,r,tag=b["Tag"],key,stamp,stamps},
  If[signs===rec["IndexPositions"],Return[Null]];
@@ -1567,7 +1601,7 @@ ClearFieldComponents[tag_String,field_] := Module[{b=background[tag],fs,records,
   If[!AssociationQ[fs],Return[failure["UnknownField","Choose a registered field."]]];
   r=guard[DeleteTensorValues[fs["NewHead"]]];If[r===$Failed,Return[failure["ClearValues","Could not clear the field values."]]];
   records=Select[b["FieldComponents"],#["Head"]=!=fs["NewHead"]&];
-  put[tag,<|"FieldComponents"->records|>];invalidateResults[tag];Null
+  put[tag,<|"FieldComponents"->records|>];recordNativeInputStamps[tag,{fs["NewHead"]}];invalidateResults[tag];Null
 ];
 Options[UnregisterTheory]={Cascade->False};
 UnregisterTheory[section_String,key_String,OptionsPattern[]] := Module[

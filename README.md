@@ -2,11 +2,11 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-> **Development branch: 14.0.0-beta.13-dev.20.** The new registration API is breaking. Dev.20 adds lazy native geometry queries in ToValues, ComponentValue and AllComponentValues; see exact validation checkpoints. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
+> **Development branch: 14.0.0-beta.13-dev.21.** The new registration API is breaking. Dev.21 preserves unchanged native field inputs during metric updates and detects identical assignments; see exact validation checkpoints. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
 
 xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
-The current experimental version is **14.0.0-beta.13-dev.20** (inferred background component evaluation, theory information, readable sector and chart displays, and revised workflow). The component calculation engine is unchanged. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Single-item registration now supports Field, Parameter, Lagrangian and Expression, with plural batch and collection names. Existing plural single-item calls remain accepted; background creation semantics are unchanged. Personalization is optional.
+The current experimental version is **14.0.0-beta.13-dev.21** (inferred background component evaluation, theory information, readable sector and chart displays, and revised workflow). The component calculation engine is unchanged. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Single-item registration now supports Field, Parameter, Lagrangian and Expression, with plural batch and collection names. Existing plural single-item calls remain accepted; background creation semantics are unchanged. Personalization is optional.
 
 ## Start here
 
@@ -101,7 +101,7 @@ If you use xPlorer in your research, please cite the version used. GitHub's **Ci
   author  = {Sanz-Romero, Eduardo},
   title   = {xPlorer},
   year    = {2026},
-  version = {14.0.0-beta.13-dev.20},
+  version = {14.0.0-beta.13-dev.21},
   url     = {https://github.com/physedu/xPlorer}
 }
 ```
@@ -183,3 +183,7 @@ Native `MetricCompute[g, chart, target]` (and explicit zero torsion) on a manage
 ### On-demand native geometry reads (dev.20)
 
 With a managed primary-chart metric, native ToValues, ComponentValue and AllComponentValues can prepare a requested standard xCoba geometry configuration, including a scalar, when its rules are absent or incomplete. Complete rules are reused; unrequested geometry is not computed beyond xCoba's native dependencies. Raw TensorValues remains introspection only. Native tensor algebra and abstract reads are unchanged. Alternative geometry variances and secondary charts are outside this checkpoint.
+
+### Selective field invalidation (dev.21)
+
+When a managed metric changes, complete recorded field source groups whose native fingerprints still match are retained without reinstalling them. Other native rule groups for those fields are invalidated and recomputed only when requested. Repeated identical managed field assignments skip replay if the source is unchanged. LI labels are included in source and derived variance fingerprints, preserving distinct perturbation orders. Missing/changed native sources still trigger the conservative managed replay. Exact repeat metric assignment and independent connection/derivative optimizations remain separate work.
