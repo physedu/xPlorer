@@ -1,0 +1,83 @@
+{
+  "version": "14.0.0-beta.13-dev.23",
+  "testedCommit": "808dd26edd164ecb9885b741dbadc0c75e620db2",
+  "kernel": "15.0.1 Linux x86-64",
+  "xAct": "1.3.0",
+  "groups": {
+    "GeometryVariance": [
+      13,
+      13
+    ],
+    "GeometryRead": [
+      13,
+      13
+    ],
+    "NativeGeometry": [
+      12,
+      12
+    ],
+    "MetricEdits": [
+      13,
+      13
+    ],
+    "SecondaryChartNative": [
+      3,
+      3
+    ],
+    "Geometry": [
+      49,
+      49
+    ],
+    "NativeRead": [
+      22,
+      22
+    ]
+  },
+  "workflow": {
+    "inputs": [
+      365,
+      365
+    ],
+    "math": [
+      84,
+      84
+    ],
+    "stages": [
+      33,
+      33
+    ],
+    "parse": 0,
+    "malformed": 0,
+    "warnings": 0,
+    "unexpectedFailures": 0,
+    "seconds": 18.913065
+  },
+  "priorCodeCandidate": "b32b5c4fce9568302a5e353bd200055b07b1c96b",
+  "priorCodeCandidateAdditionalGroups": {
+    "Lifecycle": [
+      64,
+      64
+    ],
+    "FieldCache": [
+      23,
+      23
+    ],
+    "ObjectsAndConnections": [
+      45,
+      45
+    ],
+    "SelectiveInvalidation": [
+      13,
+      13
+    ],
+    "Perturbations": [
+      48,
+      48
+    ],
+    "Reconstruction": [
+      20,
+      20
+    ]
+  },
+  "notRetested": "Other historical groups, optional xTras example, desktop rendering and archive creation/installation."
+}
