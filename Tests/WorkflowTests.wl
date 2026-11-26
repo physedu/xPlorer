@@ -4,7 +4,9 @@ Global`$XPlorerWorkflowDirectory=DirectoryName[DirectoryName[$InputFileName]];
 Global`$XPlorerWorkflowOutputs=<||>;
 Global`$XPlorerWorkflowReport=Module[
  {directory=Global`$XPlorerWorkflowDirectory,notebook,inputs,stages=<||>,checks,
-  parseFailures={},compoundFailures={},warnings={},timings={},started=AbsoluteTime[],run,failed,oldFieldName,initiallyAbsent,styleOf,printedStyle,profileRuns},
+  parseFailures={},compoundFailures={},warnings={},timings={},started=AbsoluteTime[],run,failed,oldFieldName,initiallyAbsent,styleOf,printedStyle,profileRuns,parts,baseID,partNumber,partCounts},
+ (* Reassemble comparison groups only inside the test runner; the notebook shows separate outputs. *)
+ partCounts=<|"naming_result"->4,"naming_index_aliases"->2,"inspect_registration"->2,"scalar_alias"->2,"inspect_short_names"->4,"automatic_formulas"->5,"formal_equations"->3,"riemann_tensor"->3,"custom_presentation"->3,"reset_presentation"->3,"session_prefix"->2,"local_postfix"->2,"pretty_gradient"->2,"restore_local"->2,"schwarzschild_curvature"->2,"flrw_geometry"->2,"cylindrical_connection"->2,"two_hessian_charts"->2,"trace_both"->2,"field_snapshots"->2,"vector_values"->3,"tensor_selection"->2,"formal_affine"->2,"compare_derivatives"->3,"geometry_reuse"->2,"delete_background"->2,"flat_rules"->2,"compare_affine_component"->2|>;
  initiallyAbsent=!MemberQ[$Packages,"xPlorer`"];
  notebook=Get[FileNameJoin[{directory,"xPlorer_Workflow.nb"}]];
  (* The two startup cells are alternatives. Test the direct-source path here. *)
@@ -22,6 +24,14 @@ Global`$XPlorerWorkflowReport=Module[
     AppendTo[warnings,id];$Failed]];
   AssociateTo[Global`$XPlorerWorkflowOutputs,id->value];
   AppendTo[timings,<|"Cell"->id,"Seconds"->seconds|>];
+  If[StringContainsQ[id,"_part_"],
+   baseID=First[StringSplit[id,"_part_"]];partNumber=ToExpression[Last[StringSplit[id,"_part_"]]];
+   If[partNumber===Lookup[partCounts,baseID,0],
+    value=Lookup[Global`$XPlorerWorkflowOutputs,Table[baseID<>"_part_"<>ToString[k],{k,partNumber}]];
+    If[baseID==="tensor_selection",value[[1]]=First[value[[1]]]];
+    AssociateTo[Global`$XPlorerWorkflowOutputs,baseID->value];id=baseID
+   ]
+  ];
   Switch[id,
    "load",stages["Notebook Get loads xPlorer"]=initiallyAbsent&&value===Null&&MemberQ[$Packages,"xPlorer`"],
    "naming_result",stages["Native copied head and independent printed label"]=With[{head=xPlorer`BackgroundObject["NamingExample","ScalarField"]},
