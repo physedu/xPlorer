@@ -1,18 +1,18 @@
 (* Build from a clean distribution tree, not the development repository.
    The allowlist must match PacletInfo.wl. Do not suppress PacletBuild warnings. *)
 Needs["PacletTools`"];
-Module[{root=DirectoryName[DirectoryName[$InputFileName]],files,missing,temp,stage,
+Module[{root=DirectoryName[DirectoryName[$InputFileName]],files,missing,temp=None,stage,
  out,result,archive,destination,copy,report,fail},
  files={"PacletInfo.wl","xPlorer.wl","Kernel/init.m","Kernel/init.wl","LICENSE","CITATION.cff"};
+ fail=Unique["PacletBuildExit"];
+ report=Catch[
  missing=Select[files,!FileExistsQ[FileNameJoin[{root,#}]]&];
- If[missing=!={},Return[Failure["MissingPacletFiles",<|
-  "MessageTemplate"->"Required distribution files are missing.","Files"->missing|>]]];
+ If[missing=!={},Throw[Failure["MissingPacletFiles",<|
+  "MessageTemplate"->"Required distribution files are missing.","Files"->missing|>],fail]];
  temp=Check[CreateDirectory[],$Failed];
- If[!StringQ[temp],Return[Failure["PacletStaging",<|"MessageTemplate"->"Could not create a temporary directory."|>]]];
+ If[!StringQ[temp],Throw[Failure["PacletStaging",<|"MessageTemplate"->"Could not create a temporary directory."|>],fail]];
  stage=FileNameJoin[{temp,"xPlorer"}];
  out=FileNameJoin[{root,"build"}];
- fail=Unique["PacletBuildExit"]; 
- report=Catch[
   copy=Check[
    CreateDirectory[FileNameJoin[{stage,"Kernel"}],CreateIntermediateDirectories->True];
    Scan[CopyFile[FileNameJoin[{root,#}],FileNameJoin[{stage,#}]]&,files];
@@ -35,6 +35,6 @@ Module[{root=DirectoryName[DirectoryName[$InputFileName]],files,missing,temp,sta
   (* The temporary BuildPacletDirectory is removed; expose only the durable archive path. *)
   Success["PacletBuild",Join[KeyDrop[result[[2]],{"BuildPacletDirectory"}],<|"PacletArchive"->destination|>]]
  ,fail];
- Check[DeleteDirectory[temp,DeleteContents->True],Null];
+ If[StringQ[temp] && DirectoryQ[temp],Check[DeleteDirectory[temp,DeleteContents->True],Null]];
  report
 ]
