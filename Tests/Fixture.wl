@@ -8,7 +8,7 @@ DefTensor[F[-a,-b], sourceM, Antisymmetric[{-a,-b}]];
 DefMetricPerturbation[g,h,epsSource];
 DefConstantSymbol[mass];
 DefConstantSymbol[Mbh];
-savedTheory = ShowTheory[];
+savedTheory = TheorySnapshot[];
 ClearTheory[];
 RegisterTheory["Metric", g];
 RegisterTheory["CovD", CD];
