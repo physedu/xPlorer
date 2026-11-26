@@ -27,6 +27,15 @@ assert["pretty-invalid-option",FailureQ[viewCD // PrettyExp[PartialStyle->"Bad"]
 assert["pretty-auto-owner",With[{vv=viewCD // PrettyExp[ShowBackgroundLabel->True]},!FreeQ[MakeBoxes[vv,StandardForm],"ViewCase"]],True];
 assert["pretty-no-owner-label",With[{vv=viewEx // PrettyExp[ShowBackgroundLabel->True]},FreeQ[MakeBoxes[vv,StandardForm],"None"]],True];
 assert["basis-missing-guard",FailureQ[ToBasisOf["ViewCase",viewCD]],True];
+viewMath=-3 Derivative[1,0][psi][u,v]^2/(u (u-2 v))+2 Derivative[0,1][psi][u,v]-v^2 psi[u,v];
+Do[
+ view=viewMath // PrettyExp[PartialStyle->style];
+ assert["arithmetic-normal-"<>style,Normal[view],viewMath];
+ assert["arithmetic-copy-"<>style,With[{vv=view},ToExpression[MakeBoxes[vv,StandardForm],StandardForm,HoldComplete]],With[{ee=viewMath},HoldComplete[ee]]];
+ ,{style,{"Fraction","Partial","Comma","MultiIndex","Prime"}}];
+viewTeX=ExpressionText[viewMath==0 // PrettyExp[PartialStyle->"Fraction"],"TeX"];
+assert["arithmetic-tex-clean",StringQ[viewTeX] && StringFreeQ[viewTeX,"xPlorer"|"notationAtom"|"=="] && StringContainsQ[viewTeX,"\\frac"],True];
+assert["tex-failure",FailureQ[ExpressionText[Failure["Test",<||>],"TeX"]],True];
 DeleteBackground["ViewCase"];
 
 UndefScalarFunction[psi];
