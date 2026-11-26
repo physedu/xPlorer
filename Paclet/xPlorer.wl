@@ -10,7 +10,7 @@ Block[{$PrePrint}, BeginPackage["xPlorer`", {"xAct`xTensor`", "xAct`xPert`", "xA
 RegisterTheory::usage = "RegisterTheory[\"Metric\",g], RegisterTheory[\"CovD\",CD], RegisterTheory[\"Indices\",{a,b,...}] register source geometry. RegisterTheory[\"Field\",phi,opts] registers one native tensor; RegisterTheory[\"Fields\",{phi,A,{F,Sector->\"EM\"}}] registers a batch. RegisterTheory[\"Lagrangian\", \"Gravity\"->Lgrav] and RegisterTheory[\"Expression\", \"Equation\"->eq] capture individual named formulas; use \"Lagrangians\" and \"Expressions\" for batches. Anonymous formulas require Head->\"base\". RegisterTheory[\"Parameter\",m] or RegisterTheory[\"Parameters\",{m,kappa}] registers shared xAct constants.";
 ShowTheoryKeys::usage = "ShowTheoryKeys[] lists the logical sections of the current theory.";
 TheorySector::usage = "TheorySector[sector] returns matching field, parameter, lagrangian and expression records without applying rules.";
-Managed::usage = "Managed -> True explicitly records a native scalar assignment or full field-value deletion as a managed xPlorer input change.";
+Managed::usage = "Legacy dev.17 marker; ordinary managed scalar assignments and full field-value deletion no longer require it.";
 Name::usage = "Name -> \"key\" selects the registry key of a field or parameter.";
 Sector::usage = "Sector -> \"label\" classifies a registered item without imposing any mathematics.";
 ClearTheory::usage = "ClearTheory[] resets $Theory to an empty association.";
@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.17";
+$XPlorerVersion = "14.0.0-beta.13-dev.18";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -690,8 +690,10 @@ ComputeGeometry[tag_String, targets_: {"Metric"}, OptionsPattern[]] := Module[
   ass = Replace[OptionValue[Assumptions], Automatic :> Lookup[b, "Assumptions", True]];
   policy = {fun, ass};
   If[TrueQ[OptionValue[ForceCompute]] || (KeyExistsQ[b, "GeometryPolicy"] && b["GeometryPolicy"] =!= policy),
-    clearGeometry[tag]; MetricInBasis[b["Metric"], -b["Basis"], b["MetricMatrix"]];
-    replayFields[tag];replayConnections[tag]; b = $BG[tag]];
+    clearGeometry[tag];result=guard[MetricInBasis[b["Metric"], -b["Basis"], b["MetricMatrix"]]];
+    If[result===$Failed,Return[failure["MetricAssignment","Could not restore the metric before recomputation."]]];
+    result=replayFields[tag];If[FailureQ[result],Return[result]];
+    result=replayConnections[tag];If[FailureQ[result],Return[result]];b = $BG[tag]];
   todo = Complement[wanted, b["ComputedGeometry"]];
   If[todo === {}, Return[<|"Computed" -> {}, "Cached" -> wanted, "Seconds" -> 0., "MetricRevision" -> b["MetricRevision"]|>]];
   specs = Flatten[Lookup[$geometryTargets, todo]];
@@ -711,12 +713,13 @@ indicesFor[b_, n_] := If[n <= Length[b["Indices"]], Take[b["Indices"], n], GetIn
 storeField[b_, spec_] := Module[{head = spec["Head"], signs = spec["IndexPositions"], inds, expression},
   inds = indicesFor[b, Length[signs]];
   expression = head @@ Join[If[spec["Order"] === None, {}, {LI[spec["Order"]]}], MapThread[{#1 #2, #2 b["Basis"]} &, {inds, signs}]];
-  guard[Block[{$CVVerbose = False}, If[signs === {}, ComponentValue[expression, spec["Values"]], AllComponentValues[expression, spec["Values"]]]]]
+  guard[Block[{$CVVerbose = False,$insideManagedCalculation=True}, If[signs === {}, ComponentValue[expression, spec["Values"]], AllComponentValues[expression, spec["Values"]]]]]
 ];
-replayFields[tag_, extraHeads_:{}] := Module[{b = $BG[tag], records, heads, result},
+replayFields[tag_, selection_:All] := Module[{b = $BG[tag], records, heads, result},
   records = Values[b["FieldComponents"]];
-  heads = DeleteDuplicates[Join[Lookup[records, "Head", {}],extraHeads]];
-  result = guard[Scan[DeleteTensorValues,heads]];
+  heads = If[selection===All,DeleteDuplicates[Lookup[records,"Head",{}]],DeleteDuplicates[selection]];
+  records=Select[records,MemberQ[heads,#["Head"]]&];
+  result = guard[Block[{$insideManagedCalculation=True},Scan[DeleteTensorValues,heads]]];
   If[result===$Failed,Return[failure["FieldAssignment","Could not clear existing field values."]]];
   result = storeField[b, #] & /@ records;
   If[MemberQ[result, $Failed], failure["FieldAssignment", "xCoba could not restore the field components."], Null]
@@ -746,11 +749,17 @@ fieldComponentRecord[tag_String, field_Symbol, input_, OptionsPattern[SetFieldCo
   <|"Head" -> fs["NewHead"], "IndexPositions" -> signs, "Order" -> order, "Values" -> vals|>
 ];
 fieldRecordKey[rec_] := SymbolName[rec["Head"]] <> ":" <> ToString[rec["Order"]];
-applyFieldRecords[tag_, records_Association] := Module[{b=background[tag],old,heads,result,rollback},
+(* Reapply only changed heads (and explicit dependencies in the registered inputs). *)
+dependentFieldHeads[records_,heads_] := FixedPoint[Function[affected,
+ DeleteDuplicates@Join[affected,Lookup[Select[Values[records],Function[r,
+  AnyTrue[affected,!FreeQ[r["Values"],#]&]]],"Head",{}]]],DeleteDuplicates[heads]];
+applyFieldRecords[tag_, records_Association, explicitHeads_:{}] := Module[{b=background[tag],old,heads,result,rollback,changed},
   If[FailureQ[b],Return[b]];
   If[!KeyExistsQ[b,"Basis"],Return[failure["NoChart","Define the chart before assigning field components."]]];
   old=b["FieldComponents"];
-  heads=DeleteDuplicates[Join[Lookup[Values[old],"Head",{}],Lookup[Values[records],"Head",{}]]];
+  changed=Select[Union[Keys[old],Keys[records]],Lookup[old,#,Missing[]]=!=Lookup[records,#,Missing[]]&];
+  heads=dependentFieldHeads[Join[old,records],Join[explicitHeads,Lookup[Values@KeyTake[old,changed],"Head",{}],Lookup[Values@KeyTake[records,changed],"Head",{}]]];
+  If[heads==={},Return[Null]];
   If[!AllTrue[heads,xTensorQ],Return[failure["FieldAssignment","A stored field definition no longer exists."]]];
   put[tag,<|"FieldComponents"->records|>];
   result=replayFields[tag,heads];
@@ -758,11 +767,12 @@ applyFieldRecords[tag_, records_Association] := Module[{b=background[tag],old,he
     put[tag,<|"FieldComponents"->old|>];rollback=replayFields[tag,heads];
     If[FailureQ[rollback],invalidateResults[tag];Return[failure["FieldRollback","Field assignment and restoration both failed; inspect native values.",<|"Assignment"->result,"Restoration"->rollback|>]]];
     Return[result]];
-  invalidateResults[tag];Null
+  invalidateResults[tag];
+  Null
 ];
 SetFieldComponents[tag_String,field_Symbol,input_,opts:OptionsPattern[]] := Module[{rec,result},
   rec=fieldComponentRecord[tag,field,input,opts];If[FailureQ[rec],Return[rec]];
-  result=applyFieldRecords[tag,Append[$BG[tag]["FieldComponents"],fieldRecordKey[rec]->rec]];
+  result=applyFieldRecords[tag,Append[$BG[tag]["FieldComponents"],fieldRecordKey[rec]->rec],{rec["Head"]}];
   If[FailureQ[result],result,rec]
 ];
 SetFieldComponents[expr:Except[_String],input_,opts:OptionsPattern[]] := Module[{tag=notationOwner[expr],b,fs,args,order=None,signs,ix,extra},
@@ -781,8 +791,135 @@ SetFieldComponents[expr:Except[_String],input_,opts:OptionsPattern[]] := Module[
  SetFieldComponents[tag,fs["NewHead"],input,IndexPositions->signs,PerturbationOrderLabel->Replace[order,None->1],opts]
 ];
 (* Native extensions are UpValues on owned objects, never global changes to xCoba.
-   Existing native signatures remain untouched: internal derived values are not inputs.
-   A scalar's native two-argument assignment is ambiguous, hence the explicit Managed option. *)
+   Internal writes execute in a dynamically scoped calculation/replay guard.
+   Capture only rank-zero field assignments in a managed primary chart; leave
+   native derivatives, external charts, and individual positive-rank components native. *)
+captureManagedScalar[tag_,expr_,input_] := Block[{$insideManagedCalculation=True},
+ Module[{r,actual,b=$BG[tag],head=Head[expr],rec,key,old,ids,status,previous,affected},
+  If[ListQ[input],Return[failure["FieldDimensions","A rank-zero field requires a scalar value."]]];
+  previous=Last[ComponentValue[expr]];
+  r=ComponentValue[expr,input];If[!MatchQ[r,_Rule],Return[r]];
+  actual=Last[ComponentValue[expr]];
+  If[ListQ[actual],Block[{$CVReplace=True},ComponentValue[expr,previous]];
+    Return[failure["FieldDimensions","The supplied function returned a list for a scalar field."]]];
+  rec=<|"Head"->head,"IndexPositions"->{},"Order"->None,"Values"->actual|>;
+  key=fieldRecordKey[rec];old=Lookup[b["FieldComponents"],key,Missing[]];
+  If[actual===expr,rec=Missing[]];
+  If[old===rec,Return[r]];
+  ids=Select[TensorValIDs[head],Length[List@@#]>2&];
+  status=guard[Scan[DeleteTensorValues,ids]];
+  put[tag,<|"FieldComponents"->If[MissingQ[rec],KeyDrop[b["FieldComponents"],key],Append[b["FieldComponents"],key->rec]]|>];
+  invalidateResults[tag];
+  If[status===$Failed,Return[failure["ScalarDerivativeCache","The scalar was assigned, but stored derivatives could not be cleared."]]];
+  affected=DeleteCases[dependentFieldHeads[$BG[tag]["FieldComponents"],{head}],head];
+  If[affected=!={},status=replayFields[tag,affected];If[FailureQ[status],Return[status]]];
+  r
+ ]];
+(* Only materialize a requested primary-chart variance, never all 2^rank combinations.
+   xCoba owns the stored rules; there is no second numerical tensor cache. *)
+fieldBasisExpression[b_,rec_,signs_] := rec["Head"]@@Join[If[rec["Order"]===None,{},{LI[rec["Order"]]}],
+ MapThread[{#1 #2,#2 b["Basis"]}&,{indicesFor[b,Length[signs]],signs}]];
+(* Compare native rule groups, not evaluated component arrays. A stamp is
+   recorded only after a successful conversion by this package. This also detects
+   edits/deletions via original native signatures which have not yet been hooked. *)
+nativeRuleGroup[head_,bases_List] := Module[{ids},
+ ids=Select[TensorValIDs[head],Length[List@@#]===2&&MemberQ[Last[List@@#],bases]&];
+ If[Length[ids]===1,TensorValues@@First[ids],Missing["NativeRules"]]];
+nativeVarianceStamp[b_,rec_,signs_] := Module[{ch=b["Basis"],hh=rec["Head"],gg=b["Metric"]},
+ Hash[{nativeRuleGroup[hh,rec["IndexPositions"] ch],nativeRuleGroup[hh,signs ch],
+       nativeRuleGroup[gg,{-ch,-ch}],nativeRuleGroup[gg,{ch,ch}]},"SHA256"]];
+ensureFieldConfiguration[b_,rec_,signs_] := Module[{target,init,r,tag=b["Tag"],key,stamp,stamps},
+ If[signs===rec["IndexPositions"],Return[Null]];
+ key=fieldRecordKey[rec]<>":"<>ToString[signs,InputForm];
+ stamps=Lookup[$BG[tag],"NativeVarianceStamps",<||>];
+ stamp=nativeVarianceStamp[b,rec,signs];
+ If[Lookup[stamps,key,Missing[]]===stamp,Return[Null]];
+ target=fieldBasisExpression[b,rec,signs];
+ init=fieldBasisExpression[b,rec,rec["IndexPositions"]];
+ r=guard[Block[{$insideManagedCalculation=True,$CVVerbose=False,$CVReplace=True,$TUseValues=All,$BMUseValues=All},
+  ChangeComponents[target,init]]];
+ If[r===$Failed,Return[failure["FieldVariance","xCoba could not change the field configuration."]]];
+ put[tag,<|"NativeVarianceStamps"->Append[stamps,key->nativeVarianceStamp[b,rec,signs]]|>];Null
+];
+(* Direct full-field queries may reuse the native variance rules. For general
+   expressions and selected components, preserve the existing expansion path. *)
+directFieldRecord[b_,expr_] := Module[{records,args=DeleteCases[List@@expr,_LI]},
+ If[!AllTrue[args,AIndexQ]||!DuplicateFreeQ[args/.Times[-1,i_Symbol]:>i],Return[None]];
+ records=Select[Values[b["FieldComponents"]],#["Head"]===Head[expr]&&Length[#["IndexPositions"]]===Length[args]&&
+  If[#["Order"]===None,FreeQ[expr,_LI],MemberQ[List@@expr,LI[#["Order"]]]]&];
+ If[Length[records]===1&&args=!={},First[records],None]
+];
+(* Native read integration. Only explicitly chart-indexed registered fields are
+   considered; abstract expressions and unrelated tensors retain xCoba semantics. *)
+managedPrimaryIndices[b_,expr_,test_] := Module[{args=DeleteCases[List@@expr,_LI],ch=Lookup[b,"Basis",None]},
+ If[args==={}||ch===None||!AllTrue[args,test]||!AllTrue[args,MemberQ[{ch,-ch},Last[#]]&],Return[None]];
+ If[Last[#]===ch,1,-1]& /@ args
+];
+managedNativeReadRecords[b_,expr_] := Select[Values[b["FieldComponents"]],
+ #["Head"]===Head[expr]&&Length[#["IndexPositions"]]===Length[DeleteCases[List@@expr,_LI]]&&
+ If[#["Order"]===None,FreeQ[expr,_LI],MemberQ[List@@expr,LI[#["Order"]]]]&];
+managedReadHeads[list_List] := DeleteDuplicates@Flatten[Function[b,
+ Intersection[list,Lookup[Values[Lookup[b,"Field",<||>]],"NewHead",{}]]] /@ Values[$BG]];
+managedNativeRead[expr_,list_,f_] := Block[{$insideManagedCalculation=True},
+ Module[{heads=managedReadHeads[list],atoms,b,tag,rec,signs,r,requests=<||>,key},
+  atoms=DeleteDuplicates@Cases[expr,e:_[___]/;MemberQ[heads,Head[e]],{0,Infinity}];
+  Do[tag=notationOwner[atom];If[!StringQ[tag],Continue[]];b=$BG[tag];
+   If[!KeyExistsQ[b,"MetricMatrix"],Continue[]];
+   signs=managedPrimaryIndices[b,atom,Function[i,BIndexQ[i]||CIndexQ[i]]];
+   If[signs===None,Continue[]];
+   rec=managedNativeReadRecords[b,atom];If[Length[rec]=!=1,Continue[]];rec=First[rec];
+   If[signs===rec["IndexPositions"],Continue[]];
+   key={tag,fieldRecordKey[rec],signs};requests[key]={tag,rec,signs}
+  ,{atom,atoms}];
+  Do[If[!MemberQ[$BG[req[[1]]]["ComputedGeometry"],"Metric"],r=ComputeGeometry[req[[1]],{"Metric"}];If[FailureQ[r],Return[r]]];
+   r=ensureFieldConfiguration[$BG[req[[1]]],req[[2]],req[[3]]];If[FailureQ[r],Return[r]]
+  ,{req,Values[requests]}];
+  ToValues[expr,list,f]
+ ]];
+(* A single conditional native extension covers sums and arrays as well as a
+   tensor atom. Preserve native rules and protection; no global replacement. *)
+installManagedReadSyntax[] := If[!TrueQ[$managedReadSyntaxInstalled],
+ Unprotect[ToValues];
+ ToValues[expr_,list_List,f_:Identity] /; (!TrueQ[$insideManagedCalculation] && !TrueQ[$insideNativePrintGuard] && managedReadHeads[list]=!={}) :=
+  managedNativeRead[expr,list,f];
+ Protect[ToValues];$managedReadSyntaxInstalled=True
+];
+
+(* Native writes to a complete recorded primary-chart configuration.
+   Preserve the native return and CVReplace semantics; then capture the
+   actual array. Partial data with no complete source record remain native. *)
+managedPrimarySourceRecord[tag_,expr_] := Module[{b=Lookup[$BG,tag,<||>],signs,recs},
+ If[TrueQ[$insideManagedCalculation]||TrueQ[$insideNativePrintGuard]||!KeyExistsQ[b,"Basis"],Return[None]];
+ signs=managedPrimaryIndices[b,expr,CIndexQ];If[signs===None,Return[None]];
+ recs=Select[managedNativeReadRecords[b,expr],#["IndexPositions"]===signs&];
+ If[Length[recs]===1,First[recs],None]
+];
+captureManagedComponent[tag_,expr_,value_] := Block[{$insideManagedCalculation=True},
+ Module[{b=$BG[tag],record,head=Head[expr],signs,recs,r,arr,updated,result},
+  signs=managedPrimaryIndices[b,expr,CIndexQ];recs=Select[managedNativeReadRecords[b,expr],#["IndexPositions"]===signs&];
+  record=First[recs];
+  r=ComponentValue[expr,value];If[!MatchQ[r,_Rule],Return[r]];
+  arr=ToValues[ComponentArray[fieldBasisExpression[b,record,signs]],head];
+  If[!FreeQ[arr,head],Return[failure["IncompleteField","The native edit left an incomplete source array."]]];
+  updated=Join[record,<|"Values"->arr|>];
+  If[updated===record,Return[r]];
+  result=applyFieldRecords[tag,Append[b["FieldComponents"],fieldRecordKey[updated]->updated],{head}];
+  If[FailureQ[result],result,r]
+ ]];
+managedExplicitArrayQ[tag_,expr_,rank_,values_] := Module[{b=Lookup[$BG,tag,<||>],args,signs},
+ If[TrueQ[$insideManagedCalculation]||TrueQ[$insideNativePrintGuard]||!KeyExistsQ[b,"Basis"],Return[False]];
+ signs=managedPrimaryIndices[b,expr,BIndexQ];If[signs===None,Return[False]];
+ args=First/@DeleteCases[List@@expr,_LI];
+ Length[args]===rank&&DuplicateFreeQ[args/.Times[-1,i_Symbol]:>i]&&ListQ[values]&&
+ Dimensions[values]===ConstantArray[b["Dimension"],rank]&&TrueQ[$CVReplace]
+];
+captureManagedArray[tag_,expr_,values_] := Block[{$insideManagedCalculation=True},
+ Module[{b=$BG[tag],args,abstract,r},
+  args=(First/@DeleteCases[List@@expr,_LI]);abstract=Head[expr]@@Join[Select[List@@expr,MatchQ[#,_LI]&],args];
+  r=SetFieldComponents[abstract,values];If[FailureQ[r],Return[r]];
+  AllComponentValues[expr]
+ ]];
+
 managedFieldAbstractQ[e_,rank_] := Module[{args=DeleteCases[List@@e,_LI]},
  rank>0 && Length[args]===rank && AllTrue[args,AIndexQ]
 ];
@@ -800,9 +937,14 @@ installManagedMetricSyntax[tag_,metric_Symbol] := With[{hh=metric,tt=tag},
 ];
 installManagedFieldSyntax[tag_,head_Symbol,rank_Integer] := With[{hh=head,tt=tag,rr=rank},
  If[rr===0,
+  hh /: ComponentValue[e:hh[],value_] /; (!TrueQ[$insideManagedCalculation] && KeyExistsQ[$BG[tt],"Chart"]) := captureManagedScalar[tt,e,value];
   hh /: ComponentValue[e:hh[],value_,Managed->True] := SetFieldComponents[e,value],
-  hh /: AllComponentValues[e:hh[___],value_] /; managedFieldAbstractQ[e,rr] := SetFieldComponents[e,value]
+  hh /: AllComponentValues[e:hh[___],value_] /; managedFieldAbstractQ[e,rr] := SetFieldComponents[e,value];
+  hh /: ComponentValue[e:hh[___],value_] /; AssociationQ[managedPrimarySourceRecord[tt,e]] := captureManagedComponent[tt,e,value];
+  hh /: AllComponentValues[e:hh[___],value_] /; managedExplicitArrayQ[tt,e,rr,value] := captureManagedArray[tt,e,value]
  ];
+ hh /: ChangeComponents[e:hh[___],init_,args___] /; !TrueQ[$insideManagedCalculation] := Block[{$insideManagedCalculation=True},ChangeComponents[e,init,args]];
+ hh /: DeleteTensorValues[hh] /; (!TrueQ[$insideManagedCalculation] && !TrueQ[$insideNativePrintGuard] && KeyExistsQ[$BG[tt],"Chart"]) := ClearFieldComponents[tt,hh];
  hh /: DeleteTensorValues[hh,Managed->True] := ClearFieldComponents[tt,hh];
 ];
 
@@ -826,7 +968,7 @@ ActivateProfile[tag_String,name_String] := Module[{b=background[tag],records,res
   If[FailureQ[b],Return[b]];
   records=Lookup[Lookup[b,"FieldProfiles",<||>],name,Missing[]];
   If[MissingQ[records],Return[failure["Profile","Choose a registered profile."]]];
-  result=applyFieldRecords[tag,Join[b["FieldComponents"],records]];
+  result=applyFieldRecords[tag,Join[b["FieldComponents"],records],Lookup[Values[records],"Head",{}]];
   If[FailureQ[result],result,records]
 ];
 RemoveProfile[tag_String,name_String] := Module[{b=background[tag],profiles},
@@ -847,7 +989,7 @@ prepareFieldConfigurations[tag_, expr_] := Module[{b = $BG[tag], atoms, fs, reco
     If[records =!= {} && fs["Rank"] > 0,
       init = Head[atom] @@ Join[Select[List @@ atom, MatchQ[#, _LI] &],
         MapThread[{#1 #2, #2 b["Basis"]} &, {indicesFor[b, fs["Rank"]], First[records]["IndexPositions"]}]];
-      result = guard[ChangeComponents[atom, init]];
+      result = If[SameQ[Last /@ DeleteCases[List@@atom,_LI],Last /@ DeleteCases[List@@init,_LI]],Null,guard[Block[{$insideManagedCalculation=True},ChangeComponents[atom, init]]]];
       If[result === $Failed, Return[failure["FieldVariance", "Could not change the field index configuration."]]]
     ], {atom, atoms}]; Null
 ];
@@ -881,7 +1023,7 @@ ToComponents[expr:Except[_String|_Rule|_RuleDelayed],opts:OptionsPattern[]] := M
  ToComponents[owner,expr,opts]
 ];
 ToComponents[tag_String, input_, OptionsPattern[]] := Module[
-  {b = background[tag], ex, inds, actual, basisinds, result, geometry, arr, selected, simp = OptionValue[Simplification], ass, unresolved, rec=None, chart=OptionValue[OutputChart], subset,output=OptionValue[Output],outbasis},
+  {b = background[tag], ex, inds, actual, basisinds, result, geometry, arr, selected, simp = OptionValue[Simplification], ass, unresolved, rec=None, chart=OptionValue[OutputChart], subset,output=OptionValue[Output],outbasis,fieldRecord=None},
   If[FailureQ[b], Return[b]];
   If[!KeyExistsQ[b, "MetricMatrix"], Return[failure["NoMetricComponents", "Assign metric components before evaluating components."]]];
   If[!MemberQ[{"Array","CTensor"},output],Return[failure["ComponentOutput","Choose Array or CTensor."]]];
@@ -903,11 +1045,15 @@ ToComponents[tag_String, input_, OptionsPattern[]] := Module[
   geometry = ComputeGeometry[tag, geometryNeeded[b, ex], CVSimplify -> OptionValue[CVSimplify]];
   If[FailureQ[geometry], Return[geometry]];
   ex=expandConnections[tag,ex];If[FailureQ[ex],Return[ex]];
-  ex = guard[ChangeCovD[SeparateMetric[][ex], b["CovD"], PDOfBasis[b["Chart"]]]];
+  If[OptionValue[Components]===All && MatchQ[ex,_[__]],fieldRecord=directFieldRecord[$BG[tag],ex]];
+  If[AssociationQ[fieldRecord],
+    result=ensureFieldConfiguration[$BG[tag],fieldRecord,If[UpIndexQ[#],1,-1]& /@ DeleteCases[List@@ex,_LI]];
+    If[FailureQ[result],Return[result]],
+    ex = guard[ChangeCovD[SeparateMetric[][ex], b["CovD"], PDOfBasis[b["Chart"]]]]];
   If[ex === $Failed, Return[failure["Derivatives", "The covariant derivative could not be expanded."]]];
   ex = guard[coordinateIndexify[ex, b]];
   If[ex === $Failed, Return[failure["BasisConversion", "The expression could not be converted to the chart basis."]]];
-  result = prepareFieldConfigurations[tag, ex]; If[FailureQ[result], Return[result]];
+  If[!AssociationQ[fieldRecord],result = prepareFieldConfigurations[tag, ex]; If[FailureQ[result], Return[result]]];
   basisinds = If[UpIndexQ[#], {#, b["Basis"]}, {#, -b["Basis"]}] & /@ inds;
   selected = OptionValue[Components];
   subset=selected;
@@ -1724,6 +1870,7 @@ aboutXPlorerLines[] := Module[{separator=StringRepeat["-",60]},{
  separator
 }];
 AboutXPlorer[] := Column[aboutXPlorerLines[],Spacings->0.5];
+installManagedReadSyntax[];
 updatePrintHook[];
 If[!TrueQ[$startupShown],$startupShown=True;Scan[Print,aboutXPlorerLines[]]];
 End[];
