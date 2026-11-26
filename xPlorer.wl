@@ -73,7 +73,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package version, authorship, license and project link.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.7";
+$XPlorerVersion = "14.0.0-beta.13-dev.8";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label; the association form changes several labels of owned background objects. Automatic restores the inherited default for a key.";
@@ -1558,12 +1558,15 @@ RegisterTheory[args___] := failure["Registration", "Unsupported registration arg
 aboutXPlorerLines[] := Module[{separator=StringRepeat["-",60]},{
  separator,
  "Package xPlorer` version "<>$XPlorerVersion,
- "Copyright (C) 2026 Eduardo Sanz-Romero (PhysEdu), under the GNU General Public License.",
+ "Copyright (C) 2026 Eduardo Sanz-Romero (PhysEdu).",
+ "Licensed under the GNU General Public License, version 3 or later.",
  separator,
- "Abstract theories. Independent backgrounds.",
- "Powered by xAct: xTensor, xCoba, xPert.",
- "This package comes with ABSOLUTELY NO WARRANTY. See LICENSE for details.",
- Hyperlink["github.com/physedu/xPlorer","https://github.com/physedu/xPlorer"],
+ "A package for reusing abstract xAct theories on independent geometric",
+ "backgrounds, transporting tensor expressions and computing components.",
+ "Built on xTensor, xCoba and xPert.",
+ "Documentation, examples and source code:",
+ Hyperlink["https://github.com/physedu/xPlorer","https://github.com/physedu/xPlorer"],
+ "This software comes with ABSOLUTELY NO WARRANTY. See LICENSE for details.",
  separator
 }];
 AboutXPlorer[] := Column[aboutXPlorerLines[],Spacings->0.5];
