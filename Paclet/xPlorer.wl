@@ -10,6 +10,7 @@ Block[{$PrePrint}, BeginPackage["xPlorer`", {"xAct`xTensor`", "xAct`xPert`", "xA
 RegisterTheory::usage = "RegisterTheory[\"Metric\",g], RegisterTheory[\"CovD\",CD], RegisterTheory[\"Indices\",{a,b,...}] register source geometry. RegisterTheory[\"Field\",phi,opts] registers one native tensor; RegisterTheory[\"Fields\",{phi,A,{F,Sector->\"EM\"}}] registers a batch. RegisterTheory[\"Lagrangian\", \"Gravity\"->Lgrav] and RegisterTheory[\"Expression\", \"Equation\"->eq] capture individual named formulas; use \"Lagrangians\" and \"Expressions\" for batches. Anonymous formulas require Head->\"base\". RegisterTheory[\"Parameter\",m] or RegisterTheory[\"Parameters\",{m,kappa}] registers shared xAct constants.";
 ShowTheoryKeys::usage = "ShowTheoryKeys[] lists the logical sections of the current theory.";
 TheorySector::usage = "TheorySector[sector] returns matching field, parameter, lagrangian and expression records without applying rules.";
+Managed::usage = "Managed -> True explicitly records a native scalar assignment or full field-value deletion as a managed xPlorer input change.";
 Name::usage = "Name -> \"key\" selects the registry key of a field or parameter.";
 Sector::usage = "Sector -> \"label\" classifies a registered item without imposing any mathematics.";
 ClearTheory::usage = "ClearTheory[] resets $Theory to an empty association.";
@@ -74,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.16";
+$XPlorerVersion = "14.0.0-beta.13-dev.17";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -423,6 +424,8 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
   result=KeyValueMap[Function[{key,spec},With[{ss=spec["Head"],pr=spec["SymbolOfCovD"]},AddConnection[tag,key,ss,SymbolOfCovD->pr]]],Lookup[theory,"Connections",<||>]];
   If[AnyTrue[result,FailureQ],DeleteBackground[tag];Return[First@Select[result,FailureQ]]];
   SetPresentation[tag, labels];
+  installManagedMetricSyntax[tag,g];
+  Scan[installManagedFieldSyntax[tag,#["NewHead"],#["Rank"]]&,Values[fields]];
   installBackgroundObjectAliases[tag,$Context];
   installExpressionAliases[tag, suffix, $Context];
   $BG[tag]
@@ -450,6 +453,7 @@ AddField[tag_String,source_Symbol] := Module[{b=background[tag],specs,key,spec,r
   "PresentationOverrides"->Join[b["PresentationOverrides"],labels]|>];
  If[spec["Type"]==="MetricPert",put[tag,<|"PerturbationHead"->head|>]];
  setBareBoxes[head,SymbolName[head]];
+ installManagedFieldSyntax[tag,head,rec["Rank"]];
  If[KeyExistsQ[b,"AliasContext"],installObjectAliases[tag,{head}]];
  invalidateResults[tag];head
 ];
@@ -776,6 +780,32 @@ SetFieldComponents[expr:Except[_String],input_,opts:OptionsPattern[]] := Module[
  signs=If[MatchQ[#,Times[-1,_Symbol]],-1,1]& /@ args;
  SetFieldComponents[tag,fs["NewHead"],input,IndexPositions->signs,PerturbationOrderLabel->Replace[order,None->1],opts]
 ];
+(* Native extensions are UpValues on owned objects, never global changes to xCoba.
+   Existing native signatures remain untouched: internal derived values are not inputs.
+   A scalar's native two-argument assignment is ambiguous, hence the explicit Managed option. *)
+managedFieldAbstractQ[e_,rank_] := Module[{args=DeleteCases[List@@e,_LI]},
+ rank>0 && Length[args]===rank && AllTrue[args,AIndexQ]
+];
+managedMetricInput[tag_,input_,opts___Rule] := Module[{args={opts}},
+ If[Complement[First/@args,First/@Options[SetCMetricSystem]]=!={},Return[failure["MetricOptions","Use managed metric assignment options."]]];
+ SetCMetricSystem[tag,If[ListQ[input]&&VectorQ[input],DiagonalMatrix[input],input],opts]
+];
+managedNativeGeometry[tag_,targets_,opts___Rule] := Module[{args={opts}},
+ If[Complement[First/@args,First/@Options[ComputeGeometry]]=!={},Return[failure["GeometryOptions","Use managed geometry calculation options."]]];
+ ComputeGeometry[tag,targets,opts]
+];
+installManagedMetricSyntax[tag_,metric_Symbol] := With[{hh=metric,tt=tag},
+ hh /: MetricInBasis[hh,input:(_List|_Function),opts___Rule] := managedMetricInput[tt,input,opts];
+ hh /: MetricCompute[hh,targets:(_String|_List|All),opts___Rule] := managedNativeGeometry[tt,targets,opts];
+];
+installManagedFieldSyntax[tag_,head_Symbol,rank_Integer] := With[{hh=head,tt=tag,rr=rank},
+ If[rr===0,
+  hh /: ComponentValue[e:hh[],value_,Managed->True] := SetFieldComponents[e,value],
+  hh /: AllComponentValues[e:hh[___],value_] /; managedFieldAbstractQ[e,rr] := SetFieldComponents[e,value]
+ ];
+ hh /: DeleteTensorValues[hh,Managed->True] := ClearFieldComponents[tt,hh];
+];
+
 Options[RegisterProfile]=Options[SetFieldComponents];
 RegisterProfile[tag_String,name_String] := Module[{b=background[tag],profiles},
   If[FailureQ[b],Return[b]];

@@ -8,7 +8,8 @@ Global`$XPlorerStandaloneGroups=<|
  "NativeInterop"->"15_NativeInterop.wl",
  "ProfilesAndCTensor"->"16_ProfilesAndCTensor.wl",
  "FieldExtensions"->"17_FieldExtensions.wl",
- "SecondaryChartNative"->"18_SecondaryChartNative.wl"|>;
+ "SecondaryChartNative"->"18_SecondaryChartNative.wl",
+ "ManagedNativeSyntax"->"19_ManagedNativeSyntax.wl"|>;
 Global`$XPlorerSelectedGroup=If[ValueQ[Global`$XPlorerTestGroup],Global`$XPlorerTestGroup,"Geometry"];
 If[KeyExistsQ[Global`$XPlorerStandaloneGroups,Global`$XPlorerSelectedGroup],
  Global`$XPlorerGroupReport=Block[{Print=(Null &),xAct`xPerm`$xpermQ=False,xAct`xCoba`$CVVerbose=False,Global`$B13GeometryTests=(Global`$XPlorerSelectedGroup==="RegistrationGeometry")},
@@ -25,7 +26,7 @@ Global`$XPlorerSelectedFiles=Lookup[<|
  "MetricConnectionCurvature"->{"12_MetricConnectionCurvature.wl"}|>,
  If[ValueQ[Global`$XPlorerTestGroup],Global`$XPlorerTestGroup,"Geometry"],Missing[]];
 If[MissingQ[Global`$XPlorerSelectedFiles],
- Failure["TestGroup",<|"MessageTemplate"->"Choose Geometry, Perturbations, Lifecycle, Display, ObjectsAndConnections, ComponentsAndRules, Reconstruction, MetricConnectionCurvature, Registration, RegistrationGeometry, TheoryInspection, NativeInterop, ProfilesAndCTensor, FieldExtensions, or SecondaryChartNative."|>],
+ Failure["TestGroup",<|"MessageTemplate"->"Choose Geometry, Perturbations, Lifecycle, Display, ObjectsAndConnections, ComponentsAndRules, Reconstruction, MetricConnectionCurvature, Registration, RegistrationGeometry, TheoryInspection, NativeInterop, ProfilesAndCTensor, FieldExtensions, SecondaryChartNative, or ManagedNativeSyntax."|>],
  Global`$XPlorerGroupPreviousContextPath=$ContextPath;
  $ContextPath=DeleteCases[$ContextPath,"Global`"];
  Begin["XPlorerGroup"<>StringReplace[CreateUUID[],"-"->""]<>"`"];
