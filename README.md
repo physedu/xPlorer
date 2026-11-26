@@ -2,11 +2,11 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-> **Development branch: 14.0.0-beta.13-dev.15.** The new registration API is breaking. The original 115-input author notebook and historical regression suite have been migrated and tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
+> **Development branch: 14.0.0-beta.13-dev.16.** The new registration API is breaking. The original 115-input author notebook and historical regression suite have been migrated and tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
 
 xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
-The current experimental version is **14.0.0-beta.13-dev.15** (inferred background component evaluation, theory information, readable sector and chart displays, and revised workflow). The component calculation engine is unchanged. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Single-item registration now supports Field, Parameter, Lagrangian and Expression, with plural batch and collection names. Existing plural single-item calls remain accepted; background creation semantics are unchanged. Personalization is optional.
+The current experimental version is **14.0.0-beta.13-dev.16** (native scalar coordinate aliases, chart basis integration, unary ToCTensor, independent rules and grouped specializations). Managed chart changes now register native xCoba basis changes; component transformations delegate to xCoba, with explicit coordinate substitution. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Single-item registration now supports Field, Parameter, Lagrangian and Expression, with plural batch and collection names. Existing plural single-item calls remain accepted; background creation semantics are unchanged. Personalization is optional.
 
 ## Start here
 
@@ -101,7 +101,7 @@ If you use xPlorer in your research, please cite the version used. GitHub's **Ci
   author  = {Sanz-Romero, Eduardo},
   title   = {xPlorer},
   year    = {2026},
-  version = {14.0.0-beta.13-dev.15},
+  version = {14.0.0-beta.13-dev.16},
   url     = {https://github.com/physedu/xPlorer}
 }
 ```
@@ -149,3 +149,13 @@ The dev.14 lifecycle tutorial passed 363/363 selected input cells, 82/82 mathema
 ### Extending an existing study (dev.15)
 
 `AddField[tag, source]` copies a registered source field into an existing background without rebuilding its geometry. `SetFieldComponents[ownedTensorExpression, values]` infers the owner, variance and perturbation label, using the primary chart. `expr // PerturbOn[n] // ToComponents` selects the local xPert parameter and computes the nth variation. The explicit forms remain available. See `Examples/EinsteinScalar.wl` for optional xTras action variation (run in a fresh kernel). xTras is not a mandatory dependency. Dev.15: 365/365 selected tutorial inputs, 84/84 mathematical checks, 33/33 stages; 12/12 focused checks of field addition, inference and reconstruction, and 6/6 Einstein-scalar checks.
+
+### Native integration (dev.16)
+
+```wl
+CreateBackground["Schwarzschild", SymbolSuffix -> "Schw"];
+DefineChart["Schwarzschild", {t[], r[], theta[], varphi[]}];
+ShowBackground["Schwarzschild", "Summary"]
+```
+
+Coordinates are typed as `rSchw[]` and displayed without a background suffix. Managed expressions support `expr // ToCTensor`. Named rule groups and independent rules can coexist. See the [API guide](API_GUIDE.md) and [validation record](BETA13_PROGRESS.md). This is a development checkpoint, not a release.
