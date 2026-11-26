@@ -20,8 +20,19 @@ MetricInBasis[gN,{-2,1,1,1}];checks["Metric update preserves sparse original"]=T
 recipe=ReconstructionData["N"];recreated=RecreateBackground["Copy",recipe];cc=ChartOf["Copy"];xc=CoordinatesOf["Copy"][[2]][];
 checks["Sparse reconstruction remaps coordinate values"]=AssociationQ[recreated]&&ToValues[ACopy[{0,-cc}]]===xc&&ToValues[ACopy[{1,-cc}]]===2&&ToValues[ACopy[{2,-cc}]]===ACopy[{2,-cc}];
 ClearComputedValues["N"];checks["Clear replay preserves sparse inputs"]=ToValues[AN[{0,-ch}]]===x&&ToValues[SN[{0,-ch},{1,-ch}]]===4;
-checks["AssignedFields does not treat sparse as complete"]=CheckBackground["N",Checks->{"AssignedFields"}]["AssignedFields"]["Status"]==="Inconclusive";
+checks["AssignedFields does not treat sparse as complete"]=With[{result=CheckBackground["N",Checks->{"AssignedFields"}]["Checks"]["AssignedFields"]},result["Status"]==="Inconclusive"&&MemberQ[result["MissingFields"],A]&&MemberQ[result["MissingFields"],S]&&MemberQ[result["MissingFields"],T]];
 AllComponentValues[AN[-aN],{9,8,7,6}];checks["Full array replaces partial record"]=ToComponents["N",A[a]]==={-9/2,8,7,6}&&!TrueQ[Lookup[First[Select[Values[ShowBackground["N"]["FieldComponents"]],#["Head"]===AN&]],"Partial",False]];
+checks["Complete field no longer listed missing"]=!MemberQ[CheckBackground["N",Checks->{"AssignedFields"}]["Checks"]["AssignedFields"]["MissingFields"],A];
 DeleteTensorValues[SN];checks["Full deletion removes sparse record"]=!AnyTrue[Values[ShowBackground["N"]["FieldComponents"]],#["Head"]===SN&];
+(* A second independent background with a curved, non-diagonal metric.
+   The time-dependent spatial scale gives nonzero curvature. *)
+CreateBackground["Curved"];DefineChart["Curved",{"t","x","y","z"}];
+curvedChart=ChartOf["Curved"];curvedTime=CoordinatesOf["Curved"][[1]][];
+MetricInBasis[gCurved,{{-1,0,0,0},{0,Exp[2 curvedTime],Exp[2 curvedTime]/2,0},{0,Exp[2 curvedTime]/2,Exp[2 curvedTime],0},{0,0,0,Exp[2 curvedTime]}}];
+ComponentValue[ACurved[{1,-curvedChart}],3];ComponentValue[ACurved[{2,-curvedChart}],6];
+checks["Non-diagonal curved sparse variance"]=Simplify[ToValues[ACurved[{1,curvedChart}]]]===0&&Simplify[ToValues[ACurved[{2,curvedChart}]]-6 Exp[-2 curvedTime]]===0;
+checks["Curved background preserves independent source"]=ToValues[AN[{0,-ch}]]===9&&ToValues[ACurved[{0,-curvedChart}]]===ACurved[{0,-curvedChart}];
+checks["Curved geometry nonzero"]=Simplify[ToValues[RicciScalarOf["Curved"][]]]===12;
+checks["Curved cleanup"]=DeleteBackground["Curved"]===Null;
 checks["Cleanup"]=And@@(SameQ[DeleteBackground[#],Null]& /@ {"Copy","N"});
 <|"Total"->Length[checks],"Passed"->Count[Values[checks],True],"Failures"->Keys@Select[checks,#=!=True&]|>

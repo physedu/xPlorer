@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.23";
+$XPlorerVersion = "14.0.0-beta.13-dev.24";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -816,7 +816,12 @@ storeField[b_, spec_] := Module[{head = spec["Head"], signs = spec["IndexPositio
    a complete unchanged source group and discard only other ValIDs. *)
 fieldNativeBases[b_,rec_,signs_] := Join[If[rec["Order"]===None,{},{LI[rec["Order"]]}],signs b["Basis"]];
 nativeInputStamp[b_,rec_] := Module[{raw=nativeRuleGroup[rec["Head"],fieldNativeBases[b,rec,rec["IndexPositions"]]]},
- If[MissingQ[raw],raw,Hash[raw,"SHA256"]]];
+ If[MissingQ[raw],raw,
+   Hash[If[TrueQ[Lookup[rec,"Partial",False]],
+     (* Native queries add dependent symmetry rules and identity placeholders;
+        neither constitutes a change to an authoritative sparse input. *)
+     Sort@Select[Flatten[Take[List@@raw,{2,-1,2}],1],First[#]=!=Last[#]&],
+     raw],"SHA256"]]];
 nativeInputCurrentQ[b_,rec_] := Module[{stamp=Lookup[Lookup[b,"NativeInputStamps",<||>],fieldRecordKey[rec],Missing[]]},
  IntegerQ[stamp]&&stamp===nativeInputStamp[b,rec]];
 recordNativeInputStamps[tag_,heads_List] := Module[{b=$BG[tag],recs,stamps},
@@ -1036,7 +1041,10 @@ prepareManagedRead[expr_,list_] := Module[{owners=managedReadOwners[list],atoms,
     georequests[tag]=Union[Lookup[georequests,tag,{}],{sp}]];
    Continue[]];
   rec=managedNativeReadRecords[b,atom];If[Length[rec]=!=1,Continue[]];rec=First[rec];
-  If[signs===rec["IndexPositions"],Continue[]];
+  If[signs===rec["IndexPositions"],
+    If[TrueQ[Lookup[rec,"Partial",False]]&&AllTrue[DeleteCases[List@@atom,_LI],CIndexQ],
+     ComponentValue[atom]];
+    Continue[]];
   key={tag,fieldRecordKey[rec],signs};requests[key]={tag,rec,signs}
  ,{atom,atoms}];
  Do[b=$BG[tag];r=captureNativeMetricCompute[tag,b["Chart"],georequests[tag],CVSimplify->managedReadPolicy[b]];
