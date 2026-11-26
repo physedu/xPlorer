@@ -133,3 +133,7 @@ Added a portable notebook, 75 regression checks, an MUnit report runner, and an 
 ## 14.0.0-beta.13-dev.19 (development)
 
 - Integrate explicit-chart native MetricCompute for the managed primary chart and zero torsion. Recognize native geometry coverage and selectively repair missing TensorValues groups without clearing unrelated xCoba cache entries.
+
+## 14.0.0-beta.13-dev.20 (development)
+
+- Prepare requested standard primary-chart geometry in native ToValues, ComponentValue and AllComponentValues. Share the lazy native field read path; recognize incomplete/identity-only geometry rule groups. Keep TensorValues introspection and abstract reads unchanged.

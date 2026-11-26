@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.19";
+$XPlorerVersion = "14.0.0-beta.13-dev.20";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -686,13 +686,22 @@ $geometryTargets = <|"Metric" -> {"Metric"[-1, -1], "Metric"[1, 1], "DetMetric"[
    second geometry implementation. Only inspect the managed primary chart. *)
 geometryNativeData[b_] := With[{ch=b["Chart"]},
  {{b["Metric"],b["CovD"]},{ch,PDOfBasis[ch]},{ch,PDOfBasis[ch]}}];
-nativeGeometryRulePresentQ[spec_,data_] := Module[{head,bases},
+nativeGeometryRulePresentQ[spec_,data_] := Module[{head,bases,ids,rules,parts,dim},
  head=xAct`xCoba`Private`CacheKeySymbolic[spec,data];
  If[Head[head]===MultiplyHead,head=Last[head]];
  If[head===Null,Return[True]];
  If[!xTensorQ[head],Return[False]];
  bases=xAct`xCoba`Private`signedbases[spec,data[[2,1]]];
- AnyTrue[TensorValIDs[head],Length[List@@#]===2&&MemberQ[Last[List@@#],bases]&]
+ ids=Select[TensorValIDs[head],Length[List@@#]===2&&MemberQ[Last[List@@#],bases]&];
+ If[Length[ids]=!=1,Return[False]];
+ rules=TensorValues[First[ids]];
+ If[Head[rules]=!=xAct`xCore`FoldedRule,Return[False]];
+ parts=List@@rules;dim=Length[CNumbersOf[data[[2,1]]]];
+ (* ReportCompute stores one rule per coordinate tuple, with independent
+    and symmetry-dependent rules in alternating groups. Identity rules
+    from a native ComponentValue read are not computed values. *)
+ Total[Length/@parts]===dim^Length[bases]&&
+ AllTrue[Flatten[parts[[2;;-1;;2]],1],Function[r,MatchQ[r,_Rule]&&First[r]=!=Last[r]]]
 ];
 nativeGeometryGroupPresentQ[b_,key_] := AllTrue[$geometryTargets[key],
  nativeGeometryRulePresentQ[#,geometryNativeData[b]]&];
@@ -906,31 +915,60 @@ managedPrimaryIndices[b_,expr_,test_] := Module[{args=DeleteCases[List@@expr,_LI
 managedNativeReadRecords[b_,expr_] := Select[Values[b["FieldComponents"]],
  #["Head"]===Head[expr]&&Length[#["IndexPositions"]]===Length[DeleteCases[List@@expr,_LI]]&&
  If[#["Order"]===None,FreeQ[expr,_LI],MemberQ[List@@expr,LI[#["Order"]]]]&];
-managedReadHeads[list_List] := DeleteDuplicates@Flatten[Function[b,
- Intersection[list,Lookup[Values[Lookup[b,"Field",<||>]],"NewHead",{}]]] /@ Values[$BG]];
+(* Explicit primary-chart geometry reads. The available native spec
+   determines variance: do not compute all variances just to read one. *)
+geometryReadSpecs[b_] := Module[{heads,groups},
+ If[!KeyExistsQ[b,"Chart"]||!KeyExistsQ[b,"MetricMatrix"],Return[<||>]];
+ heads=Join[KeyTake[b,{"Metric","Riemann","Ricci","RicciScalar","Einstein","Weyl","Kretschmann"}],
+ <|"Christoffel"->GiveSymbol[Christoffel,Sequence@@Sort[{b["CovD"],PDOfBasis[b["Chart"]]}]],
+   "DetMetric"->GiveSymbol[Determinant,b["Metric"],b["Chart"]]|>];
+ Association@KeyValueMap[Function[{k,h},h->$geometryTargets[k]],heads]
+];
+managedReadOwners[list_List] := Association@Flatten[Function[b,
+ (#->b["Tag"]& /@ Intersection[list,Join[Lookup[Values[Lookup[b,"Field",<||>]],"NewHead",{}],Keys[geometryReadSpecs[b]]]])] /@ Values[$BG]];
+managedReadHeads[list_List] := Keys[managedReadOwners[list]];
+managedReadPolicy[b_] := First[Lookup[b,"GeometryPolicy",{Together,True}]];
+prepareManagedRead[expr_,list_] := Module[{owners=managedReadOwners[list],atoms,b,tag,rec,signs,r,requests=<||>,key,georequests=<||>,specs,sp},
+ atoms=DeleteDuplicates@Cases[expr,e:_[___]/;KeyExistsQ[owners,Head[e]],{0,Infinity}];
+ Do[tag=owners[Head[atom]];b=$BG[tag];
+  If[!KeyExistsQ[b,"MetricMatrix"],Continue[]];
+  signs=If[List@@atom==={}, {},managedPrimaryIndices[b,atom,Function[i,BIndexQ[i]||CIndexQ[i]]]];
+  If[signs===None,Continue[]];
+  specs=Lookup[geometryReadSpecs[b],Head[atom],{}];
+  If[specs=!={},
+   sp=SelectFirst[specs,List@@#===signs&,None];
+   If[sp=!=None&&!nativeGeometryRulePresentQ[sp,geometryNativeData[b]],
+    georequests[tag]=Union[Lookup[georequests,tag,{}],{sp}]];
+   Continue[]];
+  rec=managedNativeReadRecords[b,atom];If[Length[rec]=!=1,Continue[]];rec=First[rec];
+  If[signs===rec["IndexPositions"],Continue[]];
+  key={tag,fieldRecordKey[rec],signs};requests[key]={tag,rec,signs}
+ ,{atom,atoms}];
+ Do[b=$BG[tag];r=captureNativeMetricCompute[tag,b["Chart"],georequests[tag],CVSimplify->managedReadPolicy[b]];
+  If[FailureQ[r],Return[r]],{tag,Keys[georequests]}];
+ Do[b=$BG[req[[1]]];
+  If[!MemberQ[b["ComputedGeometry"],"Metric"]||!nativeGeometryGroupPresentQ[b,"Metric"],
+   r=ComputeGeometry[req[[1]],{"Metric"},CVSimplify->managedReadPolicy[b]];If[FailureQ[r],Return[r]]];
+  r=ensureFieldConfiguration[$BG[req[[1]]],req[[2]],req[[3]]];If[FailureQ[r],Return[r]]
+ ,{req,Values[requests]}];
+ Null
+];
 managedNativeRead[expr_,list_,f_] := Block[{$insideManagedCalculation=True},
- Module[{heads=managedReadHeads[list],atoms,b,tag,rec,signs,r,requests=<||>,key},
-  atoms=DeleteDuplicates@Cases[expr,e:_[___]/;MemberQ[heads,Head[e]],{0,Infinity}];
-  Do[tag=notationOwner[atom];If[!StringQ[tag],Continue[]];b=$BG[tag];
-   If[!KeyExistsQ[b,"MetricMatrix"],Continue[]];
-   signs=managedPrimaryIndices[b,atom,Function[i,BIndexQ[i]||CIndexQ[i]]];
-   If[signs===None,Continue[]];
-   rec=managedNativeReadRecords[b,atom];If[Length[rec]=!=1,Continue[]];rec=First[rec];
-   If[signs===rec["IndexPositions"],Continue[]];
-   key={tag,fieldRecordKey[rec],signs};requests[key]={tag,rec,signs}
-  ,{atom,atoms}];
-  Do[If[!MemberQ[$BG[req[[1]]]["ComputedGeometry"],"Metric"],r=ComputeGeometry[req[[1]],{"Metric"}];If[FailureQ[r],Return[r]]];
-   r=ensureFieldConfiguration[$BG[req[[1]]],req[[2]],req[[3]]];If[FailureQ[r],Return[r]]
-  ,{req,Values[requests]}];
-  ToValues[expr,list,f]
- ]];
-(* A single conditional native extension covers sums and arrays as well as a
-   tensor atom. Preserve native rules and protection; no global replacement. *)
+ Module[{r=prepareManagedRead[expr,list]},If[FailureQ[r],r,ToValues[expr,list,f]]]];
+managedSingleReadQ[e_] := !TrueQ[$insideManagedCalculation]&&!TrueQ[$insideNativePrintGuard]&&
+ MatchQ[e,h_?xTensorQ[___]]&&managedReadHeads[{Head[e]}]=!={};
+managedSingleRead[e_,operation_] := Block[{$insideManagedCalculation=True},
+ Module[{r=prepareManagedRead[e,{Head[e]}]},If[FailureQ[r],r,operation[e]]]];
+(* Conditional native read rules retain the original native dispatch. The
+   ToValues list signature covers compound expressions; the two one-argument
+   query signatures cover component rules and full native rule groups. *)
 installManagedReadSyntax[] := If[!TrueQ[$managedReadSyntaxInstalled],
- Unprotect[ToValues];
+ Unprotect[ToValues,ComponentValue,AllComponentValues];
  ToValues[expr_,list_List,f_:Identity] /; (!TrueQ[$insideManagedCalculation] && !TrueQ[$insideNativePrintGuard] && managedReadHeads[list]=!={}) :=
   managedNativeRead[expr,list,f];
- Protect[ToValues];$managedReadSyntaxInstalled=True
+ ComponentValue[e_] /; managedSingleReadQ[e] := managedSingleRead[e,ComponentValue];
+ AllComponentValues[e:h_?xTensorQ[___]] /; managedSingleReadQ[e] := managedSingleRead[e,AllComponentValues];
+ Protect[ToValues,ComponentValue,AllComponentValues];$managedReadSyntaxInstalled=True
 ];
 
 (* Native writes to a complete recorded primary-chart configuration.

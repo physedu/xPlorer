@@ -97,3 +97,7 @@ On-demand primary-chart variance storage, native ToValues compound reads, automa
 ### dev.19 geometry checkpoint
 
 Native primary-chart MetricCompute with native target specifications and zero torsion, plus selective repair of missing native geometry groups, implemented. Next: geometry query integration and direct edits, policy/metric-change invalidation, native chart and basis lifecycle. Do not equate group existence with an arbitrary rule's mathematical validity.
+
+### dev.20 native query checkpoint
+
+Standard primary-chart geometry reads and recorded field query preparation share a native read path. Next: selective metric-update invalidation and exact repeat input assignments, remaining native mutation signatures and partial inputs, alternate geometry variance, RuleToSet, chart and basis lifecycle. No experiment bypass until integration is stronger.
