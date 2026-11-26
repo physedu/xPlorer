@@ -568,16 +568,17 @@ UseExpression[tag_String,section_String,key_String] := Module[{ex=BackgroundExpr
 coordinateDeclarationQ[expr_] := !AtomQ[expr] && Length[expr]===0 && Head[Head[expr]]===Symbol;
 coordinateLabels[names_List] := If[AllTrue[names,coordinateDeclarationQ],SymbolName[Head[#]]& /@ names,names];
 (* Aliases are installed transactionally, without replacing user definitions. *)
-installChartAliases[tag_,chart_,coords_,labels_,base_] := Module[{b=$BG[tag],heads,keys,entries=<||>,entry},
+installChartAliases[tag_,chart_,coords_,labels_,base_] := Module[{b=$BG[tag],heads,keys,entries=<||>,entry,conflicts,failed=None},
  heads=Prepend[coords,chart];keys=Prepend[(#<>base)& /@ labels,"chart"<>base];
  If[!DuplicateFreeQ[keys],Return[failure["CoordinateAlias","Coordinate names conflict with the chart name."]]];
+ conflicts=Intersection[keys,Keys[Lookup[b,"ObjectAliases",<||>]]];
+ If[conflicts=!={},Return[failure["CoordinateAlias","Coordinate aliases conflict with managed objects.",<|"Aliases"->conflicts|>]]];
  Do[
-   If[KeyExistsQ[Lookup[b,"ObjectAliases",<||>],keys[[i]]],
-     releaseAliases[entries];Return[failure["CoordinateAlias","A coordinate alias conflicts with a managed object.",<|"Alias"->keys[[i]]|>]]];
    entry=With[{target=heads[[i]]},installAlias[b["AliasContext"],keys[[i]],HoldComplete[target]]];
-   If[entry===$Failed,releaseAliases[entries];Return[failure["CoordinateAlias","Choose coordinate names whose suffixed symbols are unused.",<|"Alias"->keys[[i]]|>]]];
+   If[entry===$Failed,failed=keys[[i]];Break[]];
    entries[keys[[i]]]=entry,
    {i,Length[heads]}];
+ If[failed=!=None,releaseAliases[entries];Return[failure["CoordinateAlias","Choose coordinate names whose suffixed symbols are unused.",<|"Alias"->failed|>]]];
  put[tag,<|"ObjectAliases"->Join[Lookup[b,"ObjectAliases",<||>],entries]|>];Null
 ];
 DefineChart[tag_String, declarations_List] := Module[{b = background[tag], chart, coords, result,names=coordinateLabels[declarations],nativeQ=AllTrue[declarations,coordinateDeclarationQ]},
