@@ -13,7 +13,7 @@ Global`$XPlorerWorkflowReport=Module[
  styleOf[view_,key_]:=If[Head[view]===xPlorer`Private`expressionView,view[[2]][key],Missing["Native"]];
  printedStyle[expr_,key_]:=styleOf[xPlorer`Private`notebookPrint[expr],key];
  run[cell_]:=Module[{id=First[cell],b=Last[cell],seconds,value,parsed},
-  If[id==="delete_single_field",oldFieldName=ToString[xPlorer`BackgroundObject["MinkowskiFields","S"],InputForm]];
+  If[id==="delete_single_field_step_1",oldFieldName=ToString[xPlorer`BackgroundObject["MinkowskiFields","S"],InputForm]];
   parsed=Quiet[ToExpression[b,StandardForm,HoldComplete]];
   If[parsed===$Failed,AppendTo[parseFailures,id]];
   If[MatchQ[parsed,HoldComplete[_Times]]&&!FreeQ[parsed,_CompoundExpression],AppendTo[compoundFailures,id]];
