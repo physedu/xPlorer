@@ -21,6 +21,15 @@ recipe=ReconstructionData["N"];recreated=RecreateBackground["Copy",recipe];cc=Ch
 checks["Sparse reconstruction remaps coordinate values"]=AssociationQ[recreated]&&ToValues[ACopy[{0,-cc}]]===xc&&ToValues[ACopy[{1,-cc}]]===2&&ToValues[ACopy[{2,-cc}]]===ACopy[{2,-cc}];
 ClearComputedValues["N"];checks["Clear replay preserves sparse inputs"]=ToValues[AN[{0,-ch}]]===x&&ToValues[SN[{0,-ch},{1,-ch}]]===4;
 checks["AssignedFields does not treat sparse as complete"]=With[{result=CheckBackground["N",Checks->{"AssignedFields"}]["Checks"]["AssignedFields"]},result["Status"]==="Inconclusive"&&MemberQ[result["MissingFields"],A]&&MemberQ[result["MissingFields"],S]&&MemberQ[result["MissingFields"],T]];
+RegisterProfile["N","Sparse"];
+RegisterProfile["N","Dense",A,{9,8,7,6},IndexPositions->{-1}];
+ActivateProfile["N","Dense"];
+checks["Dense profile activates"]=ToValues[AN[{2,-ch}]]===7;
+ActivateProfile["N","Sparse"];
+checks["Sparse profile restores unspecified slots"]=ToValues[AN[{0,-ch}]]===x&&ToValues[AN[{1,-ch}]]===2&&ToValues[AN[{2,-ch}]]===AN[{2,-ch}];
+checks["Sparse profile preserves independent field"]=ToValues[SN[{1,-ch},{0,-ch}]]===-4;
+ClearFieldComponents["N",A];ActivateProfile["N","Sparse"];
+checks["Sparse profile restores cleared inputs"]=ToValues[AN[{0,-ch}]]===x&&ToValues[AN[{2,-ch}]]===AN[{2,-ch}];
 AllComponentValues[AN[-aN],{9,8,7,6}];checks["Full array replaces partial record"]=ToComponents["N",A[a]]==={-9/2,8,7,6}&&!TrueQ[Lookup[First[Select[Values[ShowBackground["N"]["FieldComponents"]],#["Head"]===AN&]],"Partial",False]];
 checks["Complete field no longer listed missing"]=!MemberQ[CheckBackground["N",Checks->{"AssignedFields"}]["Checks"]["AssignedFields"]["MissingFields"],A];
 DeleteTensorValues[SN];checks["Full deletion removes sparse record"]=!AnyTrue[Values[ShowBackground["N"]["FieldComponents"]],#["Head"]===SN&];

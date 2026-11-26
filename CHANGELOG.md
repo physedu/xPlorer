@@ -146,6 +146,13 @@ Added a portable notebook, 75 regression checks, an MUnit report runner, and an 
 
 - Stage native covariant/contravariant metric-component edits and validate before replacing the managed metric. Preserve geometry and revisions on exact repeated metric assignments with matching native fingerprints. Skip component hooks on identically vanishing tensors.
 
+## 14.0.0-beta.13-dev.24 (development)
+
+- Capture sparse primary-chart native component inputs, including canonical symmetry and LI order, without dense arrays or zero filling.
+- Ignore read-created identity and dependent rules in sparse source fingerprints; prepare same-variance sparse symmetry reads using native ComponentValue.
+- Preserve sparse inputs through metric changes, reconstruction, clear/replay and profile restoration.
+- 26/26 sparse checks; 450/450 across 18 groups; workflow 365/365, 84/84, 33/33. See Tests/dev24-results.json. Cross-variance component requests can still prepare full configurations.
+
 ## 14.0.0-beta.13-dev.23 (development)
 
 - Prepare nonstandard primary-chart geometry variances through native ChangeComponents and reuse matching rule fingerprints. Invalidate separate native imploded derivative rule groups on metric changes, retaining tensor definitions and enabling lazy primary-chart queries.
