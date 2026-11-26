@@ -235,13 +235,13 @@ Cell[BoxData[RowBox[{RowBox[{"(",RowBox[{"scalarEqSchw","\[Equal]","0"}],")"}],"
 
 Cell["Session preferences and local overrides","Subsubsection"],
 
-Cell["Choose a prefix derivative and fraction notation for the session. Both gradients inherit the session preference.","Text"],
+Cell["Choose a prefix derivative and fraction notation for the session. Both scalar equations inherit the session preference.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", RowBox[{RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}], ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Prefix\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"session_prefix"],
+Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", RowBox[{RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}], ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Prefix\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{"scalarEqM", ",", "scalarEqSchw"}], "}"}]}]],"Input",CellTags->"session_prefix"],
 
-Cell["Override only Schwarzschild: its gradient now uses postfix notation and a background label. Minkowski keeps the session defaults.","Text"],
+Cell["Override only Schwarzschild: its scalar equation uses postfix notation and a background label. Minkowski keeps the session defaults.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Postfix\""}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "True"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"local_postfix"],
+Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Postfix\""}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "True"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{"scalarEqM", ",", "scalarEqSchw"}], "}"}]}]],"Input",CellTags->"local_postfix"],
 
 Cell["Use postfix application, expr // PrettyExp, to display an expression using its current notation settings. The background is inferred when possible.","Text"],
 
@@ -253,11 +253,11 @@ Cell[BoxData[RowBox[{RowBox[{"prettyGradient","=",RowBox[{"gradPhi","//",RowBox[
 
 Cell["Remove the local overrides with Automatic to inherit session defaults again.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"CovariantStyle", "\[Rule]", "Automatic"}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "Automatic"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"restore_local"],
+Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"CovariantStyle", "\[Rule]", "Automatic"}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "Automatic"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{"scalarEqM", ",", "scalarEqSchw"}], "}"}]}]],"Input",CellTags->"restore_local"],
 
 Cell["Reset session preferences to native defaults. This does not remove existing background-specific overrides.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", "]"}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"session_reset"],
+Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences","[","]"}],";"}]],"Input",CellTags->"session_reset"],
 
 Cell["Session preferences can also specify printed labels for future backgrounds. For reference, the following non-evaluatable example uses registered object keys. Each SetXPlorerPreferences call replaces the previous session preferences; it does not rename existing tensors.","Text"],
 
@@ -292,7 +292,7 @@ Cell[BoxData[RowBox[{RowBox[{"UseExpression","[",RowBox[{"\"Schwarzschild\"",","
 Cell[BoxData[RowBox[{"lagrangianSchw","//","PrettyExp"}]],"Input",CellTags->"general_lagrangian"],
 
 
-Cell[TextData[{"First display the original expression with its mass term. The shortcut ",StyleBox["EabSchw",FontFamily->"Courier",FontSize->14]," gives the general formula and ",StyleBox["UseExpression",FontFamily->"Courier",FontSize->14]," gives the active massless case."}],"Text"],
+Cell["The registered rank-two formula remains general, including its mass term.","Text"],
 
 Cell[BoxData["EabSchw"],"Input",CellTags->"compare_mass_terms"],
 
@@ -460,6 +460,11 @@ Cell[TextData[{"Choose a static radial profile \:03c6 = u(r) on Schwarzschild. S
 Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "u", "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"Schwarzschild\"", ",", "phi", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "r", ",", "theta", ",", "varphi"}], "}"}], ",", RowBox[{"u", "[", "r", "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"schwarzschild_field"],
 
 Cell[BoxData[RowBox[{RowBox[{"eqSchw", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Schwarzschild\"", ",", "\"ScalarEq\""}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"eqSchw", "\[Equal]", "0"}]}]],"Input",CellTags->"schwarzschild_equation"],
+
+Cell["The copied rank-two expression already belongs to Schwarzschild. No explicit background argument is needed.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"EabSchw","//","ToComponents"}],"//","MatrixForm"}]],"Input",CellTags->"inferred_eab"],
+
 
 Cell["For a radial profile depending on one coordinate, prime notation is often more compact. Change only the Schwarzschild output style, then restore the session default.","Text"],
 
