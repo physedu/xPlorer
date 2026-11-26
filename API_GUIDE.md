@@ -162,3 +162,23 @@ Get works directly without installation. For a traditional application, use Inst
 PacletInfo.wl declares a kernel extension using the same source. PacletDirectoryLoad["/path/to/xPlorer/Paclet"] followed by Needs["xPlorer`"] activates a development directory. Tools/BuildPaclet.wl can build a paclet archive with PacletTools. xAct must be installed separately; it is not bundled or automatically downloaded by the package.
 
 Tests/RunTests.wl runs package checks. Tests/WorkflowTests.wl runs actual input boxes from the principal notebook in a fresh kernel. The principal notebook is the source of truth. The historical 88-input Tools builder cannot overwrite it. See BETA13_PROGRESS.md and BETA13_PLAN.md for current execution evidence and limitations.
+
+## Inferred background and theory information (dev.11)
+
+```wl
+RegisterTheory["Title", "Massive scalar field"];
+RegisterTheory["Description", "A real scalar field on curved spacetime."];
+RegisterTheory["Assumptions", Element[m, Reals] && m >= 0];
+RegisterTheory["Conditions", "Fixed metric variation."];
+ShowTheory[]
+```
+
+Title and description are optional strings. Assumptions and conditions are recorded information; pass mathematical assumptions to the operation using them. ShowTheory displays this information above geometry, omits empty optional collections and shows sector counts and keys. Metadata remains available for explicit inspection.
+
+```wl
+EabSchw // ToComponents // MatrixForm
+ToComponents[EabSchw, Output -> "CTensor"]
+ToComponents["Schwarzschild", Eab]
+```
+
+Background inference uses owned symbol identities. Owner-free or multi-background expressions require an explicit tag. A zero or simplified-away owned expression cannot identify its background. Chart display labels are presentation-only; the actual xCoba chart identity remains private and independent.
