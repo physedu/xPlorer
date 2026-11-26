@@ -197,17 +197,45 @@ Cell[TextData[{"The copied connection has its own curvature tensors. The Riemann
 
 Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"RiemannCDSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}], ",", RowBox[{"-", "cSchw"}], ",", RowBox[{"-", "dSchw"}]}], "]"}], ",", RowBox[{"RicciCDSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}]}], "]"}], ",", RowBox[{"RicciScalarCDSchw", "[", "]"}]}], "}"}]],"Input",CellTags->"riemann_tensor"],
 
-Cell[TextData[{"Change the printed labels in Schwarzschild formulas to psi for the scalar, q for the metric and D for the derivative. This changes presentation only. The scalar\:2019s lookup key remains ",StyleBox["\"phi\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell["Change only the printed labels of the scalar, metric and covariant derivative. xAct uses a pair of derivative markers: the first is the postfix separator (|), and the second is the prefix symbol (D). These settings do not change the mathematical objects or the registry keys.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"Association", "[", RowBox[{RowBox[{"\"phi\"", "\[Rule]", "\"\[Psi]\""}], ",", RowBox[{"\"Metric\"", "\[Rule]", "\"q\""}], ",", RowBox[{"\"CovD\"", "\[Rule]", RowBox[{"{", RowBox[{"\"|\"", ",", "\"D\""}], "}"}]}]}], "]"}]}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{"phiSchw", "[", "]"}], ",", RowBox[{"gSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}]}], "]"}], ",", RowBox[{RowBox[{"CDSchw", "[", RowBox[{"-", "aSchw"}], "]"}], "[", RowBox[{"phiSchw", "[", "]"}], "]"}]}], "}"}]}]],"Input",CellTags->"custom_presentation"],
+Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "phi", ",", RowBox[{"PrintAs", "\[Rule]", "\"\[Psi]\""}]}], "]"}], ";", RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "g", ",", RowBox[{"PrintAs", "\[Rule]", "\"q\""}]}], "]"}], ";", RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "CD", ",", RowBox[{"PrintAs", "\[Rule]", RowBox[{"{", RowBox[{"\"|\"", ",", "\"D\""}], "}"}]}]}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{"phiSchw", "[", "]"}], ",", RowBox[{"gSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}]}], "]"}], ",", RowBox[{RowBox[{"CDSchw", "[", RowBox[{"-", "aSchw"}], "]"}], "[", RowBox[{"phiSchw", "[", "]"}], "]"}]}], "}"}]}]],"Input",CellTags->"custom_presentation"],
 
-Cell[TextData[{StyleBox["PrintAs -> Automatic",FontFamily->"Courier",FontSize->11]," restores the inherited label. For several objects, set ",StyleBox["Presentation",FontFamily->"Courier",FontSize->11]," at creation or register a theory-wide ",StyleBox["\"Presentation\"",FontFamily->"Courier",FontSize->11]," association. Session defaults for future backgrounds can be set with ",StyleBox["SetXPlorerPreferences",FontFamily->"Courier",FontSize->11]," and reset with ",StyleBox["SetXPlorerPreferences[]",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell["PrintAs -> Automatic restores the inherited label for each object. This leaves the source theory and all other backgrounds unchanged.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"Association", "[", RowBox[{RowBox[{"\"phi\"", "\[Rule]", "Automatic"}], ",", RowBox[{"\"Metric\"", "\[Rule]", "Automatic"}], ",", RowBox[{"\"CovD\"", "\[Rule]", "Automatic"}]}], "]"}]}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{"phiSchw", "[", "]"}], ",", RowBox[{"gSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}]}], "]"}], ",", RowBox[{RowBox[{"CDSchw", "[", RowBox[{"-", "aSchw"}], "]"}], "[", RowBox[{"phiSchw", "[", "]"}], "]"}]}], "}"}]}]],"Input",CellTags->"reset_presentation"],
+Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "phi", ",", RowBox[{"PrintAs", "\[Rule]", "Automatic"}]}], "]"}], ";", RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "g", ",", RowBox[{"PrintAs", "\[Rule]", "Automatic"}]}], "]"}], ";", RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "CD", ",", RowBox[{"PrintAs", "\[Rule]", "Automatic"}]}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{"phiSchw", "[", "]"}], ",", RowBox[{"gSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}]}], "]"}], ",", RowBox[{RowBox[{"CDSchw", "[", RowBox[{"-", "aSchw"}], "]"}], "[", RowBox[{"phiSchw", "[", "]"}], "]"}]}], "}"}]}]],"Input",CellTags->"reset_presentation"],
 
-Cell[TextData[{StyleBox["PrettyExp",FontFamily->"Courier",FontSize->11]," compares two genuinely different displays of the same gradient: a prefix covariant derivative and a postfix derivative, with a background label on the second. Normal recovers the original mathematical expression. Continue calculations with ",StyleBox["gradPhi",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell["Notation and expression views","Subsubsection"],
 
-Cell[BoxData[RowBox[{RowBox[{"prettyGradient", "=", RowBox[{RowBox[{"PrettyExp", "[", RowBox[{RowBox[{"CovariantStyle", "\[Rule]", "\"Postfix\""}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "True"}]}], "]"}], "[", "gradPhi", "]"}]}], ";", RowBox[{"{", RowBox[{RowBox[{RowBox[{"PrettyExp", "[", RowBox[{"CovariantStyle", "\[Rule]", "\"Prefix\""}], "]"}], "[", "gradPhi", "]"}], ",", "prettyGradient"}], "}"}]}]],"Input",CellTags->"pretty_gradient"]
+Cell["SetXPlorerPreferences changes session-wide defaults. SetNotation overrides them for one background. PrettyExp changes only the display of one expression. These commands do not change tensor identities or mathematical results.","Text"],
+
+Cell["Choose a prefix derivative and fraction notation for the session. Both gradients inherit the session preference.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", RowBox[{RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}], ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Prefix\""}]}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"session_prefix"],
+
+Cell["Override only Schwarzschild: its gradient now uses postfix notation and a background label. Minkowski keeps the session defaults.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Postfix\""}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "True"}]}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"local_postfix"],
+
+Cell["Use postfix application, expr // PrettyExp, to display an expression using its current notation settings. The background is inferred when possible.","Text"],
+
+Cell[BoxData[RowBox[{"gradPhi", "//", "PrettyExp"}]],"Input",CellTags->"pretty_default"],
+
+Cell["For a single output, override the notation with PrettyExp options. Compare prefix and postfix views of the same gradient. Normal recovers the original expression.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"prettyGradient","=",RowBox[{"gradPhi", "//", RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Postfix\""}]},",",RowBox[{"ShowBackgroundLabel","\[Rule]","True"}]}],"]"}]}]}],";",RowBox[{"{",RowBox[{RowBox[{"gradPhi", "//", RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Prefix\""}]}}],"]"}]}],",","prettyGradient"}],"}"}]}]],"Input",CellTags->"pretty_gradient"],
+
+Cell["Remove the local overrides with Automatic to inherit session defaults again.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"CovariantStyle", "\[Rule]", "Automatic"}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "Automatic"}]}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"restore_local"],
+
+Cell["Reset session preferences to native defaults. This does not remove existing background-specific overrides.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", "]"}], ";", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"session_reset"],
+
+Cell["For the component calculations below, choose fraction notation again.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}], "]"}], ";"}]],"Input",CellTags->"session_fraction"]
 },Open]],
 
 Cell[CellGroupData[{
@@ -319,21 +347,21 @@ Cell[TextData[{StyleBox["ToComponents",FontFamily->"Courier",FontSize->11]," eva
 
 Cell[BoxData[RowBox[{RowBox[{"eqMink", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "\"ScalarEq\""}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"eqMink", "\[Equal]", "0"}]}]],"Input",CellTags->"minkowski_equation"],
 
-Cell[TextData[{"Compare the original derivative orders with fraction notation for the same equation. In native multi-index notation, (2,0,0,0) means two time derivatives. In ",StyleBox["PrettyExp",FontFamily->"Courier",FontSize->11],", ",StyleBox["\"MultiIndex\"",FontFamily->"Courier",FontSize->11]," keeps the orders explicit, ",StyleBox["\"Fraction\"",FontFamily->"Courier",FontSize->11]," gives a quotient and ",StyleBox["\"Partial\"",FontFamily->"Courier",FontSize->11]," uses a partial-derivative operator. ",StyleBox["\"Prime\"",FontFamily->"Courier",FontSize->11]," gives primes for functions of one argument and native notation for other arities."}],"Text"],
+Cell["Compare native derivative orders, fractions and partial-derivative operators for the same equation. Use // PrettyExp[PartialStyle -> ...] to override the display once. Other available styles are MultiIndex, Comma and Prime (the latter applies to single-argument functions).","Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"PrettyExp", "[", RowBox[{RowBox[{"eqMink", "\[Equal]", "0"}], ",", RowBox[{"PartialStyle", "\[Rule]", "\"Native\""}]}], "]"}], ",", RowBox[{"PrettyExp", "[", RowBox[{RowBox[{"eqMink", "\[Equal]", "0"}], ",", RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}]}], "]"}]}], "}"}]],"Input",CellTags->"partial_view"],
+Cell[BoxData[RowBox[{"{",RowBox[{RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}], "//", RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Native\""}]}}],"]"}]}],",",RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}], "//", RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Fraction\""}]}}],"]"}]}],",",RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}], "//", RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Partial\""}]}}],"]"}]}]}],"}"}]],"Input",CellTags->"partial_view"],
 
 Cell[BoxData[RowBox[{RowBox[{"Normal", "[", RowBox[{"PrettyExp", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"eqMink", "\[Equal]", "0"}]}], "]"}], "]"}], "===", RowBox[{"(", RowBox[{"eqMink", "\[Equal]", "0"}], ")"}]}]],"Input",CellTags->"view_identity"],
 
-Cell[TextData[{StyleBox["Normal",FontFamily->"Courier",FontSize->11]," recovers the underlying equation, which is also retained when the display is copied. To use comma notation throughout Minkowski, set it once with ",StyleBox["SetNotation",FontFamily->"Courier",FontSize->11]," and evaluate ",StyleBox["eqMink",FontFamily->"Courier",FontSize->11]," again. The following cell switches back to fractions."}],"Text"],
+Cell[TextData[{StyleBox["Normal",FontFamily->"Courier",FontSize->11]," recovers the underlying equation, which is also retained when the display is copied. To use comma notation throughout Minkowski, set it once with ",StyleBox["SetNotation",FontFamily->"Courier",FontSize->11]," and evaluate ",StyleBox["eqMink",FontFamily->"Courier",FontSize->11]," again. The following cell removes the local override with Automatic, returning to the session fraction style."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"PartialStyle", "\[Rule]", "\"Comma\""}]}], "]"}], ";", "\[IndentingNewLine]", "eqMink"}]],"Input",CellTags->"automatic_comma"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}]}], "]"}], ";"}]],"Input",CellTags->"automatic_fraction"],
+Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"PartialStyle", "\[Rule]", "Automatic"}]}], "]"}], ";", "eqMink"}]],"Input",CellTags->"automatic_fraction"],
 
-Cell[TextData[{"For abstract covariant derivatives, xAct\:2019s ",StyleBox["$CovDFormat",FontFamily->"Courier",FontSize->11]," selects ",StyleBox["\"Prefix\"",FontFamily->"Courier",FontSize->11]," or ",StyleBox["\"Postfix\"",FontFamily->"Courier",FontSize->11],". To choose the style for one displayed expression, pass ",StyleBox["CovariantStyle",FontFamily->"Courier",FontSize->11]," to ",StyleBox["PrettyExp",FontFamily->"Courier",FontSize->11],". This overrides the background setting for that view."}],"Text"],
+Cell["If automatic background inference is ambiguous, supply an explicit tag with expr // PrettyExp[\"Schwarzschild\"]. This selects that background's display settings; it does not transport the expression.","Text"],
 
-Cell[BoxData[RowBox[{"PrettyExp", "[", RowBox[{"\"Schwarzschild\"", ",", "gradPhi", ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Postfix\""}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "True"}]}], "]"}]],"Input",CellTags->"covariant_view"],
+Cell[BoxData[RowBox[{"gradPhi", "//", RowBox[{"PrettyExp","[","\"Schwarzschild\"","]"}]}]],"Input",CellTags->"covariant_view"],
 
 Cell[TextData[{"With signature (\:2212,+,+,+), the time and spatial second derivatives enter with opposite signs."}],"Text"],
 
@@ -350,6 +378,12 @@ Cell[TextData[{"Choose a static radial profile \:03c6 = u(r) on Schwarzschild. S
 Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "u", "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"Schwarzschild\"", ",", "phi", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "r", ",", "theta", ",", "varphi"}], "}"}], ",", RowBox[{"u", "[", "r", "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"schwarzschild_field"],
 
 Cell[BoxData[RowBox[{RowBox[{"eqSchw", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Schwarzschild\"", ",", "\"ScalarEq\""}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"eqSchw", "\[Equal]", "0"}]}]],"Input",CellTags->"schwarzschild_equation"],
+
+Cell["For a radial profile depending on one coordinate, prime notation is often more compact. Change only the Schwarzschild output style, then restore the session default.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"PartialStyle", "\[Rule]", "\"Prime\""}]}], "]"}], ";", RowBox[{"eqSchw", "\[Equal]", "0"}]}]],"Input",CellTags->"radial_prime"],
+
+Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"PartialStyle", "\[Rule]", "Automatic"}]}], "]"}], ";", RowBox[{"eqSchw", "\[Equal]", "0"}]}]],"Input",CellTags->"radial_restore"],
 
 Cell[TextData[{"The radial equation has the following divergence form."}],"Text"],
 
