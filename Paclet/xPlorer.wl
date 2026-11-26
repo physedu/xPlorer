@@ -16,6 +16,7 @@ ClearTheory::usage = "ClearTheory[] resets $Theory to an empty association.";
 
 
 CreateBackground::usage = "CreateBackground[tag] creates a background from $Theory. Use CreateBackground[tag, Indices -> Automatic] to reuse theory indices or CreateBackground[tag, Indices -> {...}] to choose a background-specific index list. Free suffixed names in the calling context refer directly to the created objects, indices and registered expressions. Use SymbolSuffix for the symbol names, PrintAs for the metric label and MetricSignature for its signature.";
+AddField::usage = "AddField[tag, source] copies one registered source field into an existing background, preserving its geometry and inputs. It does not import new formulas.";
 PortExpression::usage = "PortExpression[tag, expr] ports an abstract expression expr to the background tag.";
 PrettyExp::usage = "PrettyExp[expr, opts], expr // PrettyExp, expr // PrettyExp[tag], expr // PrettyExp[opts], or PrettyExp[tag, expr, opts] creates an interpreted presentation view. Normal returns the original expression. Infer a unique background when possible; otherwise use session defaults.";
 AddRules::usage = "AddRules[tag, rules] adds specialization rules to the background tag.";
@@ -51,14 +52,14 @@ $BG::usage = "$BG stores the backgrounds created by the package.";
 SyntaxInformation[RegisterTheory] = <|"ArgumentsPattern" -> {_, ___}|>;
 
 ToComponents::usage = "ToComponents[tag, expressionOrKey, opts] ports an expression and evaluates its components in the background chart. ToComponents[ownedExpression, opts], ownedExpression // ToComponents and ownedExpression // ToComponents[opts] infer a unique background; use an explicit tag for abstract or ambiguous expressions. Output -> \"CTensor\" returns a native xCoba CTensor for a complete resolved positive-rank zero-weight tensor array; default Output -> \"Array\".";
-SetFieldComponents::usage = "SetFieldComponents[tag, field, values, opts] assigns scalar/vector/tensor components. A pure Function receives the chart coordinate scalars.";
+SetFieldComponents::usage = "SetFieldComponents[ownedTensorExpression, values] infers the background, index variance and LI order, assigning in the primary chart. SetFieldComponents[tag, field, values, opts] also accepts a source or copied head. A pure Function receives primary coordinate scalars.";
 RegisterProfile::usage = "RegisterProfile[tag, name, field, values, opts] stores a validated field input without activating it; repeated calls add or replace field/order entries. RegisterProfile[tag, name] captures the currently assigned managed inputs.";
 ActivateProfile::usage = "ActivateProfile[tag, name] overlays a named profile on managed field inputs, preserving fields/orders not specified. Geometry is reused and saved results invalidated.";
 ShowProfiles::usage = "ShowProfiles[tag] returns the stored named field input records.";
 RemoveProfile::usage = "RemoveProfile[tag, name] removes a stored profile without changing active field values.";
 ComputeGeometry::usage = "ComputeGeometry[tag, targets, opts] computes only the requested xCoba geometry and reuses compatible cached results.";
 CheckBackground::usage = "CheckBackground[tag, opts] returns Passed, Failed or Inconclusive checks, including optional metric compatibility and contracted Bianchi tests.";
-PerturbOn::usage = "PerturbOn[tag, expressionOrKey, n, opts] computes the nth variation (or Taylor coefficient when requested), with optional component output.";
+PerturbOn::usage = "PerturbOn[tag, expressionOrKey, n, opts] or ownedExpression // PerturbOn[n, opts] computes the nth variation (or Taylor coefficient when requested), with optional component output. OutputChart selects the chart only for component output.";
 ToBasisOf::usage = "ToBasisOf[tag, expr] converts to the background basis and traces basis dummies.";
 ToValuesOf::usage = "ToValuesOf[tag, expr] evaluates values in the background basis.";
 FreeIndices::usage = "FreeIndices specifies the ordered free abstract indices of a component result.";
@@ -73,7 +74,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.14";
+$XPlorerVersion = "14.0.0-beta.13-dev.15";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -299,6 +300,42 @@ allGeometry[cd_, g_] := <|"Christoffel" -> GiveSymbol[Christoffel, cd], "Riemann
   "Weyl" -> Weyl[cd], "TFRicci" -> TFRicci[cd], "Kretschmann" -> Kretschmann[cd],
   "Epsilon" -> epsilon[g], "DetMetric" -> GiveSymbol[Determinant, g, AIndex]|>;
 
+makeOwnedField[key_, spec_, ctx_, suffix_, srcg_, srcm_, m_, g_, base_, inds_, labels_, parameter_, perturbHead_] := Module[{head, new, type, rank, slots, signs, symmetry, deps, args, print, n, dagger=Real, vanish=False, frobenius=False},
+    If[!AssociationQ[spec] || !And @@ (KeyExistsQ[spec, #] & /@ {"Head", "Type"}), Return[$Failed]];
+    head = spec["Head"]; type = spec["Type"]; print = resolveLabel[head,Lookup[spec, "PrintAs", InferFieldPrintAs[head]]];
+    new = freshOwnedSymbol[ctx, Replace[Lookup[spec,"SymbolBase",Automatic], Automatic :> safeName[key]] <> suffix];
+    print = Lookup[labels, key, print];
+    If[type === "MetricPert",
+      If[perturbHead =!= None, Return[$Failed]];
+      Block[{$PerturbationParameter}, With[{gg = g, hh = new, pp = parameter, pr = print},
+        DefMetricPerturbation[gg, hh, pp, PrintAs -> pr]]];
+      signs = {-1, -1}; rank = 2,
+      rank = Switch[type, "Scalar", 0, "Vector", 1, "Tensor", Lookup[spec, "Rank", -1], _, -1];
+      If[!IntegerQ[rank] || rank < 0, Return[$Failed]];
+      symmetry = Lookup[spec, "Symmetry", None];
+      signs = ConstantArray[-1, rank]; deps = {m};
+      If[xTensorQ[head],
+        If[WeightOfTensor[head]=!=0 || !FreeQ[UpValues[head],OrthogonalToVectorQ|Projected|GradeOfTensor], Return[$Failed]];
+        dagger=Which[HermitianQ[head],Hermitian,AntihermitianQ[head],Antihermitian,Dagger[head]===head,Real,Dagger[head]===MultiplyHead[-1,head],Imaginary,True,Complex];
+        frobenius=FrobeniusQ[head];
+        slots = SlotsOfTensor[head];
+        If[Length[slots] =!= rank || !And @@ (MemberQ[{VBundleOfMetric[srcg], -VBundleOfMetric[srcg]}, #] & /@ slots), Return[$Failed]];
+        signs = If[MatchQ[#, Times[-1, _]], -1, 1] & /@ slots;
+        vanish=SameQ[head@@MapThread[Times,{signs,Take[If[rank<=Length[base],base,GetIndicesOfVBundle[VBundleOfMetric[srcg],rank]],rank]}],0];
+        symmetry = SymmetryGroupOfTensor[head];
+        deps = DependenciesOfTensor[head] /. srcm -> m;
+        If[!FreeQ[deps, s_Symbol /; ManifoldQ[s] && s =!= m], Return[$Failed]];
+      ];
+      args = MapThread[Times, {signs, Take[If[rank <= Length[inds], inds, GetIndicesOfVBundle[TangentBundleOfManifold[m], rank]], rank]}];
+      symmetry = Switch[symmetry, "Symmetric", Symmetric[Range[rank]], "Antisymmetric", Antisymmetric[Range[rank]], None, GenSet[], _, symmetry];
+      With[{hh = new, aa = args, dd = deps, ss = symmetry, pr = print, dg=dagger,fb=frobenius,vn=vanish},
+        DefTensor[hh @@ aa, dd, ss, PrintAs -> pr,Dagger->dg,FrobeniusQ->fb,VanishingQ->vn]];
+    ];
+    If[!xTensorQ[new], Return[$Failed]];
+    <|"Type" -> type, "OldHead" -> head, "NewHead" -> new,
+      "PrintAs" -> print, "Rank" -> rank, "IndexPositions" -> signs|>
+  ];
+
 Options[CreateBackground] = {Indices -> Automatic, MetricSignature -> Automatic, Presentation -> <||>, SymbolSuffix -> Automatic, PrintAs -> Automatic};
 CreateBackground[tag_String, OptionsPattern[]] := Module[
   {theory = $Theory, srcg, srccd, srcm, dim, base, display, inds, ctx, m, g, cd, sig,
@@ -345,41 +382,11 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
   If[!AllTrue[Values[specs], AssociationQ[#] && KeyExistsQ[#,"Head"] && MemberQ[{"Scalar","Vector","Tensor","MetricPert"},Lookup[#,"Type",None]] &&
       (Lookup[#,"Type"] =!= "Tensor" || (IntegerQ[Lookup[#,"Rank",-1]] && Lookup[#,"Rank",-1]>=0))&],
     Return[failure["FieldSpecification","Every field needs a supported type and nonnegative tensor rank."]]];
-  make[key_, spec_] := Module[{head, new, type, rank, slots, signs, symmetry, deps, args, print, n, dagger=Real, vanish=False, frobenius=False},
-    If[!AssociationQ[spec] || !And @@ (KeyExistsQ[spec, #] & /@ {"Head", "Type"}), Return[$Failed]];
-    head = spec["Head"]; type = spec["Type"]; print = resolveLabel[head,Lookup[spec, "PrintAs", InferFieldPrintAs[head]]];
-    new = freshOwnedSymbol[ctx, Replace[Lookup[spec,"SymbolBase",Automatic], Automatic :> safeName[key]] <> suffix];
-    print = Lookup[labels, key, print];
-    If[type === "MetricPert",
-      If[perturbHead =!= None, Return[$Failed]];
-      Block[{$PerturbationParameter}, With[{gg = g, hh = new, pp = parameter, pr = print},
-        DefMetricPerturbation[gg, hh, pp, PrintAs -> pr]]];
-      perturbHead = new; signs = {-1, -1}; rank = 2,
-      rank = Switch[type, "Scalar", 0, "Vector", 1, "Tensor", Lookup[spec, "Rank", -1], _, -1];
-      If[!IntegerQ[rank] || rank < 0, Return[$Failed]];
-      symmetry = Lookup[spec, "Symmetry", None];
-      signs = ConstantArray[-1, rank]; deps = {m};
-      If[xTensorQ[head],
-        If[WeightOfTensor[head]=!=0 || !FreeQ[UpValues[head],OrthogonalToVectorQ|Projected|GradeOfTensor], Return[$Failed]];
-        dagger=Which[HermitianQ[head],Hermitian,AntihermitianQ[head],Antihermitian,Dagger[head]===head,Real,Dagger[head]===MultiplyHead[-1,head],Imaginary,True,Complex];
-        frobenius=FrobeniusQ[head];
-        slots = SlotsOfTensor[head];
-        If[Length[slots] =!= rank || !And @@ (MemberQ[{VBundleOfMetric[srcg], -VBundleOfMetric[srcg]}, #] & /@ slots), Return[$Failed]];
-        signs = If[MatchQ[#, Times[-1, _]], -1, 1] & /@ slots;
-        vanish=SameQ[head@@MapThread[Times,{signs,Take[If[rank<=Length[base],base,GetIndicesOfVBundle[VBundleOfMetric[srcg],rank]],rank]}],0];
-        symmetry = SymmetryGroupOfTensor[head];
-        deps = DependenciesOfTensor[head] /. srcm -> m;
-        If[!FreeQ[deps, s_Symbol /; ManifoldQ[s] && s =!= m], Return[$Failed]];
-      ];
-      args = MapThread[Times, {signs, Take[If[rank <= Length[inds], inds, GetIndicesOfVBundle[TangentBundleOfManifold[m], rank]], rank]}];
-      symmetry = Switch[symmetry, "Symmetric", Symmetric[Range[rank]], "Antisymmetric", Antisymmetric[Range[rank]], None, GenSet[], _, symmetry];
-      With[{hh = new, aa = args, dd = deps, ss = symmetry, pr = print, dg=dagger,fb=frobenius,vn=vanish},
-        DefTensor[hh @@ aa, dd, ss, PrintAs -> pr,Dagger->dg,FrobeniusQ->fb,VanishingQ->vn]];
-    ];
-    If[!xTensorQ[new], Return[$Failed]];
-    fields[key] = <|"Type" -> type, "OldHead" -> head, "NewHead" -> new,
-      "PrintAs" -> print, "Rank" -> rank, "IndexPositions" -> signs|>;
-    new
+  make[key_, spec_] := Module[{rec=makeOwnedField[key,spec,ctx,suffix,srcg,srcm,m,g,base,inds,labels,parameter,perturbHead]},
+    If[rec===$Failed,Return[$Failed]];
+    fields[key]=rec;
+    If[rec["Type"]==="MetricPert",perturbHead=rec["NewHead"]];
+    rec["NewHead"]
   ];
   installCovDNames[cd,ctx];
   result = guard[
@@ -419,6 +426,32 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
   installBackgroundObjectAliases[tag,$Context];
   installExpressionAliases[tag, suffix, $Context];
   $BG[tag]
+];
+
+AddField[tag_String,source_Symbol] := Module[{b=background[tag],specs,key,spec,rec,head,tt,rules,labels,existing},
+ If[FailureQ[b],Return[b]];
+ If[!KeyExistsQ[b,"Metric"] || !MetricQ[b["Metric"]],Return[failure["FieldGeometry","A managed metric is required."]]];
+ If[Lookup[$Theory,"Metric",None]=!=b["Theory"]["Metric"],Return[failure["FieldGeometry","The current source metric must match the background snapshot."]]];
+ specs=Select[Lookup[$Theory,"Field",<||>],Lookup[#,"Head",None]===source&];
+ If[Length[specs]=!=1,Return[failure["FieldSource","Register the source field before adding it."]]];
+ key=First[Keys[specs]];spec=specs[key];
+ If[KeyExistsQ[managedObjects[b],key] || AnyTrue[Values[b["Field"]],#["OldHead"]===source&],Return[failure["DuplicateField","The field or key is already represented in this background."]]];
+ existing=Lookup[Values@Lookup[b["Theory"],"Field",<||>],"SymbolBase",{}];
+ If[MemberQ[existing,spec["SymbolBase"]],Return[failure["DuplicateField","The symbol base is already represented."]]];
+ If[spec["Type"]==="MetricPert" && b["PerturbationHead"]=!=None,Return[failure["MetricPerturbation","This background already has a managed metric perturbation."]]];
+ labels=KeyTake[$PresentationPreferences,{key}];
+ If[!AllTrue[Values[labels],validLabelQ],Return[failure["Presentation","Invalid field display label."]]];
+ rec=guard[makeOwnedField[key,spec,b["Context"],b["SymbolSuffix"],b["Theory"]["Metric"],b["SourceManifold"],b["Manifold"],b["Metric"],b["BaseIndices"],b["Indices"],labels,b["PerturbationParameter"],b["PerturbationHead"]]];
+ If[!AssociationQ[rec],Return[failure["AddField","xAct could not copy the field. Inspect native definitions before retrying."]]];
+ head=rec["NewHead"];tt=b["Theory"];tt["Field"]=Append[Lookup[tt,"Field",<||>],key->spec];
+ rules=Join[b["HeadRules"],{source->head},If[DaggerQ[source],{Dagger[source]->Dagger[head]},{}]];
+ put[tag,<|"Theory"->tt,"Field"->Append[b["Field"],key->rec],"HeadRules"->rules,
+  "PresentationDefaults"->Append[b["PresentationDefaults"],key->spec["PrintAs"]],
+  "PresentationOverrides"->Join[b["PresentationOverrides"],labels]|>];
+ If[spec["Type"]==="MetricPert",put[tag,<|"PerturbationHead"->head|>]];
+ setBareBoxes[head,SymbolName[head]];
+ If[KeyExistsQ[b,"AliasContext"],installObjectAliases[tag,{head}]];
+ invalidateResults[tag];head
 ];
 
 sourceIndexQ[s_Symbol, bundle_] := Module[{known = Flatten[IndicesOfVBundle[bundle]], name = SymbolName[s]},
@@ -728,6 +761,21 @@ SetFieldComponents[tag_String,field_Symbol,input_,opts:OptionsPattern[]] := Modu
   result=applyFieldRecords[tag,Append[$BG[tag]["FieldComponents"],fieldRecordKey[rec]->rec]];
   If[FailureQ[result],result,rec]
 ];
+SetFieldComponents[expr:Except[_String],input_,opts:OptionsPattern[]] := Module[{tag=notationOwner[expr],b,fs,args,order=None,signs,ix,extra},
+ If[!StringQ[tag],Return[failure["FieldBackground","Use an owned tensor expression with a unique background."]]];
+ b=$BG[tag];fs=fieldSpec[b,Head[expr]];
+ If[FailureQ[fs],Return[fs]];
+ If[Complement[First /@ {opts},{Assumptions}]=!={},Return[failure["FieldOptions","The tensor expression already specifies variance and LI order. Only Assumptions may be supplied."]]];
+ args=List@@expr;
+ If[fs["Type"]==="MetricPert",
+  If[args==={} || !MatchQ[First[args],LI[_Integer?Positive]],Return[failure["PerturbationOrder","Supply LI[n] with positive integer n."]]];
+  order=First[First[args]];args=Rest[args]];
+ ix=args/.Times[-1,i_Symbol]:>i;
+ If[Length[args]=!=fs["Rank"] || !VectorQ[ix,Function[i,MatchQ[i,_Symbol]&&TrueQ[AIndexQ[i,TangentBundleOfManifold[b["Manifold"]]]]]] || !DuplicateFreeQ[ix],
+  Return[failure["FieldIndices","Supply distinct abstract indices on the owned tangent bundle. Values are assigned in the primary chart."]]];
+ signs=If[MatchQ[#,Times[-1,_Symbol]],-1,1]& /@ args;
+ SetFieldComponents[tag,fs["NewHead"],input,IndexPositions->signs,PerturbationOrderLabel->Replace[order,None->1],opts]
+];
 Options[RegisterProfile]=Options[SetFieldComponents];
 RegisterProfile[tag_String,name_String] := Module[{b=background[tag],profiles},
   If[FailureQ[b],Return[b]];
@@ -921,11 +969,16 @@ coordinateBianchi[tag_, ass_] := Module[{b = $BG[tag], ch, cd, ids, gamma, inv, 
   arrayZeroCheck[residual, ass]
 ];
 
-Options[PerturbOn] = {Output -> "Abstract", PerturbationForm -> "Variation", ApplySpecialization -> True,
+Options[PerturbOn] = {Output -> "Abstract", OutputChart -> Automatic, PerturbationForm -> "Variation", ApplySpecialization -> True,
   FreeIndices -> Automatic, Components -> All, Assumptions -> Automatic, Simplification -> Simplify, StrictComponents -> False};
+PerturbOn[n_Integer,opts:OptionsPattern[]][expr_] := Module[{tag=notationOwner[expr]},
+ If[!StringQ[tag],Return[failure["PerturbationBackground","Cannot infer a unique background. Use PerturbOn[tag, expression, n]."]]];
+ PerturbOn[tag,expr,n,opts]
+];
 PerturbOn[tag_String, input_, order_Integer: 1, OptionsPattern[]] := Module[{b = background[tag], ex, result, form = OptionValue[PerturbationForm]},
   If[FailureQ[b], Return[b]];
   If[order < 0, Return[failure["PerturbationOrder", "The order must be nonnegative."]]];
+  If[OptionValue[Output]==="Abstract" && OptionValue[OutputChart]=!=Automatic,Return[failure["PerturbationChart","OutputChart requires Output -> \"Components\"; abstract variations have no chart."]]];
   If[b["PerturbationHead"] === None, Return[failure["NoMetricPerturbation", "Register a MetricPert field before creating the background."]]];
   If[!MemberQ[{"Variation", "TaylorCoefficient"}, form] || !MemberQ[{"Abstract", "Components"}, OptionValue[Output]], Return[failure["PerturbationOptions", "Choose Variation or TaylorCoefficient, and Abstract or Components output."]]];
   ex = resolve[tag, input]; If[FailureQ[ex], Return[ex]];
@@ -933,7 +986,7 @@ PerturbOn[tag_String, input_, order_Integer: 1, OptionsPattern[]] := Module[{b =
   result = guard[Block[{$PerturbationParameter = b["PerturbationParameter"]}, ToCanonical[ContractMetric[ExpandPerturbation[Perturbation[ex, order]]]]]];
   If[result === $Failed, Return[failure["Perturbation", "xPert could not expand the requested variation."]]];
   If[form === "TaylorCoefficient", result = result/Factorial[order]];
-  If[OptionValue[Output] === "Components", Return[ToComponents[tag, result, FreeIndices -> OptionValue[FreeIndices], Components -> OptionValue[Components], Assumptions -> OptionValue[Assumptions],
+  If[OptionValue[Output] === "Components", Return[ToComponents[tag, result, OutputChart -> OptionValue[OutputChart], FreeIndices -> OptionValue[FreeIndices], Components -> OptionValue[Components], Assumptions -> OptionValue[Assumptions],
     Simplification -> OptionValue[Simplification], StrictComponents -> OptionValue[StrictComponents], ApplySpecialization -> OptionValue[ApplySpecialization]]]];
   If[TrueQ[OptionValue[ApplySpecialization]], result = ApplyRules[tag, result]];
   result
