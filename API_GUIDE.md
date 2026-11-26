@@ -1,4 +1,4 @@
-# Using xPlorer
+# Using xPlorer — beta.13-dev.6
 
 The principal worked guide is xPlorer_Workflow.nb. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside xPlorer.wl and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
@@ -19,7 +19,7 @@ RegisterTheory stores existing definitions, expressions and metadata. It does no
 | Copied symbol | private-context phiSchwarzschild1 | Independent actual xAct identity |
 | Print label | m or M1 | Presentation, not identity |
 
-PrintAs is inherited automatically. Define phi with PrintAs -> "m", then register it normally to inherit m. RegisterTheory["Field", "Scalar", phi, PrintAs -> "M1"] optionally overrides that label. These are alternatives, not instructions to register one source head under several keys.
+PrintAs is inherited automatically. Define phi with PrintAs -> "m", then register it normally to inherit m. RegisterTheory["Field", phi, PrintAs -> "M1"] optionally overrides that label. These are alternatives, not instructions to register one source head under several keys.
 
 For later or background-local changes:
 
@@ -35,7 +35,24 @@ Supported presentation keys include field keys, Metric, CovD and primary geometr
 
 SetXPlorerPreferences sets presentation defaults for future backgrounds; RegisterTheory["Presentation", assoc] sets theory defaults. Background overrides take precedence. SetPresentation changes owned heads only and accepts Automatic to restore defaults. Current background settings do not mutate the source. For connection-specific labels, pass SymbolOfCovD when registering or adding that connection. Full InputForm, Context and SymbolName remain available; bare head display uses interpreted short names and indexed tensors use xAct notation.
 
-DisplayExpression[tag, expr, opts] creates an optional interpreted view. Normal returns expr, and copying its boxes retains expr. It is a view, not a new tensor. PartialStyle selects Native, MultiIndex, Fraction, Partial or Prime; Prime only changes single-argument derivatives. CovariantStyle selects Native, Prefix or Postfix. ShowBackgroundLabel adds a label. SetNotation supplies background defaults; explicit call options win. These settings never reorder derivatives or change global derivative definitions. No front-end screenshots are part of the automated headless checks.
+PrettyExp[expr, opts], expr // PrettyExp, expr // PrettyExp[tag], expr // PrettyExp[opts], and PrettyExp[tag, expr, opts] create optional interpreted views. Unique owned background identity is inferred when possible; otherwise session defaults apply, and explicit tags override inference. No mathematical reverse transport occurs. Normal returns expr, and copying its boxes retains expr. It is a view, not a new tensor. PartialStyle selects Native, MultiIndex, Fraction, Partial, Comma or Prime; Prime only changes single-argument derivatives. CovariantStyle selects Native, Prefix or Postfix. ShowBackgroundLabel adds a label. SetNotation supplies background defaults; explicit call options win. These settings never reorder derivatives or change global derivative definitions. No front-end screenshots are part of the automated headless checks.
+
+## Registration and inspection
+
+Define native tensors before registering them. No legacy positional type argument is supported.
+
+```wl
+RegisterTheory["Field", phi, Name -> "matter"];
+RegisterTheory["Fields", {A,F}];
+RegisterTheory["Parameters", m];
+RegisterTheory["Lagrangians", {"Gravity" -> Lgrav, "Matter" -> Lmatter}];
+RegisterTheory["Expressions", "ScalarEq" -> eq];
+ShowTheory[]
+ShowTheory["Fields"]
+TheoryValue["Lagrangians","Matter"]
+```
+
+Name selects the key and default symbol base; SymbolBase can override the latter, and PrintAs changes appearance only. Sector groups items without changing the mathematics. Registering a named right-hand side preserves its source alias; anonymous formulas require an explicit Head string. No implicit sum of Lagrangians. TheorySnapshot[] returns raw restorable data, distinct from ShowTheory's native overview. Qualified expression keys are {section,key} or explicit BackgroundExpression[tag,section,key]. Existing backgrounds retain their own theory snapshot.
 
 ## Connections and components
 
@@ -62,6 +79,37 @@ CheckConnection[tag, "Affine"]
 Array order is {upper output, lower derivative, lower input}, representing Gamma^i_(j k). Pure Function inputs receive coordinate scalars. Coordinates means coefficients relative to the chart's partial derivative; Primary means a tensor difference from the metric derivative. Other reference names are currently rejected. A metric alone does not determine the independent connection. Declared zero torsion, zero curvature and metric compatibility must be verifiable before assignment; undecidable conditions produce Failure rather than accepting inconsistent data. CheckConnection reports torsion and metric-compatibility residuals. Its general-connection checks do not impose Levi-Civita Bianchi identities or Ricci symmetry.
 
 ToComponents selects the appropriate copied objects through transport, then expands the selected derivatives/curvatures using xAct. FreeIndices determines axis order. Components selects zero-based coordinate tuples. StrictComponents rejects unresolved tensor data; chart coordinate scalars are resolved inputs. Field keys cannot shadow reserved geometry/ownership keys. Source and background expressions are accepted, but mixing their indices directly before transport is invalid xAct usage.
+
+### Variance and native CTensor output
+
+SetFieldComponents[tag,A,values] defaults to the source slot configuration; IndexPositions -> {1} supplies upper vector components and {-1} lower components. Mixed and higher-rank configurations use one sign per slot. The supplied configuration is preserved when the metric changes; derived configurations are recomputed.
+
+```wl
+ToComponents[tag,A[a]]
+ToComponents[tag,A[a],Output -> "CTensor"]
+ToComponents[tag,g[-a,-b],OutputChart -> "Cylindrical"]
+```
+
+Output defaults to "Array". "CTensor" uses native xCoba CTensor with signed bases matching the ordered abstract free indices, including a named output chart. Requires a complete resolved positive-rank zero-weight tensor, not selected tuples or scalar results. Native xCoba may simplify a zero CTensor. The returned object is a snapshot, not a live linked field. Native changes of basis require native registered transformations. Secondary managed chart maps currently use a Jacobian pullback rather than native SetBasisChange.
+
+### Native xCoba interoperability
+
+CreateBackground defines actual xAct objects. Use BackgroundObject[tag,"Manifold"], BackgroundObject[tag,"Metric"], ConnectionOf[tag], ChartOf[tag] and the copied tensor/index aliases. You can define a native chart or basis, use MetricInBasis, MetricCompute, AllComponentValues, DefBasis, SetBasisChange, ToBasis and ToCTensor directly. See Examples/NativeXCoba.wl and Tests/15_NativeInterop.wl for verified cases. BasisColor is native presentation, not a metric or tensor property. There is no new xPlorer general-basis API.
+
+**Boundary:** native-only chart/value assignments are not registered by xPlorer. Managed ToComponents expects a managed primary chart and metric; it uses abstract expressions, not arbitrary pre-based external expressions. External modifications of managed values do not update the registry, geometry cache, saved results or profile records. ClearComputedValues and managed setters may restore declared managed inputs and discard native edits; use one owner for each managed assignment. Native-only work remains available; no automatic synchronization is claimed. External dependents can block deletion; inspect DeletionPlan, undefine external objects explicitly. CMetricOf, ComponentCovDOf and ExprMatrixOf were removed because they duplicated BackgroundObject/ConnectionOf/ToComponents.
+
+### Named field profiles
+
+```wl
+RegisterProfile[tag,"Current"];
+RegisterProfile[tag,"Radial",phi,Function[{t,r,th,p},r^2]];
+RegisterProfile[tag,"Radial",A,{1,0,0,0},IndexPositions->{1}];
+ActivateProfile[tag,"Radial"];
+ShowProfiles[tag]
+RemoveProfile[tag,"Radial"];
+```
+
+RegisterProfile[tag,name] captures currently assigned managed field inputs; the explicit field form validates and stores without activation. Repeated calls under one name add or replace field/order entries. ActivateProfile overlays those entries, retaining unspecified fields/orders and geometry, and invalidates managed saved results. RemoveProfile deletes only stored inputs, not current values. Registration does not invalidate results. Managed profile records are included in reconstruction; chart deletion clears them and deletion of referenced owned objects drops affected profiles. Assignment attempts restore the previous managed inputs on failure; if restoration fails a structured failure reports the incomplete state. External native edits are not preserved by replay. No arbitrary native kernel snapshot or rollback guarantee.
 
 ## Rules, results and going back
 
@@ -92,7 +140,7 @@ Xplorer follows native dependencies and collapses auto-removed servant families.
 | Feature | Current scope |
 | --- | --- |
 | Source geometry | One real zero-weight metric and its Levi-Civita derivative; integer dimension >= 2 |
-| Bundles/charts | One real tangent bundle and one chart per background |
+| Bundles/charts | One real tangent bundle, managed primary chart and additional output charts; native external bases possible |
 | Fields | Scalars, vectors, fixed-rank tensors and a metric perturbation; slots and native symmetry inherited |
 | Native field metadata | PrintAs, standard conjugation, Frobenius and vanishing behavior; supported dependencies translated |
 | Independent derivatives | Ordinary tangent-bundle derivatives, with/without torsion and curvature; metric reference may be the theory metric |
@@ -110,4 +158,4 @@ Get works directly without installation. For a traditional application, name the
 
 PacletInfo.wl declares a kernel extension using the same source. PacletDirectoryLoad["/path/to/xPlorer"] followed by Needs["xPlorer`"] activates a development directory. Tools/BuildPaclet.wl can build a paclet archive with PacletTools. xAct must be installed separately; it is not bundled or automatically downloaded by the package.
 
-Tests/RunTests.wl runs package checks. Tests/WorkflowTests.wl runs actual input boxes from the principal notebook in a fresh kernel. Tools/build_notebook.py rebuilds the notebook from editable English cells and cached native boxes; run Tools/MakeInputBoxes.wl after changing code cells. See VALIDATION.md for actual results and limitations.
+Tests/RunTests.wl runs package checks. Tests/WorkflowTests.wl runs actual input boxes from the principal notebook in a fresh kernel. The principal notebook is the source of truth. The historical 88-input Tools builder cannot overwrite it. See BETA13_PROGRESS.md and BETA13_PLAN.md for current execution evidence and limitations.
