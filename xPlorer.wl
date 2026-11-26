@@ -70,8 +70,9 @@ PerturbationForm::usage = "PerturbationForm is Variation (nth derivative) or Tay
 ApplySpecialization::usage = "ApplySpecialization controls whether background specialization rules are applied.";
 StrictComponents::usage = "StrictComponents -> True returns Failure when tensor components or covariant derivatives remain unresolved.";
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
+AboutXPlorer::usage = "AboutXPlorer[] displays the package version, authorship, license and project link.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.3";
+$XPlorerVersion = "14.0.0-beta.13-dev.4";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label; the association form changes several labels of owned background objects. Automatic restores the inherited default for a key.";
@@ -117,59 +118,20 @@ SymbolBase::usage = "SymbolBase -> name sets the base of a registered field head
 SymbolSuffix::usage = "SymbolSuffix -> \"M\" chooses a readable symbol suffix independently of the background tag.";
 BackgroundExpression::usage = "BackgroundExpression[tag,key] returns the registered formula transported without specialization rules.";
 OutputChart::usage = "OutputChart -> name expresses tensor components in a named chart of the same background.";
-ExpressionText::usage = "ExpressionText[tag,key,format] returns InputForm replay code, TeX or a readable mathematical view for a registered formula.";
+ExpressionText::usage = "ExpressionText[tag,key,format] or ExpressionText[tag,section,key,format] returns InputForm replay code, TeX, TexAct or a mathematical view. The qualified form also accepts {section,key} as the key.";
 Begin["`Private`"]
-
-SetAttributes[NameKey, HoldAll];
-NameKey[k_String] := k;
-NameKey[k_Symbol] := SymbolName[Unevaluated[k]];
-NameKey[k_] := ToString[Unevaluated[k], InputForm];;
 
 SetAttributes[RegisterTheory, HoldAll];
 
 
-RegisterTheory::badfield = "Invalid field specification: `1`.";
-RegisterTheory::badexpr = "Invalid expression specification: `1`.";
-RegisterTheory::badparam = "Invalid parameter specification: `1`.";
-CreateBackground::notheory = "No theory has been registered yet.";
-CreateBackground::nometric = "$Theory does not contain Metric.";
-CreateBackground::nocovd = "$Theory does not contain CovD.";
-CreateBackground::noindices = "$Theory does not contain a valid Indices list.";
-CreateBackground::nofield = "$Theory does not contain a valid Field association.";
-CreateBackground::badbgindices = "Option Indices must be Automatic or a list of symbols.";
-CreateBackground::badsignature = "Option MetricSignature must be an integer sign such as -1 or 1.";
-PortExpression::nobg = "Background `1` does not exist.";
-PrettyExp::nobg = "Background `1` does not exist.";
-AddRules::nobg = "Background `1` does not exist.";
-ClearRules::nobg = "Background `1` does not exist.";
-ShowRules::nobg = "Background `1` does not exist.";
-ApplyRules::nobg = "Background `1` does not exist.";
-SetFlatRules::nobg = "Background `1` does not exist.";
-UseExpression::notheory = "No theory has been registered yet.";
-UseExpression::noexpr = "$Theory does not contain a valid \"Expr\" association.";
-UseExpression::nokey = "Expression key `1` was not found in $Theory[\"Expr\"].";
-DefineChart::nobg = "Background `1` does not exist.";
-DefineChart::badcoords = "DefineChart expects exactly 4 coordinate names.";
-SetCMetricSystem::nobg = "Background `1` does not exist.";
-SetCMetricSystem::nochart = "Background `1` does not have a chart defined.";
-SetCMetricSystem::badmat = "The metric matrix must be a 4 x 4 list.";
-DeleteBackground::nobg = "Background `1` does not exist.";
-TheoryValue::nokey = "Key `1` was not found in $Theory.";
 
 If[!ValueQ[$BG] || !AssociationQ[$BG], $BG = <||>;];
 If[!ValueQ[$Theory] || !AssociationQ[$Theory], $Theory = <||>;];
 
-MergeTheoryValue[old_, new_] := Which[
-  AssociationQ[old] && AssociationQ[new], Join[old, new],
-  True, new
-];
-
-InferFieldKey[head_] := SymbolName[Unevaluated[head]];
 InferFieldPrintAs[head_] := PrintAs[head];
 validLabelQ[x_] := StringQ[x] || MatchQ[x, _RowBox|_SubscriptBox|_SuperscriptBox|_SubsuperscriptBox|_StyleBox|_OverscriptBox|_UnderscriptBox|_GridBox];
 resolveLabel[head_,label_] := If[validLabelQ[label],label,xAct`xTensor`Private`PrintAsString[head,label]];
 
-FieldPrintAsFromOpts[head_, opts___Rule] := resolveLabel[head,Lookup[Association[opts], PrintAs, InferFieldPrintAs[head]]];
 (* beta.13: hold syntax before evaluating any formula or source symbol. *)
 b13Items[HoldComplete[{items___}]] :=
  List @@ Map[HoldComplete, Unevaluated[HoldComplete[items]]];
@@ -480,8 +442,9 @@ resolve[tag_,{section:("Lagrangians"|"Expressions"),key_String}] := Module[{b=ba
 resolve[tag_,expr_] := expr;
 BackgroundExpression[tag_String,key_String] := Module[{ex=resolve[tag,key]},
  If[FailureQ[ex],ex,PortExpression[tag,ex]]];
-BackgroundExpression[tag_String,section_String,key_String] := Module[{ex=resolve[tag,{section,key}]},
- If[FailureQ[ex],ex,PortExpression[tag,ex]]];
+BackgroundExpression[tag_String,section_String,key_String] := Module[{ex},
+ If[!MemberQ[{"Lagrangians","Expressions"},section],Return[failure["ExpressionCollection","Choose Lagrangians or Expressions.",<|"Collection"->section|>]]];
+ ex=resolve[tag,{section,key}];If[FailureQ[ex],ex,PortExpression[tag,ex]]];
 (* Record the exact installed definition so deletion respects user reassignment. *)
 installAlias[context_,name_,HoldComplete[value_]] := Module[{full=context<>name,owned},
   If[Names[full]==={} && AnyTrue[DeleteCases[$ContextPath,context],Names[#<>name]=!={}&],Return[$Failed]];
@@ -523,10 +486,16 @@ releaseAliases[entries_Association] := Scan[Function[entry,
   With[{owned=entry[[2]]},
     ToExpression[First[entry],InputForm,Function[sym,
       If[OwnValues[sym] === owned, OwnValues[sym]={}],HoldAllComplete]]]],Values[entries]];
-ExpressionText[tag_String,key_String,format_String:"InputForm"] := Module[{expr=BackgroundExpression[tag,key]},
+ExpressionText[tag_String,key_String,format_String:"InputForm"] :=
+ expressionTextFormat[tag,BackgroundExpression[tag,key],{tag,key},format];
+ExpressionText[tag_String,{section_String,key_String},format_String:"InputForm"] :=
+ ExpressionText[tag,section,key,format];
+ExpressionText[tag_String,section_String,key_String,format_String] :=
+ expressionTextFormat[tag,BackgroundExpression[tag,section,key],{tag,section,key},format];
+expressionTextFormat[tag_,expr_,args_,format_] := Module[{},
   If[FailureQ[expr],Return[expr]];
   Switch[format,
-   "InputForm", "BackgroundExpression["<>ToString[tag,InputForm]<>", "<>ToString[key,InputForm]<>"]",
+   "InputForm", "BackgroundExpression["<>StringRiffle[ToString[#,InputForm]& /@ args,", "]<>"]",
    "TeX", ToString[TeXForm[expr]],
    "TexAct", If[!MemberQ[$Packages,"xAct`TexAct`"],Quiet[Needs["xAct`TexAct`"]]];
      If[MemberQ[$Packages,"xAct`TexAct`"],xAct`TexAct`TexPrint[expr],
@@ -987,7 +956,7 @@ TheoryValue["Geometry"] := b13Geometry[$Theory];
 TheoryValue["Metadata"] := b13Metadata[$Theory];
 TheoryValue["Sectors"] := b13Sectors[$Theory];
 TheoryValue[key_String] := b13Values[$Theory,key];
-TheoryValue[section_String,key_String] := Module[{a=b13Values[$Theory,section]},
+TheoryValue[section_String,key_String] := Module[{a=TheoryValue[section]},
  If[FailureQ[a],a,If[AssociationQ[a],Lookup[a,key,failure["TheoryKey","The registered item does not exist."]],failure["TheoryKey","Not a collection."]]]];
 
 
@@ -995,7 +964,6 @@ TheoryValue[section_String,key_String] := Module[{a=b13Values[$Theory,section]},
 If[!AssociationQ[$PresentationPreferences], $PresentationPreferences = <||>];
 safeName[s_String] := Module[{t = StringReplace[s, Except[LetterCharacter | DigitCharacter] -> ""]},
   If[t === "", "Object", If[StringMatchQ[StringTake[t,1], DigitCharacter], "N" <> t, t]]];
-validBaseOption[options_] := With[{base=Lookup[options,SymbolBase,Automatic]},base===Automatic || (StringQ[base] && base=!= "" && safeName[base]===base)];
 freshOwnedSymbol[context_, base_] := Module[{name = context <> base, n = 1},
   While[Names[name] =!= {}, name = context <> base <> ToString[++n]];
   Symbol[name]
@@ -1529,6 +1497,16 @@ CheckConnection[tag_String,selector_Symbol,opts:OptionsPattern[]] := Module[{b=b
 
 RegisterTheory[args___] := failure["Registration", "Unsupported registration arguments."];
 
+AboutXPlorer[] := Column[{
+ Style["xPlorer",Bold,20],
+ Style["Abstract theories. Independent backgrounds.",Italic],
+ "Version "<>$XPlorerVersion,
+ "Copyright \[Copyright] 2026 Eduardo Sanz-Romero (PhysEdu)",
+ "Released under the GNU General Public License v3 or later.",
+ "Powered by xAct: xTensor, xCoba, xPert",
+ Hyperlink["github.com/physedu/xPlorer","https://github.com/physedu/xPlorer"]
+ },Spacings->0.55];
 updatePrintHook[];
+If[!TrueQ[$startupShown],$startupShown=True;Print[AboutXPlorer[]]];
 End[];
 EndPackage[];
