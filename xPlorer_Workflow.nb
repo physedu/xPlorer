@@ -201,6 +201,10 @@ Cell["Change only the printed labels of the scalar, metric and covariant derivat
 
 Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "phi", ",", RowBox[{"PrintAs", "\[Rule]", "\"\[Psi]\""}]}], "]"}], ";", RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "g", ",", RowBox[{"PrintAs", "\[Rule]", "\"q\""}]}], "]"}], ";", RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "CD", ",", RowBox[{"PrintAs", "\[Rule]", RowBox[{"{", RowBox[{"\"|\"", ",", "\"D\""}], "}"}]}]}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{"phiSchw", "[", "]"}], ",", RowBox[{"gSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}]}], "]"}], ",", RowBox[{RowBox[{"CDSchw", "[", RowBox[{"-", "aSchw"}], "]"}], "[", RowBox[{"phiSchw", "[", "]"}], "]"}]}], "}"}]}]],"Input",CellTags->"custom_presentation"],
 
+Cell["To see the first derivative marker, display the same gradient in postfix notation. The vertical bar is a display separator, not a mathematical operation.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"CDSchw","[",RowBox[{RowBox[{"-","aSchw"}]}],"]"}],"[",RowBox[{"phiSchw","[","]"}],"]"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Postfix\""}]}],"]"}]}]],"Input",CellTags->"custom_postfix_marker"],
+
 Cell["PrintAs -> Automatic restores the inherited label for each object. This leaves the source theory and all other backgrounds unchanged.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "phi", ",", RowBox[{"PrintAs", "\[Rule]", "Automatic"}]}], "]"}], ";", RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "g", ",", RowBox[{"PrintAs", "\[Rule]", "Automatic"}]}], "]"}], ";", RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "CD", ",", RowBox[{"PrintAs", "\[Rule]", "Automatic"}]}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{"phiSchw", "[", "]"}], ",", RowBox[{"gSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}]}], "]"}], ",", RowBox[{RowBox[{"CDSchw", "[", RowBox[{"-", "aSchw"}], "]"}], "[", RowBox[{"phiSchw", "[", "]"}], "]"}]}], "}"}]}]],"Input",CellTags->"reset_presentation"],
@@ -232,6 +236,10 @@ Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",
 Cell["Reset session preferences to native defaults. This does not remove existing background-specific overrides.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", "]"}], ";", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"session_reset"],
+
+Cell["Session preferences can also specify printed labels for future backgrounds. For reference, the following non-evaluatable example uses registered object keys. Each SetXPlorerPreferences call replaces the previous session preferences; it does not rename existing tensors.","Text"],
+
+Cell[BoxData[RowBox[{"SetXPlorerPreferences","[",RowBox[{RowBox[{"\"Metric\"","\[Rule]","\"q\""}],",",RowBox[{"\"phi\"","\[Rule]","\"\[Psi]\""}],",",RowBox[{"PartialStyle","\[Rule]","\"Fraction\""}]}],"]"}]],"Code",Evaluatable->False,CellTags->"reference_session_labels"],
 
 Cell["For the component calculations below, choose fraction notation again.","Text"],
 
