@@ -16,7 +16,7 @@ checks=<|"Raised Ricci calculated lazily"->(Simplify[r0===Exp[-2 x]]===True&&r1=
 "Unrequested background unchanged"->(TensorValIDs[ro]==={})|>;
 (* Instrument actual conversion calls on repeated reads. *)
 calls=0;Internal`InheritedBlock[{ChangeComponents},Unprotect[ChangeComponents];
- ChangeComponents[f_,i_,args___] /; !TrueQ[countingCC] := Block[{countingCC=True},calls++;ChangeComponents[f,i,args]];
+ ChangeComponents[f_,i_] /; !TrueQ[countingCC] := Block[{countingCC=True},calls++;ChangeComponents[f,i]];
  Protect[ChangeComponents];r2=ToValues[ri[{0,ch},{0,ch}]]];
 checks["Repeated native variance avoids conversion"]=calls===0&&r2===r0;
 sourceSpec=xPlorer`Private`chooseGeometrySource[ShowBackground["N"],ri,{1,1},{"Ricci"[-1,-1]}];

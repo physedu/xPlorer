@@ -146,6 +146,13 @@ Added a portable notebook, 75 regression checks, an MUnit report runner, and an 
 
 - Stage native covariant/contravariant metric-component edits and validate before replacing the managed metric. Preserve geometry and revisions on exact repeated metric assignments with matching native fingerprints. Skip component hooks on identically vanishing tensors.
 
+## 14.0.0-beta.13-dev.25 (development)
+
+- Compute selected primary-chart field components by native metric separation and dummy contraction, for sparse and complete fields including LI orders; retain full native conversion for full requests.
+- Cache selected canonical native component fingerprints separately from complete-variance fingerprints; no duplicate tensor arrays or rank thresholds.
+- Extend direct primary-chart ToComponents selections and sparse symmetry reads. Correct native call-count instrumentation.
+- 688/688 checks in 25 groups, including 24/24 selected-read checks; workflow 365/365, 84/84, 33/33. See Tests/dev25-results.json. General expression and geometry conversion paths remain open.
+
 ## 14.0.0-beta.13-dev.24 (development)
 
 - Capture sparse primary-chart native component inputs, including canonical symmetry and LI order, without dense arrays or zero filling.
