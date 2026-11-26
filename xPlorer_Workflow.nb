@@ -25,13 +25,13 @@ Cell[TextData[{"Define a four-dimensional Lorentzian manifold, its metric g and 
 
 Cell[BoxData[RowBox[{RowBox[{"DefManifold", "[", RowBox[{"M", ",", "4", ",", RowBox[{"{", RowBox[{"a", ",", "b", ",", "c", ",", "d", ",", "e", ",", "f", ",", "i", ",", "j"}], "}"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"DefMetric", "[", RowBox[{RowBox[{"-", "1"}], ",", RowBox[{"g", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "CD"}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"DefTensor", "[", RowBox[{RowBox[{"phi", "[", "]"}], ",", "M", ",", RowBox[{"PrintAs", "\[Rule]", "\"\[Phi]\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"DefConstantSymbol", "[", "m", "]"}], ";"}]],"Input",CellTags->"abstract_objects"],
 
-Cell[TextData[{"Define the kinetic and mass terms separately, then form their sum explicitly. The action integrates \:2112 with the metric volume element. Vary \:03c6 at fixed metric and take its variation to have compact support so the boundary term vanishes. The variable ",StyleBox["lagrangian",FontFamily->"Courier",FontSize->11]," holds \:2112 for the variation."}],"Text"],
+Cell[TextData[{"Define the kinetic and mass terms separately, then form their sum explicitly. The action integrates \:2112 with the metric volume element. Vary \:03c6 at fixed metric and take its variation to have compact support so the boundary term vanishes. The variable ",StyleBox["lagrangian",FontFamily->"Courier",FontSize->14]," holds \:2112 for the variation."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"Lkin", "=", RowBox[{FractionBox["1", "2"], " ", RowBox[{"(", RowBox[{"-", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}]}], ")"}], " ", RowBox[{RowBox[{"CD", "[", "a", "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}]}]}], ";", "\[IndentingNewLine]", RowBox[{"Lmass", "=", RowBox[{FractionBox["1", "2"], " ", RowBox[{"(", RowBox[{"-", SuperscriptBox["m", "2"]}], ")"}], " ", SuperscriptBox[RowBox[{"phi", "[", "]"}], "2"]}]}], ";", "\[IndentingNewLine]", RowBox[{"lagrangian", "=", RowBox[{"Lkin", "+", "Lmass"}]}], ";", "\[IndentingNewLine]", TemplateBox[{"\"\[ScriptCapitalL] = \"", "lagrangian"}, "RowDefault"]}]],"Input",CellTags->"lagrangian"],
 
 Cell[BoxData[RowBox[{RowBox[{"assumptions", "=", RowBox[{RowBox[{"m", "\[Element]", TemplateBox[{}, "Reals"]}], "&&", RowBox[{"m", "\[GreaterEqual]", "0"}]}]}], ";"}]],"Input",CellTags->"conditions"],
 
-Cell[TextData[{"Apply xTensor\:2019s ",StyleBox["VarD",FontFamily->"Courier",FontSize->11]," to vary \:2112 with respect to \:03c6. Contract the metric and bring the result to canonical form."}],"Text"],
+Cell[TextData[{"Apply xTensor\:2019s ",StyleBox["VarD",FontFamily->"Courier",FontSize->14]," to vary \:2112 with respect to \:03c6. Contract the metric and bring the result to canonical form."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"scalarEq", "=", RowBox[{"ToCanonical", "[", RowBox[{"ContractMetric", "[", RowBox[{RowBox[{"VarD", "[", RowBox[{RowBox[{"phi", "[", "]"}], ",", "CD"}], "]"}], "[", "lagrangian", "]"}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"scalarEq", "\[Equal]", "0"}]}]],"Input",CellTags->"derive_equation"],
 
@@ -45,19 +45,19 @@ Cell[TextData[{"Choose a lookup key, a symbol name and a printed label"}],"Subse
 
 Cell[TextData[{"Try the naming options before registering any equations. Name chooses the lookup key and default symbol base; SymbolBase is optional when they differ. Here the temporary example uses suffix Demo, field label P, metric label q, and Greek abstract indices. Indices must contain as many labels as the source index list. These are abstract indices, not coordinates."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "phi", ",", RowBox[{"Name", "\[Rule]", "\"Materia\""}], ",", RowBox[{"SymbolBase", "\[Rule]", "\"matter\""}], ",", RowBox[{"PrintAs", "\[Rule]", "\"P\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"CreateBackground", "[", RowBox[{"\"NamingExample\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"Demo\""}], ",", RowBox[{"PrintAs", "\[Rule]", "\"q\""}], ",", RowBox[{"Indices", "\[Rule]", RowBox[{"{", RowBox[{"\[Mu]", ",", "\[Nu]", ",", "\[Rho]", ",", "\[Sigma]", ",", "\[Alpha]", ",", "\[Beta]", ",", "\[Gamma]", ",", "\[Delta]"}], "}"}]}]}], "]"}], ";"}]],"Input",CellTags->"naming_setup"],
+Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "phi", ",", RowBox[{"Name", "\[Rule]", "\"ScalarField\""}], ",", RowBox[{"SymbolBase", "\[Rule]", "\"phi\""}], ",", RowBox[{"PrintAs", "\[Rule]", "\"P\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"CreateBackground", "[", RowBox[{"\"NamingExample\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"Demo\""}], ",", RowBox[{"PrintAs", "\[Rule]", "\"q\""}], ",", RowBox[{"Indices", "\[Rule]", RowBox[{"{", RowBox[{"\[Mu]", ",", "\[Nu]", ",", "\[Rho]", ",", "\[Sigma]", ",", "\[Alpha]", ",", "\[Beta]", ",", "\[Gamma]", ",", "\[Delta]"}], "}"}]}]}], "]"}], ";"}]],"Input",CellTags->"naming_setup"],
 
-Cell[TextData[{"The copied field is matterDemo and the metric is gDemo. The indices muDemo and nuDemo (typed as Greek letters) are printed as Greek indices, not as the original Latin a and b. The same applies to derivative indices. If you only know the registration key, ",StyleBox["BackgroundObject[\"NamingExample\",\"Materia\"]",FontFamily->"Courier",FontSize->11]," retrieves the same head."}],"Text"],
+Cell[TextData[{"The copied field is phiDemo and the metric is gDemo. The indices muDemo and nuDemo (typed as Greek letters) are printed as Greek indices, not as the original Latin a and b. The same applies to derivative indices. If you only know the registration key, ",StyleBox["BackgroundObject[\"NamingExample\",\"ScalarField\"]",FontFamily->"Courier",FontSize->14]," retrieves the same head."}],"Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{"matterDemo", ",", RowBox[{"matterDemo", "[", "]"}], ",", RowBox[{"gDemo", "[", RowBox[{RowBox[{"-", "\[Mu]Demo"}], ",", RowBox[{"-", "\[Nu]Demo"}]}], "]"}], ",", RowBox[{RowBox[{"CDDemo", "[", RowBox[{"-", "\[Rho]Demo"}], "]"}], "[", RowBox[{"matterDemo", "[", "]"}], "]"}]}], "}"}]],"Input",CellTags->"naming_result"],
+Cell[BoxData[RowBox[{"{", RowBox[{"phiDemo", ",", RowBox[{"phiDemo", "[", "]"}], ",", RowBox[{"gDemo", "[", RowBox[{RowBox[{"-", "\[Mu]Demo"}], ",", RowBox[{"-", "\[Nu]Demo"}]}], "]"}], ",", RowBox[{RowBox[{"CDDemo", "[", RowBox[{"-", "\[Rho]Demo"}], "]"}], "[", RowBox[{"phiDemo", "[", "]"}], "]"}]}], "}"}]],"Input",CellTags->"naming_result"],
 
 Cell[TextData[{"If typing Greek symbols is inconvenient, retrieve the actual owned indices with BackgroundIndices and assign ordinary Latin-letter aliases. These are references to the same abstract indices, not new xAct indices. The following metric and derivative still print with Greek indices."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"muDemo", ",", "nuDemo", ",", "rhoDemo"}], "}"}], "=", RowBox[{"BackgroundIndices", "[", RowBox[{"\"NamingExample\"", ",", "3"}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{RowBox[{"gDemo", "[", RowBox[{RowBox[{"-", "muDemo"}], ",", RowBox[{"-", "nuDemo"}]}], "]"}], ",", RowBox[{RowBox[{"CDDemo", "[", RowBox[{"-", "rhoDemo"}], "]"}], "[", RowBox[{"matterDemo", "[", "]"}], "]"}]}], "}"}]}]],"Input",CellTags->"naming_index_aliases"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"muDemo", ",", "nuDemo", ",", "rhoDemo"}], "}"}], "=", RowBox[{"BackgroundIndices", "[", RowBox[{"\"NamingExample\"", ",", "3"}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{RowBox[{"gDemo", "[", RowBox[{RowBox[{"-", "muDemo"}], ",", RowBox[{"-", "nuDemo"}]}], "]"}], ",", RowBox[{RowBox[{"CDDemo", "[", RowBox[{"-", "rhoDemo"}], "]"}], "[", RowBox[{"phiDemo", "[", "]"}], "]"}]}], "}"}]}]],"Input",CellTags->"naming_index_aliases"],
 
 Cell[TextData[{"Clear the three user-defined aliases, close the example and remove its field key. The source scalar \:03c6 is still defined. We will register it below with its default name and label for the three physical backgrounds."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"Clear","[",RowBox[{"muDemo",",","nuDemo",",","rhoDemo"}],"]"}],";", "\[IndentingNewLine]", RowBox[{"DeleteBackground", "[", "\"NamingExample\"", "]"}], ";", "\[IndentingNewLine]", RowBox[{"UnregisterTheory", "[", RowBox[{"\"Fields\"", ",", "\"Materia\""}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"Keys", "[", RowBox[{"TheoryValue", "[", "\"Fields\"", "]"}], "]"}]}]],"Input",CellTags->"close_naming"],
+Cell[BoxData[RowBox[{RowBox[{"Clear","[",RowBox[{"muDemo",",","nuDemo",",","rhoDemo"}],"]"}],";", "\[IndentingNewLine]", RowBox[{"DeleteBackground", "[", "\"NamingExample\"", "]"}], ";", "\[IndentingNewLine]", RowBox[{"UnregisterTheory", "[", RowBox[{"\"Fields\"", ",", "\"ScalarField\""}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"Keys", "[", RowBox[{"TheoryValue", "[", "\"Fields\"", "]"}], "]"}]}]],"Input",CellTags->"close_naming"],
 
 Cell["Registering theory objects","Subsubsection"],
 
@@ -95,17 +95,17 @@ Cell[BoxData[RowBox[{"TheoryValue", "[", RowBox[{"\"Fields\"", ",", "\"phi\""}],
 
 Cell[TextData[{"Register the scalar and its mass"}],"Subsubsection"],
 
-Cell[TextData[{"Pass only the native tensor head ",StyleBox["phi",FontFamily->"Courier",FontSize->11]," when registering the field. xPlorer infers its rank and symmetry. The registration also gives the parameter m the lookup key ",StyleBox["\"Mass\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{"Pass only the native tensor head ",StyleBox["phi",FontFamily->"Courier",FontSize->14]," when registering the field. xPlorer infers its rank and symmetry. The registration also gives the parameter m the lookup key ",StyleBox["\"Mass\"",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "phi", ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"RegisterTheory", "[", RowBox[{"\"Parameter\"", ",", "m", ",", RowBox[{"Name", "\[Rule]", "\"Mass\""}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";"}]],"Input",CellTags->"register_matter"],
 
 Cell[BoxData[RowBox[{"KeyTake", "[", RowBox[{RowBox[{"TheoryValue", "[", RowBox[{"\"Fields\"", ",", "\"phi\""}], "]"}], ",", RowBox[{"{", RowBox[{"\"Type\"", ",", "\"Head\"", ",", "\"Rank\"", ",", "\"PrintAs\"", ",", "\"Sector\""}], "}"}]}], "]"}]],"Input",CellTags->"inspect_scalar_spec"],
 
-Cell[TextData[{"The scalar entry records the head phi, the type \"Scalar\" and the printed label \:03c6. To override just that label at registration, add ",StyleBox["PrintAs -> \"M1\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{"The scalar entry records the head phi, the type \"Scalar\" and the printed label \:03c6. To override just that label at registration, add ",StyleBox["PrintAs -> \"M1\"",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
-Cell[TextData[{"For several parameters, pass a list of native constant symbols, as in ",StyleBox["RegisterTheory[\"Parameters\", {m, kappa}]",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{"For several parameters, pass a list of native constant symbols, as in ",StyleBox["RegisterTheory[\"Parameters\", {m, kappa}]",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
-Cell[TextData[{"Store the kinetic term, mass term and their explicitly defined total in the Lagrangians collection. xPlorer does not add them automatically. Retrieve the total with ",StyleBox["TheoryValue[\"Lagrangians\", \"Lagrangian\"]",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{"Store the kinetic term, mass term and their explicitly defined total in the Lagrangians collection. xPlorer does not add them automatically. Retrieve the total with ",StyleBox["TheoryValue[\"Lagrangians\", \"Lagrangian\"]",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Lagrangian\"", ",", RowBox[{"\"Kinetic\"", "\[Rule]", "Lkin"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"RegisterTheory", "[", RowBox[{"\"Lagrangians\"", ",", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{RowBox[{"\"MassTerm\"", "\[Rule]", "Lmass"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"\"Lagrangian\"", "\[Rule]", "lagrangian"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "}"}]}], "}"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"TheoryValue", "[", "\"Lagrangians\"", "]"}]}]],"Input",CellTags->"register_lagrangian_only"],
 
@@ -121,15 +121,17 @@ Cell[TextData[{"Define and register a rank-two expression Eab from the Hessian a
 
 Cell[BoxData[RowBox[{RowBox[{"Eab", "=", RowBox[{RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "b"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}], "]"}], "+", RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"g", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], " ", RowBox[{"phi", "[", "]"}]}]}]}], ";","\[IndentingNewLine]",RowBox[{"RegisterTheory","[",RowBox[{"\"Expression\"",",",RowBox[{"\"Eab\"","\[Rule]","Eab"}],",",RowBox[{"Sector","\[Rule]","\"Matter\""}]}],"]"}],";"}]],"Input",CellTags->"register_eab"],
 
-Cell[TextData[{"For a named Wolfram expression, give an explicit lookup key. This registers the wave operator under ",StyleBox["\"boxPhi\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{"For a named Wolfram expression, give an explicit lookup key. This registers the wave operator under ",StyleBox["\"boxPhi\"",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"boxPhi", "=", RowBox[{RowBox[{"CD", "[", "a", "]"}], "[", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"RegisterTheory", "[", RowBox[{"\"Expression\"", ",", RowBox[{"\"boxPhi\"", "\[Rule]", "boxPhi"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";"}]],"Input",CellTags->"register_named_expression"],
 
-Cell[TextData[{"Store the assumptions and variational conditions alongside the theory. These entries document the calculation. Pass assumptions to the operations that use them."}],"Text"],
+Cell["Give the theory an optional title and description.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"Association", "[", RowBox[{RowBox[{"\"Assumptions\"", "\[Rule]", "assumptions"}], ",", RowBox[{"\"Conditions\"", "\[Rule]", "\"Fixed metric; compactly supported scalar variations\""}]}], "]"}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"theory", "=", RowBox[{"TheorySnapshot", "[", "]"}]}], ";"}]],"Input",CellTags->"register_metadata"],
+Cell["Assumptions and variational conditions document the calculation. Pass mathematical assumptions explicitly to operations that use them.","Text"],
 
-Cell[TextData[{StyleBox["TheoryValue",FontFamily->"Courier",FontSize->11]," retrieves a collection or an individual registry entry. Use ",StyleBox["ShowTheoryKeys[]",FontFamily->"Courier",FontSize->11]," for the top-level keys or ",StyleBox["TheorySnapshot[]",FontFamily->"Courier",FontSize->11]," for the full restorable registry. ShowTheory[] displays a concise overview. TheorySector groups objects by their physical sector."}],"Text"],
+Cell[BoxData[RowBox[{RowBox[{"RegisterTheory","[",RowBox[{"\"Title\"",",","\"Massive scalar field\""}],"]"}],";","\[IndentingNewLine]",RowBox[{"RegisterTheory","[",RowBox[{"\"Description\"",",","\"A real massive scalar field minimally coupled to gravity.\""}],"]"}],";","\[IndentingNewLine]",RowBox[{"RegisterTheory","[",RowBox[{"\"Assumptions\"",",","assumptions"}],"]"}],";","\[IndentingNewLine]",RowBox[{"RegisterTheory","[",RowBox[{"\"Conditions\"",",","\"Fixed metric; compactly supported scalar variations.\""}],"]"}],";","\[IndentingNewLine]",RowBox[{"theory","=",RowBox[{"TheorySnapshot","[","]"}]}],";","\[IndentingNewLine]","Null"}]],"Input",CellTags->"register_metadata"],
+
+Cell[TextData[{StyleBox["TheoryValue",FontFamily->"Courier",FontSize->14]," retrieves a collection or an individual registry entry. Use ",StyleBox["ShowTheoryKeys[]",FontFamily->"Courier",FontSize->14]," for the top-level keys or ",StyleBox["TheorySnapshot[]",FontFamily->"Courier",FontSize->14]," for the full restorable registry. ShowTheory[] displays a concise overview. TheorySector groups objects by their physical sector."}],"Text"],
 
 Cell[BoxData[RowBox[{"ShowTheory","[","]"}]],"Input",CellTags->"theory_overview"],
 
@@ -139,7 +141,7 @@ Cell[BoxData[RowBox[{"ShowTheory","[","\"Lagrangians\"","]"}]],"Input",CellTags-
 
 Cell[BoxData[RowBox[{"TheoryValue", "[", RowBox[{"\"Lagrangians\"", ",", "\"Lagrangian\""}], "]"}]],"Input",CellTags->"registered_lagrangian"],
 
-Cell[TextData[{StyleBox["ClearTheory[]",FontFamily->"Courier",FontSize->11]," clears the registry. The original xAct objects g, CD and \:03c6 remain defined. Re-register the objects to use them in another theory."}],"Important"]
+Cell[TextData[{StyleBox["ClearTheory[]",FontFamily->"Courier",FontSize->14]," clears the registry. The original xAct objects g, CD and \:03c6 remain defined. Re-register the objects to use them in another theory."}],"Important"]
 },Open]],
 
 Cell[CellGroupData[{
@@ -149,15 +151,15 @@ Cell[TextData[{"Create three backgrounds from the registered theory. Each gets i
 
 Cell[BoxData[RowBox[{RowBox[{"CreateBackground", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"M\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"CreateBackground", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"Schw\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"CreateBackground", "[", "\"FLRW\"", "]"}], ";"}]],"Input",CellTags->"create_manifolds"],
 
-Cell[TextData[{"FLRW uses its tag as its suffix. Schwarzschild uses Schw, so you can already type ",StyleBox["phiSchw[]",FontFamily->"Courier",FontSize->11],". To use your own name, retrieve the field by its key and assign it to ",StyleBox["phi1",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{"FLRW uses its tag as its suffix. Schwarzschild uses Schw, so you can already type ",StyleBox["phiSchw[]",FontFamily->"Courier",FontSize->14],". To use your own name, retrieve the field by its key and assign it to ",StyleBox["phi1",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"phi1", "=", RowBox[{"BackgroundObject", "[", RowBox[{"\"Schwarzschild\"", ",", "\"phi\""}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{"phi1", ",", RowBox[{"phi1", "[", "]"}]}], "}"}]}]],"Input",CellTags->"scalar_alias"],
 
-Cell[TextData[{"If you know the background tag but want to look up a head or index, use these accessors. If a notebook name is occupied, xPlorer keeps its existing definition and lists it under ",StyleBox["\"UnavailableObjectAliases\"",FontFamily->"Courier",FontSize->11]," in ",StyleBox["ShowBackground",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{"If you know the background tag but want to look up a head or index, use these accessors. If a notebook name is occupied, xPlorer keeps its existing definition and lists it under ",StyleBox["\"UnavailableObjectAliases\"",FontFamily->"Courier",FontSize->14]," in ",StyleBox["ShowBackground",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"BackgroundObject", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Metric\""}], "]"}], ",", RowBox[{"RiemannOf", "[", "\"Schwarzschild\"", "]"}], ",", RowBox[{"BackgroundObject", "[", RowBox[{"\"Schwarzschild\"", ",", "\"phi\""}], "]"}], ",", RowBox[{"First", "[", RowBox[{"BackgroundIndices", "[", RowBox[{"\"Schwarzschild\"", ",", "1"}], "]"}], "]"}]}], "}"}]],"Input",CellTags->"inspect_short_names"],
 
-Cell[TextData[{StyleBox["EabM",FontFamily->"Courier",FontSize->11]," and ",StyleBox["EabSchw",FontFamily->"Courier",FontSize->11]," retrieve the formula on their respective manifolds. If a shortcut name is occupied, use ",StyleBox["BackgroundExpression",FontFamily->"Courier",FontSize->11]," with the original key. The background lists the conflict under ",StyleBox["\"UnavailableAliases\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{StyleBox["EabM",FontFamily->"Courier",FontSize->14]," and ",StyleBox["EabSchw",FontFamily->"Courier",FontSize->14]," retrieve the formula on their respective manifolds. If a shortcut name is occupied, use ",StyleBox["BackgroundExpression",FontFamily->"Courier",FontSize->14]," with the original key. The background lists the conflict under ",StyleBox["\"UnavailableAliases\"",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[BoxData[RowBox[{"{", RowBox[{"EabM", ",", "EabSchw", ",", RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Expressions\"", ",", "\"Eab\""}], "]"}], ",", "lagrangianSchw", ",", RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Lagrangians\"", ",", "\"Lagrangian\""}], "]"}]}], "}"}]],"Input",CellTags->"automatic_formulas"],
 
@@ -165,7 +167,7 @@ Cell[TextData[{"Inspect the entries in the Schwarzschild background."}],"Text"],
 
 Cell[BoxData[RowBox[{"Keys", "[", RowBox[{"ShowBackground", "[", "\"Schwarzschild\"", "]"}], "]"}]],"Input",CellTags->"inspect_background"],
 
-Cell[TextData[{"The geometry, fields and indices have their own entries. The ",StyleBox["\"Theory\"",FontFamily->"Courier",FontSize->11]," entry records the theory as it stood at creation. Fields registered later appear in subsequent backgrounds."}],"Text"],
+Cell[TextData[{"The geometry, fields and indices have their own entries. The ",StyleBox["\"Theory\"",FontFamily->"Courier",FontSize->14]," entry records the theory as it stood at creation. Fields registered later appear in subsequent backgrounds."}],"Text"],
 
 Cell[TextData[{"Several backgrounds can coexist in one kernel. The tag selects the study, and its tensors and indices belong to its manifold."}],"Important"]
 },Open]],
@@ -177,19 +179,19 @@ Cell[TextData[{"Retrieve the scalar equation on all three manifolds before choos
 
 Cell[BoxData[RowBox[{"{", RowBox[{"scalarEqM", ",", "scalarEqSchw", ",", "scalarEqFLRW"}], "}"}]],"Input",CellTags->"formal_equations"],
 
-Cell[TextData[{StyleBox["PortExpression",FontFamily->"Courier",FontSize->11]," takes a formula directly and transfers its heads and indices. Here it returns the abstract gradient on Schwarzschild, with the background rules unapplied."}],"Text"],
+Cell[TextData[{StyleBox["PortExpression",FontFamily->"Courier",FontSize->14]," takes a formula directly and transfers its heads and indices. Here it returns the abstract gradient on Schwarzschild, with the background rules unapplied."}],"Text"],
 
 Cell[BoxData[RowBox[{"gradPhi", "=", RowBox[{"PortExpression", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}]}], "]"}]}]],"Input",CellTags->"transport_gradient"],
 
-Cell[TextData[{StyleBox["UseExpression",FontFamily->"Courier",FontSize->11]," retrieves the gradient registered under ",StyleBox["\"Gradient\"",FontFamily->"Courier",FontSize->11]," and applies the background\:2019s active rules. The rule list is currently empty, so both calls give the same gradient."}],"Text"],
+Cell[TextData[{StyleBox["UseExpression",FontFamily->"Courier",FontSize->14]," retrieves the gradient registered under ",StyleBox["\"Gradient\"",FontFamily->"Courier",FontSize->14]," and applies the background\:2019s active rules. The rule list is currently empty, so both calls give the same gradient."}],"Text"],
 
 Cell[BoxData[RowBox[{"UseExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Gradient\""}], "]"}]],"Input",CellTags->"saved_gradient"],
 
-Cell[TextData[{"Write the gradient directly with the derivative, index and field names created by ",StyleBox["CreateBackground",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{"Write the gradient directly with the derivative, index and field names created by ",StyleBox["CreateBackground",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"CDSchw", "[", RowBox[{"-", "aSchw"}], "]"}], "[", RowBox[{"phiSchw", "[", "]"}], "]"}]],"Input",CellTags->"direct_gradient"],
 
-Cell[TextData[{"In xAct, ",StyleBox["-aSchw",FontFamily->"Courier",FontSize->11]," denotes a lower index. Contract the gradient with the inverse metric to raise that index."}],"Text"],
+Cell[TextData[{"In xAct, ",StyleBox["-aSchw",FontFamily->"Courier",FontSize->14]," denotes a lower index. Contract the gradient with the inverse metric to raise that index."}],"Text"],
 
 Cell[BoxData[RowBox[{"gradPhiUp", "=", RowBox[{"ContractMetric", "[", RowBox[{RowBox[{"gSchw", "[", RowBox[{"aSchw", ",", "bSchw"}], "]"}], " ", RowBox[{RowBox[{"CDSchw", "[", RowBox[{"-", "bSchw"}], "]"}], "[", RowBox[{"phiSchw", "[", "]"}], "]"}]}], "]"}]}]],"Input",CellTags->"raise_gradient"],
 
@@ -203,7 +205,11 @@ Cell["Change an individual label with PrintAs, or several labels together with r
 
 Cell[BoxData[RowBox[{RowBox[{"SetPresentation","[",RowBox[{"\"Schwarzschild\"",",","phi",",",RowBox[{"PrintAs","\[Rule]","\"ψ\""}]}],"]"}],";","\[IndentingNewLine]",RowBox[{"SetPresentation","[",RowBox[{"\"Schwarzschild\"",",",RowBox[{"\"phi\"","\[Rule]","\"ψ\""}],",",RowBox[{"\"Metric\"","\[Rule]","\"q\""}],",",RowBox[{"\"CovD\"","\[Rule]",RowBox[{"{",RowBox[{"\"|\"",",","\"D\""}],"}"}]}]}],"]"}],";","\[IndentingNewLine]",RowBox[{"{",RowBox[{RowBox[{"phiSchw","[","]"}],",",RowBox[{"gSchw","[",RowBox[{RowBox[{"-","aSchw"}],",",RowBox[{"-","bSchw"}]}],"]"}],",",RowBox[{RowBox[{"CDSchw","[",RowBox[{RowBox[{"-","aSchw"}]}],"]"}],"[",RowBox[{"phiSchw","[","]"}],"]"}]}],"}"}]}]],"Input",CellTags->"custom_presentation"],
 
-Cell["To see the first derivative marker, display the same gradient in postfix notation. The vertical bar is a display separator, not a mathematical operation.","Text"],
+Cell["The customized symbols also appear in the complete rank-two expression.","Text"],
+
+Cell[BoxData[RowBox[{"EabSchw","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Prefix\""}]}],"]"}]}]],"Input",CellTags->"custom_eab"],
+
+Cell["The vertical bar is a display separator, not a mathematical operation.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{RowBox[{"CDSchw","[",RowBox[{RowBox[{"-","aSchw"}]}],"]"}],"[",RowBox[{"phiSchw","[","]"}],"]"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Postfix\""}]}],"]"}]}]],"Input",CellTags->"custom_postfix_marker"],
 
@@ -214,6 +220,20 @@ Cell[BoxData[RowBox[{RowBox[{"SetPresentation","[",RowBox[{"\"Schwarzschild\"","
 Cell["Notation and expression views","Subsubsection"],
 
 Cell["SetXPlorerPreferences changes session-wide defaults. SetNotation overrides them for one background. PrettyExp changes only the display of one expression. These commands do not change tensor identities or mathematical results.","Text"],
+
+Cell["Covariant derivatives: compare actual tensor expressions","Subsubsection"],
+
+Cell["Compare the native, prefix and postfix presentations of the same rank-two formula. These are display views; the expression itself remains unchanged.","Text"],
+
+Cell[BoxData[RowBox[{"EabSchw","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Native\""}]}],"]"}]}]],"Input",CellTags->"eab_native"],
+
+Cell[BoxData[RowBox[{"EabSchw","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Prefix\""}]}],"]"}]}]],"Input",CellTags->"eab_prefix"],
+
+Cell[BoxData[RowBox[{"EabSchw","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Postfix\""}]}],"]"}]}]],"Input",CellTags->"eab_postfix"],
+
+Cell[BoxData[RowBox[{RowBox[{"(",RowBox[{"scalarEqSchw","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Postfix\""}]}],"]"}]}]],"Input",CellTags->"kg_postfix"],
+
+Cell["Session preferences and local overrides","Subsubsection"],
 
 Cell["Choose a prefix derivative and fraction notation for the session. Both gradients inherit the session preference.","Text"],
 
@@ -249,13 +269,30 @@ Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", RowBox[{"PartialStyle
 },Open]],
 
 Cell[CellGroupData[{
-Cell[TextData[{"4. Specialize a case and return to the general one"}],"Section"],
+Cell[TextData[{"4. Physical limits and theory specialization"}],"Section"],
 
-Cell[TextData[{"Take the massless limit on Schwarzschild. ContractMetric and ToCanonical leave the scalar d'Alembertian of the field; the repeated upper and lower derivative indices are summed. ",StyleBox["AddRules",FontFamily->"Courier",FontSize->11]," stores the replacement locally. ",StyleBox["UseExpression",FontFamily->"Courier",FontSize->11]," evaluates the registered equation with that replacement. The source parameter m and the other backgrounds retain their values."}],"Text"],
+Cell["Start with the general massive equation in Schwarzschild.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"(",RowBox[{"scalarEqSchw","\[Equal]","0"}],")"}],"//","PrettyExp"}]],"Input",CellTags->"massive_before"],
+
+Cell["Take the massless limit only in Schwarzschild. AddRules stores the replacement locally.","Text"],
+
+Cell["UseExpression applies the active rules. ContractMetric and ToCanonical leave the scalar d'Alembertian.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"AddRules","[",RowBox[{"\"Schwarzschild\"",",",RowBox[{"{",RowBox[{RowBox[{"m","\[Rule]","0"}]}],"}"}]}],"]"}],";","\[IndentingNewLine]",RowBox[{"masslessEq","=",RowBox[{RowBox[{RowBox[{"UseExpression","[",RowBox[{"\"Schwarzschild\"",",","\"ScalarEq\""}],"]"}],"//","ContractMetric"}],"//","ToCanonical"}]}],";","\[IndentingNewLine]","masslessEq"}]],"Input",CellTags->"massless_rules"],
 
-Cell[TextData[{"First display the original expression with its mass term. The shortcut ",StyleBox["EabSchw",FontFamily->"Courier",FontSize->11]," gives the general formula and ",StyleBox["UseExpression",FontFamily->"Courier",FontSize->11]," gives the active massless case."}],"Text"],
+Cell["Minkowski still has a mass term. This illustrates the independence of the two backgrounds.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"(",RowBox[{"scalarEqM","\[Equal]","0"}],")"}],"//","PrettyExp"}]],"Input",CellTags->"massive_minkowski"],
+
+Cell["Compare the specialized Lagrangian with the original registered formula.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"UseExpression","[",RowBox[{"\"Schwarzschild\"",",","\"Lagrangians\"",",","\"Lagrangian\""}],"]"}],"//","PrettyExp"}]],"Input",CellTags->"massless_lagrangian"],
+
+Cell[BoxData[RowBox[{"lagrangianSchw","//","PrettyExp"}]],"Input",CellTags->"general_lagrangian"],
+
+
+Cell[TextData[{"First display the original expression with its mass term. The shortcut ",StyleBox["EabSchw",FontFamily->"Courier",FontSize->14]," gives the general formula and ",StyleBox["UseExpression",FontFamily->"Courier",FontSize->14]," gives the active massless case."}],"Text"],
 
 Cell[BoxData["EabSchw"],"Input",CellTags->"compare_mass_terms"],
 
@@ -263,7 +300,7 @@ Cell["Apply the active massless specialization without changing the registered g
 
 Cell[BoxData[RowBox[{"UseExpression","[",RowBox[{"\"Schwarzschild\"",",","\"Eab\""}],"]"}]],"Input",CellTags->"specialized_eab"],
 
-Cell[TextData[{StyleBox["ShowRules",FontFamily->"Courier",FontSize->11]," lists the active replacements. Use ",StyleBox["ApplyRules",FontFamily->"Courier",FontSize->11]," to apply them to an expression you already have."}],"Text"],
+Cell[TextData[{StyleBox["ShowRules",FontFamily->"Courier",FontSize->14]," lists the active replacements. Use ",StyleBox["ApplyRules",FontFamily->"Courier",FontSize->14]," to apply them to an expression you already have."}],"Text"],
 
 Cell[BoxData[RowBox[{"ShowRules", "[", "\"Schwarzschild\"", "]"}]],"Input",CellTags->"inspect_rules"],
 
@@ -273,15 +310,17 @@ Cell[TextData[{"Clear the active rules and request the equation again to recover
 
 Cell[BoxData[RowBox[{RowBox[{"ClearRules", "[", "\"Schwarzschild\"", "]"}], ";", "\[IndentingNewLine]", RowBox[{"UseExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"ScalarEq\""}], "]"}]}]],"Input",CellTags->"restore_massive"],
 
-Cell[TextData[{"Save two named mass choices. ",StyleBox["ActivateRuleGroups",FontFamily->"Courier",FontSize->11]," builds the active list in the specified order. A stored group takes effect on activation, and edits to an active group refresh the list."}],"Text"],
+Cell["Store two independent physical assumptions: a massless scalar and a Ricci-flat geometry.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetRuleGroup", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Massless\"", ",", RowBox[{"{", RowBox[{"m", "\[Rule]", "0"}], "}"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetRuleGroup", "[", RowBox[{"\"Schwarzschild\"", ",", "\"ReferenceMass\"", ",", RowBox[{"{", RowBox[{"m", "\[Rule]", "1"}], "}"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"ActivateRuleGroups", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"{", RowBox[{"\"ReferenceMass\"", ",", "\"Massless\""}], "}"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"ApplyRules", "[", RowBox[{"\"Schwarzschild\"", ",", "m"}], "]"}]}]],"Input",CellTags->"rule_groups"],
+Cell["Apply both groups to a diagnostic scalar expression containing the equation and a curvature term. This is a demonstration of specialization, not a new field equation.","Text"],
 
-Cell[TextData[{"The preceding call gives 1 because the reference-mass rule comes first. Request the numbered list to see the one-based positions used by ",StyleBox["RemoveRules",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[BoxData[RowBox[{RowBox[{"SetRuleGroup","[",RowBox[{"\"Schwarzschild\"",",","\"Massless\"",",",RowBox[{"{",RowBox[{RowBox[{"m","\[Rule]","0"}]}],"}"}]}],"]"}],";","\[IndentingNewLine]",RowBox[{"SetRuleGroup","[",RowBox[{"\"Schwarzschild\"",",","\"RicciFlat\"",",",RowBox[{"{",RowBox[{RowBox[{RowBox[{RowBox[{"RicciScalar","[",RowBox[{"CDSchw"}],"]"}],"[","]"}],"\[Rule]","0"}]}],"}"}]}],"]"}],";","\[IndentingNewLine]",RowBox[{"ActivateRuleGroups","[",RowBox[{"\"Schwarzschild\"",",",RowBox[{"{",RowBox[{"\"RicciFlat\"",",","\"Massless\""}],"}"}]}],"]"}],";","\[IndentingNewLine]",RowBox[{RowBox[{"ApplyRules","[",RowBox[{"\"Schwarzschild\"",",",RowBox[{"scalarEqSchw","+",RowBox[{RowBox[{RowBox[{"RicciScalar","[",RowBox[{"CDSchw"}],"]"}],"[","]"}]," ",RowBox[{"phiSchw","[","]"}]}]}]}],"]"}],"//","PrettyExp"}]}]],"Input",CellTags->"rule_groups"],
 
-Cell[BoxData[TagBox[RowBox[{"ShowRules", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Numbered\""}], "]"}], Function[BoxForm`e$, TableForm[BoxForm`e$]]]],"Input",CellTags->"numbered_rules"],
+Cell["Inspect the active rules and their positions before removing one. The two assumptions can be changed independently.","Text"],
 
-Cell[TextData[{"Remove the reference-mass rule by its position."}],"Text"],
+Cell[BoxData[RowBox[{RowBox[{"ShowRules","[",RowBox[{"\"Schwarzschild\"",",","\"Numbered\""}],"]"}],"//","TableForm"}]],"Input",CellTags->"numbered_rules"],
+
+Cell[TextData[{"Remove the Ricci-flat rule by its position. The massless condition remains active."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"RemoveRules", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"{", "1", "}"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"ShowRules", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Numbered\""}], "]"}]}]],"Input",CellTags->"remove_selected_rule"],
 
@@ -289,9 +328,11 @@ Cell[TextData[{"The massless rule now occupies position 1. Clear it to restore t
 
 Cell[BoxData[RowBox[{RowBox[{"ClearRules", "[", "\"Schwarzschild\"", "]"}], ";"}]],"Input",CellTags->"clear_mass_rules"],
 
-Cell[TextData[{StyleBox["SetFlatRules",FontFamily->"Courier",FontSize->11]," lets you impose vanishing curvature in an abstract calculation. Clear those rules after checking the Ricci scalar so the later curvature calculations use the assigned metric."}],"Text"],
+Cell["SetFlatRules imposes vanishing curvature symbolically in Minkowski. Compare the Ricci scalar and Kretschmann invariant.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFlatRules", "[", "\"Minkowski\"", "]"}], ";", "\[IndentingNewLine]", RowBox[{"ApplyRules", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"PortExpression", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{RowBox[{"RicciScalar", "[", "CD", "]"}], "[", "]"}]}], "]"}]}], "]"}]}]],"Input",CellTags->"flat_rules"],
+Cell["Clear these assumptions afterward so the later curvature calculation uses the actual metric.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"SetFlatRules","[",RowBox[{"\"Minkowski\""}],"]"}],";","\[IndentingNewLine]",RowBox[{"ApplyRules","[",RowBox[{"\"Minkowski\"",",",RowBox[{"{",RowBox[{RowBox[{RowBox[{"RicciScalar","[",RowBox[{"CDM"}],"]"}],"[","]"}],",",RowBox[{RowBox[{"Kretschmann","[",RowBox[{"CDM"}],"]"}],"[","]"}]}],"}"}]}],"]"}]}]],"Input",CellTags->"flat_rules"],
 
 Cell[BoxData[RowBox[{RowBox[{"ClearRules", "[", "\"Minkowski\"", "]"}], ";"}]],"Input",CellTags->"clear_flat_rules"]
 },Open]],
@@ -299,29 +340,40 @@ Cell[BoxData[RowBox[{RowBox[{"ClearRules", "[", "\"Minkowski\"", "]"}], ";"}]],"
 Cell[CellGroupData[{
 Cell[TextData[{"5. Choose coordinates and calculate components"}],"Section"],
 
-Cell[TextData[{StyleBox["DefineChart",FontFamily->"Courier",FontSize->11]," calls xCoba\:2019s ",StyleBox["DefChart",FontFamily->"Courier",FontSize->11]," on the selected manifold. Each chart gets its own coordinate scalars, even when two charts use the same labels."}],"Text"],
+Cell[TextData[{StyleBox["DefineChart",FontFamily->"Courier",FontSize->14]," calls xCoba\:2019s ",StyleBox["DefChart",FontFamily->"Courier",FontSize->14]," on the selected manifold. Each chart gets its own coordinate scalars, even when two charts use the same labels."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"{", RowBox[{"\"t\"", ",", "\"x\"", ",", "\"y\"", ",", "\"z\""}], "}"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"DefineChart", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"{", RowBox[{"\"t\"", ",", "\"r\"", ",", "\"theta\"", ",", "\"varphi\""}], "}"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"DefineChart", "[", RowBox[{"\"FLRW\"", ",", RowBox[{"{", RowBox[{"\"t\"", ",", "\"x\"", ",", "\"y\"", ",", "\"z\""}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"charts"],
 
-Cell[TextData[{StyleBox["CoordinatesOf",FontFamily->"Courier",FontSize->11]," returns the coordinate heads. Apply them with ",StyleBox["Through",FontFamily->"Courier",FontSize->11]," as below. The resulting aliases can be differentiated with ",StyleBox["D",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{StyleBox["CoordinatesOf",FontFamily->"Courier",FontSize->14]," returns the coordinate heads. Apply them with ",StyleBox["Through",FontFamily->"Courier",FontSize->14]," as below. The resulting aliases can be differentiated with ",StyleBox["D",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"tM", ",", "xM", ",", "yM", ",", "zM"}], "}"}], "=", RowBox[{"Through", "[", RowBox[{RowBox[{"CoordinatesOf", "[", "\"Minkowski\"", "]"}], "[", "]"}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{RowBox[{"{", RowBox[{"tSchw", ",", "rSchw", ",", "thetaSchw", ",", "varphiSchw"}], "}"}], "=", RowBox[{"Through", "[", RowBox[{RowBox[{"CoordinatesOf", "[", "\"Schwarzschild\"", "]"}], "[", "]"}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{RowBox[{"{", RowBox[{"tF", ",", "xF", ",", "yF", ",", "zF"}], "}"}], "=", RowBox[{"Through", "[", RowBox[{RowBox[{"CoordinatesOf", "[", "\"FLRW\"", "]"}], "[", "]"}], "]"}]}], ";"}]],"Input",CellTags->"coordinate_aliases"],
 
-Cell[TextData[{"For example, ",StyleBox["xM^2",FontFamily->"Courier",FontSize->11]," is a coordinate profile, ",StyleBox["-a",FontFamily->"Courier",FontSize->11]," is a lower abstract index, and component number 1 selects x in the Cartesian order (t,x,y,z)."}],"Text"],
+Cell[TextData[{"For example, ",StyleBox["xM^2",FontFamily->"Courier",FontSize->14]," is a coordinate profile, ",StyleBox["-a",FontFamily->"Courier",FontSize->14]," is a lower abstract index, and component number 1 selects x in the Cartesian order (t,x,y,z)."}],"Text"],
 
 Cell[TextData[{"Minkowski spacetime"}],"Subsection"],
 
-Cell[TextData[{"Supply the constant metric matrix in chart order {t,x,y,z}. ",StyleBox["SetCMetricSystem",FontFamily->"Courier",FontSize->11]," assigns it to the copied metric through xCoba and prepares the inverse and determinant. Further geometry is computed on request."}],"Text"],
+Cell[TextData[{"Supply the constant metric matrix in chart order {t,x,y,z}. ",StyleBox["SetCMetricSystem",FontFamily->"Courier",FontSize->14]," assigns it to the copied metric through xCoba and prepares the inverse and determinant. Further geometry is computed on request."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}], ",", RowBox[{"Assumptions", "\[Rule]", "assumptions"}]}], "]"}], ";"}]],"Input",CellTags->"minkowski_metric"],
 
 Cell[TextData[{"Inspect the metric as an xCoba component tensor"}],"Subsection"],
 
-Cell["MetricMatrixOf retrieves the declared covariant metric matrix in the primary managed chart. To package these entries as a native xCoba CTensor, specify the array and signed bases. The first argument stores the array; the second stores the basis and variance of each slot.","Text"],
+Cell["A native CTensor stores a component array and the signed bases of its slots.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"cartBasis","=",RowBox[{"BasisOf","[",RowBox[{"\"Minkowski\""}],"]"}]}],";","\[IndentingNewLine]",RowBox[{"metricCTensor","=",RowBox[{"CTensor","[",RowBox[{RowBox[{"MetricMatrixOf","[",RowBox[{"\"Minkowski\""}],"]"}],",",RowBox[{"{",RowBox[{RowBox[{"-","cartBasis"}],",",RowBox[{"-","cartBasis"}]}],"}"}]}],"]"}]}],";","\[IndentingNewLine]",RowBox[{RowBox[{"metricCTensor","[[","1","]]"}],"//","MatrixForm"}]}]],"Input",CellTags->"native_metric_data"],
+Cell["Request CTensor output directly from xPlorer. The two negative basis signs indicate covariant slots.","Text"],
 
-Cell[BoxData[RowBox[{"metricCTensor","[[","2","]]"}]],"Input",CellTags->"native_metric_basis"],
+Cell[BoxData[RowBox[{RowBox[{"metricCTensor","=",RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",",RowBox[{"g","[",RowBox[{RowBox[{"-","a"}],",",RowBox[{"-","b"}]}],"]"}],",",RowBox[{"Output","\[Rule]","\"CTensor\""}]}],"]"}]}],";","\[IndentingNewLine]",RowBox[{RowBox[{"Part","[",RowBox[{"metricCTensor",",","1"}],"]"}],"//","MatrixForm"}]}]],"Input",CellTags->"native_metric_data"],
+
+Cell[BoxData[RowBox[{"Part","[",RowBox[{"metricCTensor",",","2"}],"]"}]],"Input",CellTags->"native_metric_basis"],
+
+Cell["The complete native xCoba object retains the component array and its basis information.","Text"],
+
+Cell[BoxData["metricCTensor"],"Input",CellTags->"native_metric_object"],
+
+Cell["MetricMatrixOf is a direct getter for the declared covariant matrix in the primary chart.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"MetricMatrixOf","[",RowBox[{"\"Minkowski\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"declared_metric_matrix"],
+
 
 Cell[TextData[{"Alternative \:2014 two native xCoba setups"}],"Subsubsection"],
 
@@ -345,27 +397,49 @@ Cell[TextData[{"The scale factor s(t) is positive. Its derivative determines whe
 
 Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "s", "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetCMetricSystem", "[", RowBox[{"\"FLRW\"", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"]}], "}"}], "]"}]}], "]"}], ",", RowBox[{"Assumptions", "\[Rule]", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"assumptions", "&&", RowBox[{RowBox[{"s", "[", "t", "]"}], ">", "0"}]}]}], "]"}]}]}], "]"}], ";"}]],"Input",CellTags->"flrw_metric"],
 
-Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",",RowBox[{"g","[",RowBox[{RowBox[{"-","a"}],",",RowBox[{"-","b"}]}],"]"}]}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrices"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"gM","[",RowBox[{RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],"//","ToComponents"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrices"],
 
-Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"Schwarzschild\"",",",RowBox[{"g","[",RowBox[{RowBox[{"-","a"}],",",RowBox[{"-","b"}]}],"]"}]}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrix_schw"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"gSchw","[",RowBox[{RowBox[{"-","aSchw"}],",",RowBox[{"-","bSchw"}]}],"]"}],"//","ToComponents"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrix_schw"],
+
+Cell["An already transported expression carries its background. The explicit form still works for the original abstract expression.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"Schwarzschild\"",",",RowBox[{"g","[",RowBox[{RowBox[{"-","a"}],",",RowBox[{"-","b"}]}],"]"}]}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"inferred_metric_check"],
+
 
 Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"FLRW\"",",",RowBox[{"g","[",RowBox[{RowBox[{"-","a"}],",",RowBox[{"-","b"}]}],"]"}]}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrix_flrw"],
 
 Cell[TextData[{"A general scalar field in Minkowski"}],"Subsection"],
 
-Cell[TextData[{"Assign a general scalar profile on Minkowski. The function receives all four chart coordinates and returns ",StyleBox["PhiM[t,x,y,z]",FontFamily->"Courier",FontSize->11],", printed as \:03c6. Field profiles are local to the selected background."}],"Text"],
+Cell[TextData[{"Assign a general scalar profile on Minkowski. The function receives all four chart coordinates and returns ",StyleBox["PhiM[t,x,y,z]",FontFamily->"Courier",FontSize->14],", printed as \:03c6. Field profiles are local to the selected background."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", RowBox[{"PhiM",",",RowBox[{"PrintAs","\[Rule]","\"\[Phi]\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"Minkowski\"", ",", "phi", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"PhiM", "[", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"minkowski_field"],
 
-Cell[TextData[{StyleBox["ToComponents",FontFamily->"Courier",FontSize->11]," evaluates the registered equation with the chart, metric and field profile, expanding its covariant derivatives with xCoba."}],"Text"],
+Cell[TextData[{StyleBox["ToComponents",FontFamily->"Courier",FontSize->14]," evaluates the registered equation with the chart, metric and field profile, expanding its covariant derivatives with xCoba."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"eqMink", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "\"ScalarEq\""}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"eqMink", "\[Equal]", "0"}]}]],"Input",CellTags->"minkowski_equation"],
 
-Cell["Compare native derivative orders, fractions and partial-derivative operators for the same equation. Use // PrettyExp[PartialStyle -> ...] to override the display once. Other available styles are MultiIndex, Comma and Prime (the latter applies to single-argument functions).","Text"],
+Cell["Compare partial derivative styles using the same calculated Minkowski equation. Each view is a display-only transformation.","Text"],
 
-Cell[BoxData[RowBox[{"{",RowBox[{RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Native\""}]}],"]"}]}],",",RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Fraction\""}]}],"]"}]}],",",RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Partial\""}]}],"]"}]}]}],"}"}]],"Input",CellTags->"partial_view"],
+Cell[BoxData[RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Native\""}]}],"]"}]}]],"Input",CellTags->"partial_view"],
 
-Cell[TextData[{StyleBox["Normal",FontFamily->"Courier",FontSize->11]," recovers the underlying equation, which is also retained when the display is copied. To use comma notation throughout Minkowski, set it once with ",StyleBox["SetNotation",FontFamily->"Courier",FontSize->11]," and evaluate ",StyleBox["eqMink",FontFamily->"Courier",FontSize->11]," again. The following cell removes the local override with Automatic, returning to the session fraction style."}],"Text"],
+Cell["MultiIndex notation.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"MultiIndex\""}]}],"]"}]}]],"Input",CellTags->"partial_multiindex"],
+
+Cell["Fraction notation.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Fraction\""}]}],"]"}]}]],"Input",CellTags->"partial_fraction"],
+
+Cell["Partial notation.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Partial\""}]}],"]"}]}]],"Input",CellTags->"partial_partial"],
+
+Cell["Comma notation.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Comma\""}]}],"]"}]}]],"Input",CellTags->"partial_comma"],
+
+
+Cell[TextData[{StyleBox["Normal",FontFamily->"Courier",FontSize->14]," recovers the underlying equation, which is also retained when the display is copied. To use comma notation throughout Minkowski, set it once with ",StyleBox["SetNotation",FontFamily->"Courier",FontSize->14]," and evaluate ",StyleBox["eqMink",FontFamily->"Courier",FontSize->14]," again. The following cell removes the local override with Automatic, returning to the session fraction style."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"PartialStyle", "\[Rule]", "\"Comma\""}]}], "]"}], ";", "\[IndentingNewLine]", "eqMink"}]],"Input",CellTags->"automatic_comma"],
 
@@ -397,7 +471,7 @@ Cell[TextData[{"Analytical reference (not an output): the radial equation can be
 
 Cell[BoxData[TagBox[FormBox[RowBox[{RowBox[{FractionBox[TagBox[TagBox[RowBox[{FractionBox["\[PartialD]", RowBox[{"\[PartialD]", "r"}]], RowBox[{"(", RowBox[{SuperscriptBox["r", "2"], " ", RowBox[{"(", RowBox[{"1", "-", FractionBox[RowBox[{"2", " ", "Mbh"}], "r"]}], ")"}], " ", TagBox[FractionBox[RowBox[{"\[PartialD]", RowBox[{"u", "(", "r", ")"}]}], RowBox[{"\[PartialD]", "r"}], MultilineFunction -> None], "InactiveDTraditional"]}], ")"}]}], D], "InactiveDTraditional"], SuperscriptBox["r", "2"]], "-", RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"u", "(", "r", ")"}]}]}], "\[LongEqual]", "0"}], TraditionalForm], TraditionalForm, Editable -> True]],"DisplayFormula"],
 
-Cell[TextData[{"Differentiate the divergence form with ",StyleBox["D",FontFamily->"Courier",FontSize->11]," and subtract it from the tensor result. The difference should simplify to zero."}],"Text"],
+Cell[TextData[{"Differentiate the divergence form with ",StyleBox["D",FontFamily->"Courier",FontSize->14]," and subtract it from the tensor result. The difference should simplify to zero."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"radialEq", "=", RowBox[{FractionBox[RowBox[{SubscriptBox["\[PartialD]", RowBox[{"rSchw"}]], RowBox[{"(", RowBox[{SuperscriptBox["rSchw", "2"], " ", RowBox[{"(", RowBox[{"1", "-", FractionBox[RowBox[{"2", " ", "Mbh"}], "rSchw"]}], ")"}], " ", RowBox[{SuperscriptBox["u", "\[Prime]", MultilineFunction -> None], "[", "rSchw", "]"}]}], ")"}]}], SuperscriptBox["rSchw", "2"]], "-", RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"u", "[", "rSchw", "]"}]}]}]}], ";", "\[IndentingNewLine]", RowBox[{"radialCheck", "=", RowBox[{"Simplify", "[", RowBox[{"eqSchw", "-", "radialEq"}], "]"}]}]}]],"Input",CellTags->"schwarzschild_check"],
 
@@ -413,7 +487,7 @@ Cell[BoxData[RowBox[{"ToExpression","[",RowBox[{"replayEab"}],"]"}]],"Input",Cel
 
 Cell[BoxData[RowBox[{"ExpressionText","[",RowBox[{"\"Schwarzschild\"",",","\"Eab\"",",","\"TeX\""}],"]"}]],"Input",CellTags->"tex_abstract"],
 
-Cell[TextData[{"With TexAct installed, choose ",StyleBox["\"TexAct\"",FontFamily->"Courier",FontSize->11]," in ",StyleBox["ExpressionText",FontFamily->"Courier",FontSize->11]," for its tensor-specific LaTeX notation. To reproduce the calculation in another kernel, supply the notebook and its matching package."}],"Text"],
+Cell[TextData[{"With TexAct installed, choose ",StyleBox["\"TexAct\"",FontFamily->"Courier",FontSize->14]," in ",StyleBox["ExpressionText",FontFamily->"Courier",FontSize->14]," for its tensor-specific LaTeX notation. To reproduce the calculation in another kernel, supply the notebook and its matching package."}],"Text"],
 
 Cell[TextData[{"Curvature of the Schwarzschild exterior"}],"Subsection"],
 
@@ -435,13 +509,13 @@ Cell[TextData[{"Analytical reference (not an output): multiplying the computed e
 
 Cell[BoxData[TagBox[FormBox[RowBox[{RowBox[{RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"q", "(", "t", ")"}]}], "+", RowBox[{SuperscriptBox["q", "\[Prime]\[Prime]", MultilineFunction -> None], "(", "t", ")"}], "+", FractionBox[RowBox[{"3", " ", RowBox[{SuperscriptBox["q", "\[Prime]", MultilineFunction -> None], "(", "t", ")"}], " ", RowBox[{SuperscriptBox["s", "\[Prime]", MultilineFunction -> None], "(", "t", ")"}]}], RowBox[{"s", "(", "t", ")"}]]}], "\[LongEqual]", "0"}], TraditionalForm], TraditionalForm, Editable -> True]],"DisplayFormula"],
 
-Cell[TextData[{"The connection contributes the term proportional to the expansion rate s\:2032/s. Evaluate the homogeneous scalar Lagrangian and the time-time Einstein component. Chart positions start at zero, so ",StyleBox["Components -> {{0,0}}",FontFamily->"Courier",FontSize->11]," selects that single entry."}],"Text"],
+Cell[TextData[{"The connection contributes the term proportional to the expansion rate s\:2032/s. Evaluate the homogeneous scalar Lagrangian and the time-time Einstein component. Chart positions start at zero, so ",StyleBox["Components -> {{0,0}}",FontFamily->"Courier",FontSize->14]," selects that single entry."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"einstein00", "=", RowBox[{"First", "[", RowBox[{"ToComponents", "[", RowBox[{"\"FLRW\"", ",", RowBox[{RowBox[{"Einstein", "[", "CD", "]"}], "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"0", ",", "0"}], "}"}], "}"}]}]}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"lagFLRW", "=", RowBox[{"ToComponents", "[", RowBox[{"\"FLRW\"", ",", "\"Lagrangian\""}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{"einstein00", ",", "lagFLRW"}], "}"}]}]],"Input",CellTags->"flrw_geometry"],
 
 Cell[TextData[{"Checking a solution"}],"Subsection"],
 
-Cell[TextData[{"Test a plane wave on Minkowski. Evaluate the scalar equation on the new profile, then use Wolfram\:2019s ",StyleBox["Simplify",FontFamily->"Courier",FontSize->11]," with the dispersion relation \:03c9\:00b2 = k\:00b2 + m\:00b2."}],"Text"],
+Cell[TextData[{"Test a plane wave on Minkowski. Evaluate the scalar equation on the new profile, then use Wolfram\:2019s ",StyleBox["Simplify",FontFamily->"Courier",FontSize->14]," with the dispersion relation \:03c9\:00b2 = k\:00b2 + m\:00b2."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"DefConstantSymbol", "[", "omega", "]"}], ";", "\[IndentingNewLine]", RowBox[{"DefConstantSymbol", "[", "k", "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"Minkowski\"", ",", "phi", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"Cos", "[", RowBox[{RowBox[{"omega", " ", "t"}], "-", RowBox[{"k", " ", "z"}]}], "]"}]}], "]"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"waveResidual", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "\"ScalarEq\""}], "]"}]}], ";", "\[IndentingNewLine]", "waveResidual"}]],"Input",CellTags->"plane_wave"],
 
@@ -503,7 +577,7 @@ Cell[TextData[{"Compare the Cartesian wave operator with the trace of the cylind
 
 Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "boxPhi"}], "]"}], ",", RowBox[{"Simplify", "[", RowBox[{"Tr", "[", RowBox[{TemplateBox[{"gCyl"}, "Inverse", SyntaxForm -> SuperscriptBox], ".", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "\"Hessian\"", ",", RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}]}], "]"}]}], "]"}], "]"}]}], "}"}]],"Input",CellTags->"trace_both"],
 
-Cell[TextData[{"With ",StyleBox["ApplySpecialization -> False",FontFamily->"Courier",FontSize->11],", the angular component of Eab includes its mass term even when a massless rule is active. Store the component before restoring the plane-wave profile."}],"Text"],
+Cell[TextData[{"With ",StyleBox["ApplySpecialization -> False",FontFamily->"Courier",FontSize->14],", the angular component of Eab includes its mass term even when a massless rule is active. Store the component before restoring the plane-wave profile."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"eabCyl", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "EabM", ",", RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"2", ",", "2"}], "}"}], "}"}]}], ",", RowBox[{"ApplySpecialization", "\[Rule]", "False"}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"Minkowski\"", ",", "phi", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"Cos", "[", RowBox[{RowBox[{"omega", " ", "t"}], "-", RowBox[{"k", " ", "z"}]}], "]"}]}], "]"}]}], "]"}], ";", "\[IndentingNewLine]", "eabCyl"}]],"Input",CellTags->"general_cyl_equation"],
 
@@ -517,7 +591,7 @@ Cell[TextData[{"Define a covector A, a symmetric tensor S and a two-form F on th
 
 Cell[BoxData[RowBox[{RowBox[{"DefTensor", "[", RowBox[{RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}], ",", "M"}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"DefTensor", "[", RowBox[{RowBox[{"S", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "M", ",", RowBox[{"Symmetric", "[", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}], "]"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"DefTensor", "[", RowBox[{RowBox[{"F", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "M", ",", RowBox[{"Antisymmetric", "[", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}], "]"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"RegisterTheory", "[", RowBox[{"\"Fields\"", ",", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"A", ",", RowBox[{"Sector", "\[Rule]", "\"Vector\""}]}], "}"}], ",", "S", ",", RowBox[{"{", RowBox[{"F", ",", RowBox[{"Sector", "\[Rule]", "\"Vector\""}]}], "}"}]}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"extra_fields"],
 
-Cell[TextData[{"The uppercase S denotes the symmetric tensor. To register it on its own, use ",StyleBox["RegisterTheory[\"Field\", S]",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{"The uppercase S denotes the symmetric tensor. To register it on its own, use ",StyleBox["RegisterTheory[\"Field\", S]",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[TextData[{"Create a new Minkowski study from the extended theory. Compare its field keys with those in the original scalar-only background."}],"Text"],
 
@@ -525,7 +599,7 @@ Cell[BoxData[RowBox[{RowBox[{"CreateBackground", "[", "\"MinkowskiFields\"", "]"
 
 Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"Keys", "[", RowBox[{RowBox[{"ShowBackground", "[", "\"Minkowski\"", "]"}], "[", "\"Field\"", "]"}], "]"}], ",", RowBox[{"Keys", "[", RowBox[{RowBox[{"ShowBackground", "[", "\"MinkowskiFields\"", "]"}], "[", "\"Field\"", "]"}], "]"}]}], "}"}]],"Input",CellTags->"field_snapshots"],
 
-Cell[TextData[{"Assign the lower components of A in chart order (t,x,y,z) with ",StyleBox["IndexPositions -> {-1}",FontFamily->"Courier",FontSize->11],". Requesting ",StyleBox["A[a]",FontFamily->"Courier",FontSize->11]," raises the index with the Minkowski metric, changing the sign of the time component."}],"Text"],
+Cell[TextData[{"Assign the lower components of A in chart order (t,x,y,z) with ",StyleBox["IndexPositions -> {-1}",FontFamily->"Courier",FontSize->14],". Requesting ",StyleBox["A[a]",FontFamily->"Courier",FontSize->14]," raises the index with the Minkowski metric, changing the sign of the time component."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "A", ",", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}], ",", RowBox[{"IndexPositions", "\[Rule]", RowBox[{"{", RowBox[{"-", "1"}], "}"}]}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"Adown", "=", RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"Aup", "=", RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"A", "[", "a", "]"}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"normA", "=", RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{RowBox[{"A", "[", "a", "]"}], " ", RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}]}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{"Adown", ",", "Aup", ",", "normA"}], "}"}]}]],"Input",CellTags->"vector_values"],
 
@@ -533,7 +607,7 @@ Cell[TextData[{"For further native xCoba work, request Output -> \"CTensor\" to 
 
 Cell[BoxData[RowBox[{"ctA", "=", RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"A", "[", "a", "]"}], ",", RowBox[{"Output", "\[Rule]", "\"CTensor\""}]}], "]"}]}]],"Input",CellTags->"ctensor_output"],
 
-Cell[TextData[{"The contraction is \:22121 + 4 + 9 + 16 = 28. To retrieve the same covector with its abstract lower index, use ",StyleBox["PortExpression",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{"The contraction is \:22121 + 4 + 9 + 16 = 28. To retrieve the same covector with its abstract lower index, use ",StyleBox["PortExpression",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[BoxData[RowBox[{"PortExpression", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}]}], "]"}]],"Input",CellTags->"formal_vector"],
 
@@ -541,41 +615,41 @@ Cell[TextData[{"Assign matrices with the declared rank and symmetry. xPlorer che
 
 Cell[BoxData[RowBox[{RowBox[{"Fmatrix", "=", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "2", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"-", "2"}], ",", "0", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}]}], "}"}]}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "S", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}], "]"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "F", ",", "Fmatrix"}], "]"}], ";", "\[IndentingNewLine]", RowBox[{RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"S", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}]}], "]"}],"//","MatrixForm"}]}]],"Input",CellTags->"tensor_values"],
 
-Cell[TextData[{StyleBox["FreeIndices",FontFamily->"Courier",FontSize->11]," fixes the order of the array axes. Reversing the free indices transposes the matrix. ",StyleBox["Components",FontFamily->"Courier",FontSize->11]," selects individual entries. In the original order, F has entries 2 at (0,1) and \:22122 at (1,0)."}],"Text"],
+Cell[TextData[{StyleBox["FreeIndices",FontFamily->"Courier",FontSize->14]," fixes the order of the array axes. Reversing the free indices transposes the matrix. ",StyleBox["Components",FontFamily->"Courier",FontSize->14]," selects individual entries. In the original order, F has entries 2 at (0,1) and \:22122 at (1,0)."}],"Text"],
 
 Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"F", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "b"}], ",", RowBox[{"-", "a"}]}], "}"}]}]}], "]"}], ",", RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"F", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "1"}], "}"}], ",", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}], "}"}]}]}], "]"}]}], "}"}]],"Input",CellTags->"tensor_selection"],
 
 Cell[TextData[{"An independent covariant derivative"}],"Subsection"],
 
-Cell[TextData[{"Define an independent covariant derivative DA on the source manifold using the source index a. ",StyleBox["Torsion -> True",FontFamily->"Courier",FontSize->11]," allows torsion. Register DA as a connection so that ",StyleBox["CreateBackground",FontFamily->"Courier",FontSize->11]," copies it to the new study."}],"Text"],
+Cell[TextData[{"Define an independent covariant derivative DA on the source manifold using the source index a. ",StyleBox["Torsion -> True",FontFamily->"Courier",FontSize->14]," allows torsion. Register DA as a connection so that ",StyleBox["CreateBackground",FontFamily->"Courier",FontSize->14]," copies it to the new study."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"DefCovD", "[", RowBox[{RowBox[{"DA", "[", RowBox[{"-", "a"}], "]"}], ",", RowBox[{"{", "}"}], ",", RowBox[{"SymbolOfCovD", "\[Rule]", RowBox[{"{", RowBox[{"\"|\"", ",", "\"D\""}], "}"}]}], ",", RowBox[{"Torsion", "\[Rule]", "True"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"RegisterTheory", "[", RowBox[{"\"Connection\"", ",", "\"Affine\"", ",", "DA"}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"CreateBackground", "[", "\"AffineStudy\"", "]"}], ";", "\[IndentingNewLine]", RowBox[{"ConnectionsOf", "[", "\"AffineStudy\"", "]"}]}]],"Input",CellTags->"register_affine"],
 
-Cell[TextData[{"The default connection is the metric\:2019s Levi-Civita derivative, keyed by ",StyleBox["\"Primary\"",FontFamily->"Courier",FontSize->11],". Select DA explicitly to obtain its derivative and Riemann tensor. Its curvature family also has a Ricci tensor. A native Ricci scalar requires an associated metric, and requesting one for DA returns a Failure."}],"Text"],
+Cell[TextData[{"The default connection is the metric\:2019s Levi-Civita derivative, keyed by ",StyleBox["\"Primary\"",FontFamily->"Courier",FontSize->14],". Select DA explicitly to obtain its derivative and Riemann tensor. Its curvature family also has a Ricci tensor. A native Ricci scalar requires an associated metric, and requesting one for DA returns a Failure."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"aDA", ",", "bDA", ",", "cDA", ",", "dDA"}], "}"}], "=", RowBox[{"BackgroundIndices", "[", RowBox[{"\"AffineStudy\"", ",", "4"}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{RowBox[{RowBox[{RowBox[{"ConnectionOf", "[", RowBox[{"\"AffineStudy\"", ",", "DA"}], "]"}], "[", RowBox[{"-", "aDA"}], "]"}], "[", RowBox[{RowBox[{"BackgroundObject", "[", RowBox[{"\"AffineStudy\"", ",", "\"phi\""}], "]"}], "[", "]"}], "]"}], ",", RowBox[{RowBox[{"RiemannOf", "[", RowBox[{"\"AffineStudy\"", ",", "DA"}], "]"}], "[", RowBox[{RowBox[{"-", "aDA"}], ",", RowBox[{"-", "bDA"}], ",", RowBox[{"-", "cDA"}], ",", "dDA"}], "]"}]}], "}"}]}]],"Input",CellTags->"formal_affine"],
 
-Cell[TextData[{"Supply the independent connection coefficients in the order {upper output, lower derivative, lower input}. The assignment below sets a single coefficient, \:0393 with upper index t and lower indices (x,t), equal to t, in the Cartesian chart. You can also supply the difference from the metric connection using ",StyleBox["ReferenceConnection -> \"Primary\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{"Supply the independent connection coefficients in the order {upper output, lower derivative, lower input}. The assignment below sets a single coefficient, \:0393 with upper index t and lower indices (x,t), equal to t, in the Cartesian chart. You can also supply the difference from the metric connection using ",StyleBox["ReferenceConnection -> \"Primary\"",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{"{", RowBox[{"\"t\"", ",", "\"x\"", ",", "\"y\"", ",", "\"z\""}], "}"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetCMetricSystem", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"AffineStudy\"", ",", "A", ",", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{RowBox[{"{", RowBox[{"tA", ",", "xA", ",", "yA", ",", "zA"}], "}"}], "=", RowBox[{"Through", "[", RowBox[{RowBox[{"CoordinatesOf", "[", "\"AffineStudy\"", "]"}], "[", "]"}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"gammaDA", "=", RowBox[{"ConstantArray", "[", RowBox[{"0", ",", RowBox[{"{", RowBox[{"4", ",", "4", ",", "4"}], "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{RowBox[{"gammaDA", "\[LeftDoubleBracket]", RowBox[{"1", ",", "2", ",", "1"}], "\[RightDoubleBracket]"}], "=", "tA"}], ";", "\[IndentingNewLine]", RowBox[{"SetConnectionComponents", "[", RowBox[{"\"AffineStudy\"", ",", "\"Affine\"", ",", "gammaDA"}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates"],
 
-Cell[TextData[{"For this constant covector, the coefficient contributes \:2212t to the x derivative of its time component. Compute the derivative matrix and one curvature component. The latter\:2019s sign follows xAct\:2019s ",StyleBox["$RiemannSign",FontFamily->"Courier",FontSize->11]," convention."}],"Text"],
+Cell[TextData[{"For this constant covector, the coefficient contributes \:2212t to the x derivative of its time component. Compute the derivative matrix and one curvature component. The latter\:2019s sign follows xAct\:2019s ",StyleBox["$RiemannSign",FontFamily->"Courier",FontSize->14]," convention."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"gradA", "=", RowBox[{"ToComponents", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{RowBox[{"DA", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"A", "[", RowBox[{"-", "b"}], "]"}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}]}], ",", RowBox[{"StrictComponents", "\[Rule]", "True"}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"riemannDA", "=", RowBox[{"First", "[", RowBox[{"ToComponents", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{RowBox[{"Riemann", "[", "DA", "]"}], "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}], ",", RowBox[{"-", "c"}], ",", "d"}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}], ",", RowBox[{"-", "c"}], ",", "d"}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"0", ",", "1", ",", "0", ",", "0"}], "}"}], "}"}]}], ",", RowBox[{"StrictComponents", "\[Rule]", "True"}]}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"gradA","//","MatrixForm"}]}]],"Input",CellTags->"affine_results"],
 
 Cell[BoxData["riemannDA"],"Input",CellTags->"affine_curvature_component"],
 
-Cell[TextData[{"Compare the same (x,t) entry using CD and DA. The Levi-Civita derivative gives zero for these Cartesian data. ",StyleBox["CheckConnection",FontFamily->"Courier",FontSize->11]," reports the torsion and metric-compatibility residuals for DA."}],"Text"],
+Cell[TextData[{"Compare the same (x,t) entry using CD and DA. The Levi-Civita derivative gives zero for these Cartesian data. ",StyleBox["CheckConnection",FontFamily->"Courier",FontSize->14]," reports the torsion and metric-compatibility residuals for DA."}],"Text"],
 
 Cell[BoxData[RowBox[{"Grid", "[", RowBox[{RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"\"Connection\"", ",", "\"x,t component\""}], "}"}], ",", RowBox[{"{", RowBox[{"\"CD\"", ",", RowBox[{"First", "[", RowBox[{"ToComponents", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"A", "[", RowBox[{"-", "b"}], "]"}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}], "}"}]}]}], "]"}], "]"}]}], "}"}], ",", RowBox[{"{", RowBox[{"\"DA\"", ",", RowBox[{"First", "[", RowBox[{"ToComponents", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{RowBox[{"DA", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"A", "[", RowBox[{"-", "b"}], "]"}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}], "}"}]}]}], "]"}], "]"}]}], "}"}]}], "}"}], ",", RowBox[{"Frame", "\[Rule]", "All"}]}], "]"}]],"Input",CellTags->"compare_affine_component"],
 
 Cell[BoxData[RowBox[{"CheckConnection", "[", RowBox[{"\"AffineStudy\"", ",", "\"Affine\""}], "]"}]],"Input",CellTags->"affine_checks"],
 
-Cell[TextData[{StyleBox["ConnectionDifference",FontFamily->"Courier",FontSize->11]," gives the difference tensor for the two connections. Use ",StyleBox["AddConnection",FontFamily->"Courier",FontSize->11]," when the target background already exists."}],"Text"],
+Cell[TextData[{StyleBox["ConnectionDifference",FontFamily->"Courier",FontSize->14]," gives the difference tensor for the two connections. Use ",StyleBox["AddConnection",FontFamily->"Courier",FontSize->14]," when the target background already exists."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"diffDA", "=", RowBox[{"ConnectionDifference", "[", RowBox[{"\"AffineStudy\"", ",", "\"Affine\"", ",", "\"Primary\""}], "]"}]}], ";", "\[IndentingNewLine]", "diffDA"}]],"Input",CellTags->"affine_difference"],
 
-Cell[TextData[{"Inspect the manifolds of DA and its copy. In a formula the derivative head selects the connection. ",StyleBox["ComputeGeometry",FontFamily->"Courier",FontSize->11]," calculates the geometry of the metric connection."}],"Text"],
+Cell[TextData[{"Inspect the manifolds of DA and its copy. In a formula the derivative head selects the connection. ",StyleBox["ComputeGeometry",FontFamily->"Courier",FontSize->14]," calculates the geometry of the metric connection."}],"Text"],
 
 Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"ManifoldOfCovD", "[", "DA", "]"}], ",", RowBox[{"ManifoldOfCovD", "[", RowBox[{"ConnectionOf", "[", RowBox[{"\"AffineStudy\"", ",", "DA"}], "]"}], "]"}], ",", RowBox[{RowBox[{"ConnectionDifference", "[", RowBox[{"\"AffineStudy\"", ",", "DA", ",", "CD"}], "]"}], "===", "diffDA"}]}], "}"}]],"Input",CellTags->"compare_derivatives"],
 
@@ -583,19 +657,19 @@ Cell[TextData[{"Unregister DA to omit it from future backgrounds. Its source def
 
 Cell[BoxData[RowBox[{RowBox[{"UnregisterTheory", "[", "\"Connections\"", "]"}], ";"}]],"Input",CellTags->"unregister_affine"],
 
-Cell[TextData[{"Use ",StyleBox["StrictComponents -> True",FontFamily->"Courier",FontSize->11]," when every requested component must be explicit. An unresolved component then returns a Failure."}],"Tip"]
+Cell[TextData[{"Use ",StyleBox["StrictComponents -> True",FontFamily->"Courier",FontSize->14]," when every requested component must be explicit. An unresolved component then returns a Failure."}],"Tip"]
 },Open]],
 
 Cell[CellGroupData[{
 Cell[TextData[{"7. Change a calculation and reuse previous work"}],"Section"],
 
-Cell[TextData[{"To change a profile or metric in an existing study, call ",StyleBox["SetFieldComponents",FontFamily->"Courier",FontSize->11]," or ",StyleBox["SetCMetricSystem",FontFamily->"Courier",FontSize->11]," again with the new input."}],"Text"],
+Cell[TextData[{"To change a profile or metric in an existing study, call ",StyleBox["SetFieldComponents",FontFamily->"Courier",FontSize->14]," or ",StyleBox["SetCMetricSystem",FontFamily->"Courier",FontSize->14]," again with the new input."}],"Text"],
 
 Cell[TextData[{"Request the Ricci and Einstein tensors twice. With the same metric and settings, the second call reports both as cached."}],"Text"],
 
 Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"ComputeGeometry", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}], ",", RowBox[{"ComputeGeometry", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]}], "}"}]],"Input",CellTags->"geometry_reuse"],
 
-Cell[TextData[{StyleBox["SaveResult",FontFamily->"Courier",FontSize->11]," stores a value under a key and ",StyleBox["ResultOf",FontFamily->"Courier",FontSize->11]," retrieves it. Changing a printed label preserves saved results. Changing a mathematical input invalidates all saved results in that study."}],"Text"],
+Cell[TextData[{StyleBox["SaveResult",FontFamily->"Courier",FontSize->14]," stores a value under a key and ",StyleBox["ResultOf",FontFamily->"Courier",FontSize->14]," retrieves it. Changing a printed label preserves saved results. Changing a mathematical input invalidates all saved results in that study."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"SaveResult", "[", RowBox[{"\"MinkowskiFields\"", ",", "\"VectorNorm\"", ",", "normA"}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetPresentation", "[", RowBox[{"\"MinkowskiFields\"", ",", "A", ",", RowBox[{"PrintAs", "\[Rule]", "\"V\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"ResultOf", "[", RowBox[{"\"MinkowskiFields\"", ",", "\"VectorNorm\""}], "]"}]}]],"Input",CellTags->"save_result"],
 
@@ -619,7 +693,7 @@ Cell[TextData[{"Define the metric perturbation h with xPert, register its head a
 
 Cell[BoxData[RowBox[{RowBox[{"DefMetricPerturbation", "[", RowBox[{"g", ",", "h", ",", "eps"}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "h", ",", RowBox[{"Sector", "\[Rule]", "\"Perturbations\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"CreateBackground", "[", "\"MinkowskiPerturbed\"", "]"}], ";"}]],"Input",CellTags->"register_perturbation"],
 
-Cell[TextData[{StyleBox["PerturbOn",FontFamily->"Courier",FontSize->11]," returns the abstract metric variation by default."}],"Text"],
+Cell[TextData[{StyleBox["PerturbOn",FontFamily->"Courier",FontSize->14]," returns the abstract metric variation by default."}],"Text"],
 
 Cell[BoxData[RowBox[{"PerturbOn", "[", RowBox[{"\"MinkowskiPerturbed\"", ",", RowBox[{"g", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "1"}], "]"}]],"Input",CellTags->"abstract_perturbation"],
 
@@ -643,7 +717,7 @@ Cell[TextData[{"Keep a reference to the current metric so that you can check its
 
 Cell[BoxData[RowBox[{RowBox[{"oldMetric", "=", RowBox[{"BackgroundObject", "[", RowBox[{"\"MinkowskiFields\"", ",", "\"Metric\""}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"MetricQ", "[", "oldMetric", "]"}]}]],"Input",CellTags->"before_deletion"],
 
-Cell[TextData[{StyleBox["DeletionPlan",FontFamily->"Courier",FontSize->11]," shows owned objects, external blockers and removal order. xPlorer calls the xAct removal functions in dependency order. To reproduce the study, save its declared inputs with ",StyleBox["ReconstructionData",FontFamily->"Courier",FontSize->11]," before deletion. Reconstruction requires the original source definitions. Derived values can be calculated again."}],"Text"],
+Cell[TextData[{StyleBox["DeletionPlan",FontFamily->"Courier",FontSize->14]," shows owned objects, external blockers and removal order. xPlorer calls the xAct removal functions in dependency order. To reproduce the study, save its declared inputs with ",StyleBox["ReconstructionData",FontFamily->"Courier",FontSize->14]," before deletion. Reconstruction requires the original source definitions. Derived values can be calculated again."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"plan", "=", RowBox[{"DeletionPlan", "[", "\"MinkowskiFields\"", "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"KeyTake", "[", RowBox[{"plan", ",", RowBox[{"{", RowBox[{"\"Key\"", ",", "\"CanDelete\"", ",", "\"Order\"", ",", "\"ExternalBlockers\""}], "}"}]}], "]"}]}]],"Input",CellTags->"deletion_preview"],
 
@@ -667,15 +741,15 @@ Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFiel
 
 Cell[TextData[{"The upper time component is \:22125 for the new input. The Minkowski inverse metric supplies the minus sign."}],"Text"],
 
-Cell[TextData[{"To delete one owned tensor, specify its field key. S has no tracked dependents here. If an equation or rule depends on the field, ",StyleBox["Cascade -> True",FontFamily->"Courier",FontSize->11]," permits removing those dependents within this background. External xAct objects are protected."}],"Text"],
+Cell[TextData[{"To delete one owned tensor, specify its field key. S has no tracked dependents here. If an equation or rule depends on the field, ",StyleBox["Cascade -> True",FontFamily->"Courier",FontSize->14]," permits removing those dependents within this background. External xAct objects are protected."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"DeleteBackgroundObject", "[", RowBox[{"\"MinkowskiFields\"", ",", "\"S\""}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"KeyExistsQ", "[", RowBox[{RowBox[{RowBox[{"ShowBackground", "[", "\"MinkowskiFields\"", "]"}], "[", "\"Field\"", "]"}], ",", "\"S\""}], "]"}]}]],"Input",CellTags->"delete_single_field"],
 
-Cell[TextData[{"The False result confirms that the key S is gone from this study. The source tensor and its other copies are still available. To clear the values of A, use ",StyleBox["ClearFieldComponents",FontFamily->"Courier",FontSize->11],". ",StyleBox["ClearComputedValues",FontFamily->"Courier",FontSize->11]," clears derived geometry and restores declared inputs."}],"Text"],
+Cell[TextData[{"The False result confirms that the key S is gone from this study. The source tensor and its other copies are still available. To clear the values of A, use ",StyleBox["ClearFieldComponents",FontFamily->"Courier",FontSize->14],". ",StyleBox["ClearComputedValues",FontFamily->"Courier",FontSize->14]," clears derived geometry and restores declared inputs."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"ClearFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "A"}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"ClearComputedValues", "[", "\"MinkowskiFields\"", "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "A", ",", RowBox[{"{", RowBox[{"5", ",", "0", ",", "0", ",", "0"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"clear_vector_input"],
 
-Cell[TextData[{"Deleting a chart resets the coordinate setup. Removing the metric and its dependent family leaves the abstract manifold. Curvature tensors are removed with their connection, and the primary derivative with its metric. Inspect ",StyleBox["DeletionPlan",FontFamily->"Courier",FontSize->11]," before either operation."}],"Text"],
+Cell[TextData[{"Deleting a chart resets the coordinate setup. Removing the metric and its dependent family leaves the abstract manifold. Curvature tensors are removed with their connection, and the primary derivative with its metric. Inspect ",StyleBox["DeletionPlan",FontFamily->"Courier",FontSize->14]," before either operation."}],"Text"],
 
 Cell[TextData[{"Close the affine study. The three scalar backgrounds remain available."}],"Text"],
 
@@ -685,15 +759,17 @@ Cell[TextData[{"The optional ScalarTheory.wl contains the initial scalar definit
 },Open]]
 },WindowTitle->"xPlorer - Theory and backgrounds",StyleDefinitions->Notebook[{
  Cell[StyleData[StyleDefinitions -> "Default.nb"]],
- Cell[StyleData["Title"], FontSize -> 28, FontWeight -> "Bold"],
+ Cell[StyleData["Code"], FontSize -> 15],
+ Cell[StyleData["Subsubsection"], FontSize -> 18, FontWeight -> "Bold"],
+ Cell[StyleData["Title"], FontSize -> 32, FontWeight -> "Bold"],
  Cell[StyleData["Subtitle"], FontSize -> 14, FontSlant -> "Italic"],
- Cell[StyleData["Section"], FontSize -> 22, FontWeight -> "Bold"],
- Cell[StyleData["Subsection"], FontSize -> 16, FontWeight -> "Bold"],
- Cell[StyleData["Text"], FontSize -> 12, LineSpacing -> {1.2,0}],
- Cell[StyleData["Input"], FontSize -> 12, CellFrame -> {{1,0},{0,0}}, CellFrameMargins -> {{10,8},{6,6}}],
- Cell[StyleData["Output"], FontSize -> 12],
- Cell[StyleData["DisplayFormula"], FontSize -> 14],
- Cell[StyleData["Important"], FontSize -> 12, FontWeight -> "Bold", LineSpacing -> {1.2,0}, CellMargins -> {{66,10},{8,8}}, CellFrame -> {{2,0},{0,0}}, CellFrameMargins -> {{10,8},{7,7}}],
- Cell[StyleData["Tip"], FontSize -> 12, FontSlant -> "Italic", LineSpacing -> {1.2,0}, CellMargins -> {{78,10},{8,8}}, CellFrameMargins -> {{10,8},{6,6}}],
- Cell[StyleData["Program"], FontSize -> 11, CellFrame -> {{0.5,0},{0,0}}, CellFrameMargins -> {{10,8},{6,6}}]
+ Cell[StyleData["Section"], FontSize -> 24, FontWeight -> "Bold"],
+ Cell[StyleData["Subsection"], FontSize -> 19, FontWeight -> "Bold"],
+ Cell[StyleData["Text"], FontSize -> 15, LineSpacing -> {1.3,3}, CellMargins -> {{66,20},{7,7}}],
+ Cell[StyleData["Input"], FontSize -> 15, CellFrame -> {{1,0},{0,0}}, CellFrameMargins -> {{10,8},{6,6}}],
+ Cell[StyleData["Output"], FontSize -> 16, FormatType -> StandardForm],
+ Cell[StyleData["DisplayFormula"], FontSize -> 17],
+ Cell[StyleData["Important"], FontSize -> 15, FontWeight -> "Bold", LineSpacing -> {1.2,0}, CellMargins -> {{66,10},{8,8}}, CellFrame -> {{2,0},{0,0}}, CellFrameMargins -> {{10,8},{7,7}}],
+ Cell[StyleData["Tip"], FontSize -> 15, FontSlant -> "Italic", LineSpacing -> {1.2,0}, CellMargins -> {{78,10},{8,8}}, CellFrameMargins -> {{10,8},{6,6}}],
+ Cell[StyleData["Program"], FontSize -> 15, CellFrame -> {{0.5,0},{0,0}}, CellFrameMargins -> {{10,8},{6,6}}]
 },Visible->False,StyleDefinitions->"PrivateStylesheetFormatting.nb"],Saveable->True]
