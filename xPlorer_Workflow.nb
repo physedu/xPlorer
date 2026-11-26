@@ -1036,45 +1036,127 @@ Cell[TextData[{"The xx entries are t\:00b2 for the first metric variation and 2t
 },Open]],
 
 Cell[CellGroupData[{
-Cell[TextData[{"8. Delete and recreate a study"}],"Section"],
+Cell["8. Manage, delete and recover a study","Section"],
 
-Cell[TextData[{"Keep a reference to the current metric so that you can check its xAct registration after deleting the study."}],"Text"],
+Cell["Work with MinkowskiFields, the existing vector and tensor study. The goal is to distinguish reversible changes to values from removal of actual xAct definitions. The original scalar backgrounds are left untouched.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"oldMetric", "=", RowBox[{"BackgroundObject", "[", RowBox[{"\"MinkowskiFields\"", ",", "\"Metric\""}], "]"}]}], ";"}]],"Input",CellTags->"before_deletion_step_1"],
+Cell["8.1. Clear derived values without changing the model","Subsubsection"],
 
-Cell[BoxData[RowBox[{"MetricQ", "[", "oldMetric", "]"}]],"Input",CellTags->"before_deletion"],
+Cell["The time-time metric entry is still -4 from the preceding example. The covector A has lower components (1, 2, 3, 4), so its raised time component is -1/4.","Text"],
 
-Cell[TextData[{StyleBox["DeletionPlan",FontFamily->"Courier",FontSize->14]," shows owned objects, external blockers and removal order. xPlorer calls the xAct removal functions in dependency order.\n\nTo reproduce the study, save its declared inputs with ",StyleBox["ReconstructionData",FontFamily->"Courier",FontSize->14]," before deletion. Reconstruction requires the original source definitions.\n\nDerived values can be calculated again."}],"Text"],
+Cell[BoxData[RowBox[{RowBox[{"MetricMatrixOf","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"lifecycle_initial_metric"],
+
+Cell[BoxData[RowBox[{RowBox[{"AMinkowskiFields","[",RowBox[{"aMinkowskiFields"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_initial_vector"],
+
+Cell["Compute the Ricci and Einstein tensors twice. The second request uses the cached geometry.","Text"],
+
+Cell[BoxData[RowBox[{"ComputeGeometry","[",RowBox[{"\"MinkowskiFields\"",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_compute_first"],
+
+Cell[BoxData[RowBox[{"ComputeGeometry","[",RowBox[{"\"MinkowskiFields\"",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_compute_cached"],
+
+Cell["ClearComputedValues removes derived values. It retains the metric and managed field inputs and invalidates saved results. The next geometry request computes the cleared quantities again.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"ClearComputedValues","[",RowBox[{"\"MinkowskiFields\""}],"]"}],";"}]],"Input",CellTags->"clear_vector_input_step_2"],
+
+Cell[BoxData[RowBox[{"ComputeGeometry","[",RowBox[{"\"MinkowskiFields\"",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_recompute"],
+
+Cell[BoxData[RowBox[{RowBox[{"AMinkowskiFields","[",RowBox[{"aMinkowskiFields"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_after_clear_geometry"],
+
+Cell["8.2. Clear field values, preserve the tensor","Subsubsection"],
+
+Cell["Save the current field inputs as a named profile. Unlike a reconstruction recipe, this stores field assignments within the existing background, not the whole geometry.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"RegisterProfile","[",RowBox[{"\"MinkowskiFields\"",",","\"OriginalFields\""}],"]"}],";"}]],"Input",CellTags->"lifecycle_save_profile"],
+
+Cell[BoxData[RowBox[{RowBox[{"ClearFieldComponents","[",RowBox[{"\"MinkowskiFields\"",",","\"A\""}],"]"}],";"}]],"Input",CellTags->"clear_vector_input_step_1"],
+
+Cell["A is still defined; only its assigned components have been removed. Inspect the remaining managed input records, then recover the stored profile.","Text"],
+
+Cell[BoxData[RowBox[{"BackgroundObject","[",RowBox[{"\"MinkowskiFields\"",",","\"A\""}],"]"}]],"Input",CellTags->"lifecycle_field_defined"],
+
+Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{RowBox[{"ShowBackground","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"[","\"FieldComponents\"","]"}]}],"]"}]],"Input",CellTags->"lifecycle_inputs_cleared"],
+
+Cell[BoxData[RowBox[{RowBox[{"ActivateProfile","[",RowBox[{"\"MinkowskiFields\"",",","\"OriginalFields\""}],"]"}],";"}]],"Input",CellTags->"lifecycle_activate_profile"],
+
+Cell[BoxData[RowBox[{RowBox[{"AMinkowskiFields","[",RowBox[{"aMinkowskiFields"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_profile_restored"],
+
+Cell["RemoveProfile deletes the stored profile, not the active inputs. The vector still has the same components.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"RemoveProfile","[",RowBox[{"\"MinkowskiFields\"",",","\"OriginalFields\""}],"]"}],";"}]],"Input",CellTags->"lifecycle_remove_profile"],
+
+Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{"ShowProfiles","[",RowBox[{"\"MinkowskiFields\""}],"]"}]}],"]"}]],"Input",CellTags->"lifecycle_profiles_remaining"],
+
+Cell[BoxData[RowBox[{RowBox[{"AMinkowskiFields","[",RowBox[{"aMinkowskiFields"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_profile_removal_value"],
+
+Cell["8.3. Remove a stored specialization","Subsubsection"],
+
+Cell["A named rule group and the active rules are separate. ClearRules deactivates rules without deleting their stored groups. Here remove the previously stored Massless group from Schwarzschild; the general equation is unchanged.","Text"],
+
+Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{"ShowRuleGroups","[",RowBox[{"\"Schwarzschild\""}],"]"}]}],"]"}]],"Input",CellTags->"lifecycle_rule_groups_before"],
+
+Cell[BoxData[RowBox[{RowBox[{"RemoveRuleGroup","[",RowBox[{"\"Schwarzschild\"",",","\"Massless\""}],"]"}],";"}]],"Input",CellTags->"lifecycle_remove_rule_group"],
+
+Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{"ShowRuleGroups","[",RowBox[{"\"Schwarzschild\""}],"]"}]}],"]"}]],"Input",CellTags->"lifecycle_rule_groups_after"],
+
+Cell[BoxData[RowBox[{"scalarEqSchw","//","PrettyExp"}]],"Input",CellTags->"lifecycle_rule_group_eq"],
+
+Cell["8.4. Save a complete reconstruction recipe","Subsubsection"],
+
+Cell["ReconstructionData stores the managed inputs: the theory snapshot, chart maps, metric, field assignments, rules, presentation and profiles. It is an association in memory, not a file or a complete copy of the kernel.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"recipe","=",RowBox[{"ReconstructionData","[",RowBox[{"\"MinkowskiFields\""}],"]"}]}],";"}]],"Input",CellTags->"lifecycle_recipe"],
+
+Cell[BoxData[RowBox[{"Keys","[",RowBox[{"recipe"}],"]"}]],"Input",CellTags->"lifecycle_recipe_keys"],
+
+Cell["The source xAct definitions must remain alive. Native assignments outside xPlorer and saved derived results are not a complete part of this recipe. The old object identities will not survive deletion.","Text"],
+
+Cell["8.5. Preview deletion before changing anything","Subsubsection"],
+
+Cell["DeletionPlan is a read-only operation. CanDelete tells whether the current plan has known blockers. ExternalBlockers identifies xAct objects outside this background that depend on its objects. Order describes the intended removal sequence.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"plan", "=", RowBox[{"DeletionPlan", "[", "\"MinkowskiFields\"", "]"}]}], ";"}]],"Input",CellTags->"deletion_preview_step_1"],
 
-Cell[BoxData[RowBox[{"KeyTake", "[", RowBox[{"plan", ",", RowBox[{"{", RowBox[{"\"Key\"", ",", "\"CanDelete\"", ",", "\"Order\"", ",", "\"ExternalBlockers\""}], "}"}]}], "]"}]],"Input",CellTags->"deletion_preview"],
+Cell[BoxData[RowBox[{"plan","[","\"CanDelete\"","]"}]],"Input",CellTags->"lifecycle_can_delete"],
 
-Cell[TextData[{"Alternative \:2014 rebuild from a saved recipe"}],"Subsubsection"],
+Cell[BoxData[RowBox[{"plan","[","\"ExternalBlockers\"","]"}]],"Input",CellTags->"lifecycle_external_blockers"],
 
-Cell[TextData[{"Use these three lines in place of the manual deletion and recreation below to recover the declared inputs, including the assigned field components."}],"Text"],
+Cell[BoxData[RowBox[{"plan","[","\"Order\"","]"}]],"Input",CellTags->"deletion_preview"],
 
-Cell["recipe = ReconstructionData[\"MinkowskiFields\"];\nDeleteBackground[\"MinkowskiFields\"];\nRecreateBackground[\"MinkowskiFields\", recipe];","Program",Evaluatable->False],
+Cell["If the plan reports blockers, inspect them and do not proceed blindly. Cascade does not authorize removal of external objects. Here the study has no external blockers.","Text"],
 
-Cell[TextData[{"Manual recreation"}],"Subsubsection"],
+Cell[BoxData[RowBox[{RowBox[{"oldMetric", "=", RowBox[{"BackgroundObject", "[", RowBox[{"\"MinkowskiFields\"", ",", "\"Metric\""}], "]"}]}], ";"}]],"Input",CellTags->"before_deletion_step_1"],
+
+Cell["The old metric reference will be used to verify that the actual xAct definition has been removed. This is different from clearing a value.","Text"],
+
+Cell[BoxData[RowBox[{"MetricQ", "[", "oldMetric", "]"}]],"Input",CellTags->"before_deletion"],
+
+Cell["8.6. Delete the study, then recover it","Subsubsection"],
+
+Cell["DeleteBackground removes the owned metric, manifold, tensors, chart and automatic aliases. It does not erase the registered source theory or the other backgrounds.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"DeleteBackground", "[", "\"MinkowskiFields\"", "]"}], ";"}]],"Input",CellTags->"delete_background_step_1"],
+
+Cell["The background is no longer listed. The old xAct metric is no longer registered.","Text"],
 
 Cell[BoxData[RowBox[{"KeyExistsQ", "[", RowBox[{"$BG", ",", "\"MinkowskiFields\""}], "]"}]],"Input",CellTags->"delete_background_part_1"],
 
 Cell[BoxData[RowBox[{"MetricQ", "[", "oldMetric", "]"}]],"Input",CellTags->"delete_background_part_2"],
 
-Cell[TextData[{"The two False values confirm that xPlorer removed the study and xAct unregistered its old metric. Recreating a background sets up its automatic names again.\n\nRefresh any aliases you assigned yourself."}],"Text"],
+Cell["RecreateBackground uses the saved recipe to define new owned objects under the same tag. It restores the declared inputs rather than merely creating an empty background.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"CreateBackground", "[", "\"MinkowskiFields\"", "]"}], ";"}]],"Input",CellTags->"recreate_background_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"RecreateBackground","[",RowBox[{"\"MinkowskiFields\"",",","recipe"}],"]"}],";"}]],"Input",CellTags->"lifecycle_rebuild"],
 
-Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"{", RowBox[{"\"t\"", ",", "\"x\"", ",", "\"y\"", ",", "\"z\""}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"recreate_background_step_2"],
+Cell[BoxData[RowBox[{RowBox[{"MetricMatrixOf","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"lifecycle_restored_metric"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"recreate_background_step_3"],
+Cell[BoxData[RowBox[{RowBox[{"AMinkowskiFields","[",RowBox[{"aMinkowskiFields"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"recreate_background"],
 
-Cell[BoxData[RowBox[{RowBox[{"ShowBackground", "[", "\"MinkowskiFields\"", "]"}], "[", "\"FieldComponents\"", "]"}]],"Input",CellTags->"recreate_background"],
+Cell["The metric and raised vector agree with the values before deletion. Any aliases assigned manually to the old symbols must be refreshed. The automatic aliases are created again.","Text"],
 
-Cell[TextData[{"The recreated background starts with an empty field-component registry. Assign new lower components and inspect the raised vector."}],"Text"],
+Cell["8.7. Change the restored study without recreating it","Subsubsection"],
+
+Cell["There is no need to delete the background just to change its inputs. Restore the standard Minkowski metric and give the vector new lower components.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem","[",RowBox[{"\"MinkowskiFields\"",",",RowBox[{"DiagonalMatrix","[",RowBox[{RowBox[{"{",RowBox[{RowBox[{"-","1"}],",","1",",","1",",","1"}],"}"}]}],"]"}]}],"]"}],";"}]],"Input",CellTags->"lifecycle_reset_metric"],
 
 Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "A", ",", RowBox[{"{", RowBox[{"5", ",", "0", ",", "0", ",", "0"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"fresh_vector_step_1"],
 
@@ -1082,29 +1164,83 @@ Cell[BoxData[RowBox[{RowBox[{"Aup", "=", RowBox[{RowBox[{"AMinkowskiFields", "["
 
 Cell[BoxData["Aup"],"Input",CellTags->"fresh_vector"],
 
-Cell[TextData[{"The upper time component is \:22125 for the new input. The Minkowski inverse metric supplies the minus sign."}],"Text"],
+Cell["The upper time component is now -5. This is a new physical input, not a change of tensor definition.","Text"],
 
-Cell[TextData[{"To delete one owned tensor, specify its field key. S has no tracked dependents here. If an equation or rule depends on the field, ",StyleBox["Cascade -> True",FontFamily->"Courier",FontSize->14]," permits removing those dependents within this background.\n\nExternal xAct objects are protected."}],"Text"],
+Cell["8.8. Delete only one owned tensor","Subsubsection"],
+
+Cell["DeletionPlan also accepts an object key. S is an independent tensor in this example. Preview its removal before calling DeleteBackgroundObject.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"fieldPlan","=",RowBox[{"DeletionPlan","[",RowBox[{"\"MinkowskiFields\"",",","\"S\""}],"]"}]}],";"}]],"Input",CellTags->"lifecycle_field_plan"],
+
+Cell[BoxData[RowBox[{"fieldPlan","[","\"CanDelete\"","]"}]],"Input",CellTags->"lifecycle_field_plan_allowed"],
+
+Cell[BoxData[RowBox[{"fieldPlan","[","\"RegisteredExpressions\"","]"}]],"Input",CellTags->"lifecycle_field_plan_exprs"],
 
 Cell[BoxData[RowBox[{RowBox[{"DeleteBackgroundObject", "[", RowBox[{"\"MinkowskiFields\"", ",", "\"S\""}], "]"}], ";"}]],"Input",CellTags->"delete_single_field_step_1"],
 
+Cell["The field key S is gone from this background, but the source tensor S and other independent copies remain.","Text"],
+
 Cell[BoxData[RowBox[{"KeyExistsQ", "[", RowBox[{RowBox[{RowBox[{"ShowBackground", "[", "\"MinkowskiFields\"", "]"}], "[", "\"Field\"", "]"}], ",", "\"S\""}], "]"}]],"Input",CellTags->"delete_single_field"],
 
-Cell[TextData[{"The False result confirms that the key S is gone from this study. The source tensor and its other copies are still available.\n\nTo clear the values of A, use ",StyleBox["ClearFieldComponents",FontFamily->"Courier",FontSize->14],". ",StyleBox["ClearComputedValues",FontFamily->"Courier",FontSize->14]," clears derived geometry and restores declared inputs."}],"Text"],
+Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{RowBox[{"ShowBackground","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"[","\"Field\"","]"}]}],"]"}]],"Input",CellTags->"lifecycle_remaining_fields"],
 
-Cell[BoxData[RowBox[{RowBox[{"ClearFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "A"}], "]"}], ";"}]],"Input",CellTags->"clear_vector_input_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"AMinkowskiFields","[",RowBox[{"aMinkowskiFields"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_vector_preserved"],
 
-Cell[BoxData[RowBox[{RowBox[{"ClearComputedValues", "[", "\"MinkowskiFields\"", "]"}], ";"}]],"Input",CellTags->"clear_vector_input_step_2"],
+Cell["For dependent fields, Cascade -> True authorizes deletion of tracked dependent objects, expressions and rules within this background. Always inspect the cascade plan first. External xAct dependents remain protected.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "A", ",", RowBox[{"{", RowBox[{"5", ",", "0", ",", "0", ",", "0"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"clear_vector_input"],
+Cell["8.9. Remove a connection or a chart","Subsubsection"],
 
-Cell[TextData[{"Deleting a chart resets the coordinate setup. Removing the metric and its dependent family leaves the abstract manifold. Curvature tensors are removed with their connection, and the primary derivative with its metric.\n\nInspect ",StyleBox["DeletionPlan",FontFamily->"Courier",FontSize->14]," before either operation."}],"Text"],
+Cell["The independent connection in AffineStudy can be deleted without deleting its manifold. Preview the actual dependency order first. The primary metric connection is different: it belongs to its metric and cannot be removed independently.","Text"],
 
-Cell[TextData[{"Close the affine study. The three scalar backgrounds remain available."}],"Text"],
+Cell[BoxData[RowBox[{RowBox[{"affinePlan","=",RowBox[{"DeletionPlan","[",RowBox[{"\"AffineStudy\"",",","\"Affine\"",",",RowBox[{"Cascade","\[Rule]","True"}]}],"]"}]}],";"}]],"Input",CellTags->"lifecycle_affine_plan"],
+
+Cell[BoxData[RowBox[{"affinePlan","[","\"CanDelete\"","]"}]],"Input",CellTags->"lifecycle_affine_plan_allowed"],
+
+Cell[BoxData[RowBox[{RowBox[{"DeleteBackgroundObject","[",RowBox[{"\"AffineStudy\"",",","\"Affine\"",",",RowBox[{"Cascade","\[Rule]","True"}]}],"]"}],";"}]],"Input",CellTags->"lifecycle_affine_remove"],
+
+Cell[BoxData[RowBox[{"ConnectionsOf","[",RowBox[{"\"AffineStudy\""}],"]"}]],"Input",CellTags->"lifecycle_affine_connections"],
+
+Cell["The independent connection is no longer present; the Levi-Civita connection is retained. Close this study when it is no longer needed.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"DeleteBackground", "[", "\"AffineStudy\"", "]"}], ";"}]],"Input",CellTags->"close_affine_study"],
 
-Cell[TextData[{"The optional ScalarTheory.wl contains the initial scalar definitions for reuse in a separate notebook."}],"Text"]
+Cell["Deleting a chart removes its coordinate setup, additional managed charts, metric component assignment and managed field/connection inputs. It does not delete the abstract metric or manifold. Save a recipe first if these inputs matter.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"chartPlan","=",RowBox[{"DeletionPlan","[",RowBox[{"\"MinkowskiFields\"",",","\"Chart\"",",",RowBox[{"Cascade","\[Rule]","True"}]}],"]"}]}],";"}]],"Input",CellTags->"lifecycle_chart_plan"],
+
+Cell[BoxData[RowBox[{"chartPlan","[","\"CanDelete\"","]"}]],"Input",CellTags->"lifecycle_chart_plan_allowed"],
+
+Cell["The following are optional destructive operations, not part of the automatic workflow. Run only on a study whose inputs you can afford to lose. Metric deletion removes its dependent geometric family; parameter deletion can remove perturbation dependencies. Inspect the corresponding plan before each operation.","Text"],
+
+Cell["DeleteBackgroundObject[\"MinkowskiFields\", \"Chart\", Cascade -> True]","Program",Evaluatable->False],
+
+Cell["DeletionPlan[\"MinkowskiFields\", \"Metric\", Cascade -> True]","Program",Evaluatable->False],
+
+Cell["DeleteBackgroundObject[\"MinkowskiFields\", \"Metric\", Cascade -> True]","Program",Evaluatable->False],
+
+Cell["8.10. Unregister a theory or close the entire session","Subsubsection"],
+
+Cell["UnregisterTheory changes the source registry for future studies, not native xAct definitions or existing snapshots. To reset the registry itself, first save TheorySnapshot and restore it afterward if desired.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"savedRegistry","=",RowBox[{"TheorySnapshot","[","]"}]}],";"}]],"Input",CellTags->"lifecycle_theory_snapshot"],
+
+Cell[BoxData[RowBox[{RowBox[{"ClearTheory","[","]"}],";"}]],"Input",CellTags->"lifecycle_clear_theory"],
+
+Cell[BoxData[RowBox[{"ShowTheory","[","]"}]],"Input",CellTags->"lifecycle_empty_theory"],
+
+Cell["Existing backgrounds still have their captured theory. Restore the source registry from the saved association. This is not a reconstruction of undefined source tensors.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"With","[",RowBox[{RowBox[{"{",RowBox[{RowBox[{"snapshot","=","savedRegistry"}]}],"}"}],",",RowBox[{"RegisterTheory","[",RowBox[{"snapshot"}],"]"}]}],"]"}],";"}]],"Input",CellTags->"lifecycle_restore_registry"],
+
+Cell[BoxData[RowBox[{"ShowTheory","[","]"}]],"Input",CellTags->"lifecycle_theory_restored"],
+
+Cell["To end the session entirely, ClearBackgrounds attempts to delete every managed background. It may delete some backgrounds before encountering an external dependency in another. Inspect all deletion plans and save any recipes you need first.","Text"],
+
+Cell["ClearBackgrounds[]","Program",Evaluatable->False],
+
+Cell["ClearTheory[]","Program",Evaluatable->False],
+
+Cell["These final two commands are deliberately not evaluated by the tutorial. The scalar backgrounds and the restored vector study remain available for further work. The optional ScalarTheory.wl contains the initial scalar definitions for reuse in a separate notebook.","Text"]
 },Open]]
 },WindowTitle->"xPlorer - Theory and backgrounds",StyleDefinitions->Notebook[{
  Cell[StyleData[StyleDefinitions -> "Default.nb"]],
