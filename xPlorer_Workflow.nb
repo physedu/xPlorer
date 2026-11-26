@@ -21,7 +21,7 @@ Cell[BoxData[RowBox[{RowBox[{"DefManifold", "[", RowBox[{"M", ",", "4", ",", Row
 
 Cell[TextData[{"Define the kinetic and mass terms separately, then form their sum explicitly. The action integrates \:2112 with the metric volume element. Vary \:03c6 at fixed metric and take its variation to have compact support so the boundary term vanishes. The variable ",StyleBox["lagrangian",FontFamily->"Courier",FontSize->11]," holds \:2112 for the variation."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"Lkin", "=", RowBox[{FractionBox["1", "2"], " ", RowBox[{"(", RowBox[{"-", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}]}], ")"}], " ", RowBox[{RowBox[{"CD", "[", "a", "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}]}]}], ";", RowBox[{"Lmass", "=", RowBox[{FractionBox["1", "2"], " ", RowBox[{"(", RowBox[{"-", SuperscriptBox["m", "2"]}], ")"}], " ", SuperscriptBox[RowBox[{"phi", "[", "]"}], "2"]}]}], ";", RowBox[{"lagrangian", "=", RowBox[{"Lkin", "+", "Lmass"}]}], ";", TemplateBox[{"\"\[ScriptCapitalL] = \"", "lagrangian"}, "RowDefault"]}]],"Input",CellTags->"lagrangian"],
+Cell[BoxData[RowBox[{RowBox[{"Lkin", "=", RowBox[{FractionBox["1", "2"], " ", RowBox[{"(", RowBox[{"-", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}]}], ")"}], " ", RowBox[{RowBox[{"CD", "[", "a", "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}]}]}], ";", "\[IndentingNewLine]", RowBox[{"Lmass", "=", RowBox[{FractionBox["1", "2"], " ", RowBox[{"(", RowBox[{"-", SuperscriptBox["m", "2"]}], ")"}], " ", SuperscriptBox[RowBox[{"phi", "[", "]"}], "2"]}]}], ";", "\[IndentingNewLine]", RowBox[{"lagrangian", "=", RowBox[{"Lkin", "+", "Lmass"}]}], ";", "\[IndentingNewLine]", TemplateBox[{"\"\[ScriptCapitalL] = \"", "lagrangian"}, "RowDefault"]}]],"Input",CellTags->"lagrangian"],
 
 Cell[BoxData[RowBox[{RowBox[{"assumptions", "=", RowBox[{RowBox[{"m", "\[Element]", TemplateBox[{}, "Reals"]}], "&&", RowBox[{"m", "\[GreaterEqual]", "0"}]}]}], ";"}]],"Input",CellTags->"conditions"],
 
@@ -39,7 +39,7 @@ Cell[TextData[{"Choose a lookup key, a symbol name and a printed label"}],"Subse
 
 Cell[TextData[{"Try the naming options before registering any equations. Name chooses the lookup key and default symbol base; SymbolBase is optional when they differ. Here the temporary example uses suffix Demo, field label P, metric label q, and Greek abstract indices. Indices must contain as many labels as the source index list. These are abstract indices, not coordinates."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "phi", ",", RowBox[{"Name", "\[Rule]", "\"Materia\""}], ",", RowBox[{"SymbolBase", "\[Rule]", "\"matter\""}], ",", RowBox[{"PrintAs", "\[Rule]", "\"P\""}]}], "]"}], ";", RowBox[{"CreateBackground", "[", RowBox[{"\"NamingExample\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"Demo\""}], ",", RowBox[{"PrintAs", "\[Rule]", "\"q\""}], ",", RowBox[{"Indices", "\[Rule]", RowBox[{"{", RowBox[{"\[Mu]", ",", "\[Nu]", ",", "\[Rho]", ",", "\[Sigma]", ",", "\[Alpha]", ",", "\[Beta]", ",", "\[Gamma]", ",", "\[Delta]"}], "}"}]}]}], "]"}], ";"}]],"Input",CellTags->"naming_setup"],
+Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "phi", ",", RowBox[{"Name", "\[Rule]", "\"Materia\""}], ",", RowBox[{"SymbolBase", "\[Rule]", "\"matter\""}], ",", RowBox[{"PrintAs", "\[Rule]", "\"P\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"CreateBackground", "[", RowBox[{"\"NamingExample\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"Demo\""}], ",", RowBox[{"PrintAs", "\[Rule]", "\"q\""}], ",", RowBox[{"Indices", "\[Rule]", RowBox[{"{", RowBox[{"\[Mu]", ",", "\[Nu]", ",", "\[Rho]", ",", "\[Sigma]", ",", "\[Alpha]", ",", "\[Beta]", ",", "\[Gamma]", ",", "\[Delta]"}], "}"}]}]}], "]"}], ";"}]],"Input",CellTags->"naming_setup"],
 
 Cell[TextData[{"The copied field is matterDemo and the metric is gDemo. The indices muDemo and nuDemo (typed as Greek letters) are printed as Greek indices, not as the original Latin a and b. The same applies to derivative indices. If you only know the registration key, ",StyleBox["BackgroundObject[\"NamingExample\",\"Materia\"]",FontFamily->"Courier",FontSize->11]," retrieves the same head."}],"Text"],
 
@@ -47,11 +47,11 @@ Cell[BoxData[RowBox[{"{", RowBox[{"matterDemo", ",", RowBox[{"matterDemo", "[", 
 
 Cell[TextData[{"If typing Greek symbols is inconvenient, retrieve the actual owned indices with BackgroundIndices and assign ordinary Latin-letter aliases. These are references to the same abstract indices, not new xAct indices. The following metric and derivative still print with Greek indices."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"muDemo", ",", "nuDemo", ",", "rhoDemo"}], "}"}], "=", RowBox[{"BackgroundIndices", "[", RowBox[{"\"NamingExample\"", ",", "3"}], "]"}]}], ";", RowBox[{"{", RowBox[{RowBox[{"gDemo", "[", RowBox[{RowBox[{"-", "muDemo"}], ",", RowBox[{"-", "nuDemo"}]}], "]"}], ",", RowBox[{RowBox[{"CDDemo", "[", RowBox[{"-", "rhoDemo"}], "]"}], "[", RowBox[{"matterDemo", "[", "]"}], "]"}]}], "}"}]}]],"Input",CellTags->"naming_index_aliases"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"muDemo", ",", "nuDemo", ",", "rhoDemo"}], "}"}], "=", RowBox[{"BackgroundIndices", "[", RowBox[{"\"NamingExample\"", ",", "3"}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{RowBox[{"gDemo", "[", RowBox[{RowBox[{"-", "muDemo"}], ",", RowBox[{"-", "nuDemo"}]}], "]"}], ",", RowBox[{RowBox[{"CDDemo", "[", RowBox[{"-", "rhoDemo"}], "]"}], "[", RowBox[{"matterDemo", "[", "]"}], "]"}]}], "}"}]}]],"Input",CellTags->"naming_index_aliases"],
 
 Cell[TextData[{"Clear the three user-defined aliases, close the example and remove its field key. The source scalar \:03c6 is still defined. We will register it below with its default name and label for the three physical backgrounds."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"Clear","[",RowBox[{"muDemo",",","nuDemo",",","rhoDemo"}],"]"}],";",RowBox[{"DeleteBackground", "[", "\"NamingExample\"", "]"}], ";", RowBox[{"UnregisterTheory", "[", RowBox[{"\"Fields\"", ",", "\"Materia\""}], "]"}], ";", RowBox[{"Keys", "[", RowBox[{"TheoryValue", "[", "\"Fields\"", "]"}], "]"}]}]],"Input",CellTags->"close_naming"],
+Cell[BoxData[RowBox[{RowBox[{"Clear","[",RowBox[{"muDemo",",","nuDemo",",","rhoDemo"}],"]"}],";", "\[IndentingNewLine]", RowBox[{"DeleteBackground", "[", "\"NamingExample\"", "]"}], ";", "\[IndentingNewLine]", RowBox[{"UnregisterTheory", "[", RowBox[{"\"Fields\"", ",", "\"Materia\""}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"Keys", "[", RowBox[{"TheoryValue", "[", "\"Fields\"", "]"}], "]"}]}]],"Input",CellTags->"close_naming"],
 
 Cell["Registering theory objects","Subsubsection"],
 
@@ -91,7 +91,7 @@ Cell[TextData[{"Register the scalar and its mass"}],"Subsubsection"],
 
 Cell[TextData[{"Pass only the native tensor head ",StyleBox["phi",FontFamily->"Courier",FontSize->11]," when registering the field. xPlorer infers its rank and symmetry. The registration also gives the parameter m the lookup key ",StyleBox["\"Mass\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "phi", ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";", RowBox[{"RegisterTheory", "[", RowBox[{"\"Parameter\"", ",", "m", ",", RowBox[{"Name", "\[Rule]", "\"Mass\""}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";"}]],"Input",CellTags->"register_matter"],
+Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "phi", ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"RegisterTheory", "[", RowBox[{"\"Parameter\"", ",", "m", ",", RowBox[{"Name", "\[Rule]", "\"Mass\""}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";"}]],"Input",CellTags->"register_matter"],
 
 Cell[BoxData[RowBox[{"KeyTake", "[", RowBox[{RowBox[{"TheoryValue", "[", RowBox[{"\"Fields\"", ",", "\"phi\""}], "]"}], ",", RowBox[{"{", RowBox[{"\"Type\"", ",", "\"Head\"", ",", "\"Rank\"", ",", "\"PrintAs\"", ",", "\"Sector\""}], "}"}]}], "]"}]],"Input",CellTags->"inspect_scalar_spec"],
 
@@ -101,7 +101,7 @@ Cell[TextData[{"For several parameters, pass a list of native constant symbols, 
 
 Cell[TextData[{"Store the kinetic term, mass term and their explicitly defined total in the Lagrangians collection. xPlorer does not add them automatically. Retrieve the total with ",StyleBox["TheoryValue[\"Lagrangians\", \"Lagrangian\"]",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Lagrangian\"", ",", RowBox[{"\"Kinetic\"", "\[Rule]", "Lkin"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";", RowBox[{"RegisterTheory", "[", RowBox[{"\"Lagrangians\"", ",", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{RowBox[{"\"MassTerm\"", "\[Rule]", "Lmass"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"\"Lagrangian\"", "\[Rule]", "lagrangian"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "}"}]}], "}"}]}], "]"}], ";", RowBox[{"TheoryValue", "[", "\"Lagrangians\"", "]"}]}]],"Input",CellTags->"register_lagrangian_only"],
+Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Lagrangian\"", ",", RowBox[{"\"Kinetic\"", "\[Rule]", "Lkin"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"RegisterTheory", "[", RowBox[{"\"Lagrangians\"", ",", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{RowBox[{"\"MassTerm\"", "\[Rule]", "Lmass"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"\"Lagrangian\"", "\[Rule]", "lagrangian"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "}"}]}], "}"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"TheoryValue", "[", "\"Lagrangians\"", "]"}]}]],"Input",CellTags->"register_lagrangian_only"],
 
 Cell[TextData[{"Expressions and Lagrangians are separate collections, both available on backgrounds. Register the scalar equation under the key ScalarEq. Its original variable name scalarEq determines its suffixed alias. For a formula entered directly, Head specifies the alias base."}],"Text"],
 
@@ -113,11 +113,11 @@ Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Expressions\"", "
 
 Cell[TextData[{"Define and register a rank-two expression Eab from the Hessian and a mass term. The cell displays the registered formula or a registration Failure; check this before creating backgrounds. Its definition imposes no field equation."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"Eab", "=", RowBox[{RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "b"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}], "]"}], "+", RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"g", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], " ", RowBox[{"phi", "[", "]"}]}]}]}], ";", RowBox[{"eabRegistration", "=", RowBox[{"RegisterTheory", "[", RowBox[{"\"Expression\"", ",", RowBox[{"\"Eab\"", "\[Rule]", "Eab"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}]}], ";", RowBox[{"If", "[", RowBox[{RowBox[{"FailureQ", "[", "eabRegistration", "]"}], ",", "eabRegistration", ",", RowBox[{"TheoryValue", "[", RowBox[{"\"Expressions\"", ",", "\"Eab\""}], "]"}]}], "]"}]}]],"Input",CellTags->"register_eab"],
+Cell[BoxData[RowBox[{RowBox[{"Eab", "=", RowBox[{RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "b"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}], "]"}], "+", RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"g", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], " ", RowBox[{"phi", "[", "]"}]}]}]}], ";", "\[IndentingNewLine]", RowBox[{"eabRegistration", "=", RowBox[{"RegisterTheory", "[", RowBox[{"\"Expression\"", ",", RowBox[{"\"Eab\"", "\[Rule]", "Eab"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"If", "[", RowBox[{RowBox[{"FailureQ", "[", "eabRegistration", "]"}], ",", "eabRegistration", ",", RowBox[{"TheoryValue", "[", RowBox[{"\"Expressions\"", ",", "\"Eab\""}], "]"}]}], "]"}]}]],"Input",CellTags->"register_eab"],
 
 Cell[TextData[{"For a named Wolfram expression, give an explicit lookup key. This registers the wave operator under ",StyleBox["\"boxPhi\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"boxPhi", "=", RowBox[{RowBox[{"CD", "[", "a", "]"}], "[", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}], "]"}]}], ";", RowBox[{"RegisterTheory", "[", RowBox[{"\"Expression\"", ",", RowBox[{"\"boxPhi\"", "\[Rule]", "boxPhi"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";"}]],"Input",CellTags->"register_named_expression"],
+Cell[BoxData[RowBox[{RowBox[{"boxPhi", "=", RowBox[{RowBox[{"CD", "[", "a", "]"}], "[", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"RegisterTheory", "[", RowBox[{"\"Expression\"", ",", RowBox[{"\"boxPhi\"", "\[Rule]", "boxPhi"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";"}]],"Input",CellTags->"register_named_expression"],
 
 Cell[TextData[{"Store the assumptions and variational conditions alongside the theory. These entries document the calculation. Pass assumptions to the operations that use them."}],"Text"],
 
@@ -141,7 +141,7 @@ Cell[TextData[{"2. Create and inspect independent backgrounds"}],"Section"],
 
 Cell[TextData[{"Create three backgrounds from the registered theory. Each gets its own manifold, metric and fields. The coordinate matrices in section 5 will specify the three geometries."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"CreateBackground", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"M\""}]}], "]"}], ";", RowBox[{"CreateBackground", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"Schw\""}]}], "]"}], ";", RowBox[{"CreateBackground", "[", "\"FLRW\"", "]"}], ";"}]],"Input",CellTags->"create_manifolds"],
+Cell[BoxData[RowBox[{RowBox[{"CreateBackground", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"M\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"CreateBackground", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"SymbolSuffix", "\[Rule]", "\"Schw\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"CreateBackground", "[", "\"FLRW\"", "]"}], ";"}]],"Input",CellTags->"create_manifolds"],
 
 Cell[TextData[{"Check that Eab is registered in the current theory, is included in the Schwarzschild snapshot and has an installed alias. All three should be True in a fresh kernel. CreateBackground with an existing tag returns the existing snapshot; it does not refresh it. If the second check is False, recreate the study only after preserving any desired data, or restart the kernel and run from the beginning. An alias conflict alone does not remove a registered expression."}],"Text"],
 
@@ -197,9 +197,9 @@ Cell[TextData[{"The copied connection has its own curvature tensors. The Riemann
 
 Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"RiemannCDSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}], ",", RowBox[{"-", "cSchw"}], ",", RowBox[{"-", "dSchw"}]}], "]"}], ",", RowBox[{"RicciCDSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}]}], "]"}], ",", RowBox[{"RicciScalarCDSchw", "[", "]"}]}], "}"}]],"Input",CellTags->"riemann_tensor"],
 
-Cell["Change only the printed labels of the scalar, metric and covariant derivative. xAct uses a pair of derivative markers: the first is the postfix separator (|), and the second is the prefix symbol (D). These settings do not change the mathematical objects or the registry keys.","Text"],
+Cell["Change an individual label with PrintAs, or several labels together with rules. The following calls change presentation only. xAct uses a pair of derivative markers: the first is the postfix separator (|), and the second is the prefix symbol (D). These settings do not change the mathematical objects or the registry keys.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "phi", ",", RowBox[{"PrintAs", "\[Rule]", "\"\[Psi]\""}]}], "]"}], ";", RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "g", ",", RowBox[{"PrintAs", "\[Rule]", "\"q\""}]}], "]"}], ";", RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "CD", ",", RowBox[{"PrintAs", "\[Rule]", RowBox[{"{", RowBox[{"\"|\"", ",", "\"D\""}], "}"}]}]}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{"phiSchw", "[", "]"}], ",", RowBox[{"gSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}]}], "]"}], ",", RowBox[{RowBox[{"CDSchw", "[", RowBox[{"-", "aSchw"}], "]"}], "[", RowBox[{"phiSchw", "[", "]"}], "]"}]}], "}"}]}]],"Input",CellTags->"custom_presentation"],
+Cell[BoxData[RowBox[{RowBox[{"SetPresentation","[",RowBox[{"\"Schwarzschild\"",",","phi",",",RowBox[{"PrintAs","\[Rule]","\"ψ\""}]}],"]"}],";","\[IndentingNewLine]",RowBox[{"SetPresentation","[",RowBox[{"\"Schwarzschild\"",",",RowBox[{"\"phi\"","\[Rule]","\"ψ\""}],",",RowBox[{"\"Metric\"","\[Rule]","\"q\""}],",",RowBox[{"\"CovD\"","\[Rule]",RowBox[{"{",RowBox[{"\"|\"",",","\"D\""}],"}"}]}]}],"]"}],";","\[IndentingNewLine]",RowBox[{"{",RowBox[{RowBox[{"phiSchw","[","]"}],",",RowBox[{"gSchw","[",RowBox[{RowBox[{"-","aSchw"}],",",RowBox[{"-","bSchw"}]}],"]"}],",",RowBox[{RowBox[{"CDSchw","[",RowBox[{RowBox[{"-","aSchw"}]}],"]"}],"[",RowBox[{"phiSchw","[","]"}],"]"}]}],"}"}]}]],"Input",CellTags->"custom_presentation"],
 
 Cell["To see the first derivative marker, display the same gradient in postfix notation. The vertical bar is a display separator, not a mathematical operation.","Text"],
 
@@ -207,7 +207,7 @@ Cell[BoxData[RowBox[{RowBox[{RowBox[{"CDSchw","[",RowBox[{RowBox[{"-","aSchw"}]}
 
 Cell["PrintAs -> Automatic restores the inherited label for each object. This leaves the source theory and all other backgrounds unchanged.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "phi", ",", RowBox[{"PrintAs", "\[Rule]", "Automatic"}]}], "]"}], ";", RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "g", ",", RowBox[{"PrintAs", "\[Rule]", "Automatic"}]}], "]"}], ";", RowBox[{"SetPresentation", "[", RowBox[{"\"Schwarzschild\"", ",", "CD", ",", RowBox[{"PrintAs", "\[Rule]", "Automatic"}]}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{"phiSchw", "[", "]"}], ",", RowBox[{"gSchw", "[", RowBox[{RowBox[{"-", "aSchw"}], ",", RowBox[{"-", "bSchw"}]}], "]"}], ",", RowBox[{RowBox[{"CDSchw", "[", RowBox[{"-", "aSchw"}], "]"}], "[", RowBox[{"phiSchw", "[", "]"}], "]"}]}], "}"}]}]],"Input",CellTags->"reset_presentation"],
+Cell[BoxData[RowBox[{RowBox[{"SetPresentation","[",RowBox[{"\"Schwarzschild\"",",",RowBox[{"\"phi\"","\[Rule]","Automatic"}],",",RowBox[{"\"Metric\"","\[Rule]","Automatic"}],",",RowBox[{"\"CovD\"","\[Rule]","Automatic"}]}],"]"}],";","\[IndentingNewLine]",RowBox[{"{",RowBox[{RowBox[{"phiSchw","[","]"}],",",RowBox[{"gSchw","[",RowBox[{RowBox[{"-","aSchw"}],",",RowBox[{"-","bSchw"}]}],"]"}],",",RowBox[{RowBox[{"CDSchw","[",RowBox[{RowBox[{"-","aSchw"}]}],"]"}],"[",RowBox[{"phiSchw","[","]"}],"]"}]}],"}"}]}]],"Input",CellTags->"reset_presentation"],
 
 Cell["Notation and expression views","Subsubsection"],
 
@@ -215,11 +215,11 @@ Cell["SetXPlorerPreferences changes session-wide defaults. SetNotation overrides
 
 Cell["Choose a prefix derivative and fraction notation for the session. Both gradients inherit the session preference.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", RowBox[{RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}], ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Prefix\""}]}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"session_prefix"],
+Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", RowBox[{RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}], ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Prefix\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"session_prefix"],
 
 Cell["Override only Schwarzschild: its gradient now uses postfix notation and a background label. Minkowski keeps the session defaults.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Postfix\""}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "True"}]}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"local_postfix"],
+Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"CovariantStyle", "\[Rule]", "\"Postfix\""}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "True"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"local_postfix"],
 
 Cell["Use postfix application, expr // PrettyExp, to display an expression using its current notation settings. The background is inferred when possible.","Text"],
 
@@ -227,15 +227,15 @@ Cell[BoxData[RowBox[{"gradPhi", "//", "PrettyExp"}]],"Input",CellTags->"pretty_d
 
 Cell["For a single output, override the notation with PrettyExp options. Compare prefix and postfix views of the same gradient. Normal recovers the original expression.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"prettyGradient","=",RowBox[{"gradPhi","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Postfix\""}],",",RowBox[{"ShowBackgroundLabel","\[Rule]","True"}]}],"]"}]}]}],";",RowBox[{"{",RowBox[{RowBox[{"gradPhi","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Prefix\""}],",",RowBox[{"ShowBackgroundLabel","\[Rule]","False"}]}],"]"}]}],",","prettyGradient"}],"}"}]}]],"Input",CellTags->"pretty_gradient"],
+Cell[BoxData[RowBox[{RowBox[{"prettyGradient","=",RowBox[{"gradPhi","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Postfix\""}],",",RowBox[{"ShowBackgroundLabel","\[Rule]","True"}]}],"]"}]}]}],";", "\[IndentingNewLine]", RowBox[{"{",RowBox[{RowBox[{"gradPhi","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Prefix\""}],",",RowBox[{"ShowBackgroundLabel","\[Rule]","False"}]}],"]"}]}],",","prettyGradient"}],"}"}]}]],"Input",CellTags->"pretty_gradient"],
 
 Cell["Remove the local overrides with Automatic to inherit session defaults again.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"CovariantStyle", "\[Rule]", "Automatic"}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "Automatic"}]}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"restore_local"],
+Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"CovariantStyle", "\[Rule]", "Automatic"}], ",", RowBox[{"ShowBackgroundLabel", "\[Rule]", "Automatic"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"restore_local"],
 
 Cell["Reset session preferences to native defaults. This does not remove existing background-specific overrides.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", "]"}], ";", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"session_reset"],
+Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", "]"}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{RowBox[{RowBox[{"CDM", "[", RowBox[{"-", "aM"}], "]"}], "[", RowBox[{"phiM", "[", "]"}], "]"}], ",", "gradPhi"}], "}"}]}]],"Input",CellTags->"session_reset"],
 
 Cell["Session preferences can also specify printed labels for future backgrounds. For reference, the following non-evaluatable example uses registered object keys. Each SetXPlorerPreferences call replaces the previous session preferences; it does not rename existing tensors.","Text"],
 
@@ -251,17 +251,15 @@ Cell[TextData[{"4. Specialize a case and return to the general one"}],"Section"]
 
 Cell[TextData[{"Take the massless limit on Schwarzschild. ContractMetric and ToCanonical leave the scalar d'Alembertian of the field; the repeated upper and lower derivative indices are summed. ",StyleBox["AddRules",FontFamily->"Courier",FontSize->11]," stores the replacement locally. ",StyleBox["UseExpression",FontFamily->"Courier",FontSize->11]," evaluates the registered equation with that replacement. The source parameter m and the other backgrounds retain their values."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"AddRules", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"{", RowBox[{"m", "\[Rule]", "0"}], "}"}]}], "]"}], ";", RowBox[{"masslessEq", "=", RowBox[{"ToCanonical", "[", RowBox[{"ContractMetric", "[", RowBox[{"UseExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"ScalarEq\""}], "]"}], "]"}], "]"}]}], ";", "masslessEq"}]],"Input",CellTags->"massless_rules"],
+Cell[BoxData[RowBox[{RowBox[{"AddRules","[",RowBox[{"\"Schwarzschild\"",",",RowBox[{"{",RowBox[{RowBox[{"m","\[Rule]","0"}]}],"}"}]}],"]"}],";","\[IndentingNewLine]",RowBox[{"masslessEq","=",RowBox[{RowBox[{RowBox[{"UseExpression","[",RowBox[{"\"Schwarzschild\"",",","\"ScalarEq\""}],"]"}],"//","ContractMetric"}],"//","ToCanonical"}]}],";","\[IndentingNewLine]","masslessEq"}]],"Input",CellTags->"massless_rules"],
 
-Cell[TextData[{"Verify that the result has no free indices and is exactly the transported scalar wave operator. Both checks should return True."}],"Text"],
+Cell[TextData[{"First display the original expression with its mass term. The shortcut ",StyleBox["EabSchw",FontFamily->"Courier",FontSize->11]," gives the general formula and ",StyleBox["UseExpression",FontFamily->"Courier",FontSize->11]," gives the active massless case."}],"Text"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{RowBox[{"FindFreeIndices", "[", "masslessEq", "]"}], "===", RowBox[{"IndexList", "[", "]"}]}], ",", RowBox[{RowBox[{"ToCanonical", "[", RowBox[{"ContractMetric", "[", RowBox[{"masslessEq", "-", RowBox[{"PortExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "boxPhi"}], "]"}]}], "]"}], "]"}], "===", "0"}]}], "}"}]],"Input",CellTags->"massless_contraction"],
+Cell[BoxData["EabSchw"],"Input",CellTags->"compare_mass_terms"],
 
-Cell[TextData[{"Compare the mass term in the two columns. The shortcut ",StyleBox["EabSchw",FontFamily->"Courier",FontSize->11]," gives the general formula and ",StyleBox["UseExpression",FontFamily->"Courier",FontSize->11]," gives the active massless case."}],"Text"],
+Cell["Apply the active massless specialization without changing the registered general formula.","Text"],
 
-Cell[BoxData[RowBox[{"Grid", "[", RowBox[{RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"\"General Eab on Schw\"", ",", "\"Active massless case\""}], "}"}], ",", RowBox[{"{", RowBox[{"EabSchw", ",", RowBox[{"UseExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Eab\""}], "]"}]}], "}"}]}], "}"}], ",", RowBox[{"Alignment", "\[Rule]", "Left"}], ",", RowBox[{"Frame", "\[Rule]", "All"}]}], "]"}]],"Input",CellTags->"compare_mass_terms"],
-
-Cell[BoxData[RowBox[{"{", RowBox[{RowBox[{"FreeQ", "[", RowBox[{"EabSchw", ",", "m"}], "]"}], ",", RowBox[{"FreeQ", "[", RowBox[{RowBox[{"UseExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Eab\""}], "]"}], ",", "m"}], "]"}], ",", RowBox[{RowBox[{"ApplyRules", "[", RowBox[{"\"Schwarzschild\"", ",", "EabSchw"}], "]"}], "===", RowBox[{"UseExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Eab\""}], "]"}]}]}], "}"}]],"Input",CellTags->"alias_specialization"],
+Cell[BoxData[RowBox[{"UseExpression","[",RowBox[{"\"Schwarzschild\"",",","\"Eab\""}],"]"}]],"Input",CellTags->"specialized_eab"],
 
 Cell[TextData[{StyleBox["ShowRules",FontFamily->"Courier",FontSize->11]," lists the active replacements. Use ",StyleBox["ApplyRules",FontFamily->"Courier",FontSize->11]," to apply them to an expression you already have."}],"Text"],
 
@@ -317,9 +315,11 @@ Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem", "[", RowBox[{"\"Minkowski\"", "
 
 Cell[TextData[{"Inspect the metric as an xCoba component tensor"}],"Subsection"],
 
-Cell[TextData[{"xPlorer uses ",StyleBox["MetricInBasis",FontFamily->"Courier",FontSize->11]," for the existing metric. To inspect the same entries as a native xCoba component tensor, pair the matrix with its bases in ",StyleBox["CTensor",FontFamily->"Courier",FontSize->11],". The two negative basis slots give the two lower indices. ",StyleBox["CTensorArray",FontFamily->"Courier",FontSize->11]," retrieves the matrix."}],"Text"],
+Cell["MetricMatrixOf retrieves the declared covariant metric matrix in the primary managed chart. To package these entries as a native xCoba CTensor, specify the array and signed bases. The first argument stores the array; the second stores the basis and variance of each slot.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"cartBasis", "=", RowBox[{"BasisOf", "[", "\"Minkowski\"", "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"metricCTensor", "=", RowBox[{"CTensor", "[", RowBox[{RowBox[{"MetricMatrixOf", "[", "\"Minkowski\"", "]"}], ",", RowBox[{"{", RowBox[{RowBox[{"-", "cartBasis"}], ",", RowBox[{"-", "cartBasis"}]}], "}"}]}], "]"}]}], ";", "\[IndentingNewLine]", TagBox[RowBox[{"CTensorArray", "[", "metricCTensor", "]"}], Function[BoxForm`e$, MatrixForm[BoxForm`e$]]]}]],"Input",CellTags->"native_metric_data"],
+Cell[BoxData[RowBox[{RowBox[{"cartBasis","=",RowBox[{"BasisOf","[",RowBox[{"\"Minkowski\""}],"]"}]}],";","\[IndentingNewLine]",RowBox[{"metricCTensor","=",RowBox[{"CTensor","[",RowBox[{RowBox[{"MetricMatrixOf","[",RowBox[{"\"Minkowski\""}],"]"}],",",RowBox[{"{",RowBox[{RowBox[{"-","cartBasis"}],",",RowBox[{"-","cartBasis"}]}],"}"}]}],"]"}]}],";","\[IndentingNewLine]",RowBox[{RowBox[{"metricCTensor","[[","1","]]"}],"//","MatrixForm"}]}]],"Input",CellTags->"native_metric_data"],
+
+Cell[BoxData[RowBox[{"metricCTensor","[[","2","]]"}]],"Input",CellTags->"native_metric_basis"],
 
 Cell[TextData[{"Alternative \:2014 two native xCoba setups"}],"Subsubsection"],
 
@@ -343,7 +343,11 @@ Cell[TextData[{"The scale factor s(t) is positive. Its derivative determines whe
 
 Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "s", "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetCMetricSystem", "[", RowBox[{"\"FLRW\"", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"]}], "}"}], "]"}]}], "]"}], ",", RowBox[{"Assumptions", "\[Rule]", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"assumptions", "&&", RowBox[{RowBox[{"s", "[", "t", "]"}], ">", "0"}]}]}], "]"}]}]}], "]"}], ";"}]],"Input",CellTags->"flrw_metric"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{TagBox[RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "\"Metric\""}], "]"}], Function[BoxForm`e$, MatrixForm[BoxForm`e$]]], ",", TagBox[RowBox[{"ToComponents", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Metric\""}], "]"}], Function[BoxForm`e$, MatrixForm[BoxForm`e$]]], ",", TagBox[RowBox[{"ToComponents", "[", RowBox[{"\"FLRW\"", ",", "\"Metric\""}], "]"}], Function[BoxForm`e$, MatrixForm[BoxForm`e$]]]}], "}"}]],"Input",CellTags->"metric_matrices"],
+Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",","\"Metric\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrices"],
+
+Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"Schwarzschild\"",",","\"Metric\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrix_schw"],
+
+Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"FLRW\"",",","\"Metric\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrix_flrw"],
 
 Cell[TextData[{"A general scalar field in Minkowski"}],"Subsection"],
 
@@ -359,21 +363,15 @@ Cell["Compare native derivative orders, fractions and partial-derivative operato
 
 Cell[BoxData[RowBox[{"{",RowBox[{RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Native\""}]}],"]"}]}],",",RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Fraction\""}]}],"]"}]}],",",RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Partial\""}]}],"]"}]}]}],"}"}]],"Input",CellTags->"partial_view"],
 
-Cell[BoxData[RowBox[{RowBox[{"Normal", "[", RowBox[{"PrettyExp", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"eqMink", "\[Equal]", "0"}]}], "]"}], "]"}], "===", RowBox[{"(", RowBox[{"eqMink", "\[Equal]", "0"}], ")"}]}]],"Input",CellTags->"view_identity"],
-
 Cell[TextData[{StyleBox["Normal",FontFamily->"Courier",FontSize->11]," recovers the underlying equation, which is also retained when the display is copied. To use comma notation throughout Minkowski, set it once with ",StyleBox["SetNotation",FontFamily->"Courier",FontSize->11]," and evaluate ",StyleBox["eqMink",FontFamily->"Courier",FontSize->11]," again. The following cell removes the local override with Automatic, returning to the session fraction style."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"PartialStyle", "\[Rule]", "\"Comma\""}]}], "]"}], ";", "\[IndentingNewLine]", "eqMink"}]],"Input",CellTags->"automatic_comma"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"PartialStyle", "\[Rule]", "Automatic"}]}], "]"}], ";", "eqMink"}]],"Input",CellTags->"automatic_fraction"],
+Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"PartialStyle", "\[Rule]", "Automatic"}]}], "]"}], ";", "\[IndentingNewLine]", "eqMink"}]],"Input",CellTags->"automatic_fraction"],
 
-Cell["If automatic background inference is ambiguous, supply an explicit tag with expr // PrettyExp[\"Schwarzschild\"]. This selects that background's display settings; it does not transport the expression.","Text"],
+Cell[TextData[{"Analytical reference (not an output): with signature (\:2212,+,+,+), the time and spatial second derivatives enter with opposite signs."}],"Text"],
 
-Cell[BoxData[RowBox[{"gradPhi", "//", RowBox[{"PrettyExp","[","\"Schwarzschild\"","]"}]}]],"Input",CellTags->"covariant_view"],
-
-Cell[TextData[{"With signature (\:2212,+,+,+), the time and spatial second derivatives enter with opposite signs."}],"Text"],
-
-Cell[BoxData[TagBox[FormBox[RowBox[{RowBox[{RowBox[{"-", TagBox[FractionBox[RowBox[{SuperscriptBox["\[PartialD]", "2"], RowBox[{"\[Phi]", "(", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], ")"}]}], RowBox[{"\[PartialD]", SuperscriptBox["t", "2"]}], MultilineFunction -> None], "InactiveDTraditional"]}], "+", TagBox[FractionBox[RowBox[{SuperscriptBox["\[PartialD]", "2"], RowBox[{"\[Phi]", "(", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], ")"}]}], RowBox[{"\[PartialD]", SuperscriptBox["x", "2"]}], MultilineFunction -> None], "InactiveDTraditional"], "+", TagBox[FractionBox[RowBox[{SuperscriptBox["\[PartialD]", "2"], RowBox[{"\[Phi]", "(", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], ")"}]}], RowBox[{"\[PartialD]", SuperscriptBox["y", "2"]}], MultilineFunction -> None], "InactiveDTraditional"], "+", TagBox[FractionBox[RowBox[{SuperscriptBox["\[PartialD]", "2"], RowBox[{"\[Phi]", "(", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], ")"}]}], RowBox[{"\[PartialD]", SuperscriptBox["z", "2"]}], MultilineFunction -> None], "InactiveDTraditional"], "+", RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"(", RowBox[{"-", RowBox[{"\[Phi]", "(", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], ")"}]}], ")"}]}]}], "\[LongEqual]", "0"}], TraditionalForm], TraditionalForm, Editable -> True]],"DisplayFormula"],
+Cell[BoxData[TagBox[FormBox[RowBox[{RowBox[{RowBox[{"-", TagBox[FractionBox[RowBox[{SuperscriptBox["\[PartialD]", "2"], RowBox[{"\[Phi]", "(", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], ")"}]}], RowBox[{"\[PartialD]", SuperscriptBox["t", "2"]}], MultilineFunction -> None], "InactiveDTraditional"]}], "+", TagBox[FractionBox[RowBox[{SuperscriptBox["\[PartialD]", "2"], RowBox[{"\[Phi]", "(", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], ")"}]}], RowBox[{"\[PartialD]", SuperscriptBox["x", "2"]}], MultilineFunction -> None], "InactiveDTraditional"], "+", TagBox[FractionBox[RowBox[{SuperscriptBox["\[PartialD]", "2"], RowBox[{"\[Phi]", "(", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], ")"}]}], RowBox[{"\[PartialD]", SuperscriptBox["y", "2"]}], MultilineFunction -> None], "InactiveDTraditional"], "+", TagBox[FractionBox[RowBox[{SuperscriptBox["\[PartialD]", "2"], RowBox[{"\[Phi]", "(", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], ")"}]}], RowBox[{"\[PartialD]", SuperscriptBox["z", "2"]}], MultilineFunction -> None], "InactiveDTraditional"], "-", RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"\[Phi]", "(", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], ")"}]}]}], "\[LongEqual]", "0"}], TraditionalForm], TraditionalForm, Editable -> True]],"DisplayFormula"],
 
 Cell[TextData[{"Evaluate the registered Lagrangian with the same Minkowski profile."}],"Text"],
 
@@ -389,11 +387,11 @@ Cell[BoxData[RowBox[{RowBox[{"eqSchw", "=", RowBox[{"ToComponents", "[", RowBox[
 
 Cell["For a radial profile depending on one coordinate, prime notation is often more compact. Change only the Schwarzschild output style, then restore the session default.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"PartialStyle", "\[Rule]", "\"Prime\""}]}], "]"}], ";", RowBox[{"eqSchw", "\[Equal]", "0"}]}]],"Input",CellTags->"radial_prime"],
+Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"PartialStyle", "\[Rule]", "\"Prime\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"eqSchw", "\[Equal]", "0"}]}]],"Input",CellTags->"radial_prime"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"PartialStyle", "\[Rule]", "Automatic"}]}], "]"}], ";", RowBox[{"eqSchw", "\[Equal]", "0"}]}]],"Input",CellTags->"radial_restore"],
+Cell[BoxData[RowBox[{RowBox[{"SetNotation", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"PartialStyle", "\[Rule]", "Automatic"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"eqSchw", "\[Equal]", "0"}]}]],"Input",CellTags->"radial_restore"],
 
-Cell[TextData[{"The radial equation has the following divergence form."}],"Text"],
+Cell[TextData[{"Analytical reference (not an output): the radial equation can be written in divergence form."}],"Text"],
 
 Cell[BoxData[TagBox[FormBox[RowBox[{RowBox[{FractionBox[TagBox[TagBox[RowBox[{FractionBox["\[PartialD]", RowBox[{"\[PartialD]", "r"}]], RowBox[{"(", RowBox[{SuperscriptBox["r", "2"], " ", RowBox[{"(", RowBox[{"1", "-", FractionBox[RowBox[{"2", " ", "Mbh"}], "r"]}], ")"}], " ", TagBox[FractionBox[RowBox[{"\[PartialD]", RowBox[{"u", "(", "r", ")"}]}], RowBox[{"\[PartialD]", "r"}], MultilineFunction -> None], "InactiveDTraditional"]}], ")"}]}], D], "InactiveDTraditional"], SuperscriptBox["r", "2"]], "-", RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"u", "(", "r", ")"}]}]}], "\[LongEqual]", "0"}], TraditionalForm], TraditionalForm, Editable -> True]],"DisplayFormula"],
 
@@ -403,11 +401,15 @@ Cell[BoxData[RowBox[{RowBox[{"radialEq", "=", RowBox[{FractionBox[RowBox[{Subscr
 
 Cell[TextData[{"Export the radial equation and recover an abstract formula"}],"Subsection"],
 
-Cell[TextData[{StyleBox["TeXForm",FontFamily->"Courier",FontSize->11]," gives the radial equation as LaTeX. For the registered tensor Eab, ",StyleBox["ExpressionText",FontFamily->"Courier",FontSize->11]," can return LaTeX or an evaluable command. The equality below checks that the command recovers ",StyleBox["EabSchw",FontFamily->"Courier",FontSize->11]," in the initialized study."}],"Text"],
+Cell["ExpressionText exports a calculated expression as LaTeX using its presentation, without private background contexts. For a registered expression, InputForm returns a reusable lookup command; TeX returns mathematical text.","Text"],
 
-Cell[BoxData[RowBox[{"ToString", "[", RowBox[{"TeXForm", "[", RowBox[{"eqSchw", "\[Equal]", "0"}], "]"}], "]"}]],"Input",CellTags->"tex_radial"],
+Cell[BoxData[RowBox[{"ExpressionText","[",RowBox[{RowBox[{"eqSchw","\[Equal]","0"}],",","\"TeX\""}],"]"}]],"Input",CellTags->"tex_radial"],
 
-Cell[BoxData[RowBox[{RowBox[{"replayEab", "=", RowBox[{"ExpressionText", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Eab\"", ",", "\"InputForm\""}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{"replayEab", ",", RowBox[{RowBox[{"ToExpression", "[", "replayEab", "]"}], "===", "EabSchw"}], ",", RowBox[{RowBox[{"StringLength", "[", RowBox[{"ExpressionText", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Eab\"", ",", "\"TeX\""}], "]"}], "]"}], ">", "0"}]}], "}"}]}]],"Input",CellTags->"document_formula"],
+Cell[BoxData[RowBox[{RowBox[{"replayEab","=",RowBox[{"ExpressionText","[",RowBox[{"\"Schwarzschild\"",",","\"Eab\"",",","\"InputForm\""}],"]"}]}],";","\[IndentingNewLine]","replayEab"}]],"Input",CellTags->"document_formula"],
+
+Cell[BoxData[RowBox[{"ToExpression","[",RowBox[{"replayEab"}],"]"}]],"Input",CellTags->"replay_formula"],
+
+Cell[BoxData[RowBox[{"ExpressionText","[",RowBox[{"\"Schwarzschild\"",",","\"Eab\"",",","\"TeX\""}],"]"}]],"Input",CellTags->"tex_abstract"],
 
 Cell[TextData[{"With TexAct installed, choose ",StyleBox["\"TexAct\"",FontFamily->"Courier",FontSize->11]," in ",StyleBox["ExpressionText",FontFamily->"Courier",FontSize->11]," for its tensor-specific LaTeX notation. To reproduce the calculation in another kernel, supply the notebook and its matching package."}],"Text"],
 
@@ -427,7 +429,7 @@ Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "q", "]"}], ";", "\[Inden
 
 Cell[BoxData[RowBox[{RowBox[{"eqFLRW", "=", RowBox[{"ToComponents", "[", RowBox[{"\"FLRW\"", ",", "\"ScalarEq\""}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"eqFLRW", "\[Equal]", "0"}]}]],"Input",CellTags->"flrw_equation"],
 
-Cell[TextData[{"Multiplying the computed equation by \:22121 gives the usual cosmological form."}],"Text"],
+Cell[TextData[{"Analytical reference (not an output): multiplying the computed equation by \:22121 gives the usual cosmological form."}],"Text"],
 
 Cell[BoxData[TagBox[FormBox[RowBox[{RowBox[{RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"q", "(", "t", ")"}]}], "+", RowBox[{SuperscriptBox["q", "\[Prime]\[Prime]", MultilineFunction -> None], "(", "t", ")"}], "+", FractionBox[RowBox[{"3", " ", RowBox[{SuperscriptBox["q", "\[Prime]", MultilineFunction -> None], "(", "t", ")"}], " ", RowBox[{SuperscriptBox["s", "\[Prime]", MultilineFunction -> None], "(", "t", ")"}]}], RowBox[{"s", "(", "t", ")"}]]}], "\[LongEqual]", "0"}], TraditionalForm], TraditionalForm, Editable -> True]],"DisplayFormula"],
 
@@ -447,9 +449,29 @@ Cell[TextData[{"A zero residual verifies the plane wave for the stated dispersio
 
 Cell[TextData[{"Named profiles on one geometry"}],"Subsection"],
 
-Cell[TextData[{"RegisterProfile saves field inputs without changing the calculation; repeated calls for one name add field/order entries. ActivateProfile overlays the stored entries on the current field inputs, preserving the others. The geometry is reused. Here the wave profile is saved, a radial profile gives the wave operator 4, and the wave is restored."}],"Text"],
+Cell[TextData[{"RegisterProfile saves field inputs without changing the calculation; repeated calls for one name add field/order entries. ActivateProfile overlays the stored entries on the current field inputs, preserving the others. The geometry is reused. Here the plane wave is saved and a quadratic transverse profile is registered."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"RegisterProfile", "[", RowBox[{"\"Minkowski\"", ",", "\"PlaneWave\""}], "]"}], ";", RowBox[{"RegisterProfile", "[", RowBox[{"\"Minkowski\"", ",", "\"Radial\"", ",", "phi", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{SuperscriptBox["x", "2"], "+", SuperscriptBox["y", "2"]}]}], "]"}]}], "]"}], ";", RowBox[{"ActivateProfile", "[", RowBox[{"\"Minkowski\"", ",", "\"Radial\""}], "]"}], ";", RowBox[{"profileBox", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", "boxPhi"}], "]"}]}], ";", RowBox[{"ActivateProfile", "[", RowBox[{"\"Minkowski\"", ",", "\"PlaneWave\""}], "]"}], ";", RowBox[{"{", RowBox[{RowBox[{"Keys", "[", RowBox[{"ShowProfiles", "[", "\"Minkowski\"", "]"}], "]"}], ",", "profileBox", ",", RowBox[{RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"phi", "[", "]"}]}], "]"}], "===", RowBox[{"Cos", "[", RowBox[{RowBox[{"omega", " ", "tM"}], "-", RowBox[{"k", " ", "zM"}]}], "]"}]}]}], "}"}]}]],"Input",CellTags->"named_profiles"],
+Cell[BoxData[RowBox[{RowBox[{"RegisterProfile","[",RowBox[{"\"Minkowski\"",",","\"PlaneWave\""}],"]"}],";","\[IndentingNewLine]",RowBox[{"RegisterProfile","[",RowBox[{"\"Minkowski\"",",","\"Radial\"",",","phi",",",RowBox[{"Function","[",RowBox[{RowBox[{"{",RowBox[{"t",",","x",",","y",",","z"}],"}"}],",",RowBox[{SuperscriptBox["x","2"],"+",SuperscriptBox["y","2"]}]}],"]"}]}],"]"}],";","\[IndentingNewLine]",RowBox[{"Keys","[",RowBox[{RowBox[{"ShowProfiles","[",RowBox[{"\"Minkowski\""}],"]"}]}],"]"}]}]],"Input",CellTags->"named_profiles"],
+
+Cell["Before switching: inspect the plane wave and its d'Alembertian.","Text"],
+
+Cell[BoxData[RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",",RowBox[{"phi","[","]"}]}],"]"}]],"Input",CellTags->"profile_wave_before"],
+
+Cell[BoxData[RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",","boxPhi"}],"]"}]],"Input",CellTags->"profile_wave_box_before"],
+
+Cell["Activate the quadratic transverse profile. xCoba clears the previous component values, not the tensor definition. The wave operator now returns 4.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"ActivateProfile","[",RowBox[{"\"Minkowski\"",",","\"Radial\""}],"]"}],";","\[IndentingNewLine]",RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",",RowBox[{"phi","[","]"}]}],"]"}]}]],"Input",CellTags->"profile_activate_radial"],
+
+Cell[BoxData[RowBox[{"profileBox","=",RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",","boxPhi"}],"]"}]}]],"Input",CellTags->"profile_radial_box"],
+
+Cell["Restore the plane wave and inspect the same quantities. The geometry is reused.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"ActivateProfile","[",RowBox[{"\"Minkowski\"",",","\"PlaneWave\""}],"]"}],";","\[IndentingNewLine]",RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",",RowBox[{"phi","[","]"}]}],"]"}]}]],"Input",CellTags->"profile_restore_wave"],
+
+Cell[BoxData[RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",","boxPhi"}],"]"}]],"Input",CellTags->"profile_wave_box_after"],
+
+Cell[BoxData[RowBox[{"ComputeGeometry","[",RowBox[{"\"Minkowski\"",",",RowBox[{"{",RowBox[{"\"Metric\""}],"}"}]}],"]"}]],"Input",CellTags->"profile_cached_geometry"],
 
 Cell[TextData[{"One Minkowski metric, two coordinate charts"}],"Subsection"],
 
@@ -457,9 +479,11 @@ Cell[TextData[{"Add cylindrical coordinates to the existing Minkowski background
 
 Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"Minkowski\"", ",", "\"Cylindrical\"", ",", RowBox[{"{", RowBox[{"\"t\"", ",", "\"r\"", ",", "\"theta\"", ",", "\"z\""}], "}"}], ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "r", ",", "theta", ",", "z"}], "}"}], ",", RowBox[{"{", RowBox[{"t", ",", RowBox[{"r", " ", RowBox[{"Cos", "[", "theta", "]"}]}], ",", RowBox[{"r", " ", RowBox[{"Sin", "[", "theta", "]"}]}], ",", "z"}], "}"}]}], "]"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{RowBox[{"{", RowBox[{"tCyl", ",", "rCyl", ",", "thetaCyl", ",", "zCyl"}], "}"}], "=", RowBox[{"Through", "[", RowBox[{RowBox[{"CoordinatesOf", "[", RowBox[{"\"Minkowski\"", ",", "\"Cylindrical\""}], "]"}], "[", "]"}], "]"}]}], ";"}]],"Input",CellTags->"second_chart"],
 
-Cell[TextData[{"Request both matrices for the same metric. The angular entry in the cylindrical chart is r\:00b2."}],"Text"],
+Cell[TextData[{"MetricMatrixOf returns the originally assigned matrix in the primary Cartesian chart. ToComponents with OutputChart evaluates the same metric in cylindrical coordinates. The angular entry is r\:00b2."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"gCyl", "=", RowBox[{"ToComponents", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"g", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{TagBox[RowBox[{"MetricMatrixOf", "[", "\"Minkowski\"", "]"}], Function[BoxForm`e$, MatrixForm[BoxForm`e$]]], ",", TagBox["gCyl", Function[BoxForm`e$, MatrixForm[BoxForm`e$]]]}], "}"}]}]],"Input",CellTags->"two_metric_charts"],
+Cell[BoxData[RowBox[{RowBox[{"gCyl","=",RowBox[{"ToComponents","[",RowBox[{"\"Minkowski\"",",",RowBox[{"g","[",RowBox[{RowBox[{"-","a"}],",",RowBox[{"-","b"}]}],"]"}],",",RowBox[{"OutputChart","\[Rule]","\"Cylindrical\""}]}],"]"}]}],";","\[IndentingNewLine]",RowBox[{RowBox[{"MetricMatrixOf","[",RowBox[{"\"Minkowski\""}],"]"}],"//","MatrixForm"}]}]],"Input",CellTags->"two_metric_charts"],
+
+Cell[BoxData[RowBox[{"gCyl","//","MatrixForm"}]],"Input",CellTags->"cylindrical_matrix_display"],
 
 Cell[TextData[{"The table gives the correspondence between zero-based component numbers and one-based Mathematica list positions."}],"Text"],
 
@@ -489,7 +513,7 @@ Cell[TextData[{"6. Extend the theory with vectors, tensors and a connection"}],"
 
 Cell[TextData[{"Define a covector A, a symmetric tensor S and a two-form F on the source manifold, then register them together. xPlorer obtains their slots and symmetries from the native definitions. These three fields are independent in this example."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"DefTensor", "[", RowBox[{RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}], ",", "M"}], "]"}], ";", RowBox[{"DefTensor", "[", RowBox[{RowBox[{"S", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "M", ",", RowBox[{"Symmetric", "[", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}], "]"}]}], "]"}], ";", RowBox[{"DefTensor", "[", RowBox[{RowBox[{"F", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "M", ",", RowBox[{"Antisymmetric", "[", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}], "]"}]}], "]"}], ";", RowBox[{"RegisterTheory", "[", RowBox[{"\"Fields\"", ",", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"A", ",", RowBox[{"Sector", "\[Rule]", "\"Vector\""}]}], "}"}], ",", "S", ",", RowBox[{"{", RowBox[{"F", ",", RowBox[{"Sector", "\[Rule]", "\"Vector\""}]}], "}"}]}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"extra_fields"],
+Cell[BoxData[RowBox[{RowBox[{"DefTensor", "[", RowBox[{RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}], ",", "M"}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"DefTensor", "[", RowBox[{RowBox[{"S", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "M", ",", RowBox[{"Symmetric", "[", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}], "]"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"DefTensor", "[", RowBox[{RowBox[{"F", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "M", ",", RowBox[{"Antisymmetric", "[", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}], "]"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"RegisterTheory", "[", RowBox[{"\"Fields\"", ",", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"A", ",", RowBox[{"Sector", "\[Rule]", "\"Vector\""}]}], "}"}], ",", "S", ",", RowBox[{"{", RowBox[{"F", ",", RowBox[{"Sector", "\[Rule]", "\"Vector\""}]}], "}"}]}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"extra_fields"],
 
 Cell[TextData[{"The uppercase S denotes the symmetric tensor. To register it on its own, use ",StyleBox["RegisterTheory[\"Field\", S]",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
@@ -513,7 +537,7 @@ Cell[BoxData[RowBox[{"PortExpression", "[", RowBox[{"\"MinkowskiFields\"", ",", 
 
 Cell[TextData[{"Assign matrices with the declared rank and symmetry. xPlorer checks both when it stores the components."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"Fmatrix", "=", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "2", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"-", "2"}], ",", "0", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}]}], "}"}]}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "S", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}], "]"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "F", ",", "Fmatrix"}], "]"}], ";", "\[IndentingNewLine]", TagBox[RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"S", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}]}], "]"}], Function[BoxForm`e$, MatrixForm[BoxForm`e$]]]}]],"Input",CellTags->"tensor_values"],
+Cell[BoxData[RowBox[{RowBox[{"Fmatrix", "=", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "2", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"-", "2"}], ",", "0", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}]}], "}"}]}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "S", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}], "]"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", "F", ",", "Fmatrix"}], "]"}], ";", "\[IndentingNewLine]", RowBox[{RowBox[{"ToComponents", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"S", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}]}], "]"}],"//","MatrixForm"}]}]],"Input",CellTags->"tensor_values"],
 
 Cell[TextData[{StyleBox["FreeIndices",FontFamily->"Courier",FontSize->11]," fixes the order of the array axes. Reversing the free indices transposes the matrix. ",StyleBox["Components",FontFamily->"Courier",FontSize->11]," selects individual entries. In the original order, F has entries 2 at (0,1) and \:22122 at (1,0)."}],"Text"],
 
@@ -535,7 +559,7 @@ Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"AffineStudy\"", ",",
 
 Cell[TextData[{"For this constant covector, the coefficient contributes \:2212t to the x derivative of its time component. Compute the derivative matrix and one curvature component. The latter\:2019s sign follows xAct\:2019s ",StyleBox["$RiemannSign",FontFamily->"Courier",FontSize->11]," convention."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"gradA", "=", RowBox[{"ToComponents", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{RowBox[{"DA", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"A", "[", RowBox[{"-", "b"}], "]"}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}]}], ",", RowBox[{"StrictComponents", "\[Rule]", "True"}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"riemannDA", "=", RowBox[{"First", "[", RowBox[{"ToComponents", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{RowBox[{"Riemann", "[", "DA", "]"}], "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}], ",", RowBox[{"-", "c"}], ",", "d"}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}], ",", RowBox[{"-", "c"}], ",", "d"}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"0", ",", "1", ",", "0", ",", "0"}], "}"}], "}"}]}], ",", RowBox[{"StrictComponents", "\[Rule]", "True"}]}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{TagBox["gradA", Function[BoxForm`e$, MatrixForm[BoxForm`e$]]], ",", "riemannDA"}], "}"}]}]],"Input",CellTags->"affine_results"],
+Cell[BoxData[RowBox[{RowBox[{"gradA", "=", RowBox[{"ToComponents", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{RowBox[{"DA", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"A", "[", RowBox[{"-", "b"}], "]"}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}]}], ",", RowBox[{"StrictComponents", "\[Rule]", "True"}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"riemannDA", "=", RowBox[{"First", "[", RowBox[{"ToComponents", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{RowBox[{"Riemann", "[", "DA", "]"}], "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}], ",", RowBox[{"-", "c"}], ",", "d"}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}], ",", RowBox[{"-", "c"}], ",", "d"}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"0", ",", "1", ",", "0", ",", "0"}], "}"}], "}"}]}], ",", RowBox[{"StrictComponents", "\[Rule]", "True"}]}], "]"}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{RowBox[{"gradA","//","MatrixForm"}], ",", "riemannDA"}], "}"}]}]],"Input",CellTags->"affine_results"],
 
 Cell[TextData[{"Compare the same (x,t) entry using CD and DA. The Levi-Civita derivative gives zero for these Cartesian data. ",StyleBox["CheckConnection",FontFamily->"Courier",FontSize->11]," reports the torsion and metric-compatibility residuals for DA."}],"Text"],
 
@@ -589,7 +613,7 @@ Cell[TextData[{"A metric perturbation"}],"Subsection"],
 
 Cell[TextData[{"Define the metric perturbation h with xPert, register its head as an ordinary field registration and create a background. xPlorer detects its native metric-perturbation relationship automatically."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"DefMetricPerturbation", "[", RowBox[{"g", ",", "h", ",", "eps"}], "]"}], ";", RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "h", ",", RowBox[{"Sector", "\[Rule]", "\"Perturbations\""}]}], "]"}], ";", RowBox[{"CreateBackground", "[", "\"MinkowskiPerturbed\"", "]"}], ";"}]],"Input",CellTags->"register_perturbation"],
+Cell[BoxData[RowBox[{RowBox[{"DefMetricPerturbation", "[", RowBox[{"g", ",", "h", ",", "eps"}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "h", ",", RowBox[{"Sector", "\[Rule]", "\"Perturbations\""}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"CreateBackground", "[", "\"MinkowskiPerturbed\"", "]"}], ";"}]],"Input",CellTags->"register_perturbation"],
 
 Cell[TextData[{StyleBox["PerturbOn",FontFamily->"Courier",FontSize->11]," returns the abstract metric variation by default."}],"Text"],
 
@@ -599,7 +623,7 @@ Cell[TextData[{"Set the first-order xx component of h to t\:00b2 and the second-
 
 Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"MinkowskiPerturbed\"", ",", RowBox[{"{", RowBox[{"\"t\"", ",", "\"x\"", ",", "\"y\"", ",", "\"z\""}], "}"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetCMetricSystem", "[", RowBox[{"\"MinkowskiPerturbed\"", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiPerturbed\"", ",", "h", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{"0", ",", SuperscriptBox["t", "2"], ",", "0", ",", "0"}], "}"}], "]"}]}], "]"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"SetFieldComponents", "[", RowBox[{"\"MinkowskiPerturbed\"", ",", "h", ",", RowBox[{"ConstantArray", "[", RowBox[{"0", ",", RowBox[{"{", RowBox[{"4", ",", "4"}], "}"}]}], "]"}], ",", RowBox[{"PerturbationOrderLabel", "\[Rule]", "2"}]}], "]"}], ";", "\[IndentingNewLine]", RowBox[{"tP", "=", RowBox[{RowBox[{RowBox[{"CoordinatesOf", "[", "\"MinkowskiPerturbed\"", "]"}], "\[LeftDoubleBracket]", "1", "\[RightDoubleBracket]"}], "[", "]"}]}], ";"}]],"Input",CellTags->"perturbation_profile"],
 
-Cell[BoxData[RowBox[{RowBox[{"deltaG", "=", RowBox[{"PerturbOn", "[", RowBox[{"\"MinkowskiPerturbed\"", ",", RowBox[{"g", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "1", ",", RowBox[{"Output", "\[Rule]", "\"Components\""}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"delta2G", "=", RowBox[{"PerturbOn", "[", RowBox[{"\"MinkowskiPerturbed\"", ",", RowBox[{"g", "[", RowBox[{"a", ",", "b"}], "]"}], ",", "2", ",", RowBox[{"Output", "\[Rule]", "\"Components\""}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"taylor2", "=", RowBox[{"PerturbOn", "[", RowBox[{"\"MinkowskiPerturbed\"", ",", RowBox[{"g", "[", RowBox[{"a", ",", "b"}], "]"}], ",", "2", ",", RowBox[{"Output", "\[Rule]", "\"Components\""}], ",", RowBox[{"PerturbationForm", "\[Rule]", "\"TaylorCoefficient\""}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{TagBox["deltaG", Function[BoxForm`e$, MatrixForm[BoxForm`e$]]], ",", TagBox["delta2G", Function[BoxForm`e$, MatrixForm[BoxForm`e$]]], ",", TagBox["taylor2", Function[BoxForm`e$, MatrixForm[BoxForm`e$]]]}], "}"}]}]],"Input",CellTags->"perturbation_results"],
+Cell[BoxData[RowBox[{RowBox[{"deltaG", "=", RowBox[{"PerturbOn", "[", RowBox[{"\"MinkowskiPerturbed\"", ",", RowBox[{"g", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "1", ",", RowBox[{"Output", "\[Rule]", "\"Components\""}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"delta2G", "=", RowBox[{"PerturbOn", "[", RowBox[{"\"MinkowskiPerturbed\"", ",", RowBox[{"g", "[", RowBox[{"a", ",", "b"}], "]"}], ",", "2", ",", RowBox[{"Output", "\[Rule]", "\"Components\""}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"taylor2", "=", RowBox[{"PerturbOn", "[", RowBox[{"\"MinkowskiPerturbed\"", ",", RowBox[{"g", "[", RowBox[{"a", ",", "b"}], "]"}], ",", "2", ",", RowBox[{"Output", "\[Rule]", "\"Components\""}], ",", RowBox[{"PerturbationForm", "\[Rule]", "\"TaylorCoefficient\""}]}], "]"}]}], ";", "\[IndentingNewLine]", RowBox[{"{", RowBox[{RowBox[{"deltaG","//","MatrixForm"}], ",", RowBox[{"delta2G","//","MatrixForm"}], ",", RowBox[{"taylor2","//","MatrixForm"}]}], "}"}]}]],"Input",CellTags->"perturbation_results"],
 
 Cell[TextData[{"The xx entries are t\:00b2 for the first metric variation and 2t\:2074 for the second inverse-metric variation. The inverse metric contains a term quadratic in the first variation. Dividing the second variation by 2! gives the Taylor coefficient t\:2074."}],"Text"]
 },Open]],
