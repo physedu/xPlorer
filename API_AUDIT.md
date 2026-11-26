@@ -30,3 +30,7 @@ These are absence of explicit references, not claims of no indirect execution. N
 Package commit d28f7412a2f8f2467d0338a57fe294121b0b5785; tests efda587cebb708969936dbbd0cdf773893824038. Runtime validation pending: Wolfram MCP failed even for 1+1; last verified code is dev.3. Rerun notebook, registration, lifecycle, display and inspection suites and verify startup count. Do not release or merge to main.
 
 Next: update historical API guide; add explicit coverage for retained unreferenced functions; consider clearer background inspection without exposing mutable registry; review CMetricOf/ComponentCovDOf, ExprMatrixOf and PrettyExp with the author. Do not remove public functions solely based on static reference counts.
+
+## Resolution in dev.5/dev.6 (2026-11-26)
+
+All three redundant accessors removed; DisplayExpression merged into safe PrettyExp, with old reverse mapping removed. Missing chart guard and tests for retained functions. Native xCoba interop tested without new basis API. Profiles and optional CTensor added in dev.6, tested with historical suite and canonical notebook. See BETA13_PLAN.md and BETA13_PROGRESS.md for exact commits and remaining limitations. Historical reference counts above are not current dev.6 counts.
