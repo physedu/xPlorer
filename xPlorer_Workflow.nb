@@ -177,9 +177,7 @@ Cell[BoxData[RowBox[{RowBox[{"RegisterTheory","[",RowBox[{"\"Assumptions\"",",",
 
 Cell[BoxData[RowBox[{RowBox[{"RegisterTheory","[",RowBox[{"\"Conditions\"",",","\"Fixed metric; compactly supported scalar variations.\""}],"]"}], ";"}]],"Input",CellTags->"register_metadata_step_4"],
 
-Cell[BoxData[RowBox[{RowBox[{"theory","=",RowBox[{"TheorySnapshot","[","]"}]}], ";"}]],"Input",CellTags->"register_metadata_step_5"],
-
-Cell[BoxData["Null"],"Input",CellTags->"register_metadata"],
+Cell[BoxData[RowBox[{RowBox[{"theory","=",RowBox[{"TheorySnapshot","[","]"}]}], ";"}]],"Input",CellTags->"register_metadata"],
 
 Cell[TextData[{StyleBox["TheoryValue",FontFamily->"Courier",FontSize->14]," retrieves a collection or an individual registry entry. Use ",StyleBox["ShowTheoryKeys[]",FontFamily->"Courier",FontSize->14]," for the top-level keys or ",StyleBox["TheorySnapshot[]",FontFamily->"Courier",FontSize->14]," for the full restorable registry.\n\nShowTheory[] displays a concise overview. TheorySector groups objects by their physical sector."}],"Text"],
 
