@@ -223,7 +223,7 @@ Cell[BoxData[RowBox[{"gradPhi", "//", "PrettyExp"}]],"Input",CellTags->"pretty_d
 
 Cell["For a single output, override the notation with PrettyExp options. Compare prefix and postfix views of the same gradient. Normal recovers the original expression.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"prettyGradient","=",RowBox[{"gradPhi", "//", RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Postfix\""}]},",",RowBox[{"ShowBackgroundLabel","\[Rule]","True"}]}],"]"}]}]}],";",RowBox[{"{",RowBox[{RowBox[{"gradPhi", "//", RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Prefix\""}]}}],"]"}]}],",","prettyGradient"}],"}"}]}]],"Input",CellTags->"pretty_gradient"],
+Cell[BoxData[RowBox[{RowBox[{"prettyGradient","=",RowBox[{"gradPhi","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Postfix\""}],",",RowBox[{"ShowBackgroundLabel","\[Rule]","True"}]}],"]"}]}]}],";",RowBox[{"{",RowBox[{RowBox[{"gradPhi","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Prefix\""}],",",RowBox[{"ShowBackgroundLabel","\[Rule]","False"}]}],"]"}]}],",","prettyGradient"}],"}"}]}]],"Input",CellTags->"pretty_gradient"],
 
 Cell["Remove the local overrides with Automatic to inherit session defaults again.","Text"],
 
@@ -349,7 +349,7 @@ Cell[BoxData[RowBox[{RowBox[{"eqMink", "=", RowBox[{"ToComponents", "[", RowBox[
 
 Cell["Compare native derivative orders, fractions and partial-derivative operators for the same equation. Use // PrettyExp[PartialStyle -> ...] to override the display once. Other available styles are MultiIndex, Comma and Prime (the latter applies to single-argument functions).","Text"],
 
-Cell[BoxData[RowBox[{"{",RowBox[{RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}], "//", RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Native\""}]}}],"]"}]}],",",RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}], "//", RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Fraction\""}]}}],"]"}]}],",",RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}], "//", RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Partial\""}]}}],"]"}]}]}],"}"}]],"Input",CellTags->"partial_view"],
+Cell[BoxData[RowBox[{"{",RowBox[{RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Native\""}]}],"]"}]}],",",RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Fraction\""}]}],"]"}]}],",",RowBox[{RowBox[{"(",RowBox[{"eqMink","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"PartialStyle","\[Rule]","\"Partial\""}]}],"]"}]}]}],"}"}]],"Input",CellTags->"partial_view"],
 
 Cell[BoxData[RowBox[{RowBox[{"Normal", "[", RowBox[{"PrettyExp", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"eqMink", "\[Equal]", "0"}]}], "]"}], "]"}], "===", RowBox[{"(", RowBox[{"eqMink", "\[Equal]", "0"}], ")"}]}]],"Input",CellTags->"view_identity"],
 
