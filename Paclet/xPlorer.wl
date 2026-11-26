@@ -41,7 +41,7 @@ CoordinatesOf::usage = "CoordinatesOf[tag] returns the coordinate symbols stored
 BasisOf::usage = "BasisOf[tag] returns the basis symbol stored for the background tag.";
 SetCMetricSystem::usage = "SetCMetricSystem[tag, mat, opts] assigns the matrix mat as components of the already existing background metric in the coordinated chart/basis of tag using xCoba MetricInBasis, then computes the objects selected by ComputeOnSet (metric and inverse by default).";
 MetricMatrixOf::usage = "MetricMatrixOf[tag] returns the matrix used in SetCMetricSystem for the background tag.";
-ShowTheory::usage = "ShowTheory[] displays a compact theory overview. ShowTheory[section] displays details for Geometry, Fields, Parameters, Lagrangians, Expressions, Connections, Sectors or Metadata. Use TheorySnapshot[] for restorable data.";
+ShowTheory::usage = "ShowTheory[] displays a compact theory overview. ShowTheory[section] displays details for Geometry, Fields, Parameters, Lagrangians, Expressions, Connections, Sectors, Assumptions, Conditions or Metadata. Optional Title and Description appear at the top. Use TheorySnapshot[] for restorable data.";
 TheorySnapshot::usage = "TheorySnapshot[] returns the raw restorable theory association. Restore with With[{snapshot = saved}, RegisterTheory[snapshot]] after ClearTheory[]. Source xAct definitions must remain alive.";
 TheoryValue::usage = "TheoryValue[section] returns a logical collection; TheoryValue[section,key] returns one registered item.";
 
@@ -50,7 +50,7 @@ $BG::usage = "$BG stores the backgrounds created by the package.";
 
 SyntaxInformation[RegisterTheory] = <|"ArgumentsPattern" -> {_, ___}|>;
 
-ToComponents::usage = "ToComponents[tag, expressionOrKey, opts] ports an expression and evaluates its components in the background chart. Output -> \"CTensor\" returns a native xCoba CTensor for a complete resolved positive-rank zero-weight tensor array; default Output -> \"Array\".";
+ToComponents::usage = "ToComponents[tag, expressionOrKey, opts] ports an expression and evaluates its components in the background chart. ToComponents[ownedExpression, opts] infers a unique background; use an explicit tag for abstract or ambiguous expressions. Output -> \"CTensor\" returns a native xCoba CTensor for a complete resolved positive-rank zero-weight tensor array; default Output -> \"Array\".";
 SetFieldComponents::usage = "SetFieldComponents[tag, field, values, opts] assigns scalar/vector/tensor components. A pure Function receives the chart coordinate scalars.";
 RegisterProfile::usage = "RegisterProfile[tag, name, field, values, opts] stores a validated field input without activating it; repeated calls add or replace field/order entries. RegisterProfile[tag, name] captures the currently assigned managed inputs.";
 ActivateProfile::usage = "ActivateProfile[tag, name] overlays a named profile on managed field inputs, preserving fields/orders not specified. Geometry is reused and saved results invalidated.";
@@ -73,7 +73,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.10";
+$XPlorerVersion = "14.0.0-beta.13-dev.11";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -169,6 +169,8 @@ RegisterTheory[assoc_Association] := ($Theory=Join[$Theory,assoc]; $Theory);
 RegisterTheory["Metric",value_] := ($Theory["Metric"]=value;$Theory);
 RegisterTheory["CovD",value_] := ($Theory["CovD"]=value;$Theory);
 RegisterTheory["Indices",value_List] := ($Theory["Indices"]=value;$Theory);
+RegisterTheory[key:("Title"|"Description"),value_String] := ($Theory[key]=value;$Theory);
+RegisterTheory[key:("Assumptions"|"Conditions"),value_] := ($Theory[key]=value;$Theory);
 b13NativeField[h_Symbol,opts_Association] := Module[
  {g=Lookup[$Theory,"Metric",None],bundle,m,slots,rank,type,key,base,label,sector,pert,idx},
  If[!TrueQ[xTensorQ[h]] || TrueQ[MetricQ[h]],
@@ -526,6 +528,7 @@ DefineChart[tag_String, names_List] := Module[{b = background[tag], chart, coord
     DefChart[ch, mm, nums, vals]]];
   If[result === $Failed || !ChartQ[chart], Return[failure["DefineChart", "xCoba could not define the chart."]]];
   MapThread[Function[{s, lab}, With[{ss = s, ll = lab}, PrintAs[ss] ^= ll]], {coords, names}];
+  setBareBoxes[chart,"chart"<>b["SymbolSuffix"]];
   put[tag, <|"Chart" -> chart, "Basis" -> chart, "Coordinates" -> coords, "CoordinateLabels" -> names|>]
 ];
 (* Secondary coordinate charts are native xCoba charts on the owned manifold.
@@ -548,6 +551,7 @@ DefineChart[tag_String,name_String,labels_List,map_Function] := Module[
   If[!VectorQ[values] || Length[values]=!=n,UndefChart[chart];Return[failure["ChartMap","Return one primary coordinate per dimension."]]];
   jac=Outer[D,values,Through[coords[]]];det=Simplify[Det[jac]];
   If[TrueQ[det==0],UndefChart[chart];Return[failure["ChartMap","The chart Jacobian is identically singular."]]];
+  setBareBoxes[chart,safeName[name]<>b["SymbolSuffix"]];
   record=<|"Chart"->chart,"Coordinates"->coords,"Labels"->labels,"Map"->map,
     "Values"->values,"Jacobian"->jac|>;
   put[tag,<|"AdditionalCharts"->Append[charts,name->record]|>]; chart
@@ -778,6 +782,10 @@ componentAt[expr_, indices_, numbers_] := Module[{held, rules},
   rules = MapThread[Rule, {indices, MapThread[List, {numbers, Last /@ indices}]}];
   ReleaseHold[held /. rules]
 ];
+ToComponents[expr:Except[_String],opts:OptionsPattern[]] := Module[{owner=notationOwner[expr]},
+ If[!StringQ[owner],Return[failure["ComponentBackground","Cannot infer a unique background. Use ToComponents[tag, expression]."]]];
+ ToComponents[owner,expr,opts]
+];
 ToComponents[tag_String, input_, OptionsPattern[]] := Module[
   {b = background[tag], ex, inds, actual, basisinds, result, geometry, arr, selected, simp = OptionValue[Simplification], ass, unresolved, rec=None, chart=OptionValue[OutputChart], subset,output=OptionValue[Output],outbasis},
   If[FailureQ[b], Return[b]];
@@ -965,7 +973,7 @@ BackgroundIndices[tag_String, n_: Automatic] := Module[{b = background[tag]}, If
 ShowBackground[tag_String] := background[tag];
 (* Presentation is deliberately separate from the registry and mathematical access. *)
 TheorySnapshot[] := $Theory;
-b13Sections = {"Geometry","Fields","Parameters","Lagrangians","Expressions","Connections","Sectors","Metadata"};
+b13Sections = {"Geometry","Fields","Parameters","Lagrangians","Expressions","Connections","Sectors"};
 b13Geometry[t_] := Module[{a=KeyTake[t,{"Metric","CovD","Indices"}],g=Lookup[t,"Metric",None],m},
  If[TrueQ[MetricQ[g]],m=BaseOfVBundle[VBundleOfMetric[g]];
   a=Join[<|"Manifold"->m,"Dimension"->DimOfManifold[m]|>,a]];a];
@@ -982,6 +990,7 @@ b13TheoryView[t_,section_,detail_] := Module[{a},
  Switch[section,
  "Geometry",b13KeyTable[b13Geometry[t]],
  "Metadata",b13KeyTable[b13Metadata[t]],
+ "Assumptions"|"Conditions",b13KeyTable[KeyTake[t,{section}]],
  "Fields",a=b13Collection[t,section];
   b13Table[{"Key","Tensor","Type","Rank","Symbol base","Sector"},
    KeyValueMap[{#1,#2["Head"],#2["Type"],#2["Rank"],#2["SymbolBase"],b13SectorLabel[#2]}&,a]],
@@ -995,14 +1004,20 @@ b13TheoryView[t_,section_,detail_] := Module[{a},
  "Connections",b13Table[{"Key","Derivative"},
    KeyValueMap[{#1,#2["Head"]}&,Lookup[t,"Connections",<||>]]],
  "Sectors",b13Table[{"Sector","Fields","Parameters","Lagrangians","Expressions"},
-   Table[Prepend[Map[Length,Values[AssociationMap[
+   Table[Prepend[Map[Function[records,If[records===<||>,0,Column[{Length[records],Row[Riffle[Keys[records],", "]]},Spacings->0.25]]],Values[AssociationMap[
     Select[b13Collection[t,#],Lookup[#,"Sector",None]===sector&]&,
     {"Fields","Parameters","Lagrangians","Expressions"}]]],sector],{sector,b13Sectors[t]}]],
  _,failure["TheoryKey","Unknown theory display section.",<|"Key"->section|>]
  ]];
-ShowTheory[] := Column[Prepend[
- (Column[{Style[#,Bold],b13TheoryView[$Theory,#,False]},Spacings->0.5]& /@ b13Sections),
- Style["Registered theory",Bold,16]],Spacings->1.3];
+ShowTheory[] := Module[{t=$Theory,header,sections,extra},
+ header=Join[{Style[Lookup[t,"Title","Registered theory"],Bold,20]},
+  If[KeyExistsQ[t,"Description"],{Lookup[t,"Description"]},{}],
+  (Column[{Style[#,Bold],t[#]},Spacings->0.5]& /@ Select[{"Assumptions","Conditions"},KeyExistsQ[t,#]&])];
+ sections=Select[b13Sections,Switch[#,"Geometry",Length[b13Geometry[t]]>0,"Sectors",b13Sectors[t]=!={},_,Length[b13Collection[t,#]]>0]&];
+ extra=KeyDrop[b13Metadata[t],{"Title","Description","Assumptions","Conditions"}];
+ Column[Join[header,(Column[{Style[#,Bold],b13TheoryView[t,#,False]},Spacings->0.5]& /@ sections),
+  If[extra===<||>,{},{Column[{Style["Additional information",Bold],b13KeyTable[extra]}]}]],Spacings->1.3]
+];
 ShowTheory[section_String] := b13TheoryView[$Theory,section,True];
 
 TheoryValue["Geometry"] := b13Geometry[$Theory];
