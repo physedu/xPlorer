@@ -53,9 +53,23 @@ Cell[TextData[{"Clear the three user-defined aliases, close the example and remo
 
 Cell[BoxData[RowBox[{RowBox[{"Clear","[",RowBox[{"muDemo",",","nuDemo",",","rhoDemo"}],"]"}],";",RowBox[{"DeleteBackground", "[", "\"NamingExample\"", "]"}], ";", RowBox[{"UnregisterTheory", "[", RowBox[{"\"Fields\"", ",", "\"Materia\""}], "]"}], ";", RowBox[{"Keys", "[", RowBox[{"TheoryValue", "[", "\"Fields\"", "]"}], "]"}]}]],"Input",CellTags->"close_naming"],
 
+Cell["Single items and collections","Subsubsection"],
+
+Cell["Registration conventions: singular names register one item; plural names register a list of items. The collection name is always plural when inspecting, retrieving or unregistering items. Metric, CovD and Indices are geometry settings, not these collections.","Text"],
+
+Cell["Field: RegisterTheory[\"Field\", phi] | Fields: RegisterTheory[\"Fields\", {phi, A}]","Text"],
+
+Cell["Parameter: RegisterTheory[\"Parameter\", m] | Parameters: RegisterTheory[\"Parameters\", {m, kappa}]","Text"],
+
+Cell["Lagrangian: RegisterTheory[\"Lagrangian\", \"Kinetic\" -> Lkin] | Lagrangians: RegisterTheory[\"Lagrangians\", {\"Kinetic\" -> Lkin, \"MassTerm\" -> Lmass}]","Text"],
+
+Cell["Expression: RegisterTheory[\"Expression\", \"ScalarEq\" -> scalarEq] | Expressions: RegisterTheory[\"Expressions\", {\"ScalarEq\" -> scalarEq, \"Eab\" -> Eab}]","Text"],
+
+Cell["For example, ShowTheory[\"Fields\"], TheoryValue[\"Fields\", \"phi\"] and UnregisterTheory[\"Fields\", \"phi\"] all use the collection name. The examples above are alternatives for reference, not additional cells to execute. The plural registration forms also accept a single item for compatibility.","Text"],
+
 Cell[TextData[{"Register the scalar and its mass"}],"Subsubsection"],
 
-Cell[TextData[{"For one item use Field, Parameter, Lagrangian or Expression; for a batch use Fields, Parameters, Lagrangians or Expressions. Query collections with their plural names. Pass only the native tensor head ",StyleBox["phi",FontFamily->"Courier",FontSize->11]," when registering the field. xPlorer infers its rank and symmetry. The registration also gives the parameter m the lookup key ",StyleBox["\"Mass\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
+Cell[TextData[{"Pass only the native tensor head ",StyleBox["phi",FontFamily->"Courier",FontSize->11]," when registering the field. xPlorer infers its rank and symmetry. The registration also gives the parameter m the lookup key ",StyleBox["\"Mass\"",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "phi", ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";", RowBox[{"RegisterTheory", "[", RowBox[{"\"Parameter\"", ",", "m", ",", RowBox[{"Name", "\[Rule]", "\"Mass\""}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";"}]],"Input",CellTags->"register_matter"],
 
@@ -67,7 +81,7 @@ Cell[TextData[{"For several parameters, pass a list of native constant symbols, 
 
 Cell[TextData[{"Store the kinetic term, mass term and their explicitly defined total in the Lagrangians collection. xPlorer does not add them automatically. Retrieve the total with ",StyleBox["TheoryValue[\"Lagrangians\", \"Lagrangian\"]",FontFamily->"Courier",FontSize->11],"."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Lagrangians\"", ",", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{RowBox[{"\"Kinetic\"", "\[Rule]", "Lkin"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"\"MassTerm\"", "\[Rule]", "Lmass"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"\"Lagrangian\"", "\[Rule]", "lagrangian"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "}"}]}], "}"}]}], "]"}], ";", RowBox[{"TheoryValue", "[", "\"Lagrangians\"", "]"}]}]],"Input",CellTags->"register_lagrangian_only"],
+Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Lagrangian\"", ",", RowBox[{"\"Kinetic\"", "\[Rule]", "Lkin"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "]"}], ";", RowBox[{"RegisterTheory", "[", RowBox[{"\"Lagrangians\"", ",", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{RowBox[{"\"MassTerm\"", "\[Rule]", "Lmass"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"\"Lagrangian\"", "\[Rule]", "lagrangian"}], ",", RowBox[{"Sector", "\[Rule]", "\"Matter\""}]}], "}"}]}], "}"}]}], "]"}], ";", RowBox[{"TheoryValue", "[", "\"Lagrangians\"", "]"}]}]],"Input",CellTags->"register_lagrangian_only"],
 
 Cell[TextData[{"Expressions and Lagrangians are separate collections, both available on backgrounds. Register the scalar equation under the key ScalarEq. Its original variable name scalarEq determines its suffixed alias. For a formula entered directly, Head specifies the alias base."}],"Text"],
 
