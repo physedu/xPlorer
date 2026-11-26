@@ -2,11 +2,11 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-> **Development branch: 14.0.0-beta.13-dev.8.** The new registration API is breaking. The original 115-input author notebook and historical regression suite have been migrated and tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
+> **Development branch: 14.0.0-beta.13-dev.9.** The new registration API is breaking. The original 115-input author notebook and historical regression suite have been migrated and tested in a real Wolfram Language kernel. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
 
 xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
-The current experimental version is **14.0.0-beta.13-dev.8** (concise scientific startup message in xAct style). Mathematical implementation is unchanged from the fully regression-tested dev.6 checkpoint. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Theory registration and tagged background creation are unchanged. Personalization is optional.
+The current experimental version is **14.0.0-beta.13-dev.9** (consistent singular registration and revised tutorial/installer). Mathematical implementation is unchanged from the fully regression-tested dev.6 checkpoint. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Single-item registration now supports Field, Parameter, Lagrangian and Expression, with plural batch and collection names. Existing plural single-item calls remain accepted; background creation semantics are unchanged. Personalization is optional.
 
 ## Start here
 
@@ -16,7 +16,7 @@ Keep [xPlorer_Workflow.nb](xPlorer_Workflow.nb) beside [xPlorer.wl](xPlorer.wl),
 Get[FileNameJoin[{NotebookDirectory[], "xPlorer.wl"}]];
 ```
 
-The principal notebook develops a scalar theory on Minkowski, Schwarzschild and FLRW, then introduces vectors, tensors, an independent affine connection, perturbations and cleanup. It contains 119 executable input cells, with explanatory prose beside the calculations. The stylesheet inherits light/dark theme colors. ScalarTheory.wl is an optional reusable source recipe; it is not required to run the notebook.
+The principal notebook develops a scalar theory on Minkowski, Schwarzschild and FLRW, then introduces vectors, tensors, an independent affine connection, perturbations and cleanup. It contains 120 executable input cells, with explanatory prose beside the calculations. The stylesheet inherits light/dark theme colors. ScalarTheory.wl is an optional reusable source recipe; it is not required to run the notebook.
 
 ## Features
 
@@ -30,7 +30,7 @@ The principal notebook develops a scalar theory on Minkowski, Schwarzschild and 
 - Scoped rules, selective removal, named particularizations and conservative invalidation of saved results.
 - Separate value clearing, registration removal and true dependency-aware deletion of owned fields, charts, connections, metric families or whole backgrounds.
 
-The principal notebook has passed 119/119 input executions, 68/68 expected-result checks and 8/8 workflow-order checks on dev.8, after author Desktop feedback. No malformed compound inputs or unexpected nested Failure results. All eight historical groups passed (288 assertion executions including repeated core checks); registration 50/50 and inspection 25/25 (dev.8), native interop 20/20, profiles and CTensor 33/33. The author confirmed a successful Desktop paclet build on Windows. The clean builder and actual paclet installation still need Desktop verification; front-end appearance has not been fully reviewed. The 88-input legacy build source is not the current notebook.
+The principal notebook has passed 120/120 input executions, 68/68 expected-result checks and 9/9 workflow-order checks on dev.9, after author Desktop feedback. No malformed compound inputs or unexpected nested Failure results. All eight historical groups passed (288 assertion executions including repeated core checks); registration 56/56 (dev.9) and inspection 25/25 (dev.8), native interop 20/20, profiles and CTensor 33/33. The author confirmed a successful Desktop paclet build on Windows. The clean builder and actual paclet installation still need Desktop verification; front-end appearance has not been fully reviewed. The 88-input legacy build source is not the current notebook.
 
 See [API_GUIDE.md](API_GUIDE.md), the [Proca example](Examples/Beta13_Proca.wl) and [native xCoba example](Examples/NativeXCoba.wl). [VALIDATION.md](VALIDATION.md) is a historical beta.7 record; current evidence and limitations are in [BETA13_PROGRESS.md](BETA13_PROGRESS.md) and [BETA13_PLAN.md](BETA13_PLAN.md).
 
@@ -61,7 +61,7 @@ PacletDirectoryLoad["/absolute/path/to/xPlorer"];
 Needs["xPlorer`"];
 ```
 
-To build and install a distributable archive, open xPlorer_Workflow.nb in Mathematica Desktop and evaluate:
+Open [xPlorer_Install.nb](xPlorer_Install.nb) in Mathematica Desktop for the separate build, installation, verification and optional uninstallation steps. Evaluate only the required cells, not the whole notebook. The uninstall section requests confirmation. To build and install manually, evaluate:
 
 ```wl
 build = Get[FileNameJoin[{NotebookDirectory[], "Tools", "BuildPaclet.wl"}]];
@@ -101,7 +101,7 @@ If you use xPlorer in your research, please cite the version used. GitHub's **Ci
   author  = {Sanz-Romero, Eduardo},
   title   = {xPlorer},
   year    = {2026},
-  version = {14.0.0-beta.13-dev.8},
+  version = {14.0.0-beta.13-dev.9},
   url     = {https://github.com/physedu/xPlorer}
 }
 ```
