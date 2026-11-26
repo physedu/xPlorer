@@ -5,5 +5,6 @@ PacletObject[<|
  "Description" -> "Abstract xAct theories, independent backgrounds and component calculations",
  "Creator" -> "Eduardo Sanz-Romero",
  "License" -> "GPL-3.0-or-later",
- "Extensions" -> {{"Kernel", "Root" -> "Kernel", "Context" -> {"xPlorer`"}}}
+ "Extensions" -> {{"Kernel", "Root" -> "Kernel", "Context" -> {"xPlorer`"}},
+  {"Asset", "Root" -> ".", "Assets" -> {"xPlorer.wl", "LICENSE", "CITATION.cff"}}}
 |>]
