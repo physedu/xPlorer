@@ -33,3 +33,7 @@ Historical evidence in BETA13_PROGRESS.md and API_AUDIT.md. Each completed task 
 ## Desktop build follow-up
 
 Author screenshot confirms the original dev.6 builder returned Success and created an archive on Windows. Clean staging builder commit 5df780b6c681423fb807add826b709425098931d changes tooling only, not package payload or version. Remote staging no longer emits excluded-development-file warnings; missing-input and cleanup checks pass. Archive compression remains blocked remotely. Preserve the existing author-built archive, verify installation and payload before attaching it to a future release. No main merge or release.
+
+## Presentation follow-up: dev.7
+
+Author Desktop output confirms dev.6 loads and shows the banner. Replaced the styled title with native xAct-style printed lines (source 1b5b23ba75ca776a55a51520f83723a9d20bc226). Tested double Get, inspection 25/25 and actual notebook 119/119, 66/66 results, 7/7 stages at cba6f0b4dd2c40df5cce40019cb0b57dcfa35882. Mathematics unchanged. Desktop dev.7 visual/build/install check remains pending; no release or main merge.
