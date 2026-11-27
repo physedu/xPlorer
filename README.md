@@ -95,11 +95,11 @@ The managed scope includes abstract tangent-bundle tensors, perturbations and na
 
 ## Development
 
-The public distribution is intentionally different from this repository's development tree. [Release/README.md](Release/README.md) is the tester-facing README; [Tools/PrepareRelease.wl](Tools/PrepareRelease.wl) stages a whitelist of source, local source-matching archive, notebooks, license and citation. It does not publish to GitHub. See [Release preparation](RELEASE_CHECKLIST.md).
+The public distribution is intentionally different from this repository's development tree. [Release/README.md](Release/README.md) is the tester-facing README; [Tools/PrepareRelease.wl](Tools/PrepareRelease.wl) stages a whitelist of source, local source-matching archive, notebooks, license and citation. It does not publish to GitHub. See [Release preparation](Development/RELEASE_CHECKLIST.md).
 
-- [API guide](API_GUIDE.md) and [design decisions](DECISIONS.md).
-- [Consolidation and validation](BETA13_CONSOLIDATION.md), [development progress](BETA13_PROGRESS.md), [plan](BETA13_PLAN.md), [implementation instructions](IMPLEMENTATION_PROMPT.md).
-- Tests/, Tools/, Examples/, and the internal xPlorer_Consolidated.nb and historical xPlorer_QuickStart.nb are development material, not public distribution contents. Historical checkpoints are preserved in Git history. See [development history and version transition](DEVELOPMENT_HISTORY.md) for the mapping from internal versions to public beta 1.
+- [API guide](API_GUIDE.md) and [design decisions](Development/DECISIONS.md).
+- [Consolidation and validation](Development/BETA13_CONSOLIDATION.md), [development progress](Development/BETA13_PROGRESS.md), [plan](Development/BETA13_PLAN.md), [implementation instructions](Development/IMPLEMENTATION_PROMPT.md).
+- Tests/, Tools/, Examples/, and the internal xPlorer_Consolidated.nb and historical xPlorer_QuickStart.nb are development material, not public distribution contents. Historical checkpoints are preserved in Git history. See [development history and version transition](Development/DEVELOPMENT_HISTORY.md) for the mapping from internal versions to public beta 1.
 
 ## Author, citation and license
 

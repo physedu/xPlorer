@@ -5,7 +5,7 @@
 - Preserve custom abstract index choices and remap secondary-chart identities in reconstruction recipes.
 - Expose standalone beta.13 regression groups, persist incremental field and native secondary-chart feasibility checks, and harden paclet builder failure handling.
 - Verify managed/native scalar replay boundary with an explicit capture path using existing setters.
-- Synchronize package and distribution metadata. Full commit-specific evidence in BETA13_PROGRESS.md and Tests/dev16-results.json.
+- Synchronize package and distribution metadata. Full commit-specific evidence in Development/BETA13_PROGRESS.md and Development/ValidationHistory/dev16-results.json.
 - No new public API, primary-chart promotion, Desktop verification, binary archive installation or beta.13 release.
 
 ## Historical development through beta.12
@@ -150,46 +150,46 @@ Added a portable notebook, 75 regression checks, an MUnit report runner, and an 
 
 - Correct relative Christoffel ownership for all managed charts; preserve external blockers and native master/servant destruction.
 - Guard direct UndefChart/UndefBasis on managed chart symbols; chart-family deletion and recreation verified after native secondary geometry.
-- 792/792 checks across 30 groups; workflow 365/365, 84/84, 33/33. See Tests/dev30-results.json. Individual secondary deletion and native basis transform integration remain open.
+- 792/792 checks across 30 groups; workflow 365/365, 84/84, 33/33. See Development/ValidationHistory/dev30-results.json. Individual secondary deletion and native basis transform integration remain open.
 
 ## 14.0.0-beta.13-dev.29 (development)
 
 - Capture literal native held metric edits and geometry reads, preserving HoldFirst and native value semantics.
 - Install and restore authoritative metric matrices exactly; propagate native preparation failures from all three loops.
-- 779/779 checks across 29 groups; workflow 365/365, 84/84, 33/33. See Tests/dev29-results.json. Set-state writes and nonliteral held inputs remain unsupported.
+- 779/779 checks across 29 groups; workflow 365/365, 84/84, 33/33. See Development/ValidationHistory/dev29-results.json. Set-state writes and nonliteral held inputs remain unsupported.
 
 ## 14.0.0-beta.13-dev.28 (development)
 
 - Correct native Set-state detection and reject unsafe managed operations before mutation; explicit Rule restoration required.
 - Preserve tested native read-only RuleToSet/SetToRule and WithSetValues round trips without global overrides.
-- 751/751 checks across 28 groups; workflow 365/365, 84/84, 33/33. See Tests/dev28-results.json. Set-state writes remain unsupported.
+- 751/751 checks across 28 groups; workflow 365/365, 84/84, 33/33. See Development/ValidationHistory/dev28-results.json. Set-state writes remain unsupported.
 
 ## 14.0.0-beta.13-dev.27 (development)
 
 - Capture deletion of exact native authoritative primary-chart field groups in Rule state; derived groups remain native and independently recalculable.
 - Support component removal from complete fields, retaining remaining independent values in sparse recipes without zero filling.
 - Fix mixed-variance sparse canonicalization/replay tuple ordering and signs. Reassign affected old inputs; automatic recovery of malformed historical tuples is not possible.
-- 730/730 checks across 27 groups, including 22/22 deletion/symmetry tests; workflow 365/365, 84/84, 33/33. See Tests/dev27-results.json.
+- 730/730 checks across 27 groups, including 22/22 deletion/symmetry tests; workflow 365/365, 84/84, 33/33. See Development/ValidationHistory/dev27-results.json.
 
 ## 14.0.0-beta.13-dev.26 (development)
 
 - Capture literal rule-state HeldComponentValue reads and writes for owned primary-chart fields, preserving native HoldFirst and held value semantics.
 - Preserve exact captured values on replay and reconstruction; stage complete field edits and reject incomplete candidates safely.
-- 708/708 checks across 26 groups, including 20/20 held-field checks; workflow 365/365, 84/84, 33/33. See Tests/dev26-results.json. Set-state, held geometry and group deletion remain open.
+- 708/708 checks across 26 groups, including 20/20 held-field checks; workflow 365/365, 84/84, 33/33. See Development/ValidationHistory/dev26-results.json. Set-state, held geometry and group deletion remain open.
 
 ## 14.0.0-beta.13-dev.25 (development)
 
 - Compute selected primary-chart field components by native metric separation and dummy contraction, for sparse and complete fields including LI orders; retain full native conversion for full requests.
 - Cache selected canonical native component fingerprints separately from complete-variance fingerprints; no duplicate tensor arrays or rank thresholds.
 - Extend direct primary-chart ToComponents selections and sparse symmetry reads. Correct native call-count instrumentation.
-- 688/688 checks in 25 groups, including 24/24 selected-read checks; workflow 365/365, 84/84, 33/33. See Tests/dev25-results.json. General expression and geometry conversion paths remain open.
+- 688/688 checks in 25 groups, including 24/24 selected-read checks; workflow 365/365, 84/84, 33/33. See Development/ValidationHistory/dev25-results.json. General expression and geometry conversion paths remain open.
 
 ## 14.0.0-beta.13-dev.24 (development)
 
 - Capture sparse primary-chart native component inputs, including canonical symmetry and LI order, without dense arrays or zero filling.
 - Ignore read-created identity and dependent rules in sparse source fingerprints; prepare same-variance sparse symmetry reads using native ComponentValue.
 - Preserve sparse inputs through metric changes, reconstruction, clear/replay and profile restoration.
-- 26/26 sparse checks; 450/450 across 18 groups; workflow 365/365, 84/84, 33/33. See Tests/dev24-results.json. Cross-variance component requests can still prepare full configurations.
+- 26/26 sparse checks; 450/450 across 18 groups; workflow 365/365, 84/84, 33/33. See Development/ValidationHistory/dev24-results.json. Cross-variance component requests can still prepare full configurations.
 
 ## 14.0.0-beta.13-dev.23 (development)
 

@@ -4,7 +4,7 @@ Date: 2026-11-23. Environment: Wolfram Language 15.0.1, Linux x86-64; official x
 
 ## Principal notebook
 
-The actual xPlorer_Workflow.nb input boxes were parsed and executed sequentially in a fresh kernel: **88/88 inputs**, **45/45 expected-result checks**, **3/3 workflow-order checks**, **zero parse failures and zero warning cells**. The complete report is Tests/validation.json.
+The actual xPlorer_Workflow.nb input boxes were parsed and executed sequentially in a fresh kernel: **88/88 inputs**, **45/45 expected-result checks**, **3/3 workflow-order checks**, **zero parse failures and zero warning cells**. The complete report is Development/ValidationHistory/validation.json.
 
 Checks include scalar variation, abstract transport, tensor identity and raising, Minkowski/Schwarzschild/FLRW field equations and curvature, a plane wave, vector/tensor components, perturbative variations, an independent affine derivative and nonzero curvature component, optional notation identity, rule removal, saved snapshots and true deletion/recreation.
 
@@ -25,7 +25,7 @@ Checks are executed in isolated fresh kernels and small groups to stay within re
 | Managed reconstruction recipes | 9 / 9 |
 | Additional metric-connection curvature families | 6 / 6 |
 
-See Tests/Final-results.json for the execution record. Full combined remote submissions returned evaluator Internal error; those failed service calls are not counted as passing checks. The split groups above provide the reported evidence. Run Tests/RunTests.wl in an ordinary local kernel for the complete suite, or Tests/RunGroup.wl for bounded groups.
+See Development/ValidationHistory/Final-results.json for the execution record. Full combined remote submissions returned evaluator Internal error; those failed service calls are not counted as passing checks. The split groups above provide the reported evidence. Run Tests/RunTests.wl in an ordinary local kernel for the complete suite, or Tests/RunGroup.wl for bounded groups.
 
 The baseline was first revalidated before changing code. During final review, two HoldAll restoration calls in the old lifecycle test were corrected to use With; otherwise a check intended to exercise failed creation was testing an incomplete theory instead. Invalid field specifications are now rejected before mutation, and a separate source-rank mismatch exercises real partial-creation cleanup. The test results reflect these corrected cases.
 

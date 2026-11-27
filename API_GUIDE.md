@@ -161,7 +161,7 @@ Get works directly without installation. For a traditional application, use Inst
 
 PacletInfo.wl declares a kernel extension using the same source. PacletDirectoryLoad["/path/to/xPlorer/Paclet"] followed by Needs["xPlorer`"] activates a development directory. Tools/BuildPaclet.wl uses the native CreatePacletArchive directly on the prepared Paclet directory, without PacletBuild staging. xAct must be installed separately; it is not bundled or automatically downloaded by the package.
 
-Tests/RunTests.wl runs the historical groups 01-12. For all current bounded groups use Tests/RunGroup.wl in separate fresh kernels with the selected group name (including Registration, RegistrationGeometry, TheoryInspection, NativeInterop, ProfilesAndCTensor, FieldExtensions and SecondaryChartNative). Tests/PacletBuildTests.wl tests deterministic builder failures without installing a package. Tests/WorkflowTests.wl runs actual input boxes from the principal notebook in a fresh kernel. The principal notebook is the source of truth. The historical 88-input Tools builder cannot overwrite it. See BETA13_PROGRESS.md and BETA13_PLAN.md for current execution evidence and limitations.
+Tests/RunTests.wl runs the historical groups 01-12. For all current bounded groups use Tests/RunGroup.wl in separate fresh kernels with the selected group name (including Registration, RegistrationGeometry, TheoryInspection, NativeInterop, ProfilesAndCTensor, FieldExtensions and SecondaryChartNative). Tests/PacletBuildTests.wl tests deterministic builder failures without installing a package. Tests/WorkflowTests.wl runs actual input boxes from the principal notebook in a fresh kernel. The principal notebook is the source of truth. The historical 88-input Tools builder cannot overwrite it. See Development/BETA13_PROGRESS.md and Development/BETA13_PLAN.md for current execution evidence and limitations.
 
 ## Inferred background and theory information (dev.11–12)
 
@@ -347,7 +347,7 @@ The native unary ToCTensor extension is scoped to an expression with a unique ma
 
 Direct SetBasisChange replacement of an owned primary/secondary pair returns Failure["ManagedBasisPair",...] rather than desynchronize the coordinate map. Define a new named output chart or delete and recreate the managed chart family to change its map. Native pairs involving foreign bases remain available, subject to native dependencies. Direct UndefChart/UndefBasis are blocked for managed charts. Cleanup removes owned pair-specific values and aliases, not other backgrounds' basis rules. Raw edits to Basis values, native secondary field assignment, standalone removal or promotion of a secondary chart, and general foreign-basis replay are outside the managed contract.
 
-Use xPlorer_Workflow.nb for the principal tutorial; the supplementary consolidated notebook and acceptance groups Consolidation and NativeCoordinates in Tests/RunGroup.wl provide focused technical checks. Earlier public convenience functions remain supported; no mass API removal is part of this candidate. See BETA13_CONSOLIDATION.md for exact evidence and release blockers.
+Use xPlorer_Workflow.nb for the principal tutorial; the supplementary consolidated notebook and acceptance groups Consolidation and NativeCoordinates in Tests/RunGroup.wl provide focused technical checks. Earlier public convenience functions remain supported; no mass API removal is part of this candidate. See Development/BETA13_CONSOLIDATION.md for exact evidence and release blockers.
 
 
 ## Object labels and beta onboarding (dev.33)
