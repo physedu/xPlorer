@@ -23,7 +23,8 @@ Global`$XPlorerStandaloneGroups=<|
  "FieldDeletion"->"31_FieldDeletion.wl",
  "NativeSetState"->"32_NativeSetState.wl",
  "HeldGeometry"->"33_HeldGeometry.wl",
- "ChartLifecycle"->"34_ChartLifecycle.wl"|>;
+ "ChartLifecycle"->"34_ChartLifecycle.wl",
+ "Consolidation"->"35_Consolidation.wl"|>;
 Global`$XPlorerSelectedGroup=If[ValueQ[Global`$XPlorerTestGroup],Global`$XPlorerTestGroup,"Geometry"];
 If[KeyExistsQ[Global`$XPlorerStandaloneGroups,Global`$XPlorerSelectedGroup],
  Global`$XPlorerGroupReport=Block[{Print=(Null &),xAct`xPerm`$xpermQ=False,xAct`xCoba`$CVVerbose=False,Global`$B13GeometryTests=(Global`$XPlorerSelectedGroup==="RegistrationGeometry")},
@@ -37,10 +38,11 @@ Global`$XPlorerSelectedFiles=Lookup[<|
  "ObjectsAndConnections"->{"07_LifecycleObjects.wl","08_Connections.wl"},
  "ComponentsAndRules"->{"09_ConnectionComponents.wl","10_Rules.wl"},
  "Reconstruction"->{"11_Reconstruction.wl"},
- "MetricConnectionCurvature"->{"12_MetricConnectionCurvature.wl"}|>,
+ "MetricConnectionCurvature"->{"12_MetricConnectionCurvature.wl"},
+ "NativeCoordinates"->{"36_NativeCoordinates.wl"}|>,
  If[ValueQ[Global`$XPlorerTestGroup],Global`$XPlorerTestGroup,"Geometry"],Missing[]];
 If[MissingQ[Global`$XPlorerSelectedFiles],
- Failure["TestGroup",<|"MessageTemplate"->"Choose Geometry, Perturbations, Lifecycle, Display, ObjectsAndConnections, ComponentsAndRules, Reconstruction, MetricConnectionCurvature, Registration, RegistrationGeometry, TheoryInspection, NativeInterop, ProfilesAndCTensor, FieldExtensions, SecondaryChartNative, ManagedNativeSyntax, FieldCache, NativeRead, NativeGeometry, GeometryRead, SelectiveInvalidation, MetricEdits, GeometryVariance, SparseInputs, SelectedFieldReads, HeldFieldValues, FieldDeletion, NativeSetState, HeldGeometry, or ChartLifecycle."|>],
+ Failure["TestGroup",<|"MessageTemplate"->"Choose Geometry, Perturbations, Lifecycle, Display, ObjectsAndConnections, ComponentsAndRules, Reconstruction, MetricConnectionCurvature, Registration, RegistrationGeometry, TheoryInspection, NativeInterop, ProfilesAndCTensor, FieldExtensions, SecondaryChartNative, ManagedNativeSyntax, FieldCache, NativeRead, NativeGeometry, GeometryRead, SelectiveInvalidation, MetricEdits, GeometryVariance, SparseInputs, SelectedFieldReads, HeldFieldValues, FieldDeletion, NativeSetState, HeldGeometry, ChartLifecycle, Consolidation, or NativeCoordinates."|>],
  Global`$XPlorerGroupPreviousContextPath=$ContextPath;
  $ContextPath=DeleteCases[$ContextPath,"Global`"];
  Begin["XPlorerGroup"<>StringReplace[CreateUUID[],"-"->""]<>"`"];

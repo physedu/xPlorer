@@ -1,0 +1,208 @@
+{
+  "version": "14.0.0-beta.13-dev.31",
+  "testedCommit": "2dfdfa87173303ed11ac8c6115ab9fa968b12175",
+  "packageCodeCommit": "777a3956df04e80a8fdb644e5fe1788c82c864c2",
+  "bases": {
+    "registration": "6b5574d31bb300ae8f386f2daab8d35f6c8d7b67",
+    "nativeIntegration": "93b41839bfa328dfde6656d4e2b2b60015a75a01",
+    "commonAncestor": "5b0e5da236ae86846ef9353ca0078fd4a94f46ed"
+  },
+  "kernel": "15.0.1 Linux x86-64",
+  "xAct": "1.3.0",
+  "backend": "portable Wolfram Language permutations; each RunGroup in an independent kernel",
+  "groups": {
+    "Geometry": [
+      49,
+      49
+    ],
+    "Perturbations": [
+      48,
+      48
+    ],
+    "Lifecycle": [
+      64,
+      64
+    ],
+    "Display": [
+      55,
+      55
+    ],
+    "ObjectsAndConnections": [
+      45,
+      45
+    ],
+    "ComponentsAndRules": [
+      24,
+      24
+    ],
+    "Reconstruction": [
+      20,
+      20
+    ],
+    "MetricConnectionCurvature": [
+      6,
+      6
+    ],
+    "Registration": [
+      56,
+      56
+    ],
+    "RegistrationGeometry": [
+      48,
+      48
+    ],
+    "TheoryInspection": [
+      25,
+      25
+    ],
+    "NativeInterop": [
+      23,
+      23
+    ],
+    "ProfilesAndCTensor": [
+      33,
+      33
+    ],
+    "FieldExtensions": [
+      16,
+      16
+    ],
+    "SecondaryChartNative": [
+      3,
+      3
+    ],
+    "ManagedNativeSyntax": [
+      13,
+      13
+    ],
+    "FieldCache": [
+      23,
+      23
+    ],
+    "NativeRead": [
+      22,
+      22
+    ],
+    "NativeGeometry": [
+      12,
+      12
+    ],
+    "GeometryRead": [
+      13,
+      13
+    ],
+    "SelectiveInvalidation": [
+      13,
+      13
+    ],
+    "MetricEdits": [
+      13,
+      13
+    ],
+    "GeometryVariance": [
+      14,
+      14
+    ],
+    "SparseInputs": [
+      26,
+      26
+    ],
+    "SelectedFieldReads": [
+      24,
+      24
+    ],
+    "HeldFieldValues": [
+      20,
+      20
+    ],
+    "FieldDeletion": [
+      22,
+      22
+    ],
+    "NativeSetState": [
+      21,
+      21
+    ],
+    "HeldGeometry": [
+      28,
+      28
+    ],
+    "ChartLifecycle": [
+      13,
+      13
+    ],
+    "Consolidation": [
+      30,
+      30
+    ],
+    "NativeCoordinates": [
+      32,
+      32
+    ]
+  },
+  "total": [
+    854,
+    854
+  ],
+  "originalGroups": [
+    792,
+    792
+  ],
+  "additionalGroups": [
+    62,
+    62
+  ],
+  "workflow": {
+    "inputs": [
+      365,
+      365
+    ],
+    "math": [
+      84,
+      84
+    ],
+    "stages": [
+      33,
+      33
+    ],
+    "parseFailures": [],
+    "malformed": [],
+    "warnings": [],
+    "unexpectedFailures": [],
+    "expectedFailureCells": [
+      "invalidated_result"
+    ],
+    "seconds": 19.566709
+  },
+  "consolidatedWorkflow": {
+    "inputs": [
+      66,
+      66
+    ],
+    "math": [
+      22,
+      22
+    ],
+    "parseFailures": [],
+    "warnings": [],
+    "unexpectedFailures": []
+  },
+  "optionalXTras": [
+    6,
+    6
+  ],
+  "installation": {
+    "traditionalTemp": "install, duplicate refusal, Needs version dev.31, temporary target removed",
+    "pacletDirectory": "registered and Needs loaded dev.31; directory unload returned {}",
+    "archive": "Failure[PacletArchive], ArchiveResult $Failed; no distributable archive",
+    "desktop": "not tested"
+  },
+  "limitations": [
+    "counts are group executions, not deduplicated assertions",
+    "no Desktop visual verification, archive install or archive uninstall",
+    "native raw Basis/cache edits and secondary field inputs not synchronized",
+    "native foreign bases remain external; individual secondary chart deletion and promotion deferred",
+    "spinors and arbitrary bundles out of scope",
+    "no comparative performance benchmark"
+  ]
+}

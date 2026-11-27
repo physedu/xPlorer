@@ -25,7 +25,7 @@ ClearRules::usage = "ClearRules[tag] removes specialization rules from the backg
 ShowRules::usage = "ShowRules[tag] returns active rules in order. ShowRules[tag, \"Numbered\"] pairs them with their one-based positions.";
 ApplyRules::usage = "ApplyRules[tag, expr] applies the specialization rules stored for tag to expr.";
 UseExpression::usage = "UseExpression[tag,key] or UseExpression[tag,section,key] transports a registered formula and applies active background rules.";
-DefineChart::usage = "DefineChart[tag, labels] defines the primary chart. DefineChart[tag, name, labels, map] defines another chart; map supplies primary coordinates as a function of the new coordinates.";
+DefineChart::usage = "DefineChart[tag, {t[],r[],theta[],varphi[]}] defines the primary chart and exposes suffixed coordinate aliases. DefineChart[tag, name, coordinates, map] defines another chart; map supplies primary coordinates as a function of the new coordinates. String label lists are also supported for compatibility; scalar declarations install coordinate aliases.";
 DeleteBackground::usage = "DeleteBackground[tag] undefines owned xAct objects and removes the background from the registry.";
 ClearBackgrounds::usage = "ClearBackgrounds[] deletes each registered background and its owned xAct objects.";
 SetFlatRules::usage = "SetFlatRules[tag] imposes flat-curvature rules for the connection of the background tag.";
@@ -37,7 +37,7 @@ RiemannOf::usage = "RiemannOf[tag] returns the Riemann head associated with the 
 WeylOf::usage = "WeylOf[tag] returns the Weyl head associated with the background tag.";
 ChristoffelOf::usage = "ChristoffelOf[tag] returns the Christoffel head associated with the background tag.";
 BackgroundIndices::usage = "BackgroundIndices[tag, n] returns the first n internal indices of the background tag.";
-ShowBackground::usage = "ShowBackground[tag] returns the internal association of the background tag.";
+ShowBackground::usage = "ShowBackground[tag] returns the managed background record. ShowBackground[tag, section] selects Geometry, Fields, Connections, Charts, Rules, Profiles, Results, Presentation or Summary.";
 ChartOf::usage = "ChartOf[tag] returns the chart symbol stored for the background tag.";
 CoordinatesOf::usage = "CoordinatesOf[tag] returns the coordinate symbols stored for the background tag.";
 BasisOf::usage = "BasisOf[tag] returns the basis symbol stored for the background tag.";
@@ -75,13 +75,13 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.30";
+$XPlorerVersion = "14.0.0-beta.13-dev.31";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
 PresentationOf::usage = "PresentationOf[tag] reports current labels and their defaults.";
 SetXPlorerPreferences::usage = "SetXPlorerPreferences[PartialStyle -> style] sets the session output style. Label rules set defaults for future backgrounds. SetXPlorerPreferences[] resets the session preferences.";
-BackgroundObject::usage = "BackgroundObject[tag, key] returns the actual field or geometry head. Full InputForm retains its context.";
+BackgroundObject::usage = "BackgroundObject[tag, key] returns a field, connection or geometry head. BackgroundObject[tag, key, connection] retrieves geometry of a named connection.";
 
 SetNotation::usage = "SetNotation[tag, option -> value, ...] sets background display defaults; no mathematical data changes.";
 PartialStyle::usage = "PartialStyle chooses Native, MultiIndex, Fraction, Partial, Comma or Prime (one argument) for notebook output and explicit views.";
@@ -109,8 +109,9 @@ CheckConnection::usage = "CheckConnection[tag, key] computes torsion-free and me
 ReplaceRules::usage = "ReplaceRules[tag, rules] replaces the active rules. ReplaceAll uses the first matching rule.";
 RemoveRules::usage = "RemoveRules[tag, positions] removes distinct one-based rule positions shown by ShowRules.";
 SetRuleGroup::usage = "SetRuleGroup[tag, name, rules] defines a named group; active groups are refreshed when edited.";
-ShowRuleGroups::usage = "ShowRuleGroups[tag] returns named rule lists.";
-ActivateRuleGroups::usage = "ActivateRuleGroups[tag, names] replaces the active rules by the groups in the specified first-match order.";
+ShowRuleGroups::usage = "ShowRuleGroups[tag] returns named rule lists. ShowRuleGroups[tag, \"Status\"] also reports active groups, independent rules, effective rules and exact left-hand-side conflicts.";
+ActivateRuleGroups::usage = "ActivateRuleGroups[tag, names] selects named groups in first-match order, followed by independent rules.";
+DeactivateRuleGroups::usage = "DeactivateRuleGroups[tag, names] deactivates selected groups without deleting their definitions or independent rules.";
 RemoveRuleGroup::usage = "RemoveRuleGroup[tag, name] removes the group and refreshes active rules when needed.";
 SaveResult::usage = "SaveResult[tag, key, value] stores a result until the next managed mathematical change. Display changes retain it.";
 ResultOf::usage = "ResultOf[tag, key] retrieves a saved result, or returns Failure after invalidation.";
@@ -417,7 +418,7 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
     "SourceManifold" -> srcm, "SourceBundle" -> VBundleOfMetric[srcg], "Manifold" -> m,
     "Metric" -> g, "CovD" -> cd, "Signature" -> sig, "Indices" -> inds, "BaseIndices" -> base,
     "DisplayIndices" -> display, "Field" -> fields, "HeadRules" -> rules,
-    "IndexRules" -> Thread[base -> inds], "SpecializationRules" -> {},
+    "IndexRules" -> Thread[base -> inds], "SpecializationRules" -> {}, "IndividualRules" -> {},
     "MetricRevision" -> 0, "ComputedGeometry" -> {}, "GeometryRuns" -> 0,
     "FieldComponents" -> <||>, "PerturbationHead" -> perturbHead, "PerturbationParameter" -> parameter|>, geo];
   put[tag,<|"Connections"-><|"Primary"-><|"Head"->cd,"OldHead"->srccd,"Geometry"->connectionGeometry[cd],"Torsion"->False,"Curvature"->True,"Metric"->g|>|>|>];
@@ -476,7 +477,7 @@ PortExpression[tag_String, expr_] := Module[{bg = background[tag], held, indices
 
 AddRules[tag_String, rules_List] := Module[{bg = background[tag]}, If[FailureQ[bg], Return[bg]];
   If[!AllTrue[rules, MatchQ[#, _Rule | _RuleDelayed] &], Return[failure["Rules", "Supply a list of rules."]]];
-  put[tag, <|"SpecializationRules" -> Join[bg["SpecializationRules"], rules],"ActiveRuleGroups"->{}|>];invalidateResults[tag];$BG[tag]];
+  refreshRules[tag,<|"IndividualRules"->Join[individualRules[bg],rules]|>];$BG[tag]];
 ClearRules[tag_String] := ReplaceRules[tag,{}];
 ShowRules[tag_String] := Module[{b = background[tag]}, If[FailureQ[b], b, b["SpecializationRules"]]];
 ApplyRules[tag_String, expr_] := Module[{b = background[tag]}, If[FailureQ[b], b, expr /. b["SpecializationRules"]]];
@@ -568,34 +569,54 @@ UseExpression[tag_String, key_Symbol] := UseExpression[tag, SymbolName[Unevaluat
 UseExpression[tag_String,section_String,key_String] := Module[{ex=BackgroundExpression[tag,section,key]},
  If[FailureQ[ex],ex,ApplyRules[tag,ex]]];
 
-DefineChart[tag_String, names_List] := Module[{b = background[tag], chart, coords, result},
+coordinateDeclarationQ[expr_] := !AtomQ[expr] && Length[expr]===0 && Head[Head[expr]]===Symbol;
+coordinateLabels[names_List] := If[AllTrue[names,coordinateDeclarationQ],SymbolName[Head[#]]& /@ names,names];
+(* Aliases are installed transactionally, without replacing user definitions. *)
+installChartAliases[tag_,chart_,coords_,labels_,base_] := Module[{b=$BG[tag],heads,keys,entries=<||>,entry,conflicts,failed=None},
+ heads=Prepend[coords,chart];keys=Prepend[(#<>base)& /@ labels,"chart"<>base];
+ If[!DuplicateFreeQ[keys],Return[failure["CoordinateAlias","Coordinate names conflict with the chart name."]]];
+ conflicts=Intersection[keys,Keys[Lookup[b,"ObjectAliases",<||>]]];
+ If[conflicts=!={},Return[failure["CoordinateAlias","Coordinate aliases conflict with managed objects.",<|"Aliases"->conflicts|>]]];
+ Do[
+   entry=With[{target=heads[[i]]},installAlias[b["AliasContext"],keys[[i]],HoldComplete[target]]];
+   If[entry===$Failed,failed=keys[[i]];Break[]];
+   entries[keys[[i]]]=entry,
+   {i,Length[heads]}];
+ If[failed=!=None,releaseAliases[entries];Return[failure["CoordinateAlias","Choose coordinate names whose suffixed symbols are unused.",<|"Alias"->failed|>]]];
+ put[tag,<|"ObjectAliases"->Join[Lookup[b,"ObjectAliases",<||>],entries]|>];Null
+];
+DefineChart[tag_String, declarations_List] := Module[{b = background[tag], chart, coords, result,names=coordinateLabels[declarations],nativeQ=AllTrue[declarations,coordinateDeclarationQ]},
   If[FailureQ[b], Return[b]];
   If[Length[names] =!= b["Dimension"] || !VectorQ[names, StringQ] || !DuplicateFreeQ[names],
     Return[failure["Coordinates", "Supply distinct coordinate labels matching the dimension."]]];
   If[KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]],
     Return[If[Lookup[b, "CoordinateLabels", {}] === names, b, failure["ChartExists", "The primary chart already exists. Use DefineChart[tag,name,labels,map] to add an output chart."]]]];
-  chart = Symbol[b["Context"] <> "chart"];
-  coords = Table[Symbol[b["Context"] <> "coord" <> ToString[n]], {n, Length[names]}];
+  chart = If[nativeQ,freshOwnedSymbol[b["Context"],"chart"<>b["SymbolSuffix"]],Symbol[b["Context"] <> "chart"]];
+  coords = If[nativeQ,freshOwnedSymbol[b["Context"],#<>b["SymbolSuffix"]]& /@ names,
+     Table[Symbol[b["Context"] <> "coord" <> ToString[n]], {n, Length[names]}]];
   result = guard[With[{ch = chart, mm = b["Manifold"], nums = Range[0, b["Dimension"] - 1], vals = Through[coords[]]},
     DefChart[ch, mm, nums, vals]]];
   If[result === $Failed || !ChartQ[chart], Return[failure["DefineChart", "xCoba could not define the chart."]]];
   MapThread[Function[{s, lab}, With[{ss = s, ll = lab}, PrintAs[ss] ^= ll]], {coords, names}];
   setBareBoxes[chart,"chart"<>b["SymbolSuffix"]];
+  If[nativeQ,result=installChartAliases[tag,chart,coords,names,b["SymbolSuffix"]];
+    If[FailureQ[result],guard[UndefChart[chart]];Return[result]]];
   installManagedChartSyntax[tag,chart];
-  put[tag, <|"Chart" -> chart, "Basis" -> chart, "Coordinates" -> coords, "CoordinateLabels" -> names|>]
+  put[tag, <|"Chart" -> chart, "Basis" -> chart, "Coordinates" -> coords, "CoordinateLabels" -> names,"NativeCoordinateSyntax"->nativeQ|>]
 ];
 (* Secondary coordinate charts are native xCoba charts on the owned manifold.
    Maps give the primary coordinates as functions of the target coordinates. *)
-DefineChart[tag_String,name_String,labels_List,map_Function] := Module[
-  {b=background[tag],charts,coords,values,chart,jac,det,n,created,record},
+DefineChart[tag_String,name_String,declarations_List,map_Function] := Module[
+  {b=background[tag],charts,coords,values,chart,jac,det,n,created,record,labels=coordinateLabels[declarations],nativeQ=AllTrue[declarations,coordinateDeclarationQ],base,visitors,nativeObjects,newAliases},
   If[FailureQ[b],Return[b]];
   If[!KeyExistsQ[b,"Chart"],Return[failure["NoChart","Define the primary chart first."]]];
   charts=Lookup[b,"AdditionalCharts",<||>]; n=b["Dimension"];
   If[name==="Primary" || KeyExistsQ[charts,name],Return[failure["ChartExists","Choose an unused chart name."]]];
   If[Length[labels]=!=n || !VectorQ[labels,StringQ] || !DuplicateFreeQ[labels],
     Return[failure["Coordinates","Supply one distinct label per dimension."]]];
-  chart=freshOwnedSymbol[b["Context"],"chart"<>safeName[name]];
-  coords=Table[freshOwnedSymbol[b["Context"],"coord"<>safeName[name]<>ToString[i]],{i,n}];
+  base=safeName[name]<>b["SymbolSuffix"];
+  chart=freshOwnedSymbol[b["Context"],If[nativeQ,"chart"<>base,"chart"<>safeName[name]]];
+  coords=If[nativeQ,freshOwnedSymbol[b["Context"],#<>base]& /@ labels,Table[freshOwnedSymbol[b["Context"],"coord"<>safeName[name]<>ToString[i]],{i,n}]];
   With[{ch=chart,mm=b["Manifold"],nums=Range[0,n-1],xs=Through[coords[]]},
     created=guard[DefChart[ch,mm,nums,xs]]];
   If[created===$Failed || !ChartQ[chart],Return[failure["Chart","xCoba could not define this chart."]]];
@@ -605,11 +626,25 @@ DefineChart[tag_String,name_String,labels_List,map_Function] := Module[
   jac=Outer[D,values,Through[coords[]]];det=Simplify[Det[jac]];
   If[TrueQ[det==0],UndefChart[chart];Return[failure["ChartMap","The chart Jacobian is identically singular."]]];
   setBareBoxes[chart,safeName[name]<>b["SymbolSuffix"]];
+  If[nativeQ,created=installChartAliases[tag,chart,coords,labels,base];
+    If[FailureQ[created],guard[UndefChart[chart]];Return[created]]];
+  visitors=Union[VisitorsOf[chart],VisitorsOf[b["Chart"]]];
+  created=guard[SetBasisChange[CTensor[Transpose[jac],{-chart,b["Chart"]}]]];
+  nativeObjects=Select[Complement[Union[VisitorsOf[chart],VisitorsOf[b["Chart"]]],visitors],xTensorQ];
+  If[created===$Failed || FailureQ[created],
+    clearNativeBasisPair[b["Chart"],chart];
+    Scan[If[xTensorQ[#],guard[DeleteTensorValues[#];UndefTensor[#]]]&,nativeObjects];
+    newAliases=KeyDrop[Lookup[$BG[tag],"ObjectAliases",<||>],Keys[Lookup[b,"ObjectAliases",<||>]]];
+    releaseAliases[newAliases];put[tag,<|"ObjectAliases"->Lookup[b,"ObjectAliases",<||>]|>];
+    guard[UndefChart[chart]];Return[failure["ChartBasisChange","xCoba could not register the change of basis."]]];
   record=<|"Chart"->chart,"Coordinates"->coords,"Labels"->labels,"Map"->map,
-    "Values"->values,"Jacobian"->jac|>;
+    "Values"->values,"Jacobian"->jac,"NativeCoordinateSyntax"->nativeQ,"NativeBasisObjects"->nativeObjects|>;
   installManagedChartSyntax[tag,chart];
   put[tag,<|"AdditionalCharts"->Append[charts,name->record]|>]; chart
 ];
+managedChartAliasNames[b_] := Join[
+ If[TrueQ[Lookup[b,"NativeCoordinateSyntax",False]],(#<>b["SymbolSuffix"]& /@ Prepend[b["CoordinateLabels"],"chart"]),{}],
+ Flatten@KeyValueMap[Function[{key,rec},If[TrueQ[Lookup[rec,"NativeCoordinateSyntax",False]],(#<>safeName[key]<>b["SymbolSuffix"]& /@ Prepend[rec["Labels"],"chart"]),{}]],Lookup[b,"AdditionalCharts",<||>]]];
 chartRecord[b_Failure,_] := b;
 chartRecord[b_Association,name_] := Module[{rec=Lookup[Lookup[b,"AdditionalCharts",<||>],name,Missing[]]},
  If[MissingQ[rec],Return[failure["UnknownChart","Choose a defined output chart."]]];
@@ -628,13 +663,39 @@ ChartOf[tag_String,"Primary"] := ChartOf[tag];
 CoordinatesOf[tag_String,"Primary"] := CoordinatesOf[tag];
 ChartOf[tag_String,name_String] := Module[{rec=chartRecord[ShowBackground[tag],name]},If[FailureQ[rec],rec,rec["Chart"]]];
 CoordinatesOf[tag_String,name_String] := Module[{rec=chartRecord[ShowBackground[tag],name]},If[FailureQ[rec],rec,rec["Coordinates"]]];
-chartPullback[arr_,b_,rec_,indices_] := Module[{jac=rec["Jacobian"],inv,result,axis,transform},
-  result=arr/.Thread[coordinateValues[b]->rec["Values"]];
-  If[AnyTrue[indices,UpIndexQ],inv=Simplify[Inverse[jac]]];
-  Do[transform=If[UpIndexQ[indices[[axis]]],inv,Transpose[jac]];
-    result=Map[Function[slice,Dot[transform,slice]],result,{axis-1}],
-    {axis,Length[indices]}];result
+(* xCoba transforms tensor slots; the chart map substitutes scalar coordinates. *)
+chartPullback[arr_,b_,rec_,indices_] := Module[{source,target,ct,result},
+ If[indices==={},Return[arr/.Thread[coordinateValues[b]->rec["Values"]]]];
+ source=If[UpIndexQ[#],b["Basis"],-b["Basis"]]& /@ indices;
+ target=If[UpIndexQ[#],rec["Chart"],-rec["Chart"]]& /@ indices;
+ ct=guard[ToCTensor[CTensor[arr,source],target]];
+ result=Which[ct===Zero,ConstantArray[0,ConstantArray[b["Dimension"],Length[indices]]],MatchQ[ct,_CTensor],First[ct],True,
+   Return[failure["ChartComponents","xCoba could not transform the tensor components."]]];
+ result/.Thread[coordinateValues[b]->rec["Values"]]
 ];
+(* SetBasisChange installs native pair-specific values and ToCTensor upvalues.
+   Remove only those belonging to the deleted pair, not global Basis values. *)
+clearNativeBasisPair[old_,new_] := Module[{ids,prot},
+ ids=Select[TensorValIDs[Basis],!FreeQ[#,old]&&!FreeQ[#,new]&];
+ Scan[DeleteTensorValues,ids];
+ prot=Unprotect[Basis];
+ UpValues[Basis]=Select[UpValues[Basis],FreeQ[First[#],old]||FreeQ[First[#],new]&];
+ Protect[Evaluate[prot]];Null
+];
+(* A registered coordinate map and its native basis pair are one input.
+   Reject direct replacement of that pair rather than leave the chart map stale.
+   Foreign bases and pairs not owned by xPlorer retain native dispatch. *)
+managedBasisPairQ[ct_CTensor] := Module[{bases=(If[MatchQ[#,-_Symbol],-#,#]& /@ xAct`xCoba`Private`CTensorBases[ct])},
+ If[Length[bases]=!=2,Return[False]];
+ AnyTrue[Values[$BG],Function[b,KeyExistsQ[b,"Chart"] &&
+  AnyTrue[Values@Lookup[b,"AdditionalCharts",<||>],Sort[bases]===Sort[{b["Chart"],#["Chart"]}]&]]]];
+managedBasisPairFailure[] := failure["ManagedBasisPair","The basis change belongs to a managed coordinate map. Delete and recreate the chart family to change its map."];
+SetBasisChange[ct_CTensor,chart_,opts:OptionsPattern[]] /;
+ (!TrueQ[$insideNativePrintGuard] && !TrueQ[$insideManagedCalculation] && managedBasisPairQ[ct]) := managedBasisPairFailure[];
+SetBasisChange[pair:{_CTensor,_CTensor},chart_,opts:OptionsPattern[]] /;
+ (!TrueQ[$insideNativePrintGuard] && !TrueQ[$insideManagedCalculation] && AnyTrue[pair,managedBasisPairQ]) := managedBasisPairFailure[];
+clearManagedBasisPairs[b_] := Scan[Function[rec,If[KeyExistsQ[rec,"NativeBasisObjects"],clearNativeBasisPair[b["Chart"],rec["Chart"]]]],Values@Lookup[b,"AdditionalCharts",<||>]];
+nativeBasisObjects[b_] := Flatten[Lookup[Values@Lookup[b,"AdditionalCharts",<||>],"NativeBasisObjects",{}]];
 ChartOf[tag_String] := getter[tag, "Chart"];
 CoordinatesOf[tag_String] := getter[tag, "Coordinates"];
 BasisOf[tag_String] := getter[tag, "Basis"];
@@ -1568,7 +1629,7 @@ ToComponents[tag_String, input_, OptionsPattern[]] := Module[
   If[rec=!=None,
     If[!FreeQ[arr,h_[___] /; xTensorQ[h] && !MemberQ[b["Coordinates"],h]],
       Return[failure["ChartComponents","Supply field components before changing charts."]]];
-    arr=chartPullback[arr,b,rec,inds];
+    arr=chartPullback[arr,b,rec,inds];If[FailureQ[arr],Return[arr]];
     ass=ass/.Thread[coordinateValues[b]->rec["Values"]];
     If[subset=!=All,arr=If[inds==={},ConstantArray[arr,Length[subset]],Extract[arr,# + 1]& /@ subset]]];
   arr = If[MemberQ[{Simplify, FullSimplify}, simp], simp[arr, Assumptions -> ass], simp[arr]];
@@ -1581,6 +1642,9 @@ ToComponents[tag_String, input_, OptionsPattern[]] := Module[
     Return[CTensor[arr,(If[UpIndexQ[#],outbasis,-outbasis]& /@ inds)]]];
   arr
 ];
+(* Only the previously unsupported unary native form is extended; explicit bases remain native. *)
+ToCTensor[expr_] /; StringQ[notationOwner[expr]] && FreeQ[expr,_CTensor] && !AtomQ[expr] :=
+  ToComponents[expr,Output->"CTensor"];
 ToBasisOf[tag_String, expr_] := Module[{b = background[tag]}, If[FailureQ[b], Return[b]]; If[!KeyExistsQ[b,"Basis"],Return[failure["NoChart","Define the chart before converting to its basis."]]]; guard[TraceBasisDummy[ToBasis[b["Basis"]][expr]]]];
 ToValuesOf[tag_String, expr_] := Module[{ex = ToBasisOf[tag, expr]}, If[FailureQ[ex], ex, guard[ToValues[ex]]]];
 
@@ -1662,12 +1726,14 @@ PerturbOn[tag_String, input_, order_Integer: 1, OptionsPattern[]] := Module[{b =
 ];
 
 ownedObjects[b_] := Module[{roots, relative},
-  roots = DeleteMissing@Join[Lookup[b, {"Manifold", "Metric", "CovD", "Chart", "PerturbationParameter"}], Lookup[Values[b["Field"]], "NewHead", {}],connectionHeads[b],Lookup[Values@Lookup[b,"AdditionalCharts",<||>],"Chart",{}],relativeHeads[b]];
+  roots = DeleteMissing@Join[Lookup[b, {"Manifold", "Metric", "CovD", "Chart", "PerturbationParameter"}], Lookup[Values[b["Field"]], "NewHead", {}],connectionHeads[b],Lookup[Values@Lookup[b,"AdditionalCharts",<||>],"Chart",{}],nativeBasisObjects[b],relativeHeads[b]];
   If[KeyExistsQ[b,"CovD"] && CovDQ[b["CovD"]] && KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]], relative = GiveSymbol[Christoffel, Sequence @@ Sort[{b["CovD"], PDOfBasis[b["Chart"]]}]]; If[xTensorQ[relative], AppendTo[roots, relative]]];
   FixedPoint[DeleteDuplicates@Join[#, Flatten[ServantsOf /@ #]] &, roots]
 ];
 disposeObjects[b_] := Module[{fields, parameter = b["PerturbationParameter"]},
   fields = Reverse[Lookup[Values[b["Field"]], "NewHead", {}]];
+  clearManagedBasisPairs[b];
+  Scan[If[xTensorQ[#]&&MasterOf[#]===Null,DeleteTensorValues[#];UndefTensor[#]]&,nativeBasisObjects[b]];
   Scan[If[xTensorQ[#], DeleteTensorValues[#]; UndefTensor[#]] &, fields];
   Scan[If[xTensorQ[#]&&MasterOf[#]===Null,DeleteTensorValues[#];UndefTensor[#]]&,relativeHeads[b]];
   Scan[If[CovDQ[#] && #=!=Lookup[b,"CovD",None],UndefCovD[#]]&,Reverse@connectionHeads[b]];
@@ -1707,6 +1773,22 @@ ChristoffelOf[tag_String] := getter[tag, "Christoffel"];
 BackgroundIndices[tag_String, n_: Automatic] := Module[{b = background[tag]}, If[FailureQ[b], Return[b]];
   If[n === Automatic, b["Indices"], If[IntegerQ[n] && 0 <= n <= Length[b["Indices"]], Take[b["Indices"], n], failure["IndexCount", "Invalid number of indices."]]]];
 ShowBackground[tag_String] := background[tag];
+ShowBackground[tag_String,section_String] := Module[{b=background[tag]},If[FailureQ[b],Return[b]];
+ Switch[section,
+  "Geometry",KeyTake[b,{"Manifold","Dimension","Metric","CovD","Signature","ComputedGeometry","MetricRevision","GeometryRuns"}],
+  "Fields",Map[KeyTake[#,{"NewHead","Type","Rank","IndexPositions"}]&,b["Field"]],
+  "Connections",ConnectionsOf[tag],
+  "Charts",Join[If[KeyExistsQ[b,"Chart"],<|"Primary"-><|"Chart"->b["Chart"],"Coordinates"->ScalarsOfChart[b["Chart"]]|>|>,<||>],
+    Map[KeyTake[#,{"Chart","Coordinates","Labels","Map"}]&,Lookup[b,"AdditionalCharts",<||>]]],
+  "Rules",ShowRuleGroups[tag,"Status"],
+  "Profiles",ShowProfiles[tag],
+  "Results",Keys[Lookup[b,"SavedResults",<||>]],
+  "Presentation",PresentationOf[tag],
+  "Summary",<|"Tag"->tag,"Geometry"->ShowBackground[tag,"Geometry"],"Fields"->Keys[b["Field"]],"Connections"->Keys[Lookup[b,"Connections",<||>]],
+    "Charts"->Keys[ShowBackground[tag,"Charts"]],"Profiles"->Keys[ShowProfiles[tag]],"ActiveRuleGroups"->Lookup[b,"ActiveRuleGroups",{}],
+    "SavedResults"->ShowBackground[tag,"Results"]|>,
+  _,failure["BackgroundSection","Choose Geometry, Fields, Connections, Charts, Rules, Profiles, Results, Presentation or Summary."]]
+];
 (* Presentation is deliberately separate from the registry and mathematical access. *)
 TheorySnapshot[] := $Theory;
 b13Sections = {"Geometry","Fields","Parameters","Lagrangians","Expressions","Connections","Sectors"};
@@ -1788,8 +1870,9 @@ SetXPlorerPreferences[assoc_Association] := Module[{n = KeyTake[assoc,Keys[$nota
 RegisterTheory["Presentation", assoc_Association] := ($Theory["Presentation"] = assoc; $Theory);
 BackgroundObject[tag_String, key_String] := Module[{b = background[tag]},
   If[FailureQ[b], Return[b]];
-  If[KeyExistsQ[b["Field"], key], b["Field"][key]["NewHead"], getter[tag,key]]
+  If[KeyExistsQ[b["Field"], key], b["Field"][key]["NewHead"], If[KeyExistsQ[Lookup[b,"Connections",<||>],key],ConnectionOf[tag,key],getter[tag,key]]]
 ];
+BackgroundObject[tag_String,key_String,connection:(_String|_Symbol)] := connectionGetter[tag,connection,key];
 SetPresentation[tag_String, assoc_Association] := Module[{b = background[tag], unknown, current, effective, objects, val,source,kind},
   If[FailureQ[b], Return[b]];
   unknown = Complement[Keys[assoc], Keys[b["PresentationDefaults"]]];
@@ -1990,7 +2073,7 @@ DeletionPlan[tag_String,key_String:"Background",OptionsPattern[]] := Module[
    roots=Union[roots,Select[{GiveSymbol[Determinant,b["Metric"],b["Chart"]],GiveSymbol[Christoffel,Sequence@@Sort[{b["CovD"],PDOfBasis[b["Chart"]]}]]},xTensorQ]];
    owned=Union[owned,roots]
  ];
- If[key==="Chart",roots=Union[roots,servantClosure[Lookup[Values@Lookup[b,"AdditionalCharts",<||>],"Chart",{}]]]];
+ If[key==="Chart",roots=Union[roots,servantClosure[Join[Lookup[Values@Lookup[b,"AdditionalCharts",<||>],"Chart",{}],nativeBasisObjects[b]]]]];
  roots=Union[roots,Select[relativeHeads[b],Function[h,AnyTrue[roots,!FreeQ[TensorID[h],#]&]]]];
  visitors=visitorClosure[roots];
  external=Union[Complement[visitors,owned],Select[externalRelativeHeads[b],Function[h,AnyTrue[roots,!FreeQ[TensorID[h],#]&]]]];
@@ -2025,10 +2108,12 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  r=backgroundNativeSetGuard[b];If[FailureQ[r],Return[r]];
  removed=plan["Objects"];names=ToString[#,InputForm]& /@ removed;
  aliasNames=SymbolName /@ Select[removed,Head[#]===Symbol&];
+ If[key==="Chart",aliasNames=Union[aliasNames,managedChartAliasNames[b]]];
  If[KeyExistsQ[b,"MetricMatrix"],clearGeometry[tag]];
  r=guard[Internal`InheritedBlock[{Undef},Unprotect[Undef];
    Undef[s_Symbol /; StringStartsQ[ToString[Unevaluated[s],InputForm],"Removed["]]:=Null;
-   Scan[undefOwned,plan["Order"]]
+   If[key==="Chart",clearManagedBasisPairs[b]];
+    Scan[undefOwned,plan["Order"]]
  ]];
  remaining=Select[names,registeredNameQ];
  If[r===$Failed || remaining=!={},Return[failure["PartialDeletion","Deletion did not complete. Inspect the retained registry and actual xAct objects before retrying.",<|"RemainingNames"->remaining|>]]];
@@ -2045,9 +2130,11 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  newb["FieldProfiles"]=Select[Lookup[newb,"FieldProfiles",<||>],Function[profile,AllTrue[Values[profile],xTensorQ[#["Head"]]&] && !AnyTrue[removed,!FreeQ[profile,#]&]]];
  newb["HeadRules"]=Select[newb["HeadRules"],objectRegisteredQ[Last[#]]&];
  newb["RuleGroups"]=KeyDrop[Lookup[newb,"RuleGroups",<||>],plan["RuleGroupsAffected"]];
- newb["ActiveRuleGroups"]={};
+ newb["ActiveRuleGroups"]=Select[Lookup[b,"ActiveRuleGroups",{}],KeyExistsQ[newb["RuleGroups"],#]&];
  newb["Theory"]=KeyDrop[newb["Theory"],plan["RegisteredSections"]];
- newb["SpecializationRules"]=Delete[b["SpecializationRules"],List /@ plan["RulePositions"]];
+ With[{offset=Total[Length /@ Lookup[Lookup[b,"RuleGroups",<||>],Lookup[b,"ActiveRuleGroups",{}]]]},
+   newb["IndividualRules"]=removeRulePositions[individualRules[b],Select[plan["RulePositions"],#>offset&]-offset]];
+  newb["SpecializationRules"]=effectiveRules[newb];
  With[{tt=Join[newb["Theory"],<|"Field"->KeyTake[Lookup[newb["Theory"],"Field",<||>],Keys[newb["Field"]]],"Connections"->KeyTake[Lookup[newb["Theory"],"Connections",<||>],Keys[newb["Connections"]]],"Formula"->KeyDrop[Lookup[b["Theory"],"Formula",<||>],plan["RegisteredExpressions"]]|>]},newb["Theory"]=tt];
  If[MemberQ[deadKeys,"Metric"],
   newb=KeyDrop[newb,Join[{"Christoffel","Riemann","Ricci","RicciScalar","Einstein","Weyl","TFRicci","Kretschmann","Epsilon","DetMetric"},{"Metric","CovD","MetricMatrix","GeometryPolicy"}]];
@@ -2056,7 +2143,7 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  If[MemberQ[deadKeys,"Chart"],
   Scan[If[xTensorQ[#],DeleteTensorValues[#]]&,Lookup[Values[newb["Field"]],"NewHead",{}]];
   newb["FieldComponents"]=<||>;newb["FieldProfiles"]=<||>;newb["ConnectionComponents"]=<||>;
-  newb=KeyDrop[newb,{"AdditionalCharts","Chart","Basis","Coordinates","CoordinateLabels","MetricMatrix","GeometryPolicy"}]
+  newb=KeyDrop[newb,{"AdditionalCharts","Chart","Basis","Coordinates","CoordinateLabels","NativeCoordinateSyntax","MetricMatrix","GeometryPolicy"}]
  ];
  newb["PresentationDefaults"]=KeyDrop[newb["PresentationDefaults"],deadKeys];
  newb["PresentationOverrides"]=KeyDrop[newb["PresentationOverrides"],deadKeys];
@@ -2245,29 +2332,56 @@ CheckConnection[tag_String,key_String,OptionsPattern[]] := Module[{b=background[
  <|"Connection"->key,"TorsionFree"->arrayZeroCheck[tor,ass],"MetricCompatible"->arrayZeroCheck[compat,ass],
    "IdentityScope"->If[key==="Primary","Levi-Civita checks also available through CheckBackground","General connection: no metric Bianchi or Ricci-symmetry assumption"]|>
 ];
+(* Groups and independent rules remain separate. Named groups take precedence in the selected order. *)
+individualRules[b_] := Lookup[b,"IndividualRules",If[Lookup[b,"ActiveRuleGroups",{}]==={},Lookup[b,"SpecializationRules",{}],{}]];
+effectiveRules[b_] := Join[Flatten[Lookup[Lookup[b,"RuleGroups",<||>],Lookup[b,"ActiveRuleGroups",{}]],1],individualRules[b]];
+refreshRules[tag_,updates_Association] := Module[{old=$BG[tag],next,eff},
+ next=Join[old,updates];eff=effectiveRules[next];
+ put[tag,Join[updates,<|"SpecializationRules"->eff|>]];
+ If[!SameQ[eff,old["SpecializationRules"]],invalidateResults[tag]];eff
+];
 ReplaceRules[tag_String,rules_List] := Module[{b=background[tag]},If[FailureQ[b],Return[b]];
  If[!AllTrue[rules,MatchQ[#,_Rule|_RuleDelayed]&],Return[failure["Rules","Supply a list of rules."]]];
- put[tag,<|"SpecializationRules"->rules,"ActiveRuleGroups"->{}|>];invalidateResults[tag];rules
+ refreshRules[tag,<|"IndividualRules"->rules,"ActiveRuleGroups"->{}|>]
 ];
-RemoveRules[tag_String,positions_List] := Module[{b=background[tag]},If[FailureQ[b],Return[b]];
+removeRulePositions[rules_,positions_] := If[positions==={},rules,Delete[rules,List /@ positions]];
+RemoveRules[tag_String,positions_List] := Module[{b=background[tag],groups,names,offset=0,count,local,manual},
+ If[FailureQ[b],Return[b]];
  If[!DuplicateFreeQ[positions] || !VectorQ[positions,IntegerQ[#]&&1<=#<=Length[b["SpecializationRules"]]&],Return[failure["RulePositions","Use distinct one-based positions from ShowRules."]]];
- ReplaceRules[tag,Delete[b["SpecializationRules"],List /@ positions]]
+ groups=Lookup[b,"RuleGroups",<||>];names=Lookup[b,"ActiveRuleGroups",{}];
+ Do[count=Length[groups[name]];local=Select[positions,offset<#<=offset+count&]-offset;
+   groups[name]=removeRulePositions[groups[name],local];offset+=count,{name,names}];
+ manual=removeRulePositions[individualRules[b],Select[positions,#>offset&]-offset];
+ refreshRules[tag,<|"RuleGroups"->groups,"IndividualRules"->manual|>]
 ];
 SetRuleGroup[tag_String,name_String,rules_List] := Module[{b=background[tag],a},If[FailureQ[b],Return[b]];
- If[!AllTrue[rules,MatchQ[#,_Rule|_RuleDelayed]&],Return[failure["Rules","Supply a list of rules."]]];
- a=Join[Lookup[b,"RuleGroups",<||>],<|name->rules|>];put[tag,<|"RuleGroups"->a|>];
- If[MemberQ[Lookup[b,"ActiveRuleGroups",{}],name],ActivateRuleGroups[tag,b["ActiveRuleGroups"]]];a
+ If[StringTrim[name]==="" || !AllTrue[rules,MatchQ[#,_Rule|_RuleDelayed]&],Return[failure["Rules","Supply a nonempty group name and a list of rules."]]];
+ a=Join[Lookup[b,"RuleGroups",<||>],<|name->rules|>];refreshRules[tag,<|"RuleGroups"->a|>];a
 ];
 ShowRuleGroups[tag_String] := Module[{b=background[tag]},If[FailureQ[b],b,Lookup[b,"RuleGroups",<||>]]];
-ActivateRuleGroups[tag_String,names_List] := Module[{b=background[tag],a,r},If[FailureQ[b],Return[b]];
+heldRuleLHS[Verbatim[Rule][l_,r_]]:=HoldComplete[l];
+heldRuleLHS[Verbatim[RuleDelayed][l_,r_]]:=HoldComplete[l];
+heldRuleRHS[Verbatim[Rule][l_,r_]]:=HoldComplete[r];
+heldRuleRHS[Verbatim[RuleDelayed][l_,r_]]:=HoldComplete[r];
+ShowRuleGroups[tag_String,"Status"] := Module[{b=background[tag],r},If[FailureQ[b],Return[b]];
+ r=b["SpecializationRules"];
+ <|"Groups"->Lookup[b,"RuleGroups",<||>],"Active"->Lookup[b,"ActiveRuleGroups",{}],"Individual"->individualRules[b],"Effective"->r,
+ "Conflicts"->Select[GatherBy[r,heldRuleLHS],Length[DeleteDuplicates[heldRuleRHS /@ #]]>1&]|>
+];
+ActivateRuleGroups[tag_String,names_List] := Module[{b=background[tag],a},If[FailureQ[b],Return[b]];
  a=Lookup[b,"RuleGroups",<||>];
  If[!VectorQ[names,StringQ] || !DuplicateFreeQ[names] || Complement[names,Keys[a]]=!={},Return[failure["RuleGroups","Select existing distinct group names in desired first-match order."]]];
- r=Flatten[Lookup[a,names],1];ReplaceRules[tag,r];put[tag,<|"ActiveRuleGroups"->names|>];r
+ refreshRules[tag,<|"ActiveRuleGroups"->names|>]
+];
+DeactivateRuleGroups[tag_String,names_List] := Module[{b=background[tag],a},If[FailureQ[b],Return[b]];
+ a=Lookup[b,"RuleGroups",<||>];
+ If[!VectorQ[names,StringQ] || Complement[names,Keys[a]]=!={},Return[failure["RuleGroups","Select existing group names."]]];
+ ActivateRuleGroups[tag,Select[Lookup[b,"ActiveRuleGroups",{}],!MemberQ[names,#]&]]
 ];
 RemoveRuleGroup[tag_String,name_String] := Module[{b=background[tag],a,names},If[FailureQ[b],Return[b]];
  a=Lookup[b,"RuleGroups",<||>];If[!KeyExistsQ[a,name],Return[failure["RuleGroups","Unknown rule group."]]];
- put[tag,<|"RuleGroups"->KeyDrop[a,name]|>];names=DeleteCases[Lookup[b,"ActiveRuleGroups",{}],name];
- If[MemberQ[Lookup[b,"ActiveRuleGroups",{}],name],ActivateRuleGroups[tag,names]];Null
+ names=DeleteCases[Lookup[b,"ActiveRuleGroups",{}],name];
+ refreshRules[tag,<|"RuleGroups"->KeyDrop[a,name],"ActiveRuleGroups"->names|>];Null
 ];
 SaveResult[tag_String,key_String,value_] := Module[{b=background[tag]},If[FailureQ[b],Return[b]];
  put[tag,<|"SavedResults"->Join[Lookup[b,"SavedResults",<||>],<|key->value|>]|>];value
@@ -2281,10 +2395,11 @@ recipeObjects[b_] := Join[managedObjects[b],KeyTake[b,{"Christoffel","Torsion","
 ReconstructionData[tag_String] := Module[{b=background[tag],inputs,r},If[FailureQ[b],Return[b]];
  r=backgroundNativeSetGuard[b];If[FailureQ[r],Return[r]];
  inputs=Association@KeyValueMap[Function[{key,fs},key -> (KeyDrop[#,"Head"]& /@ Select[Values[b["FieldComponents"]],#["Head"]===fs["NewHead"]&])],b["Field"]];
- Join[KeyTake[b,{"Theory","Signature","SymbolSuffix","DisplayIndices","CoordinateLabels","Coordinates","MetricMatrix","Assumptions","SpecializationRules","RuleGroups","ActiveRuleGroups","PresentationOverrides","Notation","ConnectionComponents","FieldProfiles"}],
- <|"RecipeVersion"->1,"OriginalTag"->tag,"ChartMaps"->Map[KeyTake[#,{"Labels","Map","Chart","Coordinates"}]&,Lookup[b,"AdditionalCharts",<||>]],"Objects"->recipeObjects[b],"Indices"->b["Indices"],"FieldInputs"->inputs,
+ Join[KeyTake[b,{"Theory","Signature","SymbolSuffix","DisplayIndices","CoordinateLabels","Coordinates","NativeCoordinateSyntax","MetricMatrix","Assumptions","SpecializationRules","IndividualRules","RuleGroups","ActiveRuleGroups","PresentationOverrides","Notation","ConnectionComponents","FieldProfiles"}],
+ <|"RecipeVersion"->1,"OriginalTag"->tag,"ChartMaps"->Map[KeyTake[#,{"Labels","Map","Chart","Coordinates","NativeCoordinateSyntax"}]&,Lookup[b,"AdditionalCharts",<||>]],"Objects"->recipeObjects[b],"Indices"->b["Indices"],"FieldInputs"->inputs,
   "RelativeHeads"->relativeHeads[b]|>]
 ];
+recipeDeclarations[labels_,native_] := If[TrueQ[native],(Symbol["xPlorer`CoordinateDeclarations`"<>#][]& /@ labels),labels];
 RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,coords,inputs,source,result,relative,chartRules},
  If[KeyExistsQ[$BG,tag],Return[failure["BackgroundExists","Choose an unused tag or delete the old background first."]]];
  If[Lookup[recipe,"RecipeVersion",None]=!=1 || !AssociationQ[Lookup[recipe,"Theory",None]],Return[failure["Recipe","Supply ReconstructionData captured before deletion."]]];
@@ -2293,8 +2408,8 @@ RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,c
   Return[failure["RecipeScope","Reconstruction of rules on relative-connection tensor heads is not supported; rewrite them using named connections first."]]];
  b=Block[{$Theory=recipe["Theory"]},CreateBackground[tag,SymbolSuffix->If[tag===Lookup[recipe,"OriginalTag",None],Lookup[recipe,"SymbolSuffix",Automatic],Automatic],MetricSignature->Lookup[recipe,"Signature",Automatic],Indices->Lookup[recipe,"DisplayIndices",Automatic],Presentation->Lookup[recipe,"PresentationOverrides",<||>]]];
  If[FailureQ[b],Return[b]];
- If[KeyExistsQ[recipe,"CoordinateLabels"],r=DefineChart[tag,recipe["CoordinateLabels"]];If[FailureQ[r],Return[r]]];
- result=KeyValueMap[DefineChart[tag,#1,#2["Labels"],#2["Map"]]&,Lookup[recipe,"ChartMaps",<||>]];
+ If[KeyExistsQ[recipe,"CoordinateLabels"],r=DefineChart[tag,recipeDeclarations[recipe["CoordinateLabels"],Lookup[recipe,"NativeCoordinateSyntax",False]]];If[FailureQ[r],Return[r]]];
+ result=KeyValueMap[DefineChart[tag,#1,recipeDeclarations[#2["Labels"],Lookup[#2,"NativeCoordinateSyntax",False]],#2["Map"]]&,Lookup[recipe,"ChartMaps",<||>]];
  If[AnyTrue[result,FailureQ],Return[First@Select[result,FailureQ]]];
  b=$BG[tag];old=recipe["Objects"];new=recipeObjects[b];
  rules=Thread[Values@KeyTake[old,Intersection[Keys[old],Keys[new]]] -> Values@KeyTake[new,Intersection[Keys[old],Keys[new]]]];
@@ -2319,7 +2434,7 @@ RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,c
  If[AnyTrue[Flatten[result],FailureQ],Return[First@Select[Flatten[result],FailureQ]]];
  result=KeyValueMap[SetConnectionComponents[tag,#1,#2["Values"]/.rules,ReferenceConnection->#2["Reference"]]&,Lookup[recipe,"ConnectionComponents",<||>]];
  If[AnyTrue[result,FailureQ],Return[First@Select[result,FailureQ]]];
- put[tag,<|"FieldProfiles"->Map[Function[records,Association[(fieldRecordKey[#]->#)& /@ (Values[records]/.rules)]],Lookup[recipe,"FieldProfiles",<||>]],"RuleGroups"->(Lookup[recipe,"RuleGroups",<||>]/.rules),"SpecializationRules"->(Lookup[recipe,"SpecializationRules",{}]/.rules),
+ put[tag,<|"FieldProfiles"->Map[Function[records,Association[(fieldRecordKey[#]->#)& /@ (Values[records]/.rules)]],Lookup[recipe,"FieldProfiles",<||>]],"RuleGroups"->(Lookup[recipe,"RuleGroups",<||>]/.rules),"SpecializationRules"->(Lookup[recipe,"SpecializationRules",{}]/.rules),"IndividualRules"->(individualRules[recipe]/.rules),
    "ActiveRuleGroups"->Lookup[recipe,"ActiveRuleGroups",{}],"Notation"->Lookup[recipe,"Notation",<||>]|>];
  updatePrintHook[];$BG[tag]
 ];

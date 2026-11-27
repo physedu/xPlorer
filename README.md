@@ -2,15 +2,15 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-> **Development branch: 14.0.0-beta.13-dev.23.** The new registration API is breaking. Dev.23 extends lazy native geometry variance and invalidates imploded geometry derivative rules; see exact validation checkpoints. See [BETA13_PROGRESS.md](BETA13_PROGRESS.md) for exact test evidence, [targeted tests](Tests/13_Registration.wl), and a [worked Proca example](Examples/Beta13_Proca.wl). Main remains beta.12. Do not treat this branch as a release.
+> **Development candidate: 14.0.0-beta.13-dev.31.** Selective consolidation of registration dev.30 and native-integration dev.16. This branch is not a public release. See [BETA13_CONSOLIDATION.md](BETA13_CONSOLIDATION.md) for scope and validation.
 
 xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
-The current experimental version is **14.0.0-beta.13-dev.23** (inferred background component evaluation, theory information, readable sector and chart displays, and revised workflow). The component calculation engine is unchanged. See [API_AUDIT.md](API_AUDIT.md). The preserved baseline on main is beta.12. The notebook can run with Get; an installed application is loaded using Needs. Single-item registration now supports Field, Parameter, Lagrangian and Expression, with plural batch and collection names. Existing plural single-item calls remain accepted; background creation semantics are unchanged. Personalization is optional.
+xPlorer keeps the existing native registration API and background snapshots. Dev.31 retains dev.30's managed component engine and integrates native coordinate declarations, registered basis transformations, unary ToCTensor, independent rules and structured background inspection.
 
 ## Start here
 
-Keep [xPlorer_Workflow.nb](xPlorer_Workflow.nb) beside the [Paclet](Paclet/) directory, install xAct, start a fresh Mathematica kernel and evaluate the notebook in order. Choose one of its two startup cells. For source use:
+Start with [xPlorer_Consolidated.nb](xPlorer_Consolidated.nb) for the focused native workflow. For the extended tutorial, keep [xPlorer_Workflow.nb](xPlorer_Workflow.nb) beside the [Paclet](Paclet/) directory, install xAct, start a fresh Mathematica kernel and evaluate the notebook in order. Choose one of its two startup cells. For source use:
 
 ```wl
 Get[FileNameJoin[{NotebookDirectory[], "Paclet", "xPlorer.wl"}]];
@@ -24,13 +24,13 @@ The principal notebook develops a scalar theory on Minkowski, Schwarzschild and 
 - Formal expression transport before introducing coordinates, then xCoba component calculations with explicit tensor axes and component selection.
 - Native PrintAs inheritance, optional local labels, readable internal heads and safe interpreted views via `expr // PrettyExp`.
 - Optional named field profiles and native `CTensor` output with basis and slot variance; ordinary arrays remain the default.
-- Native chart and basis interoperability verified without duplicating xCoba basis machinery. Native edits are not automatically synchronized with managed data.
+- Native scalar-coordinate declarations, native chart-to-chart basis changes, and scoped primary-chart input capture. Arbitrary external native edits are not automatically synchronized.
 - Automatic notebook-context aliases for background objects and indices, e.g. `gSchw`, `CDSchw`, `phiSchw` and `aSchw` after `CreateBackground["Schwarzschild", SymbolSuffix -> "Schw"]`. Occupied names are preserved; `BackgroundObject` remains available for explicit lookup.
 - Named additional connections with their own curvature families and supplied coefficients or differences from the primary derivative.
 - Scoped rules, selective removal, named particularizations and conservative invalidation of saved results.
 - Separate value clearing, registration removal and true dependency-aware deletion of owned fields, charts, connections, metric families or whole backgrounds.
 
-The dev.13 workflow passed 327/327 selected input executions, 74/74 mathematical checks and 33/33 workflow and display checks, without warnings, parse errors or unexpected failures. The previous dev.11 display, theory inspection and profile/CTensor suites passed 55/55, 25/25 and 33/33 respectively. Desktop appearance, paclet build and installation still require verification.
+Current evidence is recorded in [BETA13_CONSOLIDATION.md](BETA13_CONSOLIDATION.md); historical checkpoints below refer to their respective versions. Desktop appearance, archive build and installation still require verification.
 
 See [API_GUIDE.md](API_GUIDE.md), the [Proca example](Examples/Beta13_Proca.wl) and [native xCoba example](Examples/NativeXCoba.wl). [VALIDATION.md](VALIDATION.md) is a historical beta.7 record; current evidence and limitations are in [BETA13_PROGRESS.md](BETA13_PROGRESS.md) and [BETA13_PLAN.md](BETA13_PLAN.md).
 
@@ -101,7 +101,7 @@ If you use xPlorer in your research, please cite the version used. GitHub's **Ci
   author  = {Sanz-Romero, Eduardo},
   title   = {xPlorer},
   year    = {2026},
-  version = {14.0.0-beta.13-dev.23},
+  version = {14.0.0-beta.13-dev.31},
   url     = {https://github.com/physedu/xPlorer}
 }
 ```
