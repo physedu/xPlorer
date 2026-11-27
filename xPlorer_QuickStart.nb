@@ -1,0 +1,144 @@
+Notebook[{
+Cell["xPlorer - Quick Start","Title"],
+
+Cell["One abstract scalar theory, three independent spacetimes | beta.13-dev.33","Subtitle"],
+
+Cell["Install xAct separately. Start a fresh kernel. Choose one load cell only; evaluate the remaining cells in order. This short notebook is a complete scientific example, not a test suite. For naming, advanced native xCoba operations, perturbations and lifecycle management, open xPlorer_Workflow.nb in a fresh kernel.","Text"],
+
+Cell["A. Load the source beside this notebook","Text"],
+
+Cell[BoxData["Get[FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]];"],"Input",CellTags->"load"],
+
+Cell["B. Alternatively, load an installed paclet (skip A)","Text"],
+
+Cell[BoxData["Needs[\"xPlorer`\"];"],"Input",CellTags->"load_installed"],
+
+Cell[BoxData["$XPlorerVersion"],"Input",CellTags->"version"],
+
+Cell["Optional: reduce native informational printing, without suppressing errors. These are native xAct settings for this kernel.","Text"],
+
+Cell[BoxData["$DefInfoQ = False; $CVVerbose = False;"],"Input",CellTags->"verbosity"],
+
+Cell["1. Define and register the theory","Section"],
+
+Cell["A real scalar of mass m, with Lorentzian signature (-,+,+,+). Vary the Klein-Gordon Lagrangian at fixed metric and discard the boundary term for compactly supported variations.","Text"],
+
+Cell[BoxData["DefManifold[M, 4, {a,b,c,d,e,f,i,j}];"],"Input",CellTags->"manifold"],
+
+Cell[BoxData["DefMetric[-1, g[-a,-b], CD];"],"Input",CellTags->"metric"],
+
+Cell[BoxData["DefTensor[phi[], M, PrintAs -> \"\\[Phi]\"];"],"Input",CellTags->"scalar"],
+
+Cell[BoxData["DefConstantSymbol[m];"],"Input",CellTags->"mass"],
+
+Cell[BoxData["L = -CD[-a][phi[]] CD[a][phi[]]/2 - m^2 phi[]^2/2;"],"Input",CellTags->"lagrangian"],
+
+Cell[BoxData["kg = VarD[phi[], CD][L] // ContractMetric // ToCanonical;"],"Input",CellTags->"equation"],
+
+Cell[BoxData["kg == 0"],"Input",CellTags->"abstract"],
+
+Cell[BoxData["RegisterTheory[\"Metric\",g]; RegisterTheory[\"CovD\",CD]; RegisterTheory[\"Indices\",{a,b,c,d,e,f,i,j}];"],"Input",CellTags->"register"],
+
+Cell[BoxData["RegisterTheory[\"Field\",phi]; RegisterTheory[\"Parameter\",m];"],"Input",CellTags->"register_fields"],
+
+Cell[BoxData["RegisterTheory[\"Lagrangian\",\"Scalar\"->L]; RegisterTheory[\"Expression\",\"KG\"->kg];"],"Input",CellTags->"register_formulas"],
+
+Cell[BoxData["ShowTheory[]"],"Input",CellTags->"inspect"],
+
+Cell["2. Reuse the theory on three geometries","Section"],
+
+Cell["Each copy has its own xAct objects and abstract indices. The symbols you type have suffixes; printed labels are optional and do not enter calculations.","Text"],
+
+Cell[BoxData["SetXPlorerPreferences[ShowObjectLabels->True,PartialStyle->\"Fraction\",CovariantStyle->\"Prefix\"];"],"Input",CellTags->"preferences"],
+
+Cell[BoxData["CreateBackground[\"Minkowski\",SymbolSuffix->\"M\"];"],"Input",CellTags->"minkowski"],
+
+Cell[BoxData["CreateBackground[\"Schwarzschild\",SymbolSuffix->\"Schw\",BackgroundLabel->\"S\"];"],"Input",CellTags->"schwarzschild"],
+
+Cell[BoxData["CreateBackground[\"FLRW\",BackgroundLabel->\"F\"];"],"Input",CellTags->"flrw"],
+
+Cell[BoxData["{kgM==0,kgSchw==0,kgFLRW==0}"],"Input",CellTags->"abstract_copies"],
+
+Cell["3. Define charts, metrics and scalar profiles","Section"],
+
+Cell["Use native xCoba MetricInBasis and ComponentValue on the owned symbols. ToComponents infers the background from the transported expression.","Text"],
+
+Cell["Minkowski: Cartesian plane wave","Subsection"],
+
+Cell[BoxData["DefineChart[\"Minkowski\",{t[],x[],y[],z[]}];"],"Input",CellTags->"chart_m"],
+
+Cell[BoxData["MetricInBasis[gM,-chartM,DiagonalMatrix[{-1,1,1,1}]];"],"Input",CellTags->"metric_m"],
+
+Cell[BoxData["DefConstantSymbol[omega]; DefConstantSymbol[k];"],"Input",CellTags->"wave_params"],
+
+Cell[BoxData["ComponentValue[phiM[],Cos[omega tM[]-k zM[]]];"],"Input",CellTags->"profile_m"],
+
+Cell[BoxData["eqM = kgM // ToComponents;"],"Input",CellTags->"eq_m"],
+
+Cell[BoxData["eqM == 0"],"Input",CellTags->"eq_m_view"],
+
+Cell[BoxData["Simplify[eqM,omega^2==k^2+m^2]"],"Input",CellTags->"wave_check"],
+
+Cell["Schwarzschild exterior: radial scalar","Subsection"],
+
+Cell[BoxData["DefineChart[\"Schwarzschild\",{t[],r[],theta[],varphi[]}];"],"Input",CellTags->"chart_s"],
+
+Cell[BoxData["DefConstantSymbol[Mbh];"],"Input",CellTags->"bh_mass"],
+
+Cell[BoxData["fSchw=1-2 Mbh/rSchw[];"],"Input",CellTags->"f"],
+
+Cell[BoxData["MetricInBasis[gSchw,DiagonalMatrix[{-fSchw,1/fSchw,rSchw[]^2,rSchw[]^2 Sin[thetaSchw[]]^2}],Assumptions->Mbh>0 && rSchw[]>2 Mbh && 0<thetaSchw[]<Pi];"],"Input",CellTags->"metric_s"],
+
+Cell[BoxData["DefScalarFunction[u];"],"Input",CellTags->"profile_fn"],
+
+Cell[BoxData["ComponentValue[phiSchw[],u[rSchw[]]];"],"Input",CellTags->"profile_s"],
+
+Cell[BoxData["eqS=kgSchw // ToComponents;"],"Input",CellTags->"eq_s"],
+
+Cell[BoxData["eqS==0"],"Input",CellTags->"eq_s_view"],
+
+Cell[BoxData["RicciScalar[CDSchw][] // ToComponents"],"Input",CellTags->"ricci_s"],
+
+Cell[BoxData["Kretschmann[CDSchw][] // ToComponents"],"Input",CellTags->"kretschmann_s"],
+
+Cell["Spatially flat FLRW: homogeneous scalar","Subsection"],
+
+Cell[BoxData["DefineChart[\"FLRW\",{t[],x[],y[],z[]}];"],"Input",CellTags->"chart_f"],
+
+Cell[BoxData["DefScalarFunction[s]; DefScalarFunction[q];"],"Input",CellTags->"fn_f"],
+
+Cell[BoxData["MetricInBasis[gFLRW,DiagonalMatrix[{-1,s[tFLRW[]]^2,s[tFLRW[]]^2,s[tFLRW[]]^2}],Assumptions->s[tFLRW[]]>0];"],"Input",CellTags->"metric_f"],
+
+Cell[BoxData["ComponentValue[phiFLRW[],q[tFLRW[]]];"],"Input",CellTags->"profile_f"],
+
+Cell[BoxData["eqF=kgFLRW // ToComponents;"],"Input",CellTags->"eq_f"],
+
+Cell[BoxData["eqF==0"],"Input",CellTags->"eq_f_view"],
+
+Cell["4. Change display or physics independently","Section"],
+
+Cell["The display can be changed without recalculating the equations. Parameters such as m are shared and are not given background labels.","Text"],
+
+Cell[BoxData["SetNotation[\"FLRW\",ShowObjectLabels->False];"],"Input",CellTags->"label_off"],
+
+Cell[BoxData["{eqS==0,eqF==0}"],"Input",CellTags->"label_compare"],
+
+Cell[BoxData["SetNotation[\"FLRW\",ShowObjectLabels->Automatic];"],"Input",CellTags->"label_inherit"],
+
+Cell[BoxData["eqS // PrettyExp[ShowObjectLabels->False,PartialStyle->\"Prime\"]"],"Input",CellTags->"one_view"],
+
+Cell[BoxData["AddRules[\"Schwarzschild\",{m->0}];"],"Input",CellTags->"massless"],
+
+Cell[BoxData["kgSchw // ToComponents"],"Input",CellTags->"massless_eq"],
+
+Cell[BoxData["ClearRules[\"Schwarzschild\"];"],"Input",CellTags->"restore"],
+
+Cell[BoxData["Simplify[(kgFLRW // ToComponents)-eqF]"],"Input",CellTags->"unchanged"],
+
+Cell[BoxData["ShowBackground[\"Schwarzschild\",\"Summary\"]"],"Input",CellTags->"summary"],
+
+Cell["5. Continue your own study","Section"],
+
+Cell["The three backgrounds remain available in this kernel. You can change their components, inspect them, or save a ReconstructionData recipe. If you want to delete a study, inspect DeletionPlan first. The full Workflow demonstrates these operations and advanced tensors, multiple charts, affine connections, perturbations, and exports. Start that notebook with a fresh kernel. Report reproducible problems via GitHub Issues, including xPlorer and Mathematica versions, platform, xAct version, and minimal input.","Text"]
+},WindowTitle->"xPlorer - Quick Start",StyleDefinitions->Notebook[{
+Cell[StyleData[StyleDefinitions->"Default.nb"]],Cell[StyleData["Title"],FontSize->32],Cell[StyleData["Section"],FontSize->24],Cell[StyleData["Subsection"],FontSize->19],Cell[StyleData["Text"],FontSize->15,LineSpacing->{1.3,3}],Cell[StyleData["Input"],FontSize->15,CellFrame->{{1,0},{0,0}}],Cell[StyleData["Output"],FontSize->16]},Visible->False,StyleDefinitions->"PrivateStylesheetFormatting.nb"]]

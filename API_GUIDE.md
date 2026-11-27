@@ -1,4 +1,4 @@
-# Using xPlorer — beta.13-dev.32
+# Using xPlorer — beta.13-dev.33
 
 xPlorer_Workflow.nb is the principal worked guide, updated for the consolidated API (dev.31, corrected in dev.32). xPlorer_Consolidated.nb is retained as a supplementary integration-test notebook. Sections labeled with earlier versions are historical checkpoints; the dev.31 contract below takes precedence. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
@@ -348,3 +348,29 @@ The native unary ToCTensor extension is scoped to an expression with a unique ma
 Direct SetBasisChange replacement of an owned primary/secondary pair returns Failure["ManagedBasisPair",...] rather than desynchronize the coordinate map. Define a new named output chart or delete and recreate the managed chart family to change its map. Native pairs involving foreign bases remain available, subject to native dependencies. Direct UndefChart/UndefBasis are blocked for managed charts. Cleanup removes owned pair-specific values and aliases, not other backgrounds' basis rules. Raw edits to Basis values, native secondary field assignment, standalone removal or promotion of a secondary chart, and general foreign-basis replay are outside the managed contract.
 
 Use xPlorer_Workflow.nb for the principal tutorial; the supplementary consolidated notebook and acceptance groups Consolidation and NativeCoordinates in Tests/RunGroup.wl provide focused technical checks. Earlier public convenience functions remain supported; no mass API removal is part of this candidate. See BETA13_CONSOLIDATION.md for exact evidence and release blockers.
+
+
+## Object labels and beta onboarding (dev.33)
+
+```wl
+SetXPlorerPreferences[ShowObjectLabels -> True, PartialStyle -> "Fraction"];
+CreateBackground["Schwarzschild", SymbolSuffix -> "Schw", BackgroundLabel -> "S"];
+DefineChart["Schwarzschild", {t[],r[],theta[],varphi[]}];
+SetNotation["Schwarzschild", ShowObjectLabels -> False];
+SetNotation["Schwarzschild", ShowObjectLabels -> Automatic];
+SetPresentation["Schwarzschild", phi, ShowObjectLabels -> False];
+SetPresentation["Schwarzschild", phi, ShowObjectLabels -> Automatic];
+scalarEqSchw // PrettyExp[ShowObjectLabels -> True]
+```
+
+Labels are disabled by default; enabling them never changes the actual suffixed symbols, abstract indices, tensor identities, components or cached results. The background label is a visual string, defaulting to SymbolSuffix. Tensors and covariant derivative marks use parenthesized superscripts; coordinate arguments use subscripts. Secondary coordinates default to the background label followed by the chart name, unless the chart has its own BackgroundLabel. Use DefineChart[tag, declarations, BackgroundLabel -> "C"] or the equivalent named secondary-chart declaration with options. For existing charts use SetNotation[tag, "Primary" or chartName, ShowObjectLabels -> value, BackgroundLabel -> label]. The order of precedence is session defaults, background, chart, individual owned head, and explicit PrettyExp options. Automatic clears the override at the relevant level. The existing ShowBackgroundLabel is a separate whole-expression caption; raw TeX export omits the caption but includes object labels. Session preferences still replace the previous preference association.
+
+SetPresentation accepts a registered source field/geometry selector or an actual owned head (including coordinates) for object visibility. Object-label options are not accepted by RegisterTheory, DefTensor, DefMetric or other native xAct definitions. New owned objects inherit labels automatically. Shared constants, free scalar functions, abstract indices and numbers do not receive invented ownership. A pure numerical result has no recoverable background; use PrettyExp[tag, expr, ShowBackgroundLabel -> True] if a caption is desired. Bare symbol names and native xAct diagnostic Print lines remain readable identifiers rather than mathematical labels. Labels apply in ordinary notebook output and PrettyExp, not InputForm or arbitrary third-party formatters. Normal and interpreted boxes preserve the original expression. Reconstruction restores background and chart overrides and remaps per-head settings for recorded recipe objects and coordinates; transient generated heads without a recipe identity need their overrides reapplied after recreation.
+
+```wl
+savedRegistry = TheorySnapshot[];
+ClearTheory[];
+RegisterTheory[savedRegistry];
+```
+
+The snapshot symbol is evaluated only in the single-argument registration form. Native declarations retain their held evaluation contract. The two public notebooks are xPlorer_QuickStart.nb (first successful scientific calculation) and xPlorer_Workflow.nb (extended reference). The consolidated notebook is an internal integration test. Tools/PrepareRelease.wl prepares an explicit whitelisted public ZIP after the author builds a matching paclet locally; it does not publish a release.
