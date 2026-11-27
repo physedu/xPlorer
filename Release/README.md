@@ -18,45 +18,13 @@ The intended audience is researchers and students already using Mathematica and 
 
 **Version:** 1.0.0-beta.1 (beta candidate). Install xAct separately: https://www.xact.es/. Mathematica 13.0+ is the declared minimum; the current automated validation uses Wolfram Language 15.0.1 and xAct 1.3.0. Earlier kernel versions have not all been tested.
 
-## Start here
+## Getting started
 
-1. Extract the distribution ZIP. Keep the two notebooks beside xPlorer.wl and the versioned paclet.
-2. Open **xPlorer_Workflow.nb** in a fresh Mathematica kernel.
-3. Choose A to install and load the supplied paclet, B if it is already installed, or C to load the source directly. Evaluate only one. Evaluate the remaining inputs in order.
-4. The seven-section research tutorial derives the massive scalar equation, evaluates it on Minkowski, Schwarzschild and FLRW, and continues through rules, profiles, secondary charts, vector/tensor fields, metric perturbations and reconstruction.
-5. For the extended API and more advanced examples, open **xPlorer_API_Examples.nb** in a fresh kernel. The advanced notebook has folded sections with shared prerequisites; it is not necessary to run it for a first study.
+Extract the complete ZIP and install xAct separately. Open **xPlorer_Install.nb** to install, verify or uninstall the supplied paclet. Then open **xPlorer_Workflow.nb** in a fresh kernel and choose Needs (installed) or Get (direct source). No installation is required for Get. Follow the six numbered sections; the main groups are folded and their subsections are open. **xPlorer_API_Examples.nb** is the advanced reference.
 
 ## Installation options
 
-Download the curated distribution ZIP from GitHub Releases (not GitHub's automatic source-code ZIP). Extract the complete folder. The versioned .paclet must sit beside both notebooks; the plain source xPlorer.wl sits beside them. Option A installs the matching archive and loads it with Needs. Option B calls Needs for an already installed package. Option C uses Get without installation. If an older package is found, the version check stops the tutorial. Restart the kernel before changing loading methods.
-
-### A. Install and load the supplied paclet (recommended)
-
-Run the A cell in either notebook. If the matching version is already registered, it skips installation and calls Needs. If you have downloaded only the separate .paclet asset, install that file manually:
-
-```wl
-archive = SystemDialogInput["FileOpen"];
-If[StringQ[archive], PacletInstall[archive]];
-```
-
-Restart the kernel, then evaluate:
-
-```wl
-Needs["xPlorer`"];
-$XPlorerVersion
-```
-
-The version should be "1.0.0-beta.1". Do not load a second copy of xPlorer in the same kernel; remove or move conflicting older traditional installations out of the Applications path before using a paclet. To uninstall, inspect PacletFind["xPlorer"] and use PacletUninstall on the specific installed PacletObject. Restart before testing a different version. Internal testers must uninstall the previous 14.0.0-beta.* paclets before using public beta 1, since Mathematica may prefer the numerically higher version.
-
-### B. Load the source without installation
-
-The B cell in either notebook uses:
-
-```wl
-Get[FileNameJoin[{NotebookDirectory[], "xPlorer.wl"}]];
-```
-
-Check $XPlorerVersion in the next cell.
+Use the installation notebook, or install a downloaded paclet manually with PacletInstall. Restart the kernel and load it with Needs["xPlorer`"]. The expected version is 1.0.0-beta.1. Remove conflicting higher-numbered internal paclets or traditional Applications copies first. For direct source loading, keep xPlorer.wl beside the scientific notebooks. Never load two copies in the same kernel.
 
 ## Inspect your models
 

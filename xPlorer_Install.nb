@@ -1,42 +1,79 @@
-(* Content-type: application/vnd.wolfram.mathematica *)
+(* Wolfram Notebook File - ASCII source *)
 Notebook[{
-Cell["xPlorer — Paclet installation","Title"],
+Cell["xPlorer - Installation and maintenance","Title"],
 
-Cell["This notebook builds, installs, verifies and uninstalls xPlorer. Keep it beside the Paclet and Tools directories. Install xAct separately first. Evaluate individual input cells with Shift+Enter; do not evaluate the whole notebook, since the final section uninstalls xPlorer.","Text"],
+Cell["Public beta 1 | Mathematica 13.0+","Subtitle"],
 
-Cell["1. Build the paclet","Section"],
+Cell["Install xAct separately (https://www.xact.es/). Extract the release ZIP before opening this notebook. Evaluate only the section you need, one cell at a time. Restart the kernel after changing installed versions. You can also use xPlorer without installation via Get in the scientific notebooks.","Text"],
 
-Cell["Evaluate this cell to create the distributable archive in the build directory. The builder archives the already prepared Paclet directory using CreatePacletArchive; development files are outside it.","Text"],
+Cell[CellGroupData[{
+Cell["1. Install xPlorer","Section"],
 
-Cell[BoxData[RowBox[{"build", "=", RowBox[{"Get", "[", RowBox[{"FileNameJoin", "[", RowBox[{"{", RowBox[{RowBox[{"NotebookDirectory", "[", "]"}], ",", "\"Tools\"", ",", "\"BuildPaclet.wl\""}], "}"}], "]"}], "]"}]}]],"Input",CellTags->"install_4"],
+Cell["The release includes xPlorer-1.0.0-beta.1.paclet next to this notebook. Check existing versions first. Internal 14.x test paclets can take precedence over the public beta; uninstall them using section 3 before installing this version.","Text"],
 
-Cell[BoxData[RowBox[{"If", "[", RowBox[{RowBox[{"MatchQ", "[", RowBox[{"build", ",", "_Success"}], "]"}], ",", RowBox[{"{", RowBox[{RowBox[{"build", "[", "\"PacletArchive\"", "]"}], ",", RowBox[{"FileExistsQ", "[", RowBox[{"build", "[", "\"PacletArchive\"", "]"}], "]"}]}], "}"}], ",", "build"}], "]"}]],"Input",CellTags->"install_5"],
+Cell[BoxData["PacletFind[\"xPlorer\"]"],"Input",CellTags->"installed_before"],
 
-Cell["2. Install","Section"],
+Cell["Install the archive beside this notebook. If you downloaded it elsewhere, use the alternative file-picker cell instead.","Text"],
 
-Cell["Use a fresh kernel. Avoid a conflicting traditional installation under Applications. This installs the archive from step 1. If xPlorer is already loaded, restart the kernel before using the newly installed version.","Text"],
+Cell[BoxData["With[{archive = FileNameJoin[{NotebookDirectory[], \"xPlorer-1.0.0-beta.1.paclet\"}]},\n  If[FileExistsQ[archive], PacletInstall[archive], Print[\"Archive not found. Use the file picker below.\"]]\n]"],"Input",CellTags->"install_local"],
 
-Cell[BoxData[RowBox[{"If", "[", RowBox[{RowBox[{RowBox[{"MatchQ", "[", RowBox[{"build", ",", "_Success"}], "]"}], "&&", RowBox[{"FileExistsQ", "[", RowBox[{"build", "[", "\"PacletArchive\"", "]"}], "]"}]}], ",", RowBox[{"PacletInstall", "[", RowBox[{"build", "[", "\"PacletArchive\"", "]"}], "]"}], ",", RowBox[{"Failure", "[", RowBox[{"\"NoArchive\"", ",", RowBox[{"Association", "[", RowBox[{"\"MessageTemplate\"", "\[Rule]", "\"Build the paclet in step 1 first.\""}], "]"}]}], "]"}]}], "]"}]],"Input",CellTags->"install_8"],
+Cell["Alternative: select the downloaded .paclet file.","Text"],
 
-Cell["Alternatively, if you already have a paclet archive, select it directly using this cell instead of building it.","Text"],
+Cell[BoxData["archive = SystemDialogInput[\"FileOpen\"];"],"Input",CellTags->"choose_archive"],
 
-Cell[BoxData[RowBox[{RowBox[{"archive", "=", RowBox[{"SystemDialogInput", "[", "\"FileOpen\"", "]"}]}], ";", RowBox[{"If", "[", RowBox[{RowBox[{RowBox[{"StringQ", "[", "archive", "]"}], "&&", RowBox[{"FileExistsQ", "[", "archive", "]"}], "&&", RowBox[{RowBox[{"FileExtension", "[", "archive", "]"}], "===", "\"paclet\""}]}], ",", RowBox[{"PacletInstall", "[", "archive", "]"}], ",", "\"No paclet selected.\""}], "]"}]}]],"Input",CellTags->"install_10"],
+Cell[BoxData["If[StringQ[archive] && FileExistsQ[archive] && ToLowerCase[FileExtension[archive]] === \"paclet\", PacletInstall[archive], Print[\"No paclet selected.\"]]"],"Input",CellTags->"install_selected"],
 
-Cell["3. Verify in a fresh kernel","Section"],
+Cell["Restart the kernel, then verify the installation in section 2.","Text"]
+},Open]],
 
-Cell["Restart the kernel using Evaluation > Quit Kernel > Local, then evaluate the following cells. The package should load from the installed paclet rather than an old Applications copy.","Text"],
+Cell[CellGroupData[{
+Cell["2. Load and verify","Section"],
 
-Cell[BoxData[RowBox[{"PacletFind", "[", "\"xPlorer\"", "]"}]],"Input",CellTags->"install_13"],
+Cell["Check the installed versions and load the package. The version should be 1.0.0-beta.1.","Text"],
 
-Cell[BoxData[RowBox[{"Needs", "[", "\"xPlorer`\"", "]"}]],"Input",CellTags->"install_14"],
+Cell[BoxData["PacletFind[\"xPlorer\"]"],"Input",CellTags->"find_installed"],
 
-Cell[BoxData[RowBox[{"{", RowBox[{"xPlorer`$XPlorerVersion", ",", RowBox[{"FindFile", "[", "\"xPlorer`\"", "]"}], ",", RowBox[{RowBox[{"(", RowBox[{RowBox[{"#1", "[", "\"Location\"", "]"}], "&"}], ")"}], "/@", RowBox[{"PacletFind", "[", "\"xPlorer\"", "]"}]}]}], "}"}]],"Input",CellTags->"install_15"],
+Cell[BoxData["Needs[\"xPlorer`\"];"],"Input",CellTags->"needs"],
 
-Cell["4. Uninstall (optional)","Section"],
+Cell[BoxData["xPlorer`$XPlorerVersion"],"Input",CellTags->"version"],
 
-Cell["WARNING: evaluate the next cell only to remove installed xPlorer paclets. A confirmation dialog protects against accidental uninstallation. It removes all installed xPlorer paclet versions, not the source directory, built archive, or xAct. A traditional Applications installation is not removed. Restart the kernel afterward.","Text"],
+Cell["Check the file Mathematica actually resolves. If it points to an old Applications copy, move that conflicting installation out of the application path before restarting the kernel.","Text"],
 
-Cell[BoxData[RowBox[{"If", "[", RowBox[{RowBox[{"TrueQ", "[", RowBox[{"ChoiceDialog", "[", "\"Uninstall all installed xPlorer paclet versions?\"", "]"}], "]"}], ",", RowBox[{"PacletUninstall", "/@", RowBox[{"PacletFind", "[", "\"xPlorer\"", "]"}]}], ",", "\"Uninstallation cancelled.\""}], "]"}]],"Input",CellTags->"install_18"],
+Cell[BoxData["FindFile[\"xPlorer`\"]"],"Input",CellTags->"location"],
 
-Cell[BoxData[RowBox[{"PacletFind", "[", "\"xPlorer\"", "]"}]],"Input",CellTags->"install_19"]
-}, WindowTitle->"xPlorer - Paclet installation", StyleDefinitions->"Default.nb"]
+Cell[BoxData["(#[\"Location\"] &) /@ PacletFind[\"xPlorer\"]"],"Input",CellTags->"paclet_locations"]
+},Closed]],
+
+Cell[CellGroupData[{
+Cell["3. Uninstall xPlorer","Section"],
+
+Cell["Inspect the installed versions. The next cell removes only the public beta paclet, after confirmation. It does not remove xAct or your notebooks.","Text"],
+
+Cell[BoxData["PacletFind[\"xPlorer\"]"],"Input",CellTags->"list_uninstall"],
+
+Cell[BoxData["If[TrueQ[ChoiceDialog[\"Uninstall xPlorer 1.0.0-beta.1?\"]], PacletUninstall /@ Select[PacletFind[\"xPlorer\"], #[\"Version\"] === \"1.0.0-beta.1\" &]]"],"Input",CellTags->"uninstall_beta"],
+
+Cell["To remove all xPlorer paclet versions, including older internal builds, use this alternative instead. A traditional Applications installation is not affected.","Text"],
+
+Cell[BoxData["If[TrueQ[ChoiceDialog[\"Uninstall ALL installed xPlorer paclet versions?\"]], PacletUninstall /@ PacletFind[\"xPlorer\"]]"],"Input",CellTags->"uninstall_all"],
+
+Cell[BoxData["PacletFind[\"xPlorer\"]"],"Input",CellTags->"remaining"],
+
+Cell["Restart the kernel after uninstalling.","Text"]
+},Closed]]
+},PageWidth->WindowWidth,WindowTitle->"xPlorer - Installation",StyleDefinitions->Notebook[{
+ Cell[StyleData[StyleDefinitions -> "Default.nb"]],
+ Cell[StyleData["Code"], FontSize -> 13, FontWeight -> "Plain"],
+ Cell[StyleData["Subsubsection"], FontSize -> 18, FontWeight -> "Bold"],
+ Cell[StyleData["Title"], FontSize -> 28, FontWeight -> "Bold"],
+ Cell[StyleData["Subtitle"], FontSize -> 14, FontSlant -> "Italic"],
+ Cell[StyleData["Section"], FontSize -> 22, FontWeight -> "Bold"],
+ Cell[StyleData["Subsection"], FontSize -> 18, FontWeight -> "Bold"],
+ Cell[StyleData["Text"], FontSize -> 14, LineSpacing -> {1.25,2}, CellMargins -> {{40,24},{6,6}}, PageWidth -> WindowWidth],
+ Cell[StyleData["Input"], FontSize -> 14, PageWidth -> WindowWidth, CellFrame -> {{1,0},{0,0}}, CellFrameMargins -> {{10,8},{6,6}}],
+ Cell[StyleData["Output"], FontSize -> 14, PageWidth -> WindowWidth, FormatType -> StandardForm],
+ Cell[StyleData["DisplayFormula"], FontSize -> 17],
+ Cell[StyleData["Important"], FontSize -> 15, FontWeight -> "Bold", LineSpacing -> {1.2,0}, CellMargins -> {{66,10},{8,8}}, CellFrame -> {{2,0},{0,0}}, CellFrameMargins -> {{10,8},{7,7}}],
+ Cell[StyleData["Tip"], FontSize -> 15, FontSlant -> "Italic", LineSpacing -> {1.2,0}, CellMargins -> {{78,10},{8,8}}, CellFrameMargins -> {{10,8},{6,6}}],
+ Cell[StyleData["Program"], FontSize -> 13, FontFamily -> "Courier", FontWeight -> "Plain", LineSpacing -> {1.1,2}, CellFrame -> {{0.5,0},{0,0}}, CellFrameMargins -> {{8,8},{4,4}}, PageWidth -> WindowWidth]
+},Visible->False,StyleDefinitions->"PrivateStylesheetFormatting.nb"],Saveable->True]

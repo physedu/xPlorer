@@ -24,10 +24,11 @@ The intended audience is researchers and students already using Mathematica and 
 
 | Notebook | Purpose |
 | --- | --- |
-| [xPlorer_Workflow.nb](xPlorer_Workflow.nb) | Start here: a practical seven-section research tutorial, from abstract equations to components, profiles, tensors and metric perturbations. |
+| [xPlorer_Install.nb](xPlorer_Install.nb) | Install, verify and uninstall the supplied paclet. |
+| [xPlorer_Workflow.nb](xPlorer_Workflow.nb) | Start here: a practical six-section research tutorial, from abstract equations to components, profiles, tensors and metric perturbations. |
 | [xPlorer_API_Examples.nb](xPlorer_API_Examples.nb) | Advanced executable reference: detailed API options, affine connections, lifecycle and special cases. |
 
-Install [xAct](https://www.xact.es/) separately. Use a fresh Mathematica kernel for either notebook. Keep the notebook beside xPlorer.wl in the release ZIP, or beside the Paclet directory in a repository checkout. Choose one startup cell: A installs and loads the supplied paclet, B loads an already installed paclet with Needs, and C loads the source with Get. The distribution ZIP places the versioned paclet and plain xPlorer.wl beside both notebooks.
+Install [xAct](https://www.xact.es/) separately. Use a fresh Mathematica kernel for either notebook. Keep the notebook beside xPlorer.wl in the release ZIP, or beside the Paclet directory in a repository checkout. Use xPlorer_Install.nb for installation or removal; the scientific notebooks use Needs or Get.
 
 ```wl
 Get[FileNameJoin[{NotebookDirectory[], "Paclet", "xPlorer.wl"}]];
@@ -78,14 +79,14 @@ Visual labels are separate from typed names. Labels are off by default; session,
 
 ## Installation
 
-The public release will supply a matching .paclet and a compact distribution ZIP with the two notebooks, source, README, license and citation. The release ZIP contains xPlorer.wl at its root; the repository source remains in Paclet/xPlorer.wl. To use a supplied local paclet, run PacletInstall with its path, restart the kernel, then:
+The public release will supply a matching .paclet and a compact distribution ZIP with the three notebooks, source, README, license and citation. The release ZIP contains xPlorer.wl at its root; the repository source remains in Paclet/xPlorer.wl. To use a supplied local paclet, run PacletInstall with its path, restart the kernel, then:
 
 ```wl
 Needs["xPlorer`"];
 $XPlorerVersion
 ```
 
-Do not mix conflicting traditional applications and paclets. If you tested the internal 14.0.0-beta.* series, uninstall those higher-numbered versions before installing public beta 1. The traditional installer [Install.wl](Install.wl) is available for development/source use. It refuses to overwrite an existing application. See [xPlorer_Install.nb](xPlorer_Install.nb) for local archive construction and installation. xAct is a separate dependency; optional xTras is not required.
+Do not mix conflicting traditional applications and paclets. If you tested the internal 14.0.0-beta.* series, uninstall those higher-numbered versions before installing public beta 1. The traditional installer [Install.wl](Install.wl) is available for development/source use. It refuses to overwrite an existing application. See [xPlorer_Install.nb](xPlorer_Install.nb) for installation and removal; use Tools/BuildPaclet.wl for archive construction. xAct is a separate dependency; optional xTras is not required.
 
 ## Feedback and scope
 

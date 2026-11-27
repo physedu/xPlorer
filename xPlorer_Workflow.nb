@@ -4,36 +4,24 @@ Cell["xPlorer - From an abstract theory to physical spacetimes","Title"],
 
 Cell["A massive scalar field on Minkowski, Schwarzschild and FLRW | 1.0.0-beta.1","Subtitle"],
 
-Cell["How can we derive a theory once, work with its tensors on several manifolds, impose different physical assumptions and obtain component equations without restarting Mathematica? This tutorial follows that calculation. Open the sections in order. The separate API Examples notebook contains the full reference and additional applications.","Text"],
+Cell["How can we derive a theory once, work with its tensors on several manifolds, impose different physical assumptions and obtain component equations without restarting Mathematica? This tutorial follows that calculation. Open the main sections in order; their subsections are already open. The separate API Examples notebook contains the full reference and additional applications.","Text"],
 
 Cell[CellGroupData[{
-Cell["Start here | Load xPlorer","Section"],
+Cell["Introduction","Section"],
 
-Cell["Requires Mathematica and xAct. Extract the complete release folder, start a fresh kernel and evaluate ONE of the following loading cells (Shift+Enter).","Text"],
+Cell["We begin with a massive scalar field, register the theory and reuse its equations on three spacetimes. Next we specialize the equations, calculate components, perturb the metric, change profiles and charts, and extend the model to vectors and tensors. Open each numbered section in order; the subsections are ready to read.","Text"],
 
-Cell["A   Install and load  |  First use","Text",FontWeight->"Bold"],
+Cell["Use a fresh kernel with xAct installed. If you have not installed xPlorer, see xPlorer_Install.nb. Choose just one of these two loading methods.","Text"],
 
-Cell["Use the .paclet supplied beside this notebook. If the file is missing, extract the complete ZIP or choose B or C instead. Installation is needed only once.","Text"],
-
-Cell[BoxData["With[{archive = FileNameJoin[{NotebookDirectory[], \"xPlorer-1.0.0-beta.1.paclet\"}]},\n  If[!FileExistsQ[archive], Print[\"Paclet not found. Extract the ZIP or choose B or C.\"]; Abort[]];\n  If[!MatchQ[PacletInstall[archive], _PacletObject], Abort[]];\n  Needs[\"xPlorer`\"]\n];"],"Input",CellTags->"load_installed"],
-
-Cell["B   Load  |  Already installed","Text",FontWeight->"Bold"],
-
-Cell["Use this on subsequent sessions; no installation or archive is needed.","Text"],
+Cell["Installed paclet:","Text"],
 
 Cell[BoxData["Needs[\"xPlorer`\"];"],"Input",CellTags->"load_existing"],
 
-Cell["C   Direct source  |  No installation","Text",FontWeight->"Bold"],
+Cell["Direct source, without installation:","Text"],
 
-Cell["Use Get to load xPlorer.wl from the extracted release folder or the Paclet directory in a GitHub checkout.","Text"],
+Cell[BoxData["Get[If[FileExistsQ[FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}]],\n  FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}],\n  FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]]];"],"Input",CellTags->"load"],
 
-Cell[BoxData["With[{file = FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}]},\n  Get[If[FileExistsQ[file], file,\n    FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]]]\n];"],"Input",CellTags->"load"],
-
-Cell["Check the version","Text",FontWeight->"Bold"],
-
-Cell["Continue only if this returns 1.0.0-beta.1. If an old internal 14.x paclet is selected, remove it with PacletUninstall and restart the kernel before loading again.","Text"],
-
-Cell[BoxData["If[$XPlorerVersion === \"1.0.0-beta.1\",\n  $XPlorerVersion,\n  Print[\"Wrong xPlorer version. Restart the kernel and check your installation.\"]; Abort[]\n]"],"Input",CellTags->"workflow_version"]
+Cell[BoxData["If[$XPlorerVersion === \"1.0.0-beta.1\", $XPlorerVersion, Print[\"Unexpected xPlorer version. See xPlorer_Install.nb.\"]; Abort[]]"],"Input",CellTags->"workflow_version"]
 },Open]],
 
 Cell["Optional: reduce native xAct informational printing to keep the mathematical output readable. These switches do not suppress warnings or errors.","Text"],
@@ -116,7 +104,7 @@ Cell[BoxData["ShowTheory[]"],"Input",CellTags->"show_theory"],
 
 Cell[BoxData["TheoryValue[\"Lagrangians\", \"Matter\"]"],"Input",CellTags->"registry_formula"]
 },Open]]
-},Open]],
+},Closed]],
 
 Cell[CellGroupData[{
 Cell["2. Reuse abstract equations on independent backgrounds","Section"],
@@ -198,7 +186,7 @@ Cell[BoxData["ClearRules[\"Schwarzschild\"];"],"Input",CellTags->"clear_individu
 
 Cell[BoxData["SetRuleGroup[\"Schwarzschild\", \"Massless\", {m -> 0}];"],"Input",CellTags->"massless"]
 },Open]]
-},Open]],
+},Closed]],
 
 Cell[CellGroupData[{
 Cell["3. Choose coordinates and calculate physical equations","Section"],
