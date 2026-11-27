@@ -28,13 +28,13 @@ checks=<|
  "Perturbation LI"->(AssociationQ[pertResult]&&ToComponents["N",h[LI[2],-a,-b]]===DiagonalMatrix[{1,2,3,4}]),
  "Managed compute"->(AssociationQ[geometryResult]&&MemberQ[Join[geometryResult["Computed"],geometryResult["Cached"]],"Ricci"]),
  "Result invalidation"->FailureQ[ResultOf["N","prior"]],
- "Independent background"->(MetricMatrixOf["Other"]===DiagonalMatrix[{-1,1,1,1}]&&ShowBackground["Other"]["FieldComponents"]===<||>)
+ "Independent background"->(MetricMatrixOf["Other"]===DiagonalMatrix[{-1,1,1,1}]&&BackgroundValue["Other"]["FieldComponents"]===<||>)
 |>;
 recipe=ReconstructionData["N"];
 r=RecreateBackground["Copy",recipe];
 checks["Reconstruction"] = AssociationQ[r]&&ToComponents["Copy",phi[]]===2&&ToComponents["Copy",A[a]]==={-1/2,2,3,4};
 DeleteTensorValues[AN,Managed->True];
-checks["Managed deletion"]=!AnyTrue[Values[ShowBackground["N"]["FieldComponents"]],#["Head"]===AN&]&&ToComponents["N",phi[]]===2;
+checks["Managed deletion"]=!AnyTrue[Values[BackgroundValue["N"]["FieldComponents"]],#["Head"]===AN&]&&ToComponents["N",phi[]]===2;
 RegisterTheory["Field",B];AddField["N",B];
 bad=AllComponentValues[BN[-aN,-bN],IdentityMatrix[4]];
 good=AllComponentValues[BN[-aN,-bN],{{0,1,0,0},{-1,0,0,0},{0,0,0,0},{0,0,0,0}}];
