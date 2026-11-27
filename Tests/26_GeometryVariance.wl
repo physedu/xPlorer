@@ -6,7 +6,7 @@ ch=ChartOf["N"];co=ChartOf["O"];x=CoordinatesOf["N"][[2]][];
 MetricInBasis[gN,{-Exp[2 x],1,1,1}];MetricInBasis[gO,{-1,1,1,1}];
 ri=Ricci[ConnectionOf["N"]];rm=Riemann[ConnectionOf["N"]];ro=Ricci[ConnectionOf["O"]];
 r0=ToValues[ri[{0,ch},{0,ch}]];r1=Last[ComponentValue[ri[{0,ch},{0,-ch}]]];
-data=xPlorer`Private`geometryNativeData[ShowBackground["N"]];
+data=xPlorer`Private`geometryNativeData[BackgroundValue["N"]];
 dm=xPlorer`Private`nativeGeometrySpecHead["DMetric"[-1,-1,-1],data];
 ddm=xPlorer`Private`nativeGeometrySpecHead["DDMetric"[-1,-1,-1,-1],data];
 d0=ToValues[dm[{0,-ch},{0,-ch},{1,-ch}]];
@@ -19,7 +19,7 @@ calls=0;Internal`InheritedBlock[{ChangeComponents},Unprotect[ChangeComponents];
  ChangeComponents[f_,i_] /; !TrueQ[countingCC] := Block[{countingCC=True},calls++;ChangeComponents[f,i]];
  Protect[ChangeComponents];r2=ToValues[ri[{0,ch},{0,ch}]]];
 checks["Repeated native variance avoids conversion"]=calls===0&&r2===r0;
-sourceSpec=xPlorer`Private`chooseGeometrySource[ShowBackground["N"],ri,{1,1},{"Ricci"[-1,-1]}];
+sourceSpec=xPlorer`Private`chooseGeometrySource[BackgroundValue["N"],ri,{1,1},{"Ricci"[-1,-1]}];
 checks["Cached geometry source is a native specification"]=sourceSpec==="Ricci"[-1,-1];
 DeleteTensorValues[ri,{{ch,ch}}];checks["Deleted raised geometry rebuilt"]=ToValues[ri[{0,ch},{0,ch}]]===r0;
 (* A standard source plus native transformation must support another Riemann variance. *)
