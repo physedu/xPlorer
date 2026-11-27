@@ -1970,11 +1970,12 @@ labelHeadRecords[b_] := Module[{coords,chartHeads,chartRecords,baseHeads},
  chartRecords=Join[If[KeyExistsQ[b,"Chart"],<|"Primary"-><|"Chart"->b["Chart"],"Coordinates"->b["Coordinates"]|>|>,<||>],Lookup[b,"AdditionalCharts",<||>]];
  coords=Association@Flatten@KeyValueMap[Function[{key,rec},(#->key)& /@ rec["Coordinates"]],chartRecords];
  chartHeads=Association@Flatten@KeyValueMap[Function[{key,rec},(#->key)& /@ Select[Join[{rec["Chart"]},VisitorsOf[rec["Chart"]]],(xTensorQ[#]||CovDQ[#])&]],chartRecords];
- baseHeads=DeleteDuplicates@Select[Join[Values@recipeObjects[b],Lookup[Values[b["Field"]],"NewHead",{}],Lookup[b,"RelativeHeads",{}],Keys[coords],Keys[chartHeads]],MatchQ[#,_Symbol]&&(xTensorQ[#]||CovDQ[#])&];
+ baseHeads=DeleteDuplicates@Select[Join[Values@recipeObjects[b],Lookup[Values[b["Field"]],"NewHead",{}],Lookup[b,"RelativeHeads",{}],Keys[coords],Keys[chartHeads],Flatten[ServantsOf /@ Select[Values@recipeObjects[b],MatchQ[#,_Symbol]&&(xTensorQ[#]||CovDQ[#]||ManifoldQ[#])&]]],MatchQ[#,_Symbol]&&(xTensorQ[#]||CovDQ[#])&];
  AssociationMap[Function[h,<|"Coordinate"->KeyExistsQ[coords,h],"Chart"->Lookup[coords,h,Lookup[chartHeads,h,None]]|>],baseHeads]
 ];
 objectLabelPlan[e_,a_] := Module[{symbols,plan=<||>,b,settings,rec,chart,local,overrides,show,label,head},
- If[!TrueQ[Lookup[a,"ShowObjectLabels",False]] && !AnyTrue[Values[$BG],Function[bg,TrueQ[Lookup[Lookup[bg,"Notation",<||>],"ShowObjectLabels",False]]||MemberQ[Values[Lookup[bg,"ObjectLabelOverrides",<||>]],True]||AnyTrue[Values[Lookup[bg,"ChartNotation",<||>]],TrueQ[Lookup[#,"ShowObjectLabels",False]]&]]],Return[plan]];
+ If[Lookup[Lookup[a,"ObjectLabelCall",<||>],"ShowObjectLabels",Automatic]===False,Return[plan]];
+ If[!TrueQ[Lookup[a,"ShowObjectLabels",False]] && !TrueQ[Lookup[$sessionNotation,"ShowObjectLabels",False]] && !AnyTrue[Values[$BG],Function[bg,TrueQ[Lookup[Lookup[bg,"Notation",<||>],"ShowObjectLabels",False]]||MemberQ[Values[Lookup[bg,"ObjectLabelOverrides",<||>]],True]||AnyTrue[Values[Lookup[bg,"ChartNotation",<||>]],TrueQ[Lookup[#,"ShowObjectLabels",False]]&]]],Return[plan]];
  symbols=DeleteDuplicates@Cases[e,_Symbol,{0,Infinity},Heads->True];
  local=Lookup[a,"ObjectLabelCall",<||>];
  KeyValueMap[Function[{tag,bg},
@@ -2493,6 +2494,8 @@ Options[SetPresentation]={PrintAs->Automatic,ShowObjectLabels->Automatic};
 SetPresentation[tag_String,object:(_Symbol|_String),opts:OptionsPattern[]] := Module[{b=background[tag],key,objects,candidates,heads,target,overrides,setting=OptionValue[ShowObjectLabels],given=First /@ {opts},result},
  If[FailureQ[b],Return[b]];
  If[Complement[given,{PrintAs,ShowObjectLabels}]=!={} || !MemberQ[{Automatic,True,False},setting],Return[failure["PresentationOptions","Use PrintAs and Boolean ShowObjectLabels (or Automatic)."]]];
+ If[MemberQ[given,ShowObjectLabels] && !MemberQ[given,PrintAs] && MatchQ[object,_Symbol] && KeyExistsQ[labelHeadRecords[b],object],
+  overrides=Lookup[b,"ObjectLabelOverrides",<||>];If[setting===Automatic,overrides=KeyDrop[overrides,object],overrides[object]=setting];put[tag,<|"ObjectLabelOverrides"->overrides|>];Return[PresentationOf[tag]]];
  If[StringQ[object],key=object,
   objects=Join[AssociationThread[Keys[b["Field"]],Lookup[Values[b["Field"]],"NewHead"]],KeyTake[b,Keys[b["PresentationDefaults"]]]];
   heads=DeleteDuplicates@Join[{object},Last /@ Select[b["HeadRules"],First[#]===object&]];
