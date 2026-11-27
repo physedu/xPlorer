@@ -2,7 +2,7 @@
 
 xPlorer lets you reuse one abstract xAct theory on independent geometric backgrounds, then calculate its components using xCoba. It is a research tool built on xTensor, xCoba and xPert, not a replacement for them.
 
-**Version:** 14.0.0-beta.13-dev.33 (beta candidate). Install xAct separately: https://www.xact.es/. Mathematica 13.0+ is the declared minimum; the current automated validation uses Wolfram Language 15.0.1 and xAct 1.3.0. Earlier kernel versions have not all been tested.
+**Version:** 14.0.0-beta.13-dev.34 (beta candidate). Install xAct separately: https://www.xact.es/. Mathematica 13.0+ is the declared minimum; the current automated validation uses Wolfram Language 15.0.1 and xAct 1.3.0. Earlier kernel versions have not all been tested.
 
 ## Start here
 
@@ -39,7 +39,7 @@ Needs["xPlorer`"];
 $XPlorerVersion
 ```
 
-The version should be "14.0.0-beta.13-dev.33". Do not load a second copy of xPlorer in the same kernel; remove or move conflicting older traditional installations out of the Applications path before using a paclet. To uninstall, inspect PacletFind["xPlorer"] and use PacletUninstall on the specific installed PacletObject. Restart before testing a different version.
+The version should be "14.0.0-beta.13-dev.34". Do not load a second copy of xPlorer in the same kernel; remove or move conflicting older traditional installations out of the Applications path before using a paclet. To uninstall, inspect PacletFind["xPlorer"] and use PacletUninstall on the specific installed PacletObject. Restart before testing a different version.
 
 ## Presentation
 
