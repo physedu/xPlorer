@@ -2,27 +2,27 @@
 Notebook[{
 Cell["xPlorer - Research workflow","Title"],
 
-Cell["From one abstract theory to several physical spacetimes | beta.13-dev.36","Subtitle"],
+Cell["From one abstract theory to several physical spacetimes | beta.1","Subtitle"],
 
 Cell["A practical research tutorial for users familiar with Mathematica and xAct. Work through the seven sections in order, opening the folded groups as needed. For detailed syntax, additional options, affine connections and special cases, use xPlorer_API_Examples.nb in a fresh kernel. Install xAct separately.","Text"],
 
-Cell["Install xAct separately and start a fresh Mathematica kernel. Extract the complete distribution ZIP, rather than opening a notebook inside the archive. Choose A or B, never both. If you already have the matching paclet installed, A simply loads it.","Text"],
+Cell["Install xAct separately and start a fresh Mathematica kernel. If you tested a previous internal xPlorer version (14.0.0-beta.*), uninstall that version before using A; Mathematica may otherwise prefer the higher version. Extract the complete distribution ZIP, rather than opening a notebook inside the archive. Choose A or B, never both. If you already have the matching paclet installed, A simply loads it.","Text"],
 
 Cell["A. Install and load the released paclet (recommended)","Text",FontWeight->"Bold"],
 
 Cell["The release ZIP contains the matching .paclet beside these notebooks. This cell installs it if needed and then loads xPlorer. If the file is absent, obtain the release ZIP or use option B.","Text"],
 
-Cell[BoxData["archive = FileNameJoin[{NotebookDirectory[], \"xPlorer-14.0.0-beta.13-dev.36.paclet\"}];\nIf[!AnyTrue[PacletFind[\"xPlorer\"], #[\"Version\"] === \"14.0.0-beta.13-dev.36\" &],\n  If[!FileExistsQ[archive], Print[\"Matching paclet not found. Extract the release ZIP or use option B.\"]; Abort[]];\n  If[!MatchQ[PacletInstall[archive], _PacletObject], Abort[]]\n];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"],
+Cell[BoxData["archive = FileNameJoin[{NotebookDirectory[], \"xPlorer-1.0.0-beta.1.paclet\"}];\nIf[!AnyTrue[PacletFind[\"xPlorer\"], #[\"Version\"] === \"1.0.0-beta.1\" &],\n  If[!FileExistsQ[archive], Print[\"Matching paclet not found. Extract the release ZIP or use option B.\"]; Abort[]];\n  If[!MatchQ[PacletInstall[archive], _PacletObject], Abort[]]\n];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"],
 
 Cell["B. Load the source without installation","Text",FontWeight->"Bold"],
 
-Cell["Use this alternative in the extracted ZIP or the development repository. It does not install a paclet.","Text"],
+Cell["Use this alternative in the extracted ZIP or development checkout. The cell loads xPlorer.wl beside the notebook, or Paclet/xPlorer.wl in the repository. It does not install a paclet.","Text"],
 
-Cell[BoxData["Get[FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]];"],"Input",CellTags->"load"],
+Cell[BoxData["Get[If[FileExistsQ[FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}]], FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}], FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]]];"],"Input",CellTags->"load"],
 
-Cell["Confirm the version before continuing. If the wrong version is loaded, restart the kernel and check for conflicting older applications or paclets.","Text"],
+Cell["Confirm the version before continuing. If the wrong version is loaded, restart the kernel and remove conflicting internal paclets or traditional installations.","Text"],
 
-Cell[BoxData["If[$XPlorerVersion === \"14.0.0-beta.13-dev.36\", $XPlorerVersion, Print[\"Unexpected xPlorer version: \", $XPlorerVersion]; Abort[]]"],"Input",CellTags->"workflow_version"],
+Cell[BoxData["If[$XPlorerVersion === \"1.0.0-beta.1\", $XPlorerVersion, Print[\"Unexpected xPlorer version: \", $XPlorerVersion]; Abort[]]"],"Input",CellTags->"workflow_version"],
 
 Cell["Optional presentation: show short background labels on mathematical objects, and use fraction notation for partial derivatives. These settings are purely visual. Turn ShowObjectLabels off to use ordinary xAct notation.","Text"],
 
