@@ -76,7 +76,8 @@ check["Reconstruction permits its declared source owner",AssociationQ[validRecre
 check["Reconstructed field snapshot",ToComponents["Copy",phiaCopy[]],2];
 
 (* Explicitly evaluated numbers are snapshots, not live foreign references. *)
-snapshotWrite=With[{head=phiaT},HeldComponentValue[head[],phiaO[]]];
+numericSnapshot=ToComponents["One",phiaO[]];
+snapshotWrite=With[{head=phiaT,value=numericSnapshot},HeldComponentValue[head[],value]];
 check["Held scalar accepts an already evaluated numeric snapshot",MatchQ[snapshotWrite,_Rule],True];
 check["Held numeric snapshot is stored as a value",ToComponents["Two",phiaT[]],2];
 
