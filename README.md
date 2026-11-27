@@ -2,7 +2,7 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-**First public beta candidate: 1.0.0-beta.1.** The public beta release has not yet been published.
+**First public beta candidate: 1.0.0-beta.1.** The public beta release has not yet been published. The verified candidate files are available below.
 
 xPlorer is a Wolfram Language research package for theoretical physics and general relativity, built on xAct. It addresses a practical problem: after deriving tensor equations on an abstract manifold, how can the same theory be studied on different metrics, coordinate charts and field configurations without redefining all the tensors or restarting the Mathematica kernel?
 
@@ -21,6 +21,8 @@ xPlorer is not a new tensor algebra engine. It uses xTensor, xCoba and xPert for
 The intended audience is researchers and students already using Mathematica and xAct, particularly those comparing geometric backgrounds or specializing abstract field equations. This is experimental research software; feedback and reproducible bug reports are welcome.
 
 ## Start here
+
+[Download the complete beta candidate ZIP](xPlorer-1.0.0-beta.1.zip) · [Paclet only](xPlorer-1.0.0-beta.1.paclet)
 
 | Notebook | Purpose |
 | --- | --- |
@@ -97,7 +99,7 @@ The managed scope includes abstract tangent-bundle tensors, perturbations and na
 
 See [VALIDATION.md](VALIDATION.md) for the exact tested revision, environment and remaining acceptance checks. Executable tests and build helpers are maintained separately on [develop](https://github.com/physedu/xPlorer/tree/develop). The public source branch contains only the package, two public notebooks and documentation; the curated release ZIP contains seven files.
 
-The complete internal development record is preserved on the [develop branch](https://github.com/physedu/xPlorer/tree/develop/Development). See [CHANGELOG.md](CHANGELOG.md) for public version history. The first public beta is pending local archive and Desktop acceptance.
+The complete internal development record is preserved on the [develop branch](https://github.com/physedu/xPlorer/tree/develop/Development). See [CHANGELOG.md](CHANGELOG.md) for public version history. The paclet and curated ZIP have been verified; the first public beta is pending Desktop visual acceptance and publication.
 
 ## Author, citation and license
 

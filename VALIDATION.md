@@ -31,6 +31,16 @@ CreatePacletArchive failed in the remote evaluator because of a Java security re
 
 The revised Workflow at [7c7b2e1](https://github.com/physedu/xPlorer/commit/7c7b2e1915269a919991ae59b6b835ba5e052dd3) passed 136/136 selected input cells and 28/28 checks, with no warnings or unexpected failures. API Examples at [5e58e9f](https://github.com/physedu/xPlorer/commit/5e58e9f26de3f95279664fe22f4f78525bc95045) passed 419/419 cells, 109/109 checks and 33/33 stages; it is unchanged at the newer revision. Both used fresh Wolfram Language 15.0.1 Linux kernels with xAct 1.3.0 and direct-source loading. The Needs cell also loaded version 1.0.0-beta.1 from a registered paclet development directory. Actual archive installation and Desktop visual acceptance remain pending.
 
+## Actual beta archive and distribution — 27 November 2026
+
+The maintainer-supplied paclet was verified byte-for-byte against all six files in the frozen public Paclet tree. In a fresh remote Wolfram Language 15.0.1 Linux kernel with xAct 1.3.0, PacletInstall succeeded, Needs loaded xPlorer 1.0.0-beta.1, and PacletUninstall succeeded (PacletFind returned an empty list afterward). This is an actual archive installation check, not the earlier development-directory test. Desktop visual acceptance remains pending.
+
+The curated ZIP was downloaded again from [78ca776](https://github.com/physedu/xPlorer/commit/78ca77620cdb5a9eca7a933a05d23de5c108dcba), extracted, and verified to contain exactly seven files. Its paclet, plain source, notebooks, license and citation match the public source tree byte-for-byte; the README is the tester-facing guide.
+
+SHA-256:
+- Paclet: `1502273632ab33859fd836f00208da83e11c1ded90fb4cd60066368b00d74798`
+- ZIP: `1ffd03f34e22a3eefb777a7d306b55923a10816c48308f38559c7d226d068621`
+
 ## Reproduce
 
 Install xAct separately. Check out the tested revisions on the development branch for the test runners, which are not distributed on main. Use a fresh Mathematica kernel for each runner, adjusting paths to your checkout:
@@ -44,6 +54,6 @@ Run each line in a separate fresh kernel. See [test sources on develop](https://
 
 ## Before public release
 
-Build the actual paclet from the current source, verify installation and uninstallation, execute both notebooks and inspect Desktop output, verify the curated ZIP and record exact artifact hashes. A full historical regression rerun remains pending. Mathematica 13.0+ is the declared minimum; the recorded environment does not establish compatibility with every supported version.
+The actual archive installation/uninstallation and curated ZIP verification have passed in the remote kernel. Review both notebooks in Mathematica Desktop, including the first-use installation path and visual output, before publication. A full historical regression rerun remains pending. Mathematica 13.0+ is the declared minimum; the recorded environment does not establish compatibility with every supported version.
 
 No final Desktop appearance, archive installation or performance speedup is claimed. Historical results and their original versions are preserved under [Development/ValidationHistory](https://github.com/physedu/xPlorer/tree/59030c6df0ad282b18b279ae620bf6ec215e8206/Development/ValidationHistory) and [development decisions](https://github.com/physedu/xPlorer/tree/59030c6df0ad282b18b279ae620bf6ec215e8206/Development/DECISIONS.md).
