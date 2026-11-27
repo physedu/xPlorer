@@ -81,7 +81,7 @@ Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labe
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
 PresentationOf::usage = "PresentationOf[tag] reports current labels and their defaults.";
 SetXPlorerPreferences::usage = "SetXPlorerPreferences[PartialStyle -> style] sets the session output style. Label rules set defaults for future backgrounds. SetXPlorerPreferences[] resets the session preferences.";
-BackgroundObject::usage = "BackgroundObject[tag, key] returns the actual field or geometry head. Full InputForm retains its context.";
+BackgroundObject::usage = "BackgroundObject[tag, key] returns a field, connection or geometry head. BackgroundObject[tag, key, connection] retrieves geometry of a named connection.";
 
 SetNotation::usage = "SetNotation[tag, option -> value, ...] sets background display defaults; no mathematical data changes.";
 PartialStyle::usage = "PartialStyle chooses Native, MultiIndex, Fraction, Partial, Comma or Prime (one argument) for notebook output and explicit views.";
@@ -1761,6 +1761,22 @@ ChristoffelOf[tag_String] := getter[tag, "Christoffel"];
 BackgroundIndices[tag_String, n_: Automatic] := Module[{b = background[tag]}, If[FailureQ[b], Return[b]];
   If[n === Automatic, b["Indices"], If[IntegerQ[n] && 0 <= n <= Length[b["Indices"]], Take[b["Indices"], n], failure["IndexCount", "Invalid number of indices."]]]];
 ShowBackground[tag_String] := background[tag];
+ShowBackground[tag_String,section_String] := Module[{b=background[tag]},If[FailureQ[b],Return[b]];
+ Switch[section,
+  "Geometry",KeyTake[b,{"Manifold","Dimension","Metric","CovD","Signature","ComputedGeometry","MetricRevision","GeometryRuns"}],
+  "Fields",Map[KeyTake[#,{"NewHead","Type","Rank","IndexPositions"}]&,b["Field"]],
+  "Connections",ConnectionsOf[tag],
+  "Charts",Join[If[KeyExistsQ[b,"Chart"],<|"Primary"-><|"Chart"->b["Chart"],"Coordinates"->ScalarsOfChart[b["Chart"]]|>|>,<||>],
+    Map[KeyTake[#,{"Chart","Coordinates","Labels","Map"}]&,Lookup[b,"AdditionalCharts",<||>]]],
+  "Rules",ShowRuleGroups[tag,"Status"],
+  "Profiles",ShowProfiles[tag],
+  "Results",Keys[Lookup[b,"SavedResults",<||>]],
+  "Presentation",PresentationOf[tag],
+  "Summary",<|"Tag"->tag,"Geometry"->ShowBackground[tag,"Geometry"],"Fields"->Keys[b["Field"]],"Connections"->Keys[Lookup[b,"Connections",<||>]],
+    "Charts"->Keys[ShowBackground[tag,"Charts"]],"Profiles"->Keys[ShowProfiles[tag]],"ActiveRuleGroups"->Lookup[b,"ActiveRuleGroups",{}],
+    "SavedResults"->ShowBackground[tag,"Results"]|>,
+  _,failure["BackgroundSection","Choose Geometry, Fields, Connections, Charts, Rules, Profiles, Results, Presentation or Summary."]]
+];
 (* Presentation is deliberately separate from the registry and mathematical access. *)
 TheorySnapshot[] := $Theory;
 b13Sections = {"Geometry","Fields","Parameters","Lagrangians","Expressions","Connections","Sectors"};
@@ -1842,8 +1858,9 @@ SetXPlorerPreferences[assoc_Association] := Module[{n = KeyTake[assoc,Keys[$nota
 RegisterTheory["Presentation", assoc_Association] := ($Theory["Presentation"] = assoc; $Theory);
 BackgroundObject[tag_String, key_String] := Module[{b = background[tag]},
   If[FailureQ[b], Return[b]];
-  If[KeyExistsQ[b["Field"], key], b["Field"][key]["NewHead"], getter[tag,key]]
+  If[KeyExistsQ[b["Field"], key], b["Field"][key]["NewHead"], If[KeyExistsQ[Lookup[b,"Connections",<||>],key],ConnectionOf[tag,key],getter[tag,key]]]
 ];
+BackgroundObject[tag_String,key_String,connection:(_String|_Symbol)] := connectionGetter[tag,connection,key];
 SetPresentation[tag_String, assoc_Association] := Module[{b = background[tag], unknown, current, effective, objects, val,source,kind},
   If[FailureQ[b], Return[b]];
   unknown = Complement[Keys[assoc], Keys[b["PresentationDefaults"]]];
