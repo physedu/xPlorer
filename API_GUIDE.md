@@ -1,6 +1,6 @@
 # Using xPlorer — beta.13-dev.31
 
-The focused native guide is xPlorer_Consolidated.nb; xPlorer_Workflow.nb remains the extended worked guide. Sections labeled with earlier versions are historical checkpoints; the dev.31 contract below takes precedence. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
+xPlorer_Workflow.nb is the principal worked guide, updated for dev.31. xPlorer_Consolidated.nb is retained as a supplementary integration-test notebook. Sections labeled with earlier versions are historical checkpoints; the dev.31 contract below takes precedence. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
 ## Responsibilities and defaults
 
@@ -347,4 +347,4 @@ The native unary ToCTensor extension is scoped to an expression with a unique ma
 
 Direct SetBasisChange replacement of an owned primary/secondary pair returns Failure["ManagedBasisPair",...] rather than desynchronize the coordinate map. Define a new named output chart or delete and recreate the managed chart family to change its map. Native pairs involving foreign bases remain available, subject to native dependencies. Direct UndefChart/UndefBasis are blocked for managed charts. Cleanup removes owned pair-specific values and aliases, not other backgrounds' basis rules. Raw edits to Basis values, native secondary field assignment, standalone removal or promotion of a secondary chart, and general foreign-basis replay are outside the managed contract.
 
-Use the consolidated notebook and the acceptance groups Consolidation and NativeCoordinates in Tests/RunGroup.wl. Earlier public convenience functions remain supported; no mass API removal is part of this candidate. See BETA13_CONSOLIDATION.md for exact evidence and release blockers.
+Use xPlorer_Workflow.nb for the principal tutorial; the supplementary consolidated notebook and acceptance groups Consolidation and NativeCoordinates in Tests/RunGroup.wl provide focused technical checks. Earlier public convenience functions remain supported; no mass API removal is part of this candidate. See BETA13_CONSOLIDATION.md for exact evidence and release blockers.
