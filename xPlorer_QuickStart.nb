@@ -1,7 +1,7 @@
 Notebook[{
 Cell["xPlorer - Quick Start","Title"],
 
-Cell["One abstract scalar theory, three independent spacetimes | beta.13-dev.36","Subtitle"],
+Cell["One abstract scalar theory, three independent spacetimes | beta.1","Subtitle"],
 
 Cell["A complete first calculation: one massive scalar theory on three independent geometries. After choosing a loading method, evaluate the remaining inputs in order. Continue with the full Workflow for advanced examples.","Text"],
 
@@ -11,7 +11,7 @@ Cell["A. Install and load the released paclet (recommended)","Text",FontWeight->
 
 Cell["The release ZIP contains the matching .paclet beside these notebooks. This cell installs it if needed and then loads xPlorer. If the file is absent, obtain the release ZIP or use option B.","Text"],
 
-Cell[BoxData["archive = FileNameJoin[{NotebookDirectory[], \"xPlorer-14.0.0-beta.13-dev.36.paclet\"}];\nIf[!AnyTrue[PacletFind[\"xPlorer\"], #[\"Version\"] === \"14.0.0-beta.13-dev.36\" &],\n  If[!FileExistsQ[archive], Print[\"Matching paclet not found. Extract the release ZIP or use option B.\"]; Abort[]];\n  If[!MatchQ[PacletInstall[archive], _PacletObject], Abort[]]\n];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"],
+Cell[BoxData["archive = FileNameJoin[{NotebookDirectory[], \"xPlorer-1.0.0-beta.1.paclet\"}];\nIf[!AnyTrue[PacletFind[\"xPlorer\"], #[\"Version\"] === \"1.0.0-beta.1\" &],\n  If[!FileExistsQ[archive], Print[\"Matching paclet not found. Extract the release ZIP or use option B.\"]; Abort[]];\n  If[!MatchQ[PacletInstall[archive], _PacletObject], Abort[]]\n];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"],
 
 Cell["B. Load the source without installation","Text",FontWeight->"Bold"],
 
@@ -21,7 +21,7 @@ Cell[BoxData["Get[FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}
 
 Cell["Confirm the version before continuing. If the wrong version is loaded, restart the kernel and check for conflicting older applications or paclets.","Text"],
 
-Cell[BoxData["If[$XPlorerVersion === \"14.0.0-beta.13-dev.36\", $XPlorerVersion, Print[\"Unexpected xPlorer version: \", $XPlorerVersion]; Abort[]]"],"Input",CellTags->"version"],
+Cell[BoxData["If[$XPlorerVersion === \"1.0.0-beta.1\", $XPlorerVersion, Print[\"Unexpected xPlorer version: \", $XPlorerVersion]; Abort[]]"],"Input",CellTags->"version"],
 
 Cell["Optional: reduce native informational printing, without suppressing errors. These are native xAct settings for this kernel.","Text"],
 
