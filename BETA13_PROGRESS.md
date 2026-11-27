@@ -295,3 +295,7 @@ Initial candidate ac491d67a56981a0723fdeab16b04be76e42742e tried to undefine nat
 ## dev.31 — consolidation
 
 Selective integration of native dev.16 onto registration dev.30, preserving both historical branch heads. Exact candidate `2dfdfa87173303ed11ac8c6115ab9fa968b12175`: 854/854 assertions across 32 groups (792/792 historical, 62/62 added), original workflow 365/365 input executions, 84/84 math and 33/33 stages; new focused workflow 66/66 input executions, 22/22 checks; no warnings or unexpected failures; optional xTras 6/6. Temporary traditional installation and paclet directory loading succeed. Real archive build returns Failure["PacletArchive",...]; Desktop validation remains the release gate. See BETA13_CONSOLIDATION.md and Tests/dev31-results.json. No main merge or release.
+
+## dev.31 — principal Workflow migration
+
+Update xPlorer_Workflow.nb as the principal guide, retaining the extended scalar, vector, affine, perturbation and lifecycle narrative; xPlorer_Consolidated.nb is supplementary. Exact candidate `a34fd3231ad530a27646b064e801b4d25e6e9001`: source Get and development-directory Needs each pass 380/380 selected inputs, 94/94 checks and 33/33 stages, with zero warnings, parse errors or unexpected failures. No package source/version change. See BETA13_CONSOLIDATION.md for evidence and outstanding real archive/visual verification. Author reports a successful local archive build; awaiting artifact inspection. No public release.
