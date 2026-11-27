@@ -52,7 +52,7 @@ check["Managed complete array rejects foreign scalar",MatchQ[foreignArray,Failur
 foreignMetric=SetCMetricSystem["Two",DiagonalMatrix[{-1,1+xO[]^2,1,1}],ComputeOnSet->None];
 check["SetCMetricSystem rejects foreign coordinate",MatchQ[foreignMetric,Failure["ForeignBackground",_Association]],True];
 check["Rejected metric preserves target",MetricMatrixOf["Two"],DiagonalMatrix[{-1,1,1,1}]];
-foreignMetricFunction=SetCMetricSystem["Two",Function[{tt,xx,yy,zz},DiagonalMatrix[{-1,1+xO[]^2,1,1}],ComputeOnSet->None];
+foreignMetricFunction=SetCMetricSystem["Two",Function[{tt,xx,yy,zz},DiagonalMatrix[{-1,1+xO[]^2,1,1}]],ComputeOnSet->None];
 check["Metric profile rejects foreign function body",MatchQ[foreignMetricFunction,Failure["ForeignBackground",_Association]],True];
 foreignMetricNative=MetricInBasis[ggT,DiagonalMatrix[{-1,1+xO[]^2,1,1}]];
 check["Native managed MetricInBasis rejects foreign coordinate",MatchQ[foreignMetricNative,Failure["ForeignBackground",_Association]],True];
