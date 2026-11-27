@@ -2,17 +2,19 @@
 
 xPlorer lets you reuse one abstract xAct theory on independent geometric backgrounds, then calculate its components using xCoba. It is a research tool built on xTensor, xCoba and xPert, not a replacement for them.
 
-**Version:** 14.0.0-beta.13-dev.35 (beta candidate). Install xAct separately: https://www.xact.es/. Mathematica 13.0+ is the declared minimum; the current automated validation uses Wolfram Language 15.0.1 and xAct 1.3.0. Earlier kernel versions have not all been tested.
+**Version:** 14.0.0-beta.13-dev.36 (beta candidate). Install xAct separately: https://www.xact.es/. Mathematica 13.0+ is the declared minimum; the current automated validation uses Wolfram Language 15.0.1 and xAct 1.3.0. Earlier kernel versions have not all been tested.
 
 ## Start here
 
 1. Extract the distribution ZIP. Keep the two notebooks beside the Paclet directory.
 2. Open **xPlorer_QuickStart.nb** in a fresh Mathematica kernel.
-3. Choose the source loading cell (A) or installed-paclet cell (B), not both. Evaluate the remaining inputs in order.
+3. Choose A to install and load the supplied paclet, or B to load the source directly, not both. Evaluate the remaining inputs in order.
 4. The quick start derives the massive scalar equation and evaluates it on Minkowski, Schwarzschild and FLRW, including curvature and a plane-wave check.
 5. For the extended API and more advanced examples, open **xPlorer_Workflow.nb** in a fresh kernel.
 
 ## Installation options
+
+Download the curated distribution ZIP from GitHub Releases (not GitHub's automatic source-code ZIP). Extract the complete folder. The versioned .paclet must sit beside both notebooks; the source stays in Paclet/xPlorer.wl. Option A in either notebook installs the matching archive when it is not already installed, then calls Needs. Option B uses Get without installation. If an older package is found, the version check stops the tutorial. Restart the kernel before changing loading methods.
 
 ### No installation: load the included source
 
@@ -39,7 +41,7 @@ Needs["xPlorer`"];
 $XPlorerVersion
 ```
 
-The version should be "14.0.0-beta.13-dev.35". Do not load a second copy of xPlorer in the same kernel; remove or move conflicting older traditional installations out of the Applications path before using a paclet. To uninstall, inspect PacletFind["xPlorer"] and use PacletUninstall on the specific installed PacletObject. Restart before testing a different version.
+The version should be "14.0.0-beta.13-dev.36". Do not load a second copy of xPlorer in the same kernel; remove or move conflicting older traditional installations out of the Applications path before using a paclet. To uninstall, inspect PacletFind["xPlorer"] and use PacletUninstall on the specific installed PacletObject. Restart before testing a different version.
 
 ## Inspect your models
 
