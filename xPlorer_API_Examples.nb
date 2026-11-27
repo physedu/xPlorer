@@ -263,9 +263,9 @@ Cell[BoxData["scalarEqSchw"],"Input",CellTags->"formal_equations_part_2"],
 
 Cell[BoxData["scalarEqFLRW"],"Input",CellTags->"formal_equations_part_3"],
 
-Cell[TextData[{StyleBox["PortExpression",FontFamily->"Courier",FontSize->14]," takes a formula directly and transfers its heads and indices. Here it returns the abstract gradient on Schwarzschild, with the background rules unapplied."}],"Text"],
+Cell[TextData[{StyleBox["PortExpression",FontFamily->"Courier",FontSize->14]," takes a source formula and transfers its heads and indices to the specified background. The postfix form specifies the destination. Here it returns the abstract gradient on Schwarzschild, with the background rules unapplied.\n\nFor a different background, start from the source formula again, not from an already copied tensor."}],"Text"],
 
-Cell[BoxData[RowBox[{"gradPhi", "=", RowBox[{"PortExpression", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{RowBox[{"CD", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"phi", "[", "]"}], "]"}]}], "]"}]}]],"Input",CellTags->"transport_gradient"],
+Cell[BoxData[RowBox[{"gradPhi","=",RowBox[{RowBox[{RowBox[{"CD","[",RowBox[{"-","a"}],"]"}],"[",RowBox[{"phi","[","]"}],"]"}],"//",RowBox[{"PortExpression","[","\"Schwarzschild\"","]"}]}]}]],"Input",CellTags->"transport_gradient"],
 
 Cell[TextData[{StyleBox["UseExpression",FontFamily->"Courier",FontSize->14]," retrieves the gradient registered under ",StyleBox["\"Gradient\"",FontFamily->"Courier",FontSize->14]," and applies the background\:2019s active rules.\n\nThe rule list is currently empty, so both calls give the same gradient."}],"Text"],
 
@@ -329,11 +329,11 @@ Cell["Apply the active massless specialization without changing the registered g
 
 Cell[BoxData[RowBox[{"UseExpression","[",RowBox[{"\"Schwarzschild\"",",","\"Eab\""}],"]"}]],"Input",CellTags->"specialized_eab"],
 
-Cell[TextData[{StyleBox["ShowRules",FontFamily->"Courier",FontSize->14]," lists the active replacements. Use ",StyleBox["ApplyRules",FontFamily->"Courier",FontSize->14]," to apply them to an expression you already have."}],"Text"],
+Cell[TextData[{StyleBox["ShowRules",FontFamily->"Courier",FontSize->14]," lists the active replacements. Use ",StyleBox["ApplyRules",FontFamily->"Courier",FontSize->14]," to apply them to an expression you already have. The postfix form infers the background from the expression. An explicit tag is useful for shared constants; it cannot override ownership of a foreign tensor."}],"Text"],
 
 Cell[BoxData[RowBox[{"ShowRules", "[", "\"Schwarzschild\"", "]"}]],"Input",CellTags->"inspect_rules"],
 
-Cell[BoxData[RowBox[{"ApplyRules", "[", RowBox[{"\"Schwarzschild\"", ",", "scalarEqSchw"}], "]"}]],"Input",CellTags->"apply_rules"],
+Cell[BoxData[RowBox[{"scalarEqSchw","//","ApplyRules"}]],"Input",CellTags->"apply_rules"],
 
 Cell[TextData[{"Clear the active rules and request the equation again to recover the mass term."}],"Text"],
 
@@ -393,9 +393,9 @@ Cell["Clear these assumptions afterward so the later curvature calculation uses 
 
 Cell[BoxData[RowBox[{RowBox[{"SetFlatRules","[",RowBox[{"\"Minkowski\""}],"]"}], ";"}]],"Input",CellTags->"flat_rules_step_1"],
 
-Cell[BoxData[RowBox[{"ApplyRules","[",RowBox[{"\"Minkowski\"",",",RowBox[{RowBox[{"RicciScalar","[",RowBox[{"CDM"}],"]"}],"[","]"}]}],"]"}]],"Input",CellTags->"flat_rules_part_1"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"RicciScalar","[","CDM","]"}],"[","]"}],"//","ApplyRules"}]],"Input",CellTags->"flat_rules_part_1"],
 
-Cell[BoxData[RowBox[{"ApplyRules","[",RowBox[{"\"Minkowski\"",",",RowBox[{RowBox[{"Kretschmann","[",RowBox[{"CDM"}],"]"}],"[","]"}]}],"]"}]],"Input",CellTags->"flat_rules_part_2"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"Kretschmann","[","CDM","]"}],"[","]"}],"//","ApplyRules"}]],"Input",CellTags->"flat_rules_part_2"],
 
 Cell[BoxData[RowBox[{RowBox[{"ClearRules", "[", "\"Minkowski\"", "]"}], ";"}]],"Input",CellTags->"clear_flat_rules"]
 },Open]]

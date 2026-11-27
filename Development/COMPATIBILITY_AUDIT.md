@@ -98,3 +98,13 @@ Fresh kernels, portable permutation backend, existing RunGroup runner (which use
 | Total | 147/147 |
 
 Previously: 63/63 focused ObjectLabels tests; 36/37 Workflow checks (remaining headless font-size diagnostic); 62/62 executable Desktop-check cells excluding the manual copy/paste check. Those passing checks do not cover the new defects. The original Desktop test ZIP is deliberately unchanged. No general guarantee for other xAct versions, xTras/xPand or arbitrary external native edits follows from this audit.
+
+## Resolution of the two confirmed defects
+
+Candidate package commit `12ccb65580d76976446aaf96a21a80c0542ae3e6`, regression runner correction `bce382bbeed8f302b6f4815a0c761a67f5f63e27`. The user visually confirmed the original Einstein-rendering repair and actual Desktop copy/paste returned True (27 November 2026) on the earlier candidate. The two subsequent fixes are separate and still require Desktop validation of named component indices.
+
+- Named indices: do not temporarily change coordinate PrintAs. Apply labels to the scalar coordinate's interpreted display box only after native index formatting. Named component indices themselves retain their native strings. The initial text-token prototype was discarded because held box replacement was not reliable. Covariant markers retain the earlier postfix string repair.
+- Ownership: central expressionOwners/backgroundExpressionGuard detect managed symbol contexts including heads and indices. PortExpression, explicit ApplyRules (including result), ToBasisOf/ToValuesOf, ToComponents/PerturbOn via PortExpression, rule definition and SaveResult reject foreign managed owners. Display of mixed backgrounds remains allowed; source formulas and shared constants remain supported. This does not claim that every possible native operation or component-input dependency is isolated.
+- Regression: CompatibilityAuditTests 65/65, ObjectLabelsTests 63/63, ResearchWorkflowTests 37/37 (153/153 inputs), NativeInterop 23/23, ComponentsAndRules 24/24. The test-only filter recognizes exactly the native FontSize -> 3 $Failed/4 rule when CurrentValue[FontSize] returns $Failed in the remote environment. No package-side suppression or font-size patch. The other failures are not filtered.
+
+The remaining native integration risk areas listed above are a separate proposed investigation, not additional confirmed defects. Do not declare universal compatibility or start a broad refactor without agreeing scope with the maintainer. Keep the public Paclet and main unchanged until the new candidate is accepted.
