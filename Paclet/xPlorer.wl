@@ -787,8 +787,8 @@ SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background
   If[FailureQ[b], Return[b]];
   If[!KeyExistsQ[b, "Chart"], Return[failure["NoChart", "Define the chart before assigning a metric."]]];
   result=backgroundNativeSetGuard[b];If[FailureQ[result],Return[result]];
-  ass = profile[ass, b];
-  mat = profile[input, b];
+  ass = profileForBackground[tag,ass,b];If[FailureQ[ass],Return[ass]];
+  mat = profileForBackground[tag,input,b];If[FailureQ[mat],Return[mat]];
   If[SameQ[Lookup[b,"MetricMatrix",Missing[]],mat]&&SameQ[Lookup[b,"Assumptions",Missing[]],ass]&&nativeMetricCurrentQ[b],
    If[OptionValue[ComputeOnSet]=!=None,
     result=ComputeGeometry[tag,OptionValue[ComputeOnSet],CVSimplify->OptionValue[CVSimplify],Assumptions->ass,Verbose->OptionValue[Verbose]];
@@ -1534,8 +1534,9 @@ installManagedFieldSyntax[tag_,head_Symbol,rank_Integer] := If[!vanishingOwnedFi
 ]];
 
 Options[RegisterProfile]=Options[SetFieldComponents];
-RegisterProfile[tag_String,name_String] := Module[{b=background[tag],profiles},
+RegisterProfile[tag_String,name_String] := Module[{b=background[tag],profiles,status},
   If[FailureQ[b],Return[b]];
+  status=backgroundExpressionGuard[tag,b["FieldComponents"]];If[FailureQ[status],Return[status]];
   If[StringTrim[name]==="" || b["FieldComponents"]===<||>,Return[failure["Profile","Choose a nonempty name and assign at least one field first."]]];
   profiles=Append[Lookup[b,"FieldProfiles",<||>],name->b["FieldComponents"]];
   put[tag,<|"FieldProfiles"->profiles|>];profiles[name]
@@ -2427,16 +2428,17 @@ replayConnections[tag_] := Module[{b=$BG[tag],r},
  If[AnyTrue[r,FailureQ],First@Select[r,FailureQ],Null]
 ];
 SetConnectionComponents[tag_String,key_String,input_,OptionsPattern[]] := Module[
- {b=background[tag],cc,vals,ref=OptionValue[ReferenceConnection],ass,rec,gamma,n,coords,res,mat,curv,r,old},
+ {b=background[tag],cc,vals,ref=OptionValue[ReferenceConnection],ass,rec,gamma,n,coords,res,mat,curv,r,old,status},
  If[FailureQ[b],Return[b]];
  cc=ConnectionOf[tag,key];If[FailureQ[cc],Return[cc]];
  If[key==="Primary",Return[failure["PrimaryConnection","Set the primary connection through the metric matrix."]]];
  If[!KeyExistsQ[b,"MetricMatrix"],Return[failure["NoMetricComponents","Define coordinates and metric components first."]]];
  r=backgroundNativeSetGuard[b];If[FailureQ[r],Return[r]];
  If[!MemberQ[{"Coordinates","Primary"},ref],Return[failure["ConnectionReference","Choose Coordinates or Primary."]]];
- vals=profile[input,b];n=b["Dimension"];
+ vals=profileForBackground[tag,input,b];If[FailureQ[vals],Return[vals]];n=b["Dimension"];
  If[Dimensions[vals]=!={n,n,n},Return[failure["ConnectionDimensions","Use an array with slots {upper output, lower derivative, lower input}."]]];
  ass=Replace[OptionValue[Assumptions],Automatic:>Lookup[b,"Assumptions",True]];
+ status=backgroundExpressionGuard[tag,ass];If[FailureQ[status],Return[status]];
  rec=<|"Values"->vals,"Reference"->ref|>;gamma=connectionGamma[tag,rec];
  If[!TorsionQ[cc] && arrayZeroCheck[gamma-Transpose[gamma,{1,3,2}],ass]["Status"]=!="Passed",Return[failure["ConnectionTorsion","The supplied coefficients violate the declared zero torsion."]]];
  coords=coordinateValues[b];
@@ -2569,6 +2571,7 @@ ResultOf[tag_String,key_String] := Module[{b=background[tag]},If[FailureQ[b],b,
 recipeObjects[b_] := Join[managedObjects[b],KeyTake[b,{"Christoffel","Torsion","Riemann","Ricci","RicciScalar","Einstein","Weyl","TFRicci","Kretschmann","Epsilon","DetMetric"}],
  Association@Flatten@KeyValueMap[Function[{key,rec},KeyValueMap[("Connection:"<>key<>":"<>#1 -> #2)&,rec["Geometry"]]],Lookup[b,"Connections",<||>]]];
 ReconstructionData[tag_String] := Module[{b=background[tag],inputs,r},If[FailureQ[b],Return[b]];
+ r=backgroundExpressionGuard[tag,b];If[FailureQ[r],Return[r]];
  r=backgroundNativeSetGuard[b];If[FailureQ[r],Return[r]];
  inputs=Association@KeyValueMap[Function[{key,fs},key -> (KeyDrop[#,"Head"]& /@ Select[Values[b["FieldComponents"]],#["Head"]===fs["NewHead"]&])],b["Field"]];
  Join[KeyTake[b,{"Theory","Signature","SymbolSuffix","DisplayIndices","CoordinateLabels","Coordinates","NativeCoordinateSyntax","MetricMatrix","Assumptions","SpecializationRules","IndividualRules","RuleGroups","ActiveRuleGroups","PresentationOverrides","Notation","ObjectLabelOverrides","ChartNotation","ConnectionComponents","FieldProfiles"}],
@@ -2576,9 +2579,11 @@ ReconstructionData[tag_String] := Module[{b=background[tag],inputs,r},If[Failure
   "RelativeHeads"->relativeHeads[b]|>]
 ];
 recipeDeclarations[labels_,native_] := If[TrueQ[native],(Symbol["xPlorer`CoordinateDeclarations`"<>#][]& /@ labels),labels];
-RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,coords,inputs,source,result,relative,chartRules},
+RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,coords,inputs,source,result,relative,chartRules,owners,foreign,status,profiles,groups,specialization,individual},
  If[KeyExistsQ[$BG,tag],Return[failure["BackgroundExists","Choose an unused tag or delete the old background first."]]];
  If[Lookup[recipe,"RecipeVersion",None]=!=1 || !AssociationQ[Lookup[recipe,"Theory",None]],Return[failure["Recipe","Supply ReconstructionData captured before deletion."]]];
+ owners=expressionOwners[recipe];foreign=DeleteCases[owners,Lookup[recipe,"OriginalTag",None]];
+ If[foreign=!={},Return[failure["ForeignBackground","The reconstruction recipe contains objects from another active background.",<|"Target"->tag,"OriginalTag"->Lookup[recipe,"OriginalTag",None],"Owners"->owners,"ForeignOwners"->foreign|>]]];
  relative=Lookup[recipe,"RelativeHeads",{}];
  If[AnyTrue[relative,(!FreeQ[Lookup[recipe,"SpecializationRules",{}],#] || !FreeQ[Lookup[recipe,"RuleGroups",<||>],#])&],
   Return[failure["RecipeScope","Reconstruction of rules on relative-connection tensor heads is not supported; rewrite them using named connections first."]]];
@@ -2610,7 +2615,10 @@ RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,c
  If[AnyTrue[Flatten[result],FailureQ],Return[First@Select[Flatten[result],FailureQ]]];
  result=KeyValueMap[SetConnectionComponents[tag,#1,#2["Values"]/.rules,ReferenceConnection->#2["Reference"]]&,Lookup[recipe,"ConnectionComponents",<||>]];
  If[AnyTrue[result,FailureQ],Return[First@Select[result,FailureQ]]];
- put[tag,<|"FieldProfiles"->Map[Function[records,Association[(fieldRecordKey[#]->#)& /@ (Values[records]/.rules)]],Lookup[recipe,"FieldProfiles",<||>]],"RuleGroups"->(Lookup[recipe,"RuleGroups",<||>]/.rules),"SpecializationRules"->(Lookup[recipe,"SpecializationRules",{}]/.rules),"IndividualRules"->(individualRules[recipe]/.rules),
+ profiles=Map[Function[records,Association[(fieldRecordKey[#]->#)& /@ (Values[records]/.rules)]],Lookup[recipe,"FieldProfiles",<||>]];
+ groups=Lookup[recipe,"RuleGroups",<||>]/.rules;specialization=Lookup[recipe,"SpecializationRules",{}]/.rules;individual=individualRules[recipe]/.rules;
+ status=backgroundExpressionGuard[tag,{profiles,groups,specialization,individual}];If[FailureQ[status],Return[status]];
+ put[tag,<|"FieldProfiles"->profiles,"RuleGroups"->groups,"SpecializationRules"->specialization,"IndividualRules"->individual,
    "ActiveRuleGroups"->Lookup[recipe,"ActiveRuleGroups",{}],"Notation"->Lookup[recipe,"Notation",<||>],"ObjectLabelOverrides"->KeyTake[Association[Normal[Lookup[recipe,"ObjectLabelOverrides",<||>]]/.rules],Keys[labelHeadRecords[$BG[tag]]]],"ChartNotation"->Lookup[recipe,"ChartNotation",<||>]|>];
  updatePrintHook[];$BG[tag]
 ];
