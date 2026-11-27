@@ -7,8 +7,8 @@ CreateBackground["N"];CreateBackground["O"];DefineChart["N",{"t","x","y","z"}];D
 MetricInBasis[gN,{-1,1,1,1}];MetricInBasis[gO,{-1,1,1,1}];
 ch=ChartOf["N"];x=CoordinatesOf["N"][[2]][];head=BackgroundObject["N","phi"];
 cv[e_]:=FixedPoint[ToValues,e,12];
-record[]:=First[Select[Values[ShowBackground["N"]["FieldComponents"]],#["Head"]===head&]]["Values"];
-ComponentValue[phiN[]];q=ShowBackground["N"]["FieldComponents"]===<||>;
+record[]:=First[Select[Values[BackgroundValue["N"]["FieldComponents"]],#["Head"]===head&]]["Values"];
+ComponentValue[phiN[]];q=BackgroundValue["N"]["FieldComponents"]===<||>;
 ret=ComponentValue[phiN[],x^2];v1=record[];
 AllComponentValues[AN[-aN],{1,2,3,4}];au=AN[{aN,ch}];aBefore=TensorValIDs[AN];firstA=ToComponents["N",A[a]];aIDs=TensorValIDs[AN];aRules=TensorValues[AN];secondA=ToComponents["N",A[a]];aUnchanged=TensorValues[AN]===aRules;
 AllComponentValues[SN[-aN,-bN],DiagonalMatrix[{1,2,3,4}]];sBefore=Length[TensorValIDs[SN]];sMixed=ToComponents["N",S[a,-b]];
@@ -23,14 +23,14 @@ checks=<|"Read does not register"->q,"Scalar assignment returns native rule"->(M
 "Two LI orders"->(cv[ComponentArray[hN[LI[1],{aN,ch},{-bN,-ch}]]]===DiagonalMatrix[{-1,2,3,4}]&&cv[ComponentArray[hN[LI[2],{aN,ch},{-bN,-ch}]]]===DiagonalMatrix[{-5,6,7,8}]),
 "High rank skips unrequested calculation"->(AssociationQ[high]&&Length[TensorValIDs[TN]]===1),
 "High rank still calculable"->(ToComponents["N",T[a,-b,-c]][[1,1,1]]===-1)|>;
-nativeVectorRules=TensorValues[AN];rev=ShowBackground["N"]["DataRevision"];kin=ToComponents["N",CD[-a][CD[a][phi[]]]];
-checks["Calculation does not register"]=kin===2&&ShowBackground["N"]["DataRevision"]===rev;
+nativeVectorRules=TensorValues[AN];rev=BackgroundValue["N"]["DataRevision"];kin=ToComponents["N",CD[-a][CD[a][phi[]]]];
+checks["Calculation does not register"]=kin===2&&BackgroundValue["N"]["DataRevision"]===rev;
 derivative=PDOfBasis[ch][{1,-ch}][phiN[]];ComponentValue[derivative,100];d1=ToValues[derivative];SaveResult["N","prior",1];ret2=ComponentValue[phiN[],x^3];
 checks["Scalar update clears derivative"]=d1===100&&ToValues[derivative]===3 x^2&&ToComponents["N",CD[-a][CD[a][phi[]]]]===6 x;
 checks["Unrelated vector cache retained"]=TensorValues[AN]===nativeVectorRules;
 checks["Managed results invalidated"]=FailureQ[ResultOf["N","prior"]];
-rev=ShowBackground["N"]["DataRevision"];Block[{$CVReplace=False},ComponentValue[phiN[],99]];
-checks["Native CVReplace respected"]=record[]===x^3&&ShowBackground["N"]["DataRevision"]===rev;
+rev=BackgroundValue["N"]["DataRevision"];Block[{$CVReplace=False},ComponentValue[phiN[],99]];
+checks["Native CVReplace respected"]=record[]===x^3&&BackgroundValue["N"]["DataRevision"]===rev;
 ComponentValue[phiN[],Function[s,99]];checks["Existing native Function semantics"]=record[]===x^3;
 ComponentValue[phiO[],Function[s,12]];checks["New native Function semantics"]=ToComponents["O",phi[]]===12;
 MetricInBasis[gN,{-2,1,1,1}];checks["Metric update invalidates then lazily rebuilds vector cache"]=Length[TensorValIDs[AN]]===1&&ToComponents["N",A[a]]==={-1/2,2,3,4}&&cv[ComponentArray[au]]==={-1/2,2,3,4};
