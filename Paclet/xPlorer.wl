@@ -1487,7 +1487,10 @@ heldManagedLiteralQ[tag_,e_] := heldManagedSyntaxQ[tag,e] &&
 SetAttributes[heldManagedSyntaxQ,HoldAllComplete];
 heldManagedSyntaxQ[tag_,e_] := Module[{b=Lookup[$BG,tag,<||>]},
  !TrueQ[$insideManagedCalculation]&&!TrueQ[$insideNativePrintGuard]&&KeyExistsQ[b,"Basis"]&&
- With[{bb=b["Basis"]},MatchQ[HoldComplete[e],HoldComplete[_[(LI[_Integer?Positive]|{_Integer,bb}|{_Integer,-bb})...]]]]
+ With[{bb=b["Basis"]},
+  MatchQ[HoldComplete[e],HoldComplete[_[]]]||
+   MatchQ[HoldComplete[e],HoldComplete[_[(LI[_Integer?Positive]|{_Integer,bb}|{_Integer,-bb})...]]]
+ ]
 ];
 (* Native ValID deletion dispatches through DeleteTensorValues[head,bases].
    Only a registered source group is an authoritative input deletion.
