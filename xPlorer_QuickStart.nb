@@ -1,19 +1,41 @@
 Notebook[{
 Cell["xPlorer - Quick Start","Title"],
 
-Cell["One abstract scalar theory, three independent spacetimes | beta.13-dev.35","Subtitle"],
+Cell["One abstract scalar theory, three independent spacetimes | beta.13-dev.36","Subtitle"],
 
-Cell["Install xAct separately. Start a fresh kernel. Choose one load cell only; evaluate the remaining cells in order. This short notebook is a complete scientific example, not a test suite. For naming, advanced native xCoba operations, perturbations and lifecycle management, open xPlorer_Workflow.nb in a fresh kernel.","Text"],
+Cell["A complete first calculation: one massive scalar theory on three independent geometries. After choosing a loading method, evaluate the remaining inputs in order. Continue with the full Workflow for advanced examples.","Text"],
 
-Cell["A. Load the source beside this notebook","Text"],
+Cell[CellGroupData[{
 
-Cell[BoxData["Get[FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]];"],"Input",CellTags->"load"],
+Cell["0. Start here - choose one loading method","Section"],
 
-Cell["B. Alternatively, load an installed paclet (skip A)","Text"],
+Cell["Install xAct separately and start a fresh Mathematica kernel. Extract the complete distribution ZIP, rather than opening a notebook inside the archive. Choose A or B, never both. If you already have the matching paclet installed, A simply loads it.","Text"],
 
-Cell[BoxData["Needs[\"xPlorer`\"];"],"Input",CellTags->"load_installed"],
+Cell[CellGroupData[{
 
-Cell[BoxData["$XPlorerVersion"],"Input",CellTags->"version"],
+Cell["A. Install and load the released paclet (recommended)","Subsection"],
+
+Cell["The release ZIP contains the matching .paclet beside these notebooks. This cell installs it if needed and then loads xPlorer. If the file is absent, obtain the release ZIP or use option B.","Text"],
+
+Cell[BoxData["archive = FileNameJoin[{NotebookDirectory[], \"xPlorer-14.0.0-beta.13-dev.36.paclet\"}];\nIf[!AnyTrue[PacletFind[\"xPlorer\"], #[\"Version\"] === \"14.0.0-beta.13-dev.36\" &],\n  If[!FileExistsQ[archive], Print[\"Matching paclet not found. Extract the release ZIP or use option B.\"]; Abort[]];\n  If[!MatchQ[PacletInstall[archive], _PacletObject], Abort[]]\n];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"]
+
+},Open]],
+
+Cell[CellGroupData[{
+
+Cell["B. Load the source without installation","Subsection"],
+
+Cell["Use this alternative in the extracted ZIP or the development repository. It does not install a paclet.","Text"],
+
+Cell[BoxData["Get[FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]];"],"Input",CellTags->"load"]
+
+},Open]],
+
+Cell["Confirm the version before continuing. If the wrong version is loaded, restart the kernel and check for conflicting older applications or paclets.","Text"],
+
+Cell[BoxData["If[$XPlorerVersion === \"14.0.0-beta.13-dev.36\", $XPlorerVersion, Print[\"Unexpected xPlorer version: \", $XPlorerVersion]; Abort[]]"],"Input",CellTags->"version"]
+
+},Open]],
 
 Cell["Optional: reduce native informational printing, without suppressing errors. These are native xAct settings for this kernel.","Text"],
 
@@ -81,7 +103,7 @@ Cell[BoxData["Simplify[eqM,omega^2==k^2+m^2]"],"Input",CellTags->"wave_check"],
 
 Cell["Schwarzschild exterior: radial scalar","Subsection"],
 
-Cell[BoxData["DefineChart[\"Schwarzschild\",{t[],r[],theta[],varphi[]}];"],"Input",CellTags->"chart_s"],
+Cell[BoxData["DefineChart[\"Schwarzschild\",{t[],r[],theta[],varphi[]}]; PrintAs[Evaluate[thetaSchw]] ^= \"\\[Theta]\"; PrintAs[Evaluate[varphiSchw]] ^= \"\\[CurlyPhi]\";"],"Input",CellTags->"chart_s"],
 
 Cell[BoxData["DefConstantSymbol[Mbh];"],"Input",CellTags->"bh_mass"],
 
@@ -140,5 +162,5 @@ Cell[BoxData["ShowBackground[\"Schwarzschild\"]"],"Input",CellTags->"summary"],
 Cell["5. Continue your own study","Section"],
 
 Cell["The three backgrounds remain available in this kernel. You can change their components, inspect them, or save a ReconstructionData recipe. If you want to delete a study, inspect DeletionPlan first. The full Workflow demonstrates these operations and advanced tensors, multiple charts, affine connections, perturbations, and exports. Start that notebook with a fresh kernel. Report reproducible problems via GitHub Issues, including xPlorer and Mathematica versions, platform, xAct version, and minimal input.","Text"]
-},WindowTitle->"xPlorer - Quick Start",StyleDefinitions->Notebook[{
-Cell[StyleData[StyleDefinitions->"Default.nb"]],Cell[StyleData["Title"],FontSize->32],Cell[StyleData["Section"],FontSize->24],Cell[StyleData["Subsection"],FontSize->19],Cell[StyleData["Text"],FontSize->15,LineSpacing->{1.3,3}],Cell[StyleData["Input"],FontSize->15,CellFrame->{{1,0},{0,0}}],Cell[StyleData["Output"],FontSize->16]},Visible->False,StyleDefinitions->"PrivateStylesheetFormatting.nb"]]
+},PageWidth->WindowWidth,WindowTitle->"xPlorer - Quick Start",StyleDefinitions->Notebook[{
+Cell[StyleData[StyleDefinitions->"Default.nb"]],Cell[StyleData["Title"],FontSize->28],Cell[StyleData["Section"],FontSize->22],Cell[StyleData["Subsection"],FontSize->18],Cell[StyleData["Text"],FontSize->14,LineSpacing->{1.25,2},PageWidth->WindowWidth],Cell[StyleData["Input"],FontSize->14,PageWidth->WindowWidth,CellFrame->{{1,0},{0,0}}],Cell[StyleData["Output"],FontSize->14,PageWidth->WindowWidth]},Visible->False,StyleDefinitions->"PrivateStylesheetFormatting.nb"]]
