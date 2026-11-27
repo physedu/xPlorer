@@ -2,7 +2,7 @@
 root=DirectoryName[DirectoryName[$InputFileName]];
 Needs["xAct`xPert`"]; Needs["xAct`xCoba`"];
 nb=Get[FileNameJoin[{root,"xPlorer_Workflow.nb"}]];
-inputs=DeleteCases[Cases[nb,Cell[BoxData[b_],"Input",CellTags->id_String]:>{id,b},Infinity],{"load_installed",_}];
+inputs=DeleteCases[Cases[nb,Cell[BoxData[b_],"Input",CellTags->id_String]:>{id,b},Infinity],{("load_installed"|"load_existing"),_}];
 warnings={}; outputs=<||>;
 (* Load the package before parsing checks that refer to its public symbols. *)
 loadCell=First@Select[inputs,First[#]==="load"&];

@@ -27,7 +27,7 @@ The intended audience is researchers and students already using Mathematica and 
 | [xPlorer_Workflow.nb](xPlorer_Workflow.nb) | Start here: a practical seven-section research tutorial, from abstract equations to components, profiles, tensors and metric perturbations. |
 | [xPlorer_API_Examples.nb](xPlorer_API_Examples.nb) | Advanced executable reference: detailed API options, affine connections, lifecycle and special cases. |
 
-Install [xAct](https://www.xact.es/) separately. Use a fresh Mathematica kernel for either notebook. Keep the notebook beside xPlorer.wl in the release ZIP, or beside the Paclet directory in a repository checkout. Choose exactly one startup cell: A installs the matching released paclet if needed and loads it with Needs; B loads the source directly using Get. The distribution ZIP places the versioned paclet and plain xPlorer.wl beside both notebooks.
+Install [xAct](https://www.xact.es/) separately. Use a fresh Mathematica kernel for either notebook. Keep the notebook beside xPlorer.wl in the release ZIP, or beside the Paclet directory in a repository checkout. Choose one startup cell: A installs and loads the supplied paclet, B loads an already installed paclet with Needs, and C loads the source with Get. The distribution ZIP places the versioned paclet and plain xPlorer.wl beside both notebooks.
 
 ```wl
 Get[FileNameJoin[{NotebookDirectory[], "Paclet", "xPlorer.wl"}]];

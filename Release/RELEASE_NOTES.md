@@ -12,7 +12,7 @@ xPlorer connects abstract xAct calculations with concrete geometric studies. Def
 - xPlorer_API_Examples.nb: the exhaustive executable reference with advanced presentation, affine connections, lifecycle and other API examples.
 - README, GPL-3.0-or-later license and citation information.
 
-Install xAct separately. Extract the curated ZIP and open xPlorer_Workflow.nb in a fresh Mathematica kernel. Choose A to install/load the included paclet, or B to load the source. Start the reference notebook in a separate fresh kernel.
+Install xAct separately. Extract the curated ZIP and open xPlorer_Workflow.nb in a fresh Mathematica kernel. Choose A to install/load the included paclet, B if it is already installed, or C to load the source. Start the reference notebook in a separate fresh kernel.
 
 The internal development series used 14.0.0-beta.* identifiers; public numbering now starts at 1.0.0-beta.1. Internal testers must remove those older, numerically higher paclets before installing this one.
 

@@ -6,23 +6,35 @@ Cell["From one abstract theory to several physical spacetimes | beta.1","Subtitl
 
 Cell["A practical tutorial: define a theory once, compare physical backgrounds, specialize its equations, and change inputs without rebuilding the theory. Seven short sections introduce the commands as they become useful. Open the folded groups in order; the separate API Examples notebook is the exhaustive reference, including independent affine connections.","Text"],
 
-Cell["Install xAct separately and start a fresh Mathematica kernel. If you tested a previous internal xPlorer version (14.0.0-beta.*), uninstall that version before using A; Mathematica may otherwise prefer the higher version. Extract the complete distribution ZIP, rather than opening a notebook inside the archive. Choose A or B, never both. If you already have the matching paclet installed, A simply loads it.","Text"],
+Cell[CellGroupData[{
+Cell["Start here | Load xPlorer","Section"],
 
-Cell["A. Install and load the released paclet (recommended)","Text",FontWeight->"Bold"],
+Cell["Requires Mathematica and xAct. Extract the complete release folder, start a fresh kernel and evaluate ONE of the following loading cells (Shift+Enter).","Text"],
 
-Cell["The release ZIP contains the matching .paclet beside these notebooks. This cell installs it if needed and then loads xPlorer. If the file is absent, obtain the release ZIP or use option B.","Text"],
+Cell["A   Install and load  |  First use","Text",FontWeight->"Bold"],
 
-Cell[BoxData["archive = FileNameJoin[{NotebookDirectory[], \"xPlorer-1.0.0-beta.1.paclet\"}];\nIf[!AnyTrue[PacletFind[\"xPlorer\"], #[\"Version\"] === \"1.0.0-beta.1\" &],\n  If[!FileExistsQ[archive], Print[\"Matching paclet not found. Extract the release ZIP or use option B.\"]; Abort[]];\n  If[!MatchQ[PacletInstall[archive], _PacletObject], Abort[]]\n];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"],
+Cell["Use the .paclet supplied beside this notebook. Installation is needed only once.","Text"],
 
-Cell["B. Load the source without installation","Text",FontWeight->"Bold"],
+Cell[BoxData["If[!MatchQ[PacletInstall[FileNameJoin[{NotebookDirectory[],\n    \"xPlorer-1.0.0-beta.1.paclet\"}]], _PacletObject], Abort[]];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"],
 
-Cell["Use this alternative in the extracted ZIP or development checkout. The cell loads xPlorer.wl beside the notebook, or Paclet/xPlorer.wl in the repository. It does not install a paclet.","Text"],
+Cell["B   Load  |  Already installed","Text",FontWeight->"Bold"],
 
-Cell[BoxData["Get[If[FileExistsQ[FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}]], FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}], FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]]];"],"Input",CellTags->"load"],
+Cell["Use this on subsequent sessions; no installation or archive is needed.","Text"],
 
-Cell["Confirm the version before continuing. If the wrong version is loaded, restart the kernel and remove conflicting internal paclets or traditional installations.","Text"],
+Cell[BoxData["Needs[\"xPlorer`\"];"],"Input",CellTags->"load_existing"],
 
-Cell[BoxData["If[$XPlorerVersion === \"1.0.0-beta.1\", $XPlorerVersion, Print[\"Unexpected xPlorer version: \", $XPlorerVersion]; Abort[]]"],"Input",CellTags->"workflow_version"],
+Cell["C   Direct source  |  No installation","Text",FontWeight->"Bold"],
+
+Cell["Use Get to load xPlorer.wl from the extracted release folder or the Paclet directory in a GitHub checkout.","Text"],
+
+Cell[BoxData["With[{file = FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}]},\n  Get[If[FileExistsQ[file], file,\n    FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]]]\n];"],"Input",CellTags->"load"],
+
+Cell["Check the version","Text",FontWeight->"Bold"],
+
+Cell["Continue only if this returns 1.0.0-beta.1. If an old internal 14.x paclet is selected, remove it with PacletUninstall and restart the kernel before loading again.","Text"],
+
+Cell[BoxData["If[$XPlorerVersion === \"1.0.0-beta.1\",\n  $XPlorerVersion,\n  Print[\"Wrong xPlorer version. Restart the kernel and check your installation.\"]; Abort[]\n]"],"Input",CellTags->"workflow_version"]
+},Open]],
 
 Cell["SetXPlorerPreferences sets session-wide display defaults. Here we enable short background labels on tensors and coordinates and fraction notation for partial derivatives. ShowObjectLabels -> False restores ordinary xAct appearance. Neither option changes the mathematical expression.","Text"],
 

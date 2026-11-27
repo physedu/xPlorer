@@ -22,13 +22,13 @@ The intended audience is researchers and students already using Mathematica and 
 
 1. Extract the distribution ZIP. Keep the two notebooks beside xPlorer.wl and the versioned paclet.
 2. Open **xPlorer_Workflow.nb** in a fresh Mathematica kernel.
-3. Choose A to install and load the supplied paclet, or B to load the source directly, not both. Evaluate the remaining inputs in order.
+3. Choose A to install and load the supplied paclet, B if it is already installed, or C to load the source directly. Evaluate only one. Evaluate the remaining inputs in order.
 4. The seven-section research tutorial derives the massive scalar equation, evaluates it on Minkowski, Schwarzschild and FLRW, and continues through rules, profiles, secondary charts, vector/tensor fields, metric perturbations and reconstruction.
 5. For the extended API and more advanced examples, open **xPlorer_API_Examples.nb** in a fresh kernel. The advanced notebook has folded sections with shared prerequisites; it is not necessary to run it for a first study.
 
 ## Installation options
 
-Download the curated distribution ZIP from GitHub Releases (not GitHub's automatic source-code ZIP). Extract the complete folder. The versioned .paclet must sit beside both notebooks; the plain source xPlorer.wl sits beside them. Option A in either notebook installs the matching archive when it is not already installed, then calls Needs. Option B uses Get without installation. If an older package is found, the version check stops the tutorial. Restart the kernel before changing loading methods.
+Download the curated distribution ZIP from GitHub Releases (not GitHub's automatic source-code ZIP). Extract the complete folder. The versioned .paclet must sit beside both notebooks; the plain source xPlorer.wl sits beside them. Option A installs the matching archive and loads it with Needs. Option B calls Needs for an already installed package. Option C uses Get without installation. If an older package is found, the version check stops the tutorial. Restart the kernel before changing loading methods.
 
 ### A. Install and load the supplied paclet (recommended)
 

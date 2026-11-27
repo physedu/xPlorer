@@ -3,7 +3,7 @@ Global`$XPlorerStartupDirectory = DirectoryName[DirectoryName[$InputFileName]];
 Global`$XPlorerStartupChecks = Module[
   {directory = Global`$XPlorerStartupDirectory, notebook, inputs, before, result},
   notebook = Get[FileNameJoin[{directory,"xPlorer_Workflow.nb"}]];
-  inputs = Cases[notebook,Cell[BoxData[boxes_],"Input",___] :> boxes,Infinity];
+  inputs = Cases[notebook,Cell[BoxData[boxes_],"Input",CellTags->"load"] :> boxes,Infinity];
   before = MemberQ[$Packages,"xPlorer`"];
   result = Block[{NotebookDirectory = Function[directory], Print = (Null &)},
     ToExpression[First[inputs],StandardForm]];
@@ -11,7 +11,7 @@ Global`$XPlorerStartupChecks = Module[
     "Checks" -> <|
       "SingleGetReturnsNull" -> SameQ[result,Null],
       "PackageLoaded" -> MemberQ[$Packages,"xPlorer`"],
-      "PackageVersion" -> SameQ[xPlorer`$XPlorerVersion,"14.0.0-beta.13-dev.23"],
+      "PackageVersion" -> SameQ[xPlorer`$XPlorerVersion,"1.0.0-beta.1"],
       "DependenciesAvailable" -> And @@ (MemberQ[$ContextPath,#] & /@
         {"xPlorer`","xAct`xTensor`","xAct`xPert`","xAct`xCoba`"})
     |>
