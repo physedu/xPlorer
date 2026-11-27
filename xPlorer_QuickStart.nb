@@ -1,7 +1,7 @@
 Notebook[{
 Cell["xPlorer - Quick Start","Title"],
 
-Cell["One abstract scalar theory, three independent spacetimes | beta.13-dev.33","Subtitle"],
+Cell["One abstract scalar theory, three independent spacetimes | beta.13-dev.34","Subtitle"],
 
 Cell["Install xAct separately. Start a fresh kernel. Choose one load cell only; evaluate the remaining cells in order. This short notebook is a complete scientific example, not a test suite. For naming, advanced native xCoba operations, perturbations and lifecycle management, open xPlorer_Workflow.nb in a fresh kernel.","Text"],
 
