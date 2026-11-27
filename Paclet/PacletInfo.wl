@@ -1,6 +1,6 @@
 PacletObject[<|
  "Name" -> "xPlorer",
- "Version" -> "14.0.0-beta.13-dev.31",
+ "Version" -> "14.0.0-beta.13-dev.32",
  "WolframVersion" -> "13.0+",
  "Description" -> "Abstract xAct theories, independent backgrounds and component calculations",
  "Creator" -> "Eduardo Sanz-Romero",
