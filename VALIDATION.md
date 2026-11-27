@@ -1,56 +1,45 @@
-# Validation: 14.0.0-beta.7
+# Validation — xPlorer 1.0.0-beta.1 candidate
 
-Date: 2026-11-23. Environment: Wolfram Language 15.0.1, Linux x86-64; official xAct 1.3.0 (xTensor, xCoba, xPert). The test harness selects portable Wolfram Language permutations because the remote environment does not provide a working external xPerm executable. The package and principal notebook do not change the user's backend setting.
+## Executed evidence
 
-## Principal notebook
+The maintainer's recorded test candidate is [4ed4712](https://github.com/physedu/xPlorer/commit/4ed4712d06a6a926acacc41d91d303f3af2699e7). Environment: Wolfram Language 15.0.1, Linux, xAct 1.3.0, portable permutation backend; native printing enabled.
 
-The actual xPlorer_Workflow.nb input boxes were parsed and executed sequentially in a fresh kernel: **88/88 inputs**, **45/45 expected-result checks**, **3/3 workflow-order checks**, **zero parse failures and zero warning cells**. The complete report is Tests/validation.json.
-
-Checks include scalar variation, abstract transport, tensor identity and raising, Minkowski/Schwarzschild/FLRW field equations and curvature, a plane wave, vector/tensor components, perturbative variations, an independent affine derivative and nonzero curvature component, optional notation identity, rule removal, saved snapshots and true deletion/recreation.
-
-A separate cold-start check confirms the package was initially absent, the notebook's single Get returned Null, the version matched and the dependencies were available. Traditional application loading through Needs and development PacletDirectoryLoad followed by Needs were checked separately in fresh kernels. Metadata/loading was checked; no built binary paclet or submission to a paclet server is claimed.
-
-## Package regression
-
-Checks are executed in isolated fresh kernels and small groups to stay within remote evaluator limits. The suite contains 196 distinct assertions, including loops in the notation tests. Core assertions repeat across some groups:
-
-| Group | Passed / total |
+| Test | Result |
 | --- | --- |
-| Core + geometry | 49 / 49 |
-| Core + perturbations | 48 / 48 |
-| Core + lifecycle, including genuine partial-creation cleanup | 63 / 63 |
-| Presentation + notation | 34 / 34 |
-| Object lifecycle + connections/properties | 45 / 45 |
-| Independent components + rules/results | 24 / 24 |
-| Managed reconstruction recipes | 9 / 9 |
-| Additional metric-connection curvature families | 6 / 6 |
+| Research Workflow, flat source loading and registered development directory loading | 131/131 selected cells, 26/26 checks for each |
+| API Examples, direct source loading in repository layout | 419/419 selected cells, 109/109 checks, 33/33 stages |
+| Warnings and unexpected failures in those runs | 0 |
 
-See Tests/Final-results.json for the execution record. Full combined remote submissions returned evaluator Internal error; those failed service calls are not counted as passing checks. The split groups above provide the reported evidence. Run Tests/RunTests.wl in an ordinary local kernel for the complete suite, or Tests/RunGroup.wl for bounded groups.
+The release staging helper was exercised with a synthetic ZIP containing the six required internal files, renamed .paclet. The output contained seven top-level files and byte-identical plain source. This was not an actual installable paclet test.
 
-The baseline was first revalidated before changing code. During final review, two HoldAll restoration calls in the old lifecycle test were corrected to use With; otherwise a check intended to exercise failed creation was testing an incomplete theory instead. Invalid field specifications are now rejected before mutation, and a separate source-rank mismatch exercises real partial-creation cleanup. The test results reflect these corrected cases.
+These results describe the recorded candidate, not a fresh run on the reorganized repository. Subsequent source changes are limited to the introductory banner and AboutXPlorer output; the scientific source and both public notebooks are unchanged by this organization. The supplemental integration notebook has been relocated into Tests/Fixtures/ and its runner path adjusted; the relocated runner has not been executed here.
 
-Additional metric-connection cases cover Einstein, Weyl, Ricci scalar, trace-free Ricci and Kretschmann, including a torsionful metric-compatible example. Scalar wrappers are traced independently so local contracted-index scopes are preserved. Additional-connection Kretschmann uses coordinate curvature coefficients and sparse metric contractions rather than expanding a product of abstract Riemann tensors.
+## Revalidation of the clean public source tree — 27 November 2026
 
-## Presentation and scope limits
+Exact tested commit: [d67e5b8](https://github.com/physedu/xPlorer/commit/d67e5b8f09d99ccd457f3237569e992de57ad9aa). Fresh remote Wolfram Language 15.0.1 Linux kernels, xAct 1.3.0, portable permutation backend, native printing enabled, repository direct-source loading.
 
-No Mathematica front end was available, so no pixel-level screenshots or light/dark visual verification are claimed. The notebook inherits Default.nb colors and has no explicit color rules or color objects. Native xAct boxes may use front-end-dependent font sizes and their own output conventions. Interpreted-view checks recover the original expressions, including covariant derivative views; they do not prove every possible front-end interaction.
+| Test | Result |
+| --- | --- |
+| Research Workflow | 131/131 cells, 26/26 checks |
+| API Examples | 419/419 cells, 109/109 checks, 33/33 stages |
+| Warnings, parse errors and unexpected failures | None reported by the respective runners |
+| Startup banner | Correct version 1.0.0-beta.1 and GitHub URL observed |
 
-Supported mathematical scope is documented in API_GUIDE.md. Complex conjugate transport is checked abstractly; a separate component-assignment API for conjugate heads is not provided. Density, projected/graded fields, extra bundles and extended connections are rejected. Arbitrary user definitions and variables are outside managed cleanup/invalidation. No timing comparison or speedup factor is claimed.
+CreatePacletArchive failed in the remote evaluator because of a Java security restriction; no actual installable archive or Desktop acceptance is claimed. The integration fixture and complete regression suite have not been rerun.
 
-## Reproduction
+## Reproduce
 
-With xAct installed, start a fresh kernel for each group:
-
-```wl
-Get["/path/to/xPlorer/Tests/RunTests.wl"];
-$XPlorerTestSummary
-```
-
-For the sequential principal notebook:
+Install xAct separately. Use a fresh Mathematica kernel for each runner, adjusting paths to your checkout:
 
 ```wl
-Get["/path/to/xPlorer/Tests/WorkflowTests.wl"];
-$XPlorerWorkflowReport
+Get["/path/to/xPlorer/Tests/ResearchWorkflowTests.wl"]
+Get["/path/to/xPlorer/Tests/WorkflowTests.wl"]
 ```
 
-All delivered source/prose is English ASCII. Notebook mathematical notation uses native Wolfram boxes. The editable cell schema and box cache are under Tools; rebuild with Python 3 Tools/build_notebook.py, regenerating native boxes with Tools/MakeInputBoxes.wl when input source changes.
+Run each line in a separate fresh kernel. See [Tests/README.md](Tests/README.md) for grouped regression tests and additional checks.
+
+## Before public release
+
+Build the actual paclet from the current source, verify installation and uninstallation, execute both notebooks and inspect Desktop output, verify the curated ZIP and record exact artifact hashes. A full historical regression rerun remains pending. Mathematica 13.0+ is the declared minimum; the recorded environment does not establish compatibility with every supported version.
+
+No final Desktop appearance, archive installation or performance speedup is claimed. Historical results and their original versions are preserved under [Development/ValidationHistory](https://github.com/physedu/xPlorer/tree/59030c6df0ad282b18b279ae620bf6ec215e8206/Development/ValidationHistory) and [development decisions](https://github.com/physedu/xPlorer/tree/59030c6df0ad282b18b279ae620bf6ec215e8206/Development/DECISIONS.md).

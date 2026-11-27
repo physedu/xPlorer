@@ -1,6 +1,9 @@
 (* Loaded after Fixture.wl in an isolated context. *)
 With[{ss=phi},PrintAs[ss]^="m"];
-RegisterTheory["Field","Scalar",phi];
+sourceFormulaSnapshot=TheorySnapshot[]["Formula"];
+UnregisterTheory["Fields","phi",Cascade->True];
+RegisterTheory["Field",phi];
+With[{f=sourceFormulaSnapshot},RegisterTheory[<|"Formula"->f|>]];
 RegisterTheory["Presentation",<|"Metric"->"q"|>];
 tagPrint="PrintCase"; CreateBackground[tagPrint,Presentation-><|"phi"->"M1"|>];
 ps=BackgroundObject[tagPrint,"phi"]; pg=BackgroundObject[tagPrint,"Metric"]; pc=BackgroundObject[tagPrint,"CovD"];
@@ -20,13 +23,12 @@ CreateBackground[tagPrint];
 assert["print-recreate",With[{hh=BackgroundObject[tagPrint,"phi"]},PrintAs[hh]],"m"];
 assert["print-recreated-independent",BackgroundObject[tagPrint,"phi"] =!= ps,True];
 DeleteBackground[tagPrint];
-DefTensor[pretty[],sourceM,PrintAs->Function[s,"P"]];RegisterTheory["Field","Scalar",pretty];
+DefTensor[pretty[],sourceM,PrintAs->Function[s,"P"]];RegisterTheory["Field",pretty];
 CreateBackground["FunctionPrint"];assert["native-function-print",With[{hh=BackgroundObject["FunctionPrint","pretty"]},PrintAs[hh]],"P"];
 SetPresentation["FunctionPrint",<|"pretty"->SubscriptBox["M","1"]|>];
 assert["boxed-label-override",With[{hh=BackgroundObject["FunctionPrint","pretty"]},PrintAs[hh]],SubscriptBox["M","1"]];
-DeleteBackground["FunctionPrint"];UnregisterTheory["Field","pretty"];UndefTensor[pretty];
+DeleteBackground["FunctionPrint"];UnregisterTheory["Fields","pretty"];UndefTensor[pretty];
 
-beforeReserved=ShowTheory[];
-RegisterTheory["Field","Metric","Scalar",phi];
-assert["reserved-field-key-protected",FailureQ[CreateBackground["ReservedKey"]],True];
+beforeReserved=TheorySnapshot[];
+assert["reserved-field-key-protected",FailureQ[RegisterTheory["Field",phi,Name->"Metric"]],True];
 ClearTheory[];With[{tt=beforeReserved},RegisterTheory[tt]];

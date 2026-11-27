@@ -1,2 +1,2 @@
-(* Context loader for Needs and the kernel paclet extension. *)
-Get[FileNameJoin[{DirectoryName[$InputFileName], "xPlorer.wl"}]];
+(* Compatibility loader for the development checkout; implementation lives in Paclet. *)
+Get[FileNameJoin[{DirectoryName[$InputFileName], "Paclet", "xPlorer.wl"}]];
