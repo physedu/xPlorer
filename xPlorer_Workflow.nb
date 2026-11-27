@@ -951,19 +951,19 @@ Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Fields\"", ",", R
 
 Cell[TextData[{"The uppercase S denotes the symmetric tensor. To register it on its own, use ",StyleBox["RegisterTheory[\"Field\", S]",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
-Cell[TextData[{"Create a new Minkowski study from the extended theory. Its descriptive tag is MinkowskiFields, but the typed suffix Mf is deliberately short: AMf, gMf and chartMf. Compare the field keys with those in the original scalar-only background."}],"Text"],
+Cell[TextData[{"Create a new Minkowski study from the extended theory. Its descriptive tag is MinkowskiFields, but the typed suffix minkF is deliberately short: AminkF, gminkF and chartminkF. Compare the field keys with those in the original scalar-only background."}],"Text"],
 
-Cell[BoxData["CreateBackground[\"MinkowskiFields\", SymbolSuffix -> \"Mf\"];"],"Input",CellTags->"field_background_step_1"],
+Cell[BoxData["CreateBackground[\"MinkowskiFields\", SymbolSuffix -> \"minkF\"];"],"Input",CellTags->"field_background_step_1"],
 
 Cell[BoxData["DefineChart[\"MinkowskiFields\", {t[], x[], y[], z[]}];"],"Input",CellTags->"field_background_step_2"],
 
-Cell[BoxData["MetricInBasis[gMf, -chartMf, DiagonalMatrix[{-1, 1, 1, 1}]];"],"Input",CellTags->"field_background"],
+Cell[BoxData["MetricInBasis[gminkF, -chartminkF, DiagonalMatrix[{-1, 1, 1, 1}]];"],"Input",CellTags->"field_background"],
 
 Cell["Native geometry can be computed explicitly with the chart basis, or read lazily through native component readers. Here the Cartesian Ricci scalar vanishes.","Text"],
 
-Cell[BoxData["MetricCompute[gMf, chartMf, \"RicciScalar\"[]];"],"Input",CellTags->"dev31_native_metric_compute"],
+Cell[BoxData["MetricCompute[gminkF, chartminkF, \"RicciScalar\"[]];"],"Input",CellTags->"dev31_native_metric_compute"],
 
-Cell[BoxData["ToComponents[RicciScalar[CDMf][]]"],"Input",CellTags->"dev31_native_ricci"],
+Cell[BoxData["ToComponents[RicciScalar[CDminkF][]]"],"Input",CellTags->"dev31_native_ricci"],
 
 Cell[BoxData["Keys[ShowBackground[\"Minkowski\", \"Fields\"]]"],"Input",CellTags->"field_snapshots_part_1"],
 
@@ -971,13 +971,13 @@ Cell[BoxData["Keys[ShowBackground[\"MinkowskiFields\", \"Fields\"]]"],"Input",Ce
 
 Cell[TextData[{"Assign the lower components of A in chart order (t,x,y,z) using ",StyleBox["AllComponentValues",FontFamily->"Courier",FontSize->14],". With abstract indices on an owned field, xPlorer infers the primary chart and remembers the supplied variance. The explicit primary-chart array syntax is also supported. Requesting the upper vector raises the index with the Minkowski metric only when needed. Native ToValues can then reuse the stored components."}],"Text"],
 
-Cell[BoxData["AllComponentValues[AMf[{-aMf, -chartMf}], {1, 2, 3, 4}];"],"Input",CellTags->"vector_values_step_1"],
+Cell[BoxData["AllComponentValues[AminkF[{-aminkF, -chartminkF}], {1, 2, 3, 4}];"],"Input",CellTags->"vector_values_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"Adown", "=", RowBox[{RowBox[{"AMf", "[", RowBox[{"-", "aMf"}], "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_2"],
+Cell[BoxData[RowBox[{RowBox[{"Adown", "=", RowBox[{RowBox[{"AminkF", "[", RowBox[{"-", "aminkF"}], "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_2"],
 
-Cell[BoxData[RowBox[{RowBox[{"Aup", "=", RowBox[{RowBox[{"AMf", "[", "aMf", "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_3"],
+Cell[BoxData[RowBox[{RowBox[{"Aup", "=", RowBox[{RowBox[{"AminkF", "[", "aminkF", "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_3"],
 
-Cell[BoxData[RowBox[{RowBox[{"normA", "=", RowBox[{RowBox[{RowBox[{"AMf", "[", "aMf", "]"}], " ", RowBox[{"AMf", "[", RowBox[{"-", "aMf"}], "]"}]}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_4"],
+Cell[BoxData[RowBox[{RowBox[{"normA", "=", RowBox[{RowBox[{RowBox[{"AminkF", "[", "aminkF", "]"}], " ", RowBox[{"AminkF", "[", RowBox[{"-", "aminkF"}], "]"}]}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_4"],
 
 Cell[BoxData["Adown"],"Input",CellTags->"vector_values_part_1"],
 
@@ -987,7 +987,7 @@ Cell[BoxData["normA"],"Input",CellTags->"vector_values_part_3"],
 
 Cell["ToCTensor returns a snapshot, not a live field. Managed primary-chart native inputs are captured and replayed; arbitrary external bases, secondary-chart assignments and raw native cache mutations are not automatically synchronized. Explicit native ToCTensor[expr, bases] still uses xCoba.","Text"],
 
-Cell[BoxData["ctA = AMf[aMf] // ToCTensor"],"Input",CellTags->"ctensor_output"],
+Cell[BoxData["ctA = AminkF[aminkF] // ToCTensor"],"Input",CellTags->"ctensor_output"],
 
 Cell[TextData[{"The contraction is \:22121 + 4 + 9 + 16 = 28. To retrieve the same covector with its abstract lower index, use ",StyleBox["PortExpression",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
@@ -995,27 +995,27 @@ Cell[BoxData[RowBox[{"PortExpression", "[", RowBox[{"\"MinkowskiFields\"", ",", 
 
 Cell["A complete component array is not required for every field. Supply an independent component of the antisymmetric tensor F using native ComponentValue. Native symmetry determines its opposite slot; unrelated, unassigned entries remain symbolic, not zero. The complete array in the next example replaces this sparse input.","Text"],
 
-Cell[BoxData["ComponentValue[FMf[{1, -chartMf}, {0, -chartMf}], 3];"],"Input",CellTags->"dev31_sparse_input"],
+Cell[BoxData["ComponentValue[FminkF[{1, -chartminkF}, {0, -chartminkF}], 3];"],"Input",CellTags->"dev31_sparse_input"],
 
-Cell[BoxData["ToValues[FMf[{0, -chartMf}, {1, -chartMf}]]"],"Input",CellTags->"dev31_sparse_antisym"],
+Cell[BoxData["ToValues[FminkF[{0, -chartminkF}, {1, -chartminkF}]]"],"Input",CellTags->"dev31_sparse_antisym"],
 
-Cell[BoxData["ToValues[FMf[{0, -chartMf}, {2, -chartMf}]]"],"Input",CellTags->"dev31_sparse_unknown"],
+Cell[BoxData["ToValues[FminkF[{0, -chartminkF}, {2, -chartminkF}]]"],"Input",CellTags->"dev31_sparse_unknown"],
 
 Cell[TextData[{"Assign matrices with the declared rank and symmetry. xPlorer checks both when it stores the components."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"Fmatrix", "=", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "2", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"-", "2"}], ",", "0", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}]}], "}"}]}], ";"}]],"Input",CellTags->"tensor_values_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"SMf","[",RowBox[{RowBox[{"-","aMf"}],",",RowBox[{"-","bMf"}]}],"]"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"tensor_values_step_2"],
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"SminkF","[",RowBox[{RowBox[{"-","aminkF"}],",",RowBox[{"-","bminkF"}]}],"]"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"tensor_values_step_2"],
 
-Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"FMf","[",RowBox[{RowBox[{"-","aMf"}],",",RowBox[{"-","bMf"}]}],"]"}], ",", "Fmatrix"}], "]"}], ";"}]],"Input",CellTags->"tensor_values_step_3"],
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"FminkF","[",RowBox[{RowBox[{"-","aminkF"}],",",RowBox[{"-","bminkF"}]}],"]"}], ",", "Fmatrix"}], "]"}], ";"}]],"Input",CellTags->"tensor_values_step_3"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"SMf", "[", RowBox[{RowBox[{"-", "aMf"}], ",", RowBox[{"-", "bMf"}]}], "]"}], "//", "ToComponents"}],"//","MatrixForm"}]],"Input",CellTags->"tensor_values"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"SminkF", "[", RowBox[{RowBox[{"-", "aminkF"}], ",", RowBox[{"-", "bminkF"}]}], "]"}], "//", "ToComponents"}],"//","MatrixForm"}]],"Input",CellTags->"tensor_values"],
 
 Cell[TextData[{StyleBox["FreeIndices",FontFamily->"Courier",FontSize->14]," fixes the order of the array axes. Reversing the free indices transposes the matrix. ",StyleBox["Components",FontFamily->"Courier",FontSize->14]," selects individual entries.\n\nIn the original order, F has entries 2 at (0,1) and \:22122 at (1,0)."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"FMf", "[", RowBox[{RowBox[{"-", "aMf"}], ",", RowBox[{"-", "bMf"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "bMf"}], ",", RowBox[{"-", "aMf"}]}], "}"}]}]}], "]"}]}],"//","MatrixForm"}]],"Input",CellTags->"tensor_selection_part_1"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"FminkF", "[", RowBox[{RowBox[{"-", "aminkF"}], ",", RowBox[{"-", "bminkF"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "bminkF"}], ",", RowBox[{"-", "aminkF"}]}], "}"}]}]}], "]"}]}],"//","MatrixForm"}]],"Input",CellTags->"tensor_selection_part_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"FMf", "[", RowBox[{RowBox[{"-", "aMf"}], ",", RowBox[{"-", "bMf"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "1"}], "}"}], ",", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}], "}"}]}]}], "]"}]}]],"Input",CellTags->"tensor_selection_part_2"],
+Cell[BoxData[RowBox[{RowBox[{"FminkF", "[", RowBox[{RowBox[{"-", "aminkF"}], ",", RowBox[{"-", "bminkF"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "1"}], "}"}], ",", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}], "}"}]}]}], "]"}]}]],"Input",CellTags->"tensor_selection_part_2"],
 
 Cell[TextData[{"An independent covariant derivative"}],"Subsection"],
 
@@ -1107,9 +1107,9 @@ Cell["Reuse computed geometry","Subsection"],
 
 Cell[TextData[{"Request the Ricci and Einstein tensors twice. With the same metric and settings, the second call reports both as cached."}],"Text"],
 
-Cell[BoxData[RowBox[{"MetricCompute", "[", RowBox[{"gMf", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_1"],
+Cell[BoxData[RowBox[{"MetricCompute", "[", RowBox[{"gminkF", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_1"],
 
-Cell[BoxData[RowBox[{"MetricCompute", "[", RowBox[{"gMf", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_2"],
+Cell[BoxData[RowBox[{"MetricCompute", "[", RowBox[{"gminkF", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_2"],
 
 Cell["Optional: detect stale notebook results","Subsection"],
 
@@ -1125,23 +1125,23 @@ Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"MinkowskiFields\
 
 Cell[TextData[{"Change the metric\:2019s time-time entry to \:22124. The covector still has lower time component 1, so raising its index now gives \:22121/4.\n\nChanging the metric also invalidates its cached curvature."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gMf", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "4"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"change_metric_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gminkF", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "4"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"change_metric_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"AMf", "[", "aMf", "]"}], "//", "ToComponents"}]],"Input",CellTags->"change_metric"],
+Cell[BoxData[RowBox[{RowBox[{"AminkF", "[", "aminkF", "]"}], "//", "ToComponents"}]],"Input",CellTags->"change_metric"],
 
 Cell[TextData[{"The next lookup reports True for FailureQ because the saved norm was computed with the old metric. The ordinary variable still stores 28; the new norm is 115/4. Recalculate and save it explicitly if useful."}],"Text"],
 
 Cell[BoxData["FailureQ[ResultOf[\"MinkowskiFields\", \"VectorNorm\"]]"],"Input",CellTags->"invalidated_result"],
 
-Cell[BoxData["{normA, AMf[aMf] AMf[-aMf] // ToComponents}"],"Input",CellTags->"stale_comparison"],
+Cell[BoxData["{normA, AminkF[aminkF] AminkF[-aminkF] // ToComponents}"],"Input",CellTags->"stale_comparison"],
 
-Cell[BoxData["SaveResult[\"MinkowskiFields\", \"VectorNorm\", AMf[aMf] AMf[-aMf] // ToComponents]"],"Input",CellTags->"save_new_result"],
+Cell[BoxData["SaveResult[\"MinkowskiFields\", \"VectorNorm\", AminkF[aminkF] AminkF[-aminkF] // ToComponents]"],"Input",CellTags->"save_new_result"],
 
 Cell[BoxData["ResultOf[\"MinkowskiFields\", \"VectorNorm\"]"],"Input",CellTags->"new_result"],
 
 Cell[TextData[{"Restore the Minkowski metric."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gMf", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"restore_metric"],
+Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gminkF", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"restore_metric"],
 
 Cell["The vector study has been restored to its original metric. Next, return to the independent scalar Minkowski background to vary its metric.","Text"]
 },Open]],
@@ -1213,21 +1213,21 @@ Cell["The preceding example restored the standard Minkowski metric. The covector
 
 Cell[BoxData[RowBox[{RowBox[{"MetricMatrixOf","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"lifecycle_initial_metric"],
 
-Cell[BoxData[RowBox[{RowBox[{"AMf","[",RowBox[{"aMf"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_initial_vector"],
+Cell[BoxData[RowBox[{RowBox[{"AminkF","[",RowBox[{"aminkF"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_initial_vector"],
 
 Cell["Compute the Ricci and Einstein tensors twice. The second request uses the cached geometry.","Text"],
 
-Cell[BoxData[RowBox[{"MetricCompute","[",RowBox[{"gMf",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_compute_first"],
+Cell[BoxData[RowBox[{"MetricCompute","[",RowBox[{"gminkF",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_compute_first"],
 
-Cell[BoxData[RowBox[{"MetricCompute","[",RowBox[{"gMf",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_compute_cached"],
+Cell[BoxData[RowBox[{"MetricCompute","[",RowBox[{"gminkF",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_compute_cached"],
 
 Cell["ClearComputedValues removes derived values. It retains the metric and managed field inputs and invalidates saved results. The next geometry request computes the cleared quantities again.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"ClearComputedValues","[",RowBox[{"\"MinkowskiFields\""}],"]"}],";"}]],"Input",CellTags->"clear_vector_input_step_2"],
 
-Cell[BoxData[RowBox[{"MetricCompute","[",RowBox[{"gMf",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_recompute"],
+Cell[BoxData[RowBox[{"MetricCompute","[",RowBox[{"gminkF",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_recompute"],
 
-Cell[BoxData[RowBox[{RowBox[{"AMf","[",RowBox[{"aMf"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_after_clear_geometry"],
+Cell[BoxData[RowBox[{RowBox[{"AminkF","[",RowBox[{"aminkF"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_after_clear_geometry"],
 
 Cell["11.2. Clear field values, preserve the tensor","Subsubsection"],
 
@@ -1241,11 +1241,11 @@ Cell["A is still defined; only its assigned components have been removed. The na
 
 Cell[BoxData[RowBox[{"BackgroundObject","[",RowBox[{"\"MinkowskiFields\"",",","\"A\""}],"]"}]],"Input",CellTags->"lifecycle_field_defined"],
 
-Cell[BoxData["AMf[-aMf] // ToComponents[StrictComponents -> False]"],"Input",CellTags->"lifecycle_inputs_cleared"],
+Cell[BoxData["AminkF[-aminkF] // ToComponents[StrictComponents -> False]"],"Input",CellTags->"lifecycle_inputs_cleared"],
 
 Cell[BoxData[RowBox[{RowBox[{"ActivateProfile","[",RowBox[{"\"MinkowskiFields\"",",","\"OriginalFields\""}],"]"}],";"}]],"Input",CellTags->"lifecycle_activate_profile"],
 
-Cell[BoxData[RowBox[{RowBox[{"AMf","[",RowBox[{"aMf"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_profile_restored"],
+Cell[BoxData[RowBox[{RowBox[{"AminkF","[",RowBox[{"aminkF"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_profile_restored"],
 
 Cell["RemoveProfile deletes the stored profile, not the active inputs. The vector still has the same components.","Text"],
 
@@ -1253,7 +1253,7 @@ Cell[BoxData[RowBox[{RowBox[{"RemoveProfile","[",RowBox[{"\"MinkowskiFields\"","
 
 Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{"ShowProfiles","[",RowBox[{"\"MinkowskiFields\""}],"]"}]}],"]"}]],"Input",CellTags->"lifecycle_profiles_remaining"],
 
-Cell[BoxData[RowBox[{RowBox[{"AMf","[",RowBox[{"aMf"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_profile_removal_value"],
+Cell[BoxData[RowBox[{RowBox[{"AminkF","[",RowBox[{"aminkF"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_profile_removal_value"],
 
 Cell["11.3. Remove a stored specialization","Subsubsection"],
 
@@ -1315,7 +1315,7 @@ Cell[BoxData[RowBox[{RowBox[{"RecreateBackground","[",RowBox[{"\"MinkowskiFields
 
 Cell[BoxData[RowBox[{RowBox[{"MetricMatrixOf","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"lifecycle_restored_metric"],
 
-Cell[BoxData[RowBox[{RowBox[{"AMf","[",RowBox[{"aMf"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"recreate_background"],
+Cell[BoxData[RowBox[{RowBox[{"AminkF","[",RowBox[{"aminkF"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"recreate_background"],
 
 Cell["The metric and raised vector agree with the values before deletion. Any aliases assigned manually to the old symbols must be refreshed. The automatic aliases are created again.","Text"],
 
@@ -1324,9 +1324,9 @@ Cell["11.7. Change the restored study without recreating it","Subsubsection"],
 Cell["There is no need to delete the background just to change its inputs. Keep the restored metric and give the vector new lower components.","Text"],
 
 
-Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"AMf","[",RowBox[{RowBox[{"-","aMf"}]}],"]"}], ",", RowBox[{"{", RowBox[{"5", ",", "0", ",", "0", ",", "0"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"fresh_vector_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"AminkF","[",RowBox[{RowBox[{"-","aminkF"}]}],"]"}], ",", RowBox[{"{", RowBox[{"5", ",", "0", ",", "0", ",", "0"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"fresh_vector_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"Aup", "=", RowBox[{RowBox[{"AMf", "[", "aMf", "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"fresh_vector_step_2"],
+Cell[BoxData[RowBox[{RowBox[{"Aup", "=", RowBox[{RowBox[{"AminkF", "[", "aminkF", "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"fresh_vector_step_2"],
 
 Cell[BoxData["Aup"],"Input",CellTags->"fresh_vector"],
 
@@ -1350,7 +1350,7 @@ Cell[BoxData[RowBox[{"KeyExistsQ", "[", RowBox[{RowBox[{RowBox[{"ShowBackground"
 
 Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{RowBox[{"ShowBackground","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"[","\"Field\"","]"}]}],"]"}]],"Input",CellTags->"lifecycle_remaining_fields"],
 
-Cell[BoxData[RowBox[{RowBox[{"AMf","[",RowBox[{"aMf"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_vector_preserved"],
+Cell[BoxData[RowBox[{RowBox[{"AminkF","[",RowBox[{"aminkF"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_vector_preserved"],
 
 Cell["For dependent fields, Cascade -> True authorizes deletion of tracked dependent objects, expressions and rules within this background. Always inspect the cascade plan first. External xAct dependents remain protected.","Text"],
 
