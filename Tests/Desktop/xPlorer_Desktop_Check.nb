@@ -1,0 +1,201 @@
+(* Wolfram Notebook File - ASCII source *)
+Notebook[{
+Cell["xPlorer - Desktop acceptance checks","Title"],
+
+Cell["Candidate 1ef1a5a | direct source loading only","Subtitle"],
+
+Cell[CellGroupData[{
+Cell["Introduction","Section"],
+
+Cell[TextData[{"Restart the Mathematica kernel before starting. Extract the entire ZIP into one directory. xAct must already be installed.\n\nThis is a test of the corrected development source, not a released Paclet. Do not run Needs for xPlorer in this session. The version string is deliberately still 1.0.0-beta.1; the source hash identifies the candidate."}],"Text"],
+
+Cell[BoxData["Get[FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}]];"],"Input",CellTags->"load"],
+
+Cell[BoxData["$XPlorerVersion"],"Input",CellTags->"version"],
+
+Cell[BoxData["IntegerString[FileHash[FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}], \"SHA256\"],16,64]"],"Input",CellTags->"source_hash"],
+
+Cell[BoxData["$Version"],"Input",CellTags->"wl_version"],
+
+Cell[TextData[{"Evaluate one cell at a time. In sections 1–3, inspect the displayed tensor expressions as well as messages. No red boxes, missing indices, StringJoin::string or Table::iterb should appear.\n\nThe final section checks that the mathematical results are unchanged. The full Workflow is supplied for a separate fresh-kernel run."}],"Text"]
+},Open]],
+
+Cell[CellGroupData[{
+Cell["1. Native xAct reference","Section"],
+
+Cell[BoxData["$DefInfoQ = False;"],"Input",CellTags->"quiet"],
+
+Cell[BoxData["$CVVerbose = False;"],"Input",CellTags->"quiet_components"],
+
+Cell[BoxData["DefManifold[M,4,{a,b,c,d,e,f,i,j}];"],"Input",CellTags->"manifold"],
+
+Cell[BoxData["DefMetric[-1,g[-a,-b],CD];"],"Input",CellTags->"metric"],
+
+Cell[BoxData["DefMetricPerturbation[g,h,eps];"],"Input",CellTags->"pert"],
+
+Cell[BoxData["DefTensor[phi[],M,PrintAs -> \"\\[Phi]\"];"],"Input",CellTags->"field"],
+
+Cell[BoxData["DefConstantSymbol[m];"],"Input",CellTags->"mass"],
+
+Cell[TextData[{"This is an unmanaged source-manifold expression. Its native xAct formatting provides the reference for the perturbations below."}],"Text"],
+
+Cell[BoxData["$CovDFormat = \"Postfix\";"],"Input",CellTags->"native_postfix"],
+
+Cell[BoxData["dG = Perturbation[Einstein[CD][a,-b],1] // ExpandPerturbation // ContractMetric // ToCanonical"],"Input",CellTags->"native_dg"],
+
+Cell[BoxData["$CovDFormat = \"Prefix\";"],"Input",CellTags->"native_prefix"],
+
+Cell[BoxData["dG"],"Input",CellTags->"native_prefix_view"],
+
+Cell[BoxData["$CovDFormat = \"Postfix\";"],"Input",CellTags->"native_restore"],
+
+Cell[TextData[{"Both outputs should contain readable derivatives and perturbation indices. If native xAct also fails, record that separately."}],"Text"]
+},Closed]],
+
+Cell[CellGroupData[{
+Cell["2. Reproduce the original failure","Section"],
+
+Cell[BoxData["RegisterTheory[\"Metric\",g];"],"Input",CellTags->"register_metric"],
+
+Cell[BoxData["RegisterTheory[\"CovD\",CD];"],"Input",CellTags->"register_cd"],
+
+Cell[BoxData["RegisterTheory[\"Indices\",{a,b,c,d,e,f,i,j}];"],"Input",CellTags->"register_indices"],
+
+Cell[BoxData["RegisterTheory[\"Fields\",{phi,{h,Sector -> \"Perturbations\"}}];"],"Input",CellTags->"register_fields"],
+
+Cell[BoxData["RegisterTheory[\"Parameter\",m];"],"Input",CellTags->"register_mass"],
+
+Cell[BoxData["SetXPlorerPreferences[ShowObjectLabels -> True, PartialStyle -> \"Fraction\"];"],"Input",CellTags->"preferences"],
+
+Cell[BoxData["CreateBackground[\"Minkowski\",SymbolSuffix -> \"M\",BackgroundLabel -> \"M\"];"],"Input",CellTags->"bg_m"],
+
+Cell[BoxData["CreateBackground[\"FLRW\",BackgroundLabel -> \"F\"];"],"Input",CellTags->"bg_f"],
+
+Cell[TextData[{"Evaluate the two cells that previously produced red boxes in the Workflow. The labels M and F should remain visible on their respective tensors and covariant derivatives."}],"Text"],
+
+Cell[BoxData["dGM = Einstein[CDM][aM,-bM] // PerturbOn[1]"],"Input",CellTags->"wave_abstract_m"],
+
+Cell[BoxData["dGF = Einstein[CDFLRW][aFLRW,-bFLRW] // PerturbOn[1]"],"Input",CellTags->"wave_abstract_f"],
+
+Cell[TextData[{"Disable labels on FLRW only, retaining the native derivative style. Then turn them back on and inspect the same expression again."}],"Text"],
+
+Cell[BoxData["SetNotation[\"FLRW\",ShowObjectLabels -> False];"],"Input",CellTags->"labels_off"],
+
+Cell[BoxData["dGF"],"Input",CellTags->"unlabelled"],
+
+Cell[BoxData["SetNotation[\"FLRW\",ShowObjectLabels -> True];"],"Input",CellTags->"labels_on"],
+
+Cell[BoxData["dGF"],"Input",CellTags->"labelled"],
+
+Cell[TextData[{"The underlying tensor and its covariant derivative must be unchanged. Native formatting should still use ordinary strings outside the display operation."}],"Text"],
+
+Cell[BoxData["VectorQ[SymbolOfCovD[CDFLRW],StringQ]"],"Input",CellTags->"marker_check"]
+},Closed]],
+
+Cell[CellGroupData[{
+Cell["3. Presentation, copying and TeX","Section"],
+
+Cell[TextData[{"Persistent notation should work without PrettyExp. Compare the same multi-term tensor expression in each style."}],"Text"],
+
+Cell[BoxData["SetNotation[\"FLRW\",CovariantStyle -> \"Prefix\"];"],"Input",CellTags->"prefix"],
+
+Cell[BoxData["dGF"],"Input",CellTags->"prefix_view"],
+
+Cell[BoxData["SetNotation[\"FLRW\",CovariantStyle -> \"Postfix\"];"],"Input",CellTags->"postfix"],
+
+Cell[BoxData["dGF"],"Input",CellTags->"postfix_view"],
+
+Cell[BoxData["SetNotation[\"FLRW\",CovariantStyle -> \"Native\"];"],"Input",CellTags->"native"],
+
+Cell[BoxData["dGF"],"Input",CellTags->"native_view"],
+
+Cell[TextData[{"For a temporary override, replace repeated object labels with a caption. This is a genuine use of PrettyExp."}],"Text"],
+
+Cell[BoxData["view = dGF // PrettyExp[CovariantStyle -> \"Postfix\",ShowObjectLabels -> False,ShowBackgroundLabel -> True]"],"Input",CellTags->"caption"],
+
+Cell[BoxData["SameQ[Normal[view],dGF]"],"Input",CellTags->"normal"],
+
+Cell[BoxData["ExpressionText[view,\"TeX\"]"],"Input",CellTags->"tex"],
+
+Cell[TextData[{"Copy the displayed captioned expression into a new Input cell, assign it to copied and evaluate it. Then evaluate the following check. It should return True (dummy names can differ)."}],"Text"],
+
+Cell[BoxData["ToCanonical[ContractMetric[copied-dGF]] === 0"],"Input",CellTags->"copy_check"],
+
+Cell[TextData[{"The next expression contains nested covariant derivatives of a metric perturbation, and its displayed indices must remain legible."}],"Text"],
+
+Cell[BoxData["CDFLRW[-aFLRW][CDFLRW[-bFLRW][hFLRW[LI[1],-cFLRW,-dFLRW]]]"],"Input",CellTags->"nested"],
+
+Cell[BoxData["gM[aM,bM] // PerturbOn[2]"],"Input",CellTags->"second"]
+},Closed]],
+
+Cell[CellGroupData[{
+Cell["4. New postfix API","Section"],
+
+Cell[TextData[{"ApplyRules should infer the owner of the copied expression. Add a massless rule only to Minkowski; FLRW must stay massive."}],"Text"],
+
+Cell[BoxData["AddRules[\"Minkowski\",{m -> 0}];"],"Input",CellTags->"rule"],
+
+Cell[BoxData["m^2 phiM[] // ApplyRules"],"Input",CellTags->"inferred"],
+
+Cell[BoxData["m^2 phiM[] // ApplyRules[\"Minkowski\"]"],"Input",CellTags->"explicit"],
+
+Cell[BoxData["m^2 phiFLRW[] // ApplyRules"],"Input",CellTags->"independence"],
+
+Cell[BoxData["CD[-a][phi[]] // PortExpression[\"FLRW\"]"],"Input",CellTags->"transport"],
+
+Cell[TextData[{"These two deliberate negative tests should return True: a mixed-background or ownerless expression cannot infer a unique rule set."}],"Text"],
+
+Cell[BoxData["FailureQ[(phiM[]+phiFLRW[]) // ApplyRules]"],"Input",CellTags->"mixed"],
+
+Cell[BoxData["FailureQ[m // ApplyRules]"],"Input",CellTags->"ownerless"],
+
+Cell[BoxData["ClearRules[\"Minkowski\"];"],"Input",CellTags->"rules_clear"]
+},Closed]],
+
+Cell[CellGroupData[{
+Cell["5. Component results remain correct","Section"],
+
+Cell[BoxData["DefineChart[\"Minkowski\",{t[],x[],y[],z[]}];"],"Input",CellTags->"chart_m"],
+
+Cell[BoxData["DefineChart[\"FLRW\",{t[],x[],y[],z[]}];"],"Input",CellTags->"chart_f"],
+
+Cell[BoxData["DefScalarFunction[s];"],"Input",CellTags->"scale"],
+
+Cell[BoxData["DefScalarFunction[gam,PrintAs -> \"\\[Gamma]\"];"],"Input",CellTags->"gamma"],
+
+Cell[BoxData["MetricInBasis[gM,DiagonalMatrix[{-1,1,1,1}]];"],"Input",CellTags->"metric_m"],
+
+Cell[BoxData["MetricInBasis[gFLRW,DiagonalMatrix[{-1,s[tFLRW[]]^2,s[tFLRW[]]^2,s[tFLRW[]]^2}],Assumptions -> s[tFLRW[]]>0];"],"Input",CellTags->"metric_f"],
+
+Cell[BoxData["AllComponentValues[hM[LI[1],-aM,-bM],DiagonalMatrix[{0,gam[tM[],zM[]],-gam[tM[],zM[]],0}]];"],"Input",CellTags->"h_m"],
+
+Cell[BoxData["AllComponentValues[hFLRW[LI[1],-aFLRW,-bFLRW],s[tFLRW[]]^2 DiagonalMatrix[{0,gam[tFLRW[],zFLRW[]],-gam[tFLRW[],zFLRW[]],0}]];"],"Input",CellTags->"h_f"],
+
+Cell[BoxData["gwM = 2 First[dGM // ToComponents[FreeIndices -> {aM,-bM},Components -> {{1,1}}]]"],"Input",CellTags->"gw_m"],
+
+Cell[BoxData["gwF = 2 First[dGF // ToComponents[FreeIndices -> {aFLRW,-bFLRW},Components -> {{1,1}}]]"],"Input",CellTags->"gw_f"],
+
+Cell[TextData[{"Both residual checks must return zero. In FLRW, the expansion term and inverse scale factor squared are present."}],"Text"],
+
+Cell[BoxData["Simplify[gwM-(Derivative[2,0][gam][tM[],zM[]]-Derivative[0,2][gam][tM[],zM[]])]"],"Input",CellTags->"check_m"],
+
+Cell[BoxData["Simplify[gwF-(Derivative[2,0][gam][tFLRW[],zFLRW[]]+3 s'[tFLRW[]]/s[tFLRW[]] Derivative[1,0][gam][tFLRW[],zFLRW[]]-Derivative[0,2][gam][tFLRW[],zFLRW[]]/s[tFLRW[]]^2)]"],"Input",CellTags->"check_f"],
+
+Cell[TextData[{"Report any errors, together with a screenshot of sections 2 and 3. Then restart the kernel, open xPlorer_Workflow.nb, and choose its Get cell (not Needs)."}],"Text"]
+},Closed]]
+},PageWidth->WindowWidth,WindowTitle->"xPlorer - Desktop acceptance",StyleDefinitions->Notebook[{
+ Cell[StyleData[StyleDefinitions -> "Default.nb"]],
+ Cell[StyleData["Code"], FontSize -> 13, FontWeight -> "Plain"],
+ Cell[StyleData["Subsubsection"], FontSize -> 18, FontWeight -> "Bold"],
+ Cell[StyleData["Title"], FontSize -> 28, FontWeight -> "Bold"],
+ Cell[StyleData["Subtitle"], FontSize -> 14, FontSlant -> "Italic"],
+ Cell[StyleData["Section"], FontSize -> 22, FontWeight -> "Bold"],
+ Cell[StyleData["Subsection"], FontSize -> 18, FontWeight -> "Bold"],
+ Cell[StyleData["Text"], FontSize -> 14, LineSpacing -> {1.25,2}, CellMargins -> {{40,24},{6,6}}, PageWidth -> WindowWidth],
+ Cell[StyleData["Input"], FontSize -> 14, PageWidth -> WindowWidth, CellFrame -> {{1,0},{0,0}}, CellFrameMargins -> {{10,8},{6,6}}],
+ Cell[StyleData["Output"], FontSize -> 14, PageWidth -> WindowWidth, FormatType -> StandardForm],
+ Cell[StyleData["DisplayFormula"], FontSize -> 17],
+ Cell[StyleData["Important"], FontSize -> 15, FontWeight -> "Bold", LineSpacing -> {1.2,0}, CellMargins -> {{66,10},{8,8}}, CellFrame -> {{2,0},{0,0}}, CellFrameMargins -> {{10,8},{7,7}}],
+ Cell[StyleData["Tip"], FontSize -> 15, FontSlant -> "Italic", LineSpacing -> {1.2,0}, CellMargins -> {{78,10},{8,8}}, CellFrameMargins -> {{10,8},{6,6}}],
+ Cell[StyleData["Program"], FontSize -> 13, FontFamily -> "Courier", FontWeight -> "Plain", LineSpacing -> {1.1,2}, CellFrame -> {{0.5,0},{0,0}}, CellFrameMargins -> {{8,8},{4,4}}, PageWidth -> WindowWidth]
+},Visible->False,StyleDefinitions->"PrivateStylesheetFormatting.nb"],Saveable->True]
