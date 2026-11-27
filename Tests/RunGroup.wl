@@ -22,7 +22,8 @@ Global`$XPlorerStandaloneGroups=<|
  "HeldFieldValues"->"30_HeldFieldValues.wl",
  "FieldDeletion"->"31_FieldDeletion.wl",
  "NativeSetState"->"32_NativeSetState.wl",
- "HeldGeometry"->"33_HeldGeometry.wl"|>;
+ "HeldGeometry"->"33_HeldGeometry.wl",
+ "ChartLifecycle"->"34_ChartLifecycle.wl"|>;
 Global`$XPlorerSelectedGroup=If[ValueQ[Global`$XPlorerTestGroup],Global`$XPlorerTestGroup,"Geometry"];
 If[KeyExistsQ[Global`$XPlorerStandaloneGroups,Global`$XPlorerSelectedGroup],
  Global`$XPlorerGroupReport=Block[{Print=(Null &),xAct`xPerm`$xpermQ=False,xAct`xCoba`$CVVerbose=False,Global`$B13GeometryTests=(Global`$XPlorerSelectedGroup==="RegistrationGeometry")},
@@ -39,7 +40,7 @@ Global`$XPlorerSelectedFiles=Lookup[<|
  "MetricConnectionCurvature"->{"12_MetricConnectionCurvature.wl"}|>,
  If[ValueQ[Global`$XPlorerTestGroup],Global`$XPlorerTestGroup,"Geometry"],Missing[]];
 If[MissingQ[Global`$XPlorerSelectedFiles],
- Failure["TestGroup",<|"MessageTemplate"->"Choose Geometry, Perturbations, Lifecycle, Display, ObjectsAndConnections, ComponentsAndRules, Reconstruction, MetricConnectionCurvature, Registration, RegistrationGeometry, TheoryInspection, NativeInterop, ProfilesAndCTensor, FieldExtensions, SecondaryChartNative, ManagedNativeSyntax, FieldCache, NativeRead, NativeGeometry, GeometryRead, SelectiveInvalidation, MetricEdits, GeometryVariance, SparseInputs, SelectedFieldReads, HeldFieldValues, FieldDeletion, NativeSetState, or HeldGeometry."|>],
+ Failure["TestGroup",<|"MessageTemplate"->"Choose Geometry, Perturbations, Lifecycle, Display, ObjectsAndConnections, ComponentsAndRules, Reconstruction, MetricConnectionCurvature, Registration, RegistrationGeometry, TheoryInspection, NativeInterop, ProfilesAndCTensor, FieldExtensions, SecondaryChartNative, ManagedNativeSyntax, FieldCache, NativeRead, NativeGeometry, GeometryRead, SelectiveInvalidation, MetricEdits, GeometryVariance, SparseInputs, SelectedFieldReads, HeldFieldValues, FieldDeletion, NativeSetState, HeldGeometry, or ChartLifecycle."|>],
  Global`$XPlorerGroupPreviousContextPath=$ContextPath;
  $ContextPath=DeleteCases[$ContextPath,"Global`"];
  Begin["XPlorerGroup"<>StringReplace[CreateUUID[],"-"->""]<>"`"];

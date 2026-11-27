@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.29";
+$XPlorerVersion = "14.0.0-beta.13-dev.30";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -581,6 +581,7 @@ DefineChart[tag_String, names_List] := Module[{b = background[tag], chart, coord
   If[result === $Failed || !ChartQ[chart], Return[failure["DefineChart", "xCoba could not define the chart."]]];
   MapThread[Function[{s, lab}, With[{ss = s, ll = lab}, PrintAs[ss] ^= ll]], {coords, names}];
   setBareBoxes[chart,"chart"<>b["SymbolSuffix"]];
+  installManagedChartSyntax[tag,chart];
   put[tag, <|"Chart" -> chart, "Basis" -> chart, "Coordinates" -> coords, "CoordinateLabels" -> names|>]
 ];
 (* Secondary coordinate charts are native xCoba charts on the owned manifold.
@@ -606,11 +607,23 @@ DefineChart[tag_String,name_String,labels_List,map_Function] := Module[
   setBareBoxes[chart,safeName[name]<>b["SymbolSuffix"]];
   record=<|"Chart"->chart,"Coordinates"->coords,"Labels"->labels,"Map"->map,
     "Values"->values,"Jacobian"->jac|>;
+  installManagedChartSyntax[tag,chart];
   put[tag,<|"AdditionalCharts"->Append[charts,name->record]|>]; chart
 ];
 chartRecord[b_Failure,_] := b;
-chartRecord[b_Association,name_] := Lookup[Lookup[b,"AdditionalCharts",<||>],name,
-  failure["UnknownChart","Choose a defined output chart."]];
+chartRecord[b_Association,name_] := Module[{rec=Lookup[Lookup[b,"AdditionalCharts",<||>],name,Missing[]]},
+ If[MissingQ[rec],Return[failure["UnknownChart","Choose a defined output chart."]]];
+ If[!ChartQ[rec["Chart"]],Return[failure["ChartLifecycle","The registered native chart no longer exists. Inspect the background before reconstructing it."]]];
+ rec];
+(* Native chart definitions belong to the background lifecycle. UndefBasis
+   is not a valid partial destructor for a chart (also a mapping).
+   Do not allow direct removal to leave managed inputs and recipes dangling. *)
+installManagedChartSyntax[tag_,chart_Symbol] := With[{hh=chart,tt=tag},
+ hh /: UndefChart[hh] /; (!TrueQ[$insideNativePrintGuard]&&!TrueQ[$insideManagedCalculation]&&KeyExistsQ[$BG,tt]) :=
+   failure["ChartLifecycle","Use DeleteBackgroundObject[tag, \"Chart\", Cascade->True] to remove the managed chart family, or DeleteBackground[tag].",<|"Background"->tt,"Chart"->hh|>];
+ hh /: UndefBasis[hh] /; (!TrueQ[$insideNativePrintGuard]&&!TrueQ[$insideManagedCalculation]&&KeyExistsQ[$BG,tt]) :=
+   failure["ChartLifecycle","A managed chart is also a mapping. Use the background chart lifecycle instead of UndefBasis.",<|"Background"->tt,"Chart"->hh|>]
+];
 ChartOf[tag_String,"Primary"] := ChartOf[tag];
 CoordinatesOf[tag_String,"Primary"] := CoordinatesOf[tag];
 ChartOf[tag_String,name_String] := Module[{rec=chartRecord[ShowBackground[tag],name]},If[FailureQ[rec],rec,rec["Chart"]]];
@@ -1653,12 +1666,10 @@ ownedObjects[b_] := Module[{roots, relative},
   If[KeyExistsQ[b,"CovD"] && CovDQ[b["CovD"]] && KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]], relative = GiveSymbol[Christoffel, Sequence @@ Sort[{b["CovD"], PDOfBasis[b["Chart"]]}]]; If[xTensorQ[relative], AppendTo[roots, relative]]];
   FixedPoint[DeleteDuplicates@Join[#, Flatten[ServantsOf /@ #]] &, roots]
 ];
-disposeObjects[b_] := Module[{fields, relative, parameter = b["PerturbationParameter"]},
+disposeObjects[b_] := Module[{fields, parameter = b["PerturbationParameter"]},
   fields = Reverse[Lookup[Values[b["Field"]], "NewHead", {}]];
   Scan[If[xTensorQ[#], DeleteTensorValues[#]; UndefTensor[#]] &, fields];
-  If[KeyExistsQ[b,"CovD"] && CovDQ[b["CovD"]] && KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]],
-    relative = GiveSymbol[Christoffel, Sequence @@ Sort[{b["CovD"], PDOfBasis[b["Chart"]]}]];
-    If[xTensorQ[relative], UndefTensor[relative]]];
+  Scan[If[xTensorQ[#],DeleteTensorValues[#];UndefTensor[#]]&,relativeHeads[b]];
   Scan[If[CovDQ[#] && #=!=Lookup[b,"CovD",None],UndefCovD[#]]&,Reverse@connectionHeads[b]];
   If[MetricQ[b["Metric"]], UndefMetric[b["Metric"]]];
   If[KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]], UndefChart[b["Chart"]]];
@@ -2011,6 +2022,7 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  plan=DeletionPlan[tag,key,Cascade->OptionValue[Cascade]];If[FailureQ[plan],Return[plan]];
  If[!TrueQ[plan["CanDelete"]],Return[failure["DeleteBlocked","Owned or external dependents block deletion.",<|"Plan"->plan|>]]];
  If[MemberQ[{"Background","Manifold"},key],Return[DeleteBackground[tag]]];
+ r=backgroundNativeSetGuard[b];If[FailureQ[r],Return[r]];
  removed=plan["Objects"];names=ToString[#,InputForm]& /@ removed;
  aliasNames=SymbolName /@ Select[removed,Head[#]===Symbol&];
  If[KeyExistsQ[b,"MetricMatrix"],clearGeometry[tag]];
@@ -2052,8 +2064,8 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  (* clearGeometry deleted the covariant metric input as well as derived geometry.
     Restore surviving managed inputs, without recomputing unrelated curvature. *)
  If[KeyExistsQ[newb,"MetricMatrix"] && KeyExistsQ[newb,"Chart"] && KeyExistsQ[newb,"Metric"],
-  r=guard[MetricInBasis[newb["Metric"],-newb["Basis"],newb["MetricMatrix"]]];
-  If[r===$Failed,Return[failure["PostDeletionRestore","Object deletion completed, but metric inputs could not be restored.",<|"DeletedNames"->names|>]]];
+  r=storeManagedMetric[newb,newb["MetricMatrix"]];
+  If[r===$Failed,Return[failure["PostDeletionRestore","Object deletion completed, but metric inputs could not be restored.",<|"DeletedNames"->names|>]]];recordNativeMetricState[tag];
   r=replayFields[tag];If[FailureQ[r],Return[failure["PostDeletionRestore","Object deletion completed, but surviving field inputs could not be restored.",<|"DeletedNames"->names,"Cause"->r|>]]];
   r=replayConnections[tag];If[FailureQ[r],Return[failure["PostDeletionRestore","Object deletion completed, but surviving connection inputs could not be restored.",<|"DeletedNames"->names,"Cause"->r|>]]]
  ];
@@ -2119,15 +2131,19 @@ ConnectionDifference[tag_String,key1:(_String|_Symbol),key2:(_String|_Symbol)] :
  ii=indicesFor[b,3];Christoffel[c1,c2][ii[[1]],-ii[[2]],-ii[[3]]]
 ];
 connectionHeads[b_] := DeleteDuplicates@DeleteMissing@Join[Lookup[b,{"CovD"}],Lookup[Values@Lookup[b,"Connections",<||>],"Head",{}]];
-relativeHeads[b_] := Module[{allowed=Join[connectionHeads[b],{PD},If[KeyExistsQ[b,"Chart"]&&ChartQ[b["Chart"]],{PDOfBasis[b["Chart"]]},{}]]},
- First /@ Select[xAct`xTensor`Private`$Christoffels,Function[r,AnyTrue[connectionHeads[b],MemberQ[r[[2]],#]&] && AllTrue[Rest[r[[2]]],MemberQ[allowed,#]&]]]
+managedChartList[b_] := Select[DeleteDuplicates@Join[DeleteMissing[Lookup[b,{"Chart"}]],
+ Lookup[Values[Lookup[b,"AdditionalCharts",<||>]],"Chart",{}]],ChartQ];
+managedDerivativeHeads[b_] := DeleteDuplicates@Join[connectionHeads[b],PDOfBasis /@ managedChartList[b]];
+relativeHeads[b_] := Module[{cds=managedDerivativeHeads[b],allowed},
+ allowed=Join[cds,{PD}];
+ First /@ Select[xAct`xTensor`Private`$Christoffels,Function[r,
+  AnyTrue[cds,MemberQ[Rest[r[[2]]],#]&]&&AllTrue[Rest[r[[2]]],MemberQ[allowed,#]&]]]
 ];
 
-externalRelativeHeads[b_] := Module[{cds=connectionHeads[b],allowed,pd},
- pd=If[KeyExistsQ[b,"Chart"]&&ChartQ[b["Chart"]],PDOfBasis[b["Chart"]],None];
- allowed=Join[cds,{PD,pd}];
+externalRelativeHeads[b_] := Module[{cds=managedDerivativeHeads[b],allowed},
+ allowed=Join[cds,{PD}];
  First /@ Select[xAct`xTensor`Private`$Christoffels,Function[r,
-   AnyTrue[Join[cds,{pd}],MemberQ[Rest[r[[2]]],#]&] && !AllTrue[Rest[r[[2]]],MemberQ[allowed,#]&]]]
+  AnyTrue[cds,MemberQ[Rest[r[[2]]],#]&]&&!AllTrue[Rest[r[[2]]],MemberQ[allowed,#]&]]]
 ];
 
 (* General connection inputs are coefficients relative to the coordinate derivative,
