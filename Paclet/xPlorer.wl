@@ -1482,7 +1482,8 @@ vanishingOwnedFieldQ[tag_,head_,rank_] := Module[{b=$BG[tag],fs},
 nativeFieldWrite[operation_,expr_,value_] := With[{e=expr},operation[e,value]];
 SetAttributes[heldManagedLiteralQ,HoldAllComplete];
 heldManagedLiteralQ[tag_,e_] := heldManagedSyntaxQ[tag,e] &&
- SameQ[HoldComplete[e],With[{v=e},HoldComplete[v]]] &&
+ (MatchQ[HoldComplete[e],HoldComplete[_[]]]||
+  SameQ[HoldComplete[e],With[{v=e},HoldComplete[v]]]) &&
  !nativeSetActiveQ[Head[e]];
 SetAttributes[heldManagedSyntaxQ,HoldAllComplete];
 heldManagedSyntaxQ[tag_,e_] := Module[{b=Lookup[$BG,tag,<||>]},
