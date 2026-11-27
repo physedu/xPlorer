@@ -1,0 +1,169 @@
+(* Wolfram Notebook File *)
+Notebook[{
+Cell["xPlorer - Compatibility checks","Title"],
+
+Cell["Candidate 51d9fae | direct source loading","Subtitle"],
+
+Cell[CellGroupData[{
+Cell["Introduction","Section"],
+
+Cell[TextData[{"Restart the Mathematica kernel and extract the ZIP in one directory. xAct must already be installed.\n\nThis short notebook tests the two remaining issues from the compatibility audit. The original Einstein variation and copying test have already been verified in Desktop on the preceding candidate."}],"Text"],
+
+Cell[BoxData["Get[FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}]];"],"Input",CellTags->"load"],
+
+Cell[BoxData["System`$Version"],"Input",CellTags->"version"],
+
+Cell[BoxData["$XPlorerVersion"],"Input",CellTags->"source_version"],
+
+Cell[BoxData["IntegerString[FileHash[FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}],\"SHA256\"],16,64]"],"Input",CellTags->"hash"]
+},Open]],
+
+Cell[CellGroupData[{
+Cell["1. Prepare independent backgrounds","Section"],
+
+Cell[BoxData["$DefInfoQ = False;"],"Input",CellTags->"quiet"],
+
+Cell[BoxData["$CVVerbose = False;"],"Input",CellTags->"quiet_cv"],
+
+Cell[BoxData["DefManifold[M,4,{a,b,c,d,e,f,i,j}];"],"Input",CellTags->"manifold"],
+
+Cell[BoxData["DefMetric[-1,g[-a,-b],CD];"],"Input",CellTags->"metric"],
+
+Cell[BoxData["DefMetricPerturbation[g,h,eps];"],"Input",CellTags->"metric_pert"],
+
+Cell[BoxData["DefTensor[phi[],M,PrintAs -> \"\\[Phi]\"];"],"Input",CellTags->"scalar"],
+
+Cell[BoxData["DefTensor[A[-a],M];"],"Input",CellTags->"vector"],
+
+Cell[BoxData["DefConstantSymbol[m];"],"Input",CellTags->"constant"],
+
+Cell[BoxData["RegisterTheory[\"Metric\",g];"],"Input",CellTags->"reg_g"],
+
+Cell[BoxData["RegisterTheory[\"CovD\",CD];"],"Input",CellTags->"reg_cd"],
+
+Cell[BoxData["RegisterTheory[\"Indices\",{a,b,c,d,e,f,i,j}];"],"Input",CellTags->"reg_i"],
+
+Cell[BoxData["RegisterTheory[\"Fields\",{A,phi,h}];"],"Input",CellTags->"reg_f"],
+
+Cell[BoxData["RegisterTheory[\"Parameter\",m];"],"Input",CellTags->"reg_p"],
+
+Cell[BoxData["SetXPlorerPreferences[ShowObjectLabels -> True];"],"Input",CellTags->"prefs"],
+
+Cell[BoxData["CreateBackground[\"One\",SymbolSuffix -> \"O\",BackgroundLabel -> \"O\"];"],"Input",CellTags->"one"],
+
+Cell[BoxData["CreateBackground[\"Two\",SymbolSuffix -> \"T\",BackgroundLabel -> \"T\"];"],"Input",CellTags->"two"],
+
+Cell[BoxData["DefineChart[\"One\",{t[],x[],y[],z[]}];"],"Input",CellTags->"chart_o"],
+
+Cell[BoxData["DefineChart[\"Two\",{t[],x[],y[],z[]}];"],"Input",CellTags->"chart_t"],
+
+Cell[BoxData["ch = ChartOf[\"One\"];"],"Input",CellTags->"basis_o"],
+
+Cell[BoxData["MetricInBasis[gO,DiagonalMatrix[{-1,1,1,1}]];"],"Input",CellTags->"metric_o"],
+
+Cell[BoxData["MetricInBasis[gT,DiagonalMatrix[{-1,1,1,1}]];"],"Input",CellTags->"metric_t"],
+
+Cell[BoxData["ComponentValue[phiO[],2];"],"Input",CellTags->"phi_o"],
+
+Cell[BoxData["ComponentValue[phiT[],7];"],"Input",CellTags->"phi_t"]
+},Closed]],
+
+Cell[CellGroupData[{
+Cell["2. Named component indices","Section"],
+
+Cell[TextData[{"Native xTensor can print component indices as coordinate names rather than numbers. The old code failed when the same coordinate was also a factor in the expression.\n\nFirst inspect the ordinary numbered version."}],"Text"],
+
+Cell[BoxData["savedCIndexForm = $CIndexForm;"],"Input",CellTags->"old_option"],
+
+Cell[BoxData["savedCovDFormat = $CovDFormat;"],"Input",CellTags->"old_cov"],
+
+Cell[BoxData["$CIndexForm = False;"],"Input",CellTags->"numeric"],
+
+Cell[BoxData["xO[] AO[{1,-ch}]"],"Input",CellTags->"number_view"],
+
+Cell[BoxData["$CIndexForm = True;"],"Input",CellTags->"named"],
+
+Cell[TextData[{"The next expression should show the coordinate scalar with its O subscript and the component of A with the native x index. There should be no format error or red box."}],"Text"],
+
+Cell[BoxData["xO[] AO[{1,-ch}]"],"Input",CellTags->"named_view"],
+
+Cell[BoxData["$CovDFormat = \"Postfix\";"],"Input",CellTags->"native_postfix"],
+
+Cell[BoxData["tO[] xO[] CDO[{0,-ch}][AO[{1,-ch}]]"],"Input",CellTags->"named_derivative"],
+
+Cell[BoxData["tO[] xO[] PDOfBasis[ch][{0,-ch}][AO[{1,-ch}]]"],"Input",CellTags->"named_basis"],
+
+Cell[BoxData["SetNotation[\"One\",CovariantStyle -> \"Prefix\"];"],"Input",CellTags->"prefix"],
+
+Cell[BoxData["tO[] xO[] CDO[{0,-ch}][AO[{1,-ch}]]"],"Input",CellTags->"prefix_view"],
+
+Cell[BoxData["SetNotation[\"One\",CovariantStyle -> \"Postfix\"];"],"Input",CellTags->"postfix"],
+
+Cell[BoxData["tO[] xO[] CDO[{0,-ch}][AO[{1,-ch}]]"],"Input",CellTags->"postfix_view"],
+
+Cell[BoxData["SetNotation[\"One\",CovariantStyle -> \"Native\"];"],"Input",CellTags->"native"],
+
+Cell[BoxData["StringQ[PrintAs[xO]]"],"Input",CellTags->"print_name"],
+
+Cell[BoxData["$CIndexForm = savedCIndexForm;"],"Input",CellTags->"restore_idx"],
+
+Cell[BoxData["$CovDFormat = savedCovDFormat;"],"Input",CellTags->"restore_cov"],
+
+Cell[TextData[{"The labels must remain readable. The component index is intentionally native, while the tensor and explicit coordinate scalar identify the background. The StringQ check should return True."}],"Text"]
+},Closed]],
+
+Cell[CellGroupData[{
+Cell["3. Background isolation","Section"],
+
+Cell[TextData[{"The same abstract field has different numerical values in the two backgrounds. Inferred calls and source-to-background calls must agree with the selected background."}],"Text"],
+
+Cell[BoxData["phiO[] // ToComponents"],"Input",CellTags->"o_value"],
+
+Cell[BoxData["phiT[] // ToComponents"],"Input",CellTags->"t_value"],
+
+Cell[BoxData["ToComponents[\"Two\",phi[]]"],"Input",CellTags->"source_value"],
+
+Cell[TextData[{"The next operation deliberately requests components in the wrong background. It must return a Failure with tag ForeignBackground, not the number 2."}],"Text"],
+
+Cell[BoxData["ToComponents[\"Two\",phiO[]]"],"Input",CellTags->"foreign_value"],
+
+Cell[BoxData["FailureQ[ToComponents[\"Two\",phiO[],StrictComponents -> True]]"],"Input",CellTags->"strict"],
+
+Cell[BoxData["FailureQ[phiO[] // PortExpression[\"Two\"]]"],"Input",CellTags->"foreign_port"],
+
+Cell[BoxData["SameQ[phi[] // PortExpression[\"Two\"],phiT[]]"],"Input",CellTags->"source_port"],
+
+Cell[BoxData["FailureQ[PerturbOn[\"Two\",gO[-aO,-bO],1]]"],"Input",CellTags->"foreign_pert"],
+
+Cell[TextData[{"Rules are also local. Define the massless limit only in Two."}],"Text"],
+
+Cell[BoxData["AddRules[\"Two\",{m->0}];"],"Input",CellTags->"rules"],
+
+Cell[BoxData["m phiO[] // ApplyRules"],"Input",CellTags->"inferred_o"],
+
+Cell[BoxData["m phiT[] // ApplyRules"],"Input",CellTags->"inferred_t"],
+
+Cell[BoxData["FailureQ[m phiO[] // ApplyRules[\"Two\"]]"],"Input",CellTags->"wrong_rules"],
+
+Cell[BoxData["FailureQ[AddRules[\"Two\",{m->phiO[]}]]"],"Input",CellTags->"bad_rule_def"],
+
+Cell[BoxData["SameQ[{phiO[]//ToComponents,phiT[]//ToComponents},{2,7}]"],"Input",CellTags->"end_values"],
+
+Cell[TextData[{"All FailureQ and SameQ checks in this section should return True. The inferred rules on One must retain m, while the inferred rules on Two yield zero.\n\nThis completes the targeted test. The complete Workflow and API Examples are supplied for optional separate runs in fresh kernels using their Get cells."}],"Text"]
+},Closed]]
+},PageWidth->WindowWidth,WindowTitle->"xPlorer - Compatibility checks",StyleDefinitions->Notebook[{
+ Cell[StyleData[StyleDefinitions -> "Default.nb"]],
+ Cell[StyleData["Code"], FontSize -> 13, FontWeight -> "Plain"],
+ Cell[StyleData["Subsubsection"], FontSize -> 18, FontWeight -> "Bold"],
+ Cell[StyleData["Title"], FontSize -> 28, FontWeight -> "Bold"],
+ Cell[StyleData["Subtitle"], FontSize -> 14, FontSlant -> "Italic"],
+ Cell[StyleData["Section"], FontSize -> 22, FontWeight -> "Bold"],
+ Cell[StyleData["Subsection"], FontSize -> 18, FontWeight -> "Bold"],
+ Cell[StyleData["Text"], FontSize -> 14, LineSpacing -> {1.25,2}, CellMargins -> {{40,24},{6,6}}, PageWidth -> WindowWidth],
+ Cell[StyleData["Input"], FontSize -> 14, PageWidth -> WindowWidth, CellFrame -> {{1,0},{0,0}}, CellFrameMargins -> {{10,8},{6,6}}],
+ Cell[StyleData["Output"], FontSize -> 14, PageWidth -> WindowWidth, FormatType -> StandardForm],
+ Cell[StyleData["DisplayFormula"], FontSize -> 17],
+ Cell[StyleData["Important"], FontSize -> 15, FontWeight -> "Bold", LineSpacing -> {1.2,0}, CellMargins -> {{66,10},{8,8}}, CellFrame -> {{2,0},{0,0}}, CellFrameMargins -> {{10,8},{7,7}}],
+ Cell[StyleData["Tip"], FontSize -> 15, FontSlant -> "Italic", LineSpacing -> {1.2,0}, CellMargins -> {{78,10},{8,8}}, CellFrameMargins -> {{10,8},{6,6}}],
+ Cell[StyleData["Program"], FontSize -> 13, FontFamily -> "Courier", FontWeight -> "Plain", LineSpacing -> {1.1,2}, CellFrame -> {{0.5,0},{0,0}}, CellFrameMargins -> {{8,8},{4,4}}, PageWidth -> WindowWidth]
+},Visible->False,StyleDefinitions->"PrivateStylesheetFormatting.nb"],Saveable->True]
