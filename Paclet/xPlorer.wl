@@ -2074,33 +2074,31 @@ objectLabelPlan[e_,a_] := Module[{symbols,plan=<||>,b,settings,rec,chart,local,o
    ],KeyTake[labelHeadRecords[b],symbols]]
  ],$BG];plan
 ];
-(* Keep the native formatting metadata string-valued while xAct assembles
-   indices. Unique temporary text markers are expanded to real boxes only
-   after native MakeBoxes has completed. No native index/format hooks changed. *)
-labelTextMarker[box_] := Module[{key="XPLabel"<>StringReplace[CreateUUID[],"-"->""]},
-  AssociateTo[$labelTextBoxes,key->box];key
-];
-expandLabelText[str_String,labels_Association] := Module[{pos,parts={},last=1,key},
-  If[labels===<||>,Return[str]];
-  pos=StringPosition[str,Alternatives@@Keys[labels]];
-  If[pos==={},Return[str]];
-  Do[If[p[[1]]>last,AppendTo[parts,StringTake[str,{last,p[[1]]-1}]]];
-    key=StringTake[str,p];AppendTo[parts,labels[key]];last=p[[2]]+1,{p,pos}];
-  If[last<=StringLength[str],AppendTo[parts,StringDrop[str,last-1]]];
-  If[Length[parts]===1,First[parts],RowBox[parts]]
-];
+(* A named component index reads PrintAs of its coordinate as a string.
+   Leave coordinate metadata untouched and label only the displayed scalar
+   InterpretationBox, after native index formatting. Component-index names
+   themselves stay native; the owning tensor supplies the background label. *)
 applyObjectLabel[h_,rec_] := Module[{label=rec["Label"],base,markers},
  If[CovDQ[h],markers=SymbolOfCovD[h];
-   With[{hh=h,mm={First[markers]<>"("<>label<>")",labelTextMarker[labelBox[Last[markers],label,False]]}},SymbolOfCovD[hh]^=mm],
-   base=PrintAs[h];With[{hh=h,bb=labelTextMarker[labelBox[base,label,rec["Coordinate"]]]},PrintAs[hh]^=bb]]
+   With[{hh=h,mm={First[markers]<>"("<>label<>")",labelBox[Last[markers],label,False]}},SymbolOfCovD[hh]^=mm],
+   base=PrintAs[h];With[{hh=h,bb=labelBox[base,label,False]},PrintAs[hh]^=bb]]
 ];
-labelledNotationBoxes[e_,a_] := Module[{plan=If[KeyExistsQ[a,"ResolvedObjectLabels"],a["ResolvedObjectLabels"],objectLabelPlan[e,a]],boxes,labels},
+coordinateLabelRule[box_,coords_] := Module[{head=Head[box[[2]]],part,replacement},
+ part=labelBox[box[[1]],coords[head]["Label"],True];
+ replacement=With[{p=part},ReplacePart[box,1->p]];
+ Rule[box,replacement]
+];
+labelCoordinates[boxes_,coords_] := Module[{targets,rules},
+ If[coords===<||>,Return[boxes]];
+ targets=DeleteDuplicates@Cases[boxes,bb:InterpretationBox[_,h_Symbol[],___]/;KeyExistsQ[coords,h]:>bb,{0,Infinity}];
+ rules=coordinateLabelRule[#,coords]& /@ targets;
+ boxes/.rules
+];
+labelledNotationBoxes[e_,a_] := Module[{plan=If[KeyExistsQ[a,"ResolvedObjectLabels"],a["ResolvedObjectLabels"],objectLabelPlan[e,a]],coords,other,boxes},
  If[plan===<||>,Return[notationBoxes[e,a]]];
- Block[{$labelTextBoxes=<||>},
-  boxes=With[{heads=Keys[plan]},Internal`InheritedBlock[heads,KeyValueMap[applyObjectLabel,plan];notationBoxes[e,a]]];
-  labels=$labelTextBoxes;
-  Replace[boxes,str_String:>expandLabelText[str,labels],{0,Infinity}]
- ]
+ coords=Select[plan,TrueQ[#["Coordinate"]]&];other=KeyDrop[plan,Keys[coords]];
+ boxes=If[other===<||>,notationBoxes[e,a],With[{heads=Keys[other]},Internal`InheritedBlock[heads,KeyValueMap[applyObjectLabel,other];notationBoxes[e,a]]]];
+ labelCoordinates[boxes,coords]
 ];
 nativeBoxes[e_] := With[{ex=e},MakeBoxes[ex,StandardForm]];
 (* Build a pure Wolfram arithmetic skeleton from temporary scalar leaves. Do not mix
