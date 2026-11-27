@@ -5,12 +5,10 @@ DefMetric[-1,gg[-aa,-bb],CDa];
 DefTensor[phia[],ForeignM];
 DefTensor[psia[],ForeignM];
 DefTensor[Va[-aa],ForeignM];
-DefCovD[DAa[-aa],{},FromMetric->gg,Torsion->True];
 RegisterTheory["Metric",gg];
 RegisterTheory["CovD",CDa];
 RegisterTheory["Indices",{aa,bb,cc,dd,ee,ff,ii,jj}];
 RegisterTheory["Fields",{phia,psia,Va}];
-RegisterTheory["Connection","Affine",DAa];
 
 CreateBackground["One",SymbolSuffix->"O"];
 CreateBackground["Two",SymbolSuffix->"T"];
@@ -18,6 +16,10 @@ DefineChart["One",{tt[],xx[],yy[],zz[]}];
 DefineChart["Two",{tt[],xx[],yy[],zz[]}];
 SetCMetricSystem["One",DiagonalMatrix[{-1,1,1,1}],ComputeOnSet->None];
 SetCMetricSystem["Two",DiagonalMatrix[{-1,1,1,1}],ComputeOnSet->None];
+recipe=ReconstructionData["One"];
+DefCovD[DAa[-aa],{},FromMetric->gg,Torsion->True];
+AddConnection["One","Affine",DAa];
+AddConnection["Two","Affine",DAa];
 SetFieldComponents["One",phia,2];
 SetFieldComponents["Two",phia,7];
 
@@ -65,7 +67,6 @@ foreignChart=DefineChart["Two","Foreign",{"T","u","v","w"},Function[{t1,u1,v1,w1
 check["Secondary chart map rejects foreign coordinate",MatchQ[foreignChart,Failure["ForeignBackground",_Association]],True];
 check["Rejected chart is not stored",!KeyExistsQ[BackgroundValue["Two"]["AdditionalCharts"],"Foreign"],True];
 
-recipe=ReconstructionData["One"];
 badRecipe=Append[recipe,"ForeignProbe"->psiaT[]];
 foreignRecreation=RecreateBackground["Copy",badRecipe];
 check["RecreateBackground rejects a second active owner",MatchQ[foreignRecreation,Failure["ForeignBackground",_Association]],True];
