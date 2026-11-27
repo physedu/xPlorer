@@ -2,9 +2,9 @@
 Notebook[{
 Cell[TextData[{"xPlorer - From an abstract theory to physical spacetimes"}],"Title"],
 
-Cell[TextData[{"A massive scalar field on Minkowski, Schwarzschild and FLRW backgrounds | beta.13"}],"Subtitle"],
+Cell[TextData[{"A massive scalar field on Minkowski, Schwarzschild and FLRW backgrounds | beta.13-dev.31"}],"Subtitle"],
 
-Cell[TextData[{"With xAct installed, start a fresh kernel. Choose just one of the two loading cells below, then evaluate the remaining input cells in order with Shift+Enter.\n\nStandalone recipes are marked \:201cAlternative\:201d and are for reference."}],"Text"],
+Cell["With xAct installed, start a fresh kernel. Choose just one of the two loading cells below, then evaluate the remaining input cells in order with Shift+Enter. Standalone recipes marked Alternative are for reference. xTensor defines the abstract theory; xCoba stores and transforms components; xPlorer manages isolated copies and transports registered expressions.","Text"],
 
 Cell["Option A: Load the source directly (keep this notebook beside the Paclet directory).","Text"],
 
@@ -14,7 +14,9 @@ Cell["Option B: Load the installed xPlorer application or paclet. Skip Option A 
 
 Cell[BoxData[RowBox[{RowBox[{"Needs","[","\"xPlorer`\"","]"}],";"}]],"Input",CellTags->"load_installed"],
 
-Cell[TextData[{"Set the session preference to display coordinate derivatives as fractions. xPlorer displays contracted indices with short letters. Their internal names are available in InputForm."}],"Text"],
+Cell[BoxData["$XPlorerVersion"],"Input",CellTags->"workflow_version"],
+
+Cell["Optional presentation: display coordinate derivatives as fractions. This setting changes the displayed expression, not its mathematics. The default native notation also works.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", RowBox[{"PartialStyle", "\[Rule]", "\"Fraction\""}], "]"}], ";"}]],"Input",CellTags->"session_notation"],
 
@@ -247,6 +249,8 @@ Cell[TextData[{"Inspect the entries in the Schwarzschild background."}],"Text"],
 
 Cell[BoxData[RowBox[{"Keys", "[", RowBox[{"ShowBackground", "[", "\"Schwarzschild\"", "]"}], "]"}]],"Input",CellTags->"inspect_background"],
 
+Cell[BoxData["ShowBackground[\"Schwarzschild\", \"Summary\"]"],"Input",CellTags->"dev31_background_summary"],
+
 Cell[TextData[{"The geometry, fields and indices have their own entries. The ",StyleBox["\"Theory\"",FontFamily->"Courier",FontSize->14]," entry records the theory as it stood at creation.\n\nFields registered later appear in subsequent backgrounds."}],"Text"],
 
 Cell[TextData[{"Several backgrounds can coexist in one kernel. The tag selects the study, and its tensors and indices belong to its manifold."}],"Important"]
@@ -446,6 +450,18 @@ Cell[BoxData[RowBox[{RowBox[{"ActivateRuleGroups","[",RowBox[{"\"Schwarzschild\"
 
 Cell[BoxData[RowBox[{RowBox[{"ApplyRules","[",RowBox[{"\"Schwarzschild\"",",",RowBox[{"scalarEqSchw","+",RowBox[{RowBox[{RowBox[{"RicciScalar","[",RowBox[{"CDSchw"}],"]"}],"[","]"}]," ",RowBox[{"phiSchw","[","]"}]}]}]}],"]"}],"//","PrettyExp"}]],"Input",CellTags->"rule_groups"],
 
+Cell["Active groups are applied in their specified order, then independent rules. An exact left-hand-side conflict is reported; earlier matching rules take precedence. Deactivating one group leaves independent rules and the other groups intact.","Text"],
+
+Cell[BoxData["AddRules[\"Schwarzschild\", {m -> 2}];"],"Input",CellTags->"dev31_independent_rule"],
+
+Cell[BoxData["ShowRuleGroups[\"Schwarzschild\", \"Status\"]"],"Input",CellTags->"dev31_rule_status"],
+
+Cell[BoxData["DeactivateRuleGroups[\"Schwarzschild\", {\"Massless\"}];"],"Input",CellTags->"dev31_deactivate_group"],
+
+Cell[BoxData["ShowRules[\"Schwarzschild\"]"],"Input",CellTags->"dev31_remaining_rules"],
+
+Cell[BoxData["ClearRules[\"Schwarzschild\"]; ActivateRuleGroups[\"Schwarzschild\", {\"RicciFlat\", \"Massless\"}];"],"Input",CellTags->"dev31_restore_groups"],
+
 Cell["Inspect the active rules and their positions before removing one. The two assumptions can be changed independently.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"ShowRules","[",RowBox[{"\"Schwarzschild\"",",","\"Numbered\""}],"]"}],"//","TableForm"}]],"Input",CellTags->"numbered_rules"],
@@ -476,37 +492,37 @@ Cell[BoxData[RowBox[{RowBox[{"ClearRules", "[", "\"Minkowski\"", "]"}], ";"}]],"
 Cell[CellGroupData[{
 Cell[TextData[{"5. Choose coordinates and calculate components"}],"Section"],
 
-Cell[TextData[{StyleBox["DefineChart",FontFamily->"Courier",FontSize->14]," calls xCoba\:2019s ",StyleBox["DefChart",FontFamily->"Courier",FontSize->14]," on the selected manifold. Each chart gets its own coordinate scalars, even when two charts use the same labels."}],"Text"],
+Cell["DefineChart calls native DefChart on the selected manifold. Use scalar declarations such as t[] and r[]; xPlorer creates independent coordinate heads and suffixed aliases, e.g. tM[] and rSchw[]. The earlier string-label syntax remains supported.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"Minkowski\"", ",", RowBox[{"{", RowBox[{"\"t\"", ",", "\"x\"", ",", "\"y\"", ",", "\"z\""}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"charts_step_1"],
+Cell[BoxData["DefineChart[\"Minkowski\", {t[], x[], y[], z[]}];"],"Input",CellTags->"charts_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"Schwarzschild\"", ",", RowBox[{"{", RowBox[{"\"t\"", ",", "\"r\"", ",", "\"theta\"", ",", "\"varphi\""}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"charts_step_2"],
+Cell[BoxData["DefineChart[\"Schwarzschild\", {t[], r[], theta[], varphi[]}];"],"Input",CellTags->"charts_step_2"],
 
-Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"FLRW\"", ",", RowBox[{"{", RowBox[{"\"t\"", ",", "\"x\"", ",", "\"y\"", ",", "\"z\""}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"charts"],
+Cell[BoxData["DefineChart[\"FLRW\", {t[], x[], y[], z[]}];"],"Input",CellTags->"charts"],
 
-Cell[TextData[{StyleBox["CoordinatesOf",FontFamily->"Courier",FontSize->14]," returns the coordinate heads. Apply them with ",StyleBox["Through",FontFamily->"Courier",FontSize->14]," as below. The resulting aliases can be differentiated with ",StyleBox["D",FontFamily->"Courier",FontSize->14],"."}],"Text"],
+Cell["The suffixed aliases are scalar heads, so write xM[] rather than xM. CoordinatesOf returns the actual heads; Through[CoordinatesOf[tag][]] retrieves the corresponding coordinate expressions without changing the aliases.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"tM", ",", "xM", ",", "yM", ",", "zM"}], "}"}], "=", RowBox[{"Through", "[", RowBox[{RowBox[{"CoordinatesOf", "[", "\"Minkowski\"", "]"}], "[", "]"}], "]"}]}], ";"}]],"Input",CellTags->"coordinate_aliases_step_1"],
+Cell[BoxData["{tM[], xM[], yM[], zM[]}"],"Input",CellTags->"coordinate_aliases_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"tSchw", ",", "rSchw", ",", "thetaSchw", ",", "varphiSchw"}], "}"}], "=", RowBox[{"Through", "[", RowBox[{RowBox[{"CoordinatesOf", "[", "\"Schwarzschild\"", "]"}], "[", "]"}], "]"}]}], ";"}]],"Input",CellTags->"coordinate_aliases_step_2"],
+Cell[BoxData["{tSchw[], rSchw[], thetaSchw[], varphiSchw[]}"],"Input",CellTags->"coordinate_aliases_step_2"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"tF", ",", "xF", ",", "yF", ",", "zF"}], "}"}], "=", RowBox[{"Through", "[", RowBox[{RowBox[{"CoordinatesOf", "[", "\"FLRW\"", "]"}], "[", "]"}], "]"}]}], ";"}]],"Input",CellTags->"coordinate_aliases"],
+Cell[BoxData["{tFLRW[], xFLRW[], yFLRW[], zFLRW[]}"],"Input",CellTags->"coordinate_aliases"],
 
-Cell[TextData[{"For example, ",StyleBox["xM^2",FontFamily->"Courier",FontSize->14]," is a coordinate profile, ",StyleBox["-a",FontFamily->"Courier",FontSize->14]," is a lower abstract index, and component number 1 selects x in the Cartesian order (t,x,y,z)."}],"Text"],
+Cell["For example, xM[]^2 is a coordinate profile, -a is a lower abstract index, and component number 1 selects x in Cartesian order (t,x,y,z).","Text"],
 
 Cell[TextData[{"Minkowski spacetime"}],"Subsection"],
 
 Cell[TextData[{"Supply the constant metric matrix in chart order {t,x,y,z}. ",StyleBox["MetricInBasis",FontFamily->"Courier",FontSize->14]," accepts the copied metric and infers its managed primary chart when the basis is omitted. xCoba stores the components; xPlorer remembers the input. The original explicit-basis xCoba syntax remains available. Further geometry is computed on request."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gM", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}], ",", RowBox[{"Assumptions", "\[Rule]", "assumptions"}]}], "]"}], ";"}]],"Input",CellTags->"minkowski_metric"],
+Cell[BoxData["MetricInBasis[gM, DiagonalMatrix[{-1, 1, 1, 1}], Assumptions -> assumptions];"],"Input",CellTags->"minkowski_metric"],
 
 Cell[TextData[{"Inspect the metric as an xCoba component tensor"}],"Subsection"],
 
 Cell["A native CTensor stores a component array and the signed bases of its slots.","Text"],
 
-Cell["Request CTensor output directly from xPlorer. The two negative basis signs indicate covariant slots.","Text"],
+Cell["Unary ToCTensor converts a complete, resolved positive-rank expression with a unique background into a native CTensor snapshot. The explicit ToComponents[Output -> \"CTensor\"] form remains available. Negative basis signs indicate covariant slots.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"metricCTensor","=",RowBox[{RowBox[{"gM","[",RowBox[{RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"Output","\[Rule]","\"CTensor\""}]}], "]"}]}]}], ";"}]],"Input",CellTags->"native_metric_data_step_1"],
+Cell[BoxData["metricCTensor = gM[-aM, -bM] // ToCTensor;"],"Input",CellTags->"native_metric_data_step_1"],
 
 Cell[BoxData[RowBox[{RowBox[{"Part","[",RowBox[{"metricCTensor",",","1"}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"native_metric_data"],
 
@@ -547,7 +563,7 @@ Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "s", "]"}], ";"}]],"Input
 
 Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gFLRW", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"], ",", SuperscriptBox[RowBox[{"s", "[", "t", "]"}], "2"]}], "}"}], "]"}]}], "]"}], ",", RowBox[{"Assumptions", "\[Rule]", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"assumptions", "&&", RowBox[{RowBox[{"s", "[", "t", "]"}], ">", "0"}]}]}], "]"}]}]}], "]"}], ";"}]],"Input",CellTags->"flrw_metric"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"gM","[",RowBox[{RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],"//","ToComponents"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrices"],
+Cell[BoxData["gM[-aM, -bM] // ToComponents // MatrixForm"],"Input",CellTags->"metric_matrices"],
 
 Cell[BoxData[RowBox[{RowBox[{RowBox[{"gSchw","[",RowBox[{RowBox[{"-","aSchw"}],",",RowBox[{"-","bSchw"}]}],"]"}],"//","ToComponents"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrix_schw"],
 
@@ -564,7 +580,7 @@ Cell[TextData[{"Assign a general scalar profile using the actual chart coordinat
 
 Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", RowBox[{"PhiM",",",RowBox[{"PrintAs","\[Rule]","\"\[Phi]\""}]}], "]"}], ";"}]],"Input",CellTags->"minkowski_field_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"ComponentValue","[",RowBox[{RowBox[{"phiM","[","]"}],",",RowBox[{"PhiM","[",RowBox[{"tM",",","xM",",","yM",",","zM"}],"]"}]}],"]"}],";"}]],"Input",CellTags->"minkowski_field"],
+Cell[BoxData[RowBox[{RowBox[{"ComponentValue","[",RowBox[{RowBox[{"phiM","[","]"}],",",RowBox[{"PhiM","[",RowBox[{RowBox[{"tM","[","]"}],",",RowBox[{"xM","[","]"}],",",RowBox[{"yM","[","]"}],",",RowBox[{"zM","[","]"}]}],"]"}]}],"]"}],";"}]],"Input",CellTags->"minkowski_field"],
 
 Cell[TextData[{StyleBox["ToComponents",FontFamily->"Courier",FontSize->14]," evaluates the registered equation with the chart, metric and field profile, expanding its covariant derivatives with xCoba."}],"Text"],
 
@@ -617,7 +633,7 @@ Cell[TextData[{"Choose a static radial profile \:03c6 = u(r) on Schwarzschild. S
 
 Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "u", "]"}], ";"}]],"Input",CellTags->"schwarzschild_field_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"ComponentValue","[",RowBox[{RowBox[{"phiSchw","[","]"}],",",RowBox[{"u","[","rSchw","]"}]}],"]"}],";"}]],"Input",CellTags->"schwarzschild_field"],
+Cell[BoxData[RowBox[{RowBox[{"ComponentValue","[",RowBox[{RowBox[{"phiSchw","[","]"}],",",RowBox[{"u","[",RowBox[{"rSchw","[","]"}],"]"}]}],"]"}],";"}]],"Input",CellTags->"schwarzschild_field"],
 
 Cell[BoxData[RowBox[{RowBox[{"eqSchw", "=", RowBox[{"scalarEqSchw", "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"schwarzschild_equation_step_1"],
 
@@ -644,7 +660,7 @@ Cell[BoxData[TagBox[FormBox[RowBox[{RowBox[{FractionBox[TagBox[TagBox[RowBox[{Fr
 
 Cell[TextData[{"Differentiate the divergence form with ",StyleBox["D",FontFamily->"Courier",FontSize->14]," and subtract it from the tensor result. The difference should simplify to zero."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"radialEq", "=", RowBox[{FractionBox[RowBox[{SubscriptBox["\[PartialD]", RowBox[{"rSchw"}]], RowBox[{"(", RowBox[{SuperscriptBox["rSchw", "2"], " ", RowBox[{"(", RowBox[{"1", "-", FractionBox[RowBox[{"2", " ", "Mbh"}], "rSchw"]}], ")"}], " ", RowBox[{SuperscriptBox["u", "\[Prime]", MultilineFunction -> None], "[", "rSchw", "]"}]}], ")"}]}], SuperscriptBox["rSchw", "2"]], "-", RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"u", "[", "rSchw", "]"}]}]}]}], ";"}]],"Input",CellTags->"schwarzschild_check_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"radialEq", "=", RowBox[{FractionBox[RowBox[{SubscriptBox["\[PartialD]", RowBox[{RowBox[{"rSchw","[","]"}]}]], RowBox[{"(", RowBox[{SuperscriptBox[RowBox[{"rSchw","[","]"}], "2"], " ", RowBox[{"(", RowBox[{"1", "-", FractionBox[RowBox[{"2", " ", "Mbh"}], RowBox[{"rSchw","[","]"}]]}], ")"}], " ", RowBox[{SuperscriptBox["u", "\[Prime]", MultilineFunction -> None], "[", RowBox[{"rSchw","[","]"}], "]"}]}], ")"}]}], SuperscriptBox[RowBox[{"rSchw","[","]"}], "2"]], "-", RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"u", "[", RowBox[{"rSchw","[","]"}], "]"}]}]}]}], ";"}]],"Input",CellTags->"schwarzschild_check_step_1"],
 
 Cell[BoxData[RowBox[{"radialCheck", "=", RowBox[{"Simplify", "[", RowBox[{"eqSchw", "-", "radialEq"}], "]"}]}]],"Input",CellTags->"schwarzschild_check"],
 
@@ -684,7 +700,7 @@ Cell[TextData[{"Choose a homogeneous field \:03c6 = q(t) on FLRW."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"DefScalarFunction", "[", "q", "]"}], ";"}]],"Input",CellTags->"flrw_field_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"ComponentValue","[",RowBox[{RowBox[{"phiFLRW","[","]"}],",",RowBox[{"q","[","tF","]"}]}],"]"}],";"}]],"Input",CellTags->"flrw_field"],
+Cell[BoxData[RowBox[{RowBox[{"ComponentValue","[",RowBox[{RowBox[{"phiFLRW","[","]"}],",",RowBox[{"q","[",RowBox[{"tFLRW","[","]"}],"]"}]}],"]"}],";"}]],"Input",CellTags->"flrw_field"],
 
 Cell[BoxData[RowBox[{RowBox[{"eqFLRW", "=", RowBox[{"scalarEqFLRW", "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"flrw_equation_step_1"],
 
@@ -712,7 +728,7 @@ Cell[BoxData[RowBox[{RowBox[{"DefConstantSymbol", "[", "omega", "]"}], ";"}]],"I
 
 Cell[BoxData[RowBox[{RowBox[{"DefConstantSymbol", "[", "k", "]"}], ";"}]],"Input",CellTags->"plane_wave_step_2"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{RowBox[{"phiM","[","]"}], ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"Cos", "[", RowBox[{RowBox[{"omega", " ", "t"}], "-", RowBox[{"k", " ", "z"}]}], "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"plane_wave_step_3"],
+Cell[BoxData["ComponentValue[phiM[], Cos[omega tM[] - k zM[]]];"],"Input",CellTags->"plane_wave_step_3"],
 
 Cell[BoxData[RowBox[{RowBox[{"waveResidual", "=", RowBox[{"scalarEqM", "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"plane_wave_step_4"],
 
@@ -760,9 +776,15 @@ Cell[TextData[{"One Minkowski metric, two coordinate charts"}],"Subsection"],
 
 Cell[TextData[{"Add cylindrical coordinates to the existing Minkowski background. Supply the primary Cartesian coordinates as functions of the new ones, in the order (t, r cos \:03b8, r sin \:03b8, z).\n\nThe map applies on r > 0 within one angular patch."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"Minkowski\"", ",", "\"Cylindrical\"", ",", RowBox[{"{", RowBox[{"\"t\"", ",", "\"r\"", ",", "\"theta\"", ",", "\"z\""}], "}"}], ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "r", ",", "theta", ",", "z"}], "}"}], ",", RowBox[{"{", RowBox[{"t", ",", RowBox[{"r", " ", RowBox[{"Cos", "[", "theta", "]"}]}], ",", RowBox[{"r", " ", RowBox[{"Sin", "[", "theta", "]"}]}], ",", "z"}], "}"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"second_chart_step_1"],
+Cell[BoxData["DefineChart[\"Minkowski\", \"Cylindrical\", {t[], r[], theta[], z[]}, Function[{tt, rr, th, zz}, {tt, rr Cos[th], rr Sin[th], zz}]];"],"Input",CellTags->"second_chart_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"tCyl", ",", "rCyl", ",", "thetaCyl", ",", "zCyl"}], "}"}], "=", RowBox[{"Through", "[", RowBox[{RowBox[{"CoordinatesOf", "[", RowBox[{"\"Minkowski\"", ",", "\"Cylindrical\""}], "]"}], "[", "]"}], "]"}]}], ";"}]],"Input",CellTags->"second_chart"],
+Cell[BoxData["{tCylindricalM[], rCylindricalM[], thetaCylindricalM[], zCylindricalM[]}"],"Input",CellTags->"second_chart"],
+
+Cell["The registered map also installs native xCoba basis transformations. A pure component tensor can therefore change its slots with explicit ToCTensor. For coordinate-dependent components, ToComponents with OutputChart additionally substitutes the scalar coordinate map.","Text"],
+
+Cell[BoxData["nativeCylCovector = ToCTensor[CTensor[{0, 1, 0, 0}, {-chartM}], {-chartCylindricalM}]"],"Input",CellTags->"dev31_native_basis"],
+
+Cell["This is the Cartesian dx covector in cylindrical slots: (0, cos(theta), -r sin(theta), 0). Do not directly overwrite a managed chart pair with SetBasisChange.","Text"],
 
 Cell[TextData[{"MetricMatrixOf returns the originally assigned matrix in the primary Cartesian chart. Use // ToComponents[OutputChart -> \"Cylindrical\"] to evaluate the same metric in cylindrical coordinates.\n\nThe angular entry is r\:00b2."}],"Text"],
 
@@ -786,7 +808,7 @@ Cell[BoxData[RowBox[{"gammaCyl", "\[LeftDoubleBracket]", RowBox[{"3", ",", "2", 
 
 Cell[TextData[{"Set \:03c6 = x\:00b2 + y\:00b2 in the primary chart. In cylindrical coordinates this is r\:00b2. Its angular Hessian component is 2r\:00b2 because the Levi-Civita connection acts on the gradient."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{RowBox[{"phiM","[","]"}], ",", RowBox[{SuperscriptBox["xM", "2"], "+", SuperscriptBox["yM", "2"]}]}], "]"}], ";"}]],"Input",CellTags->"two_hessian_charts_step_1"],
+Cell[BoxData["ComponentValue[phiM[], xM[]^2 + yM[]^2];"],"Input",CellTags->"two_hessian_charts_step_1"],
 
 Cell[BoxData[RowBox[{RowBox[{"phiCyl", "=", RowBox[{RowBox[{"phiM", "[", "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}]}], "]"}]}]}], ";"}]],"Input",CellTags->"two_hessian_charts_step_2"],
 
@@ -806,7 +828,7 @@ Cell[TextData[{"With ",StyleBox["ApplySpecialization -> False",FontFamily->"Cour
 
 Cell[BoxData[RowBox[{RowBox[{"eabCyl", "=", RowBox[{"EabM", "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "aM"}], ",", RowBox[{"-", "bM"}]}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"2", ",", "2"}], "}"}], "}"}]}], ",", RowBox[{"ApplySpecialization", "\[Rule]", "False"}]}], "]"}]}]}], ";"}]],"Input",CellTags->"general_cyl_equation_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{RowBox[{"phiM","[","]"}], ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"Cos", "[", RowBox[{RowBox[{"omega", " ", "t"}], "-", RowBox[{"k", " ", "z"}]}], "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"general_cyl_equation_step_2"],
+Cell[BoxData["ComponentValue[phiM[], Cos[omega tM[] - k zM[]]];"],"Input",CellTags->"general_cyl_equation_step_2"],
 
 Cell[BoxData["eabCyl"],"Input",CellTags->"general_cyl_equation"],
 
@@ -832,9 +854,15 @@ Cell[TextData[{"Create a new Minkowski study from the extended theory. Compare i
 
 Cell[BoxData[RowBox[{RowBox[{"CreateBackground", "[", "\"MinkowskiFields\"", "]"}], ";"}]],"Input",CellTags->"field_background_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"{", RowBox[{"\"t\"", ",", "\"x\"", ",", "\"y\"", ",", "\"z\""}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"field_background_step_2"],
+Cell[BoxData["DefineChart[\"MinkowskiFields\", {t[], x[], y[], z[]}];"],"Input",CellTags->"field_background_step_2"],
 
-Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gMinkowskiFields", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"field_background"],
+Cell[BoxData["MetricInBasis[gMinkowskiFields, -chartMinkowskiFields, DiagonalMatrix[{-1, 1, 1, 1}]];"],"Input",CellTags->"field_background"],
+
+Cell["Native geometry can be computed explicitly with the chart basis, or read lazily through native component readers. Here the Cartesian Ricci scalar vanishes.","Text"],
+
+Cell[BoxData["MetricCompute[gMinkowskiFields, chartMinkowskiFields, \"RicciScalar\"[]];"],"Input",CellTags->"dev31_native_metric_compute"],
+
+Cell[BoxData["ToComponents[RicciScalar[CDMinkowskiFields][]]"],"Input",CellTags->"dev31_native_ricci"],
 
 Cell[BoxData[RowBox[{"Keys", "[", RowBox[{RowBox[{"ShowBackground", "[", "\"Minkowski\"", "]"}], "[", "\"Field\"", "]"}], "]"}]],"Input",CellTags->"field_snapshots_part_1"],
 
@@ -842,7 +870,7 @@ Cell[BoxData[RowBox[{"Keys", "[", RowBox[{RowBox[{"ShowBackground", "[", "\"Mink
 
 Cell[TextData[{"Assign the lower components of A in chart order (t,x,y,z) using ",StyleBox["AllComponentValues",FontFamily->"Courier",FontSize->14],". With abstract indices on an owned field, xPlorer infers the primary chart and remembers the supplied variance. The explicit primary-chart array syntax is also supported. Requesting the upper vector raises the index with the Minkowski metric only when needed. Native ToValues can then reuse the stored components."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"AllComponentValues","[",RowBox[{RowBox[{"AMinkowskiFields","[",RowBox[{RowBox[{"-","aMinkowskiFields"}]}],"]"}],",",RowBox[{"{",RowBox[{"1",",","2",",","3",",","4"}],"}"}]}],"]"}],";"}]],"Input",CellTags->"vector_values_step_1"],
+Cell[BoxData["AllComponentValues[AMinkowskiFields[{-aMinkowskiFields, -chartMinkowskiFields}], {1, 2, 3, 4}];"],"Input",CellTags->"vector_values_step_1"],
 
 Cell[BoxData[RowBox[{RowBox[{"Adown", "=", RowBox[{RowBox[{"AMinkowskiFields", "[", RowBox[{"-", "aMinkowskiFields"}], "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_2"],
 
@@ -856,13 +884,21 @@ Cell[BoxData["Aup"],"Input",CellTags->"vector_values_part_2"],
 
 Cell[BoxData["normA"],"Input",CellTags->"vector_values_part_3"],
 
-Cell[TextData[{"For further native xCoba work, request Output -> \"CTensor\" to retain the basis and the variance of every tensor slot. The ordinary array remains the default.\n\nNative DefBasis, SetBasisChange, ToBasis and ToCTensor can be used on the owned xAct objects; see Tests/15_NativeInterop.wl and Examples/NativeXCoba.wl for a separate workflow.\n\nNative assignments do not automatically synchronize the managed registry."}],"Text"],
+Cell["ToCTensor returns a snapshot, not a live field. Managed primary-chart native inputs are captured and replayed; arbitrary external bases, secondary-chart assignments and raw native cache mutations are not automatically synchronized. Explicit native ToCTensor[expr, bases] still uses xCoba.","Text"],
 
-Cell[BoxData[RowBox[{"ctA", "=", RowBox[{RowBox[{"AMinkowskiFields", "[", "aMinkowskiFields", "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"Output", "\[Rule]", "\"CTensor\""}]}], "]"}]}]}]],"Input",CellTags->"ctensor_output"],
+Cell[BoxData["ctA = AMinkowskiFields[aMinkowskiFields] // ToCTensor"],"Input",CellTags->"ctensor_output"],
 
 Cell[TextData[{"The contraction is \:22121 + 4 + 9 + 16 = 28. To retrieve the same covector with its abstract lower index, use ",StyleBox["PortExpression",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[BoxData[RowBox[{"PortExpression", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}]}], "]"}]],"Input",CellTags->"formal_vector"],
+
+Cell["A complete component array is not required for every field. Supply an independent component of the antisymmetric tensor F using native ComponentValue. Native symmetry determines its opposite slot; unrelated, unassigned entries remain symbolic, not zero. The complete array in the next example replaces this sparse input.","Text"],
+
+Cell[BoxData["ComponentValue[FMinkowskiFields[{1, -chartMinkowskiFields}, {0, -chartMinkowskiFields}], 3];"],"Input",CellTags->"dev31_sparse_input"],
+
+Cell[BoxData["ToValues[FMinkowskiFields[{0, -chartMinkowskiFields}, {1, -chartMinkowskiFields}]]"],"Input",CellTags->"dev31_sparse_antisym"],
+
+Cell[BoxData["ToValues[FMinkowskiFields[{0, -chartMinkowskiFields}, {2, -chartMinkowskiFields}]]"],"Input",CellTags->"dev31_sparse_unknown"],
 
 Cell[TextData[{"Assign matrices with the declared rank and symmetry. xPlorer checks both when it stores the components."}],"Text"],
 
@@ -900,19 +936,21 @@ Cell[BoxData[RowBox[{RowBox[{RowBox[{"ConnectionOf", "[", RowBox[{"\"AffineStudy
 
 Cell[BoxData[RowBox[{RowBox[{"RiemannOf", "[", RowBox[{"\"AffineStudy\"", ",", "DA"}], "]"}], "[", RowBox[{RowBox[{"-", "aDA"}], ",", RowBox[{"-", "bDA"}], ",", RowBox[{"-", "cDA"}], ",", "dDA"}], "]"}]],"Input",CellTags->"formal_affine_part_2"],
 
+Cell[BoxData["BackgroundObject[\"AffineStudy\", \"Riemann\", \"Affine\"]"],"Input",CellTags->"dev31_connection_lookup"],
+
 Cell[TextData[{"Supply the independent connection coefficients in the order {upper output, lower derivative, lower input}. The assignment below sets a single coefficient, \:0393 with upper index t and lower indices (x,t), equal to t, in the Cartesian chart.\n\nYou can also supply the difference from the metric connection using ",StyleBox["ReferenceConnection -> \"Primary\"",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"DefineChart", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{"{", RowBox[{"\"t\"", ",", "\"x\"", ",", "\"y\"", ",", "\"z\""}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates_step_1"],
+Cell[BoxData["DefineChart[\"AffineStudy\", {t[], x[], y[], z[]}];"],"Input",CellTags->"affine_coordinates_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetCMetricSystem", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates_step_2"],
+Cell[BoxData["MetricInBasis[gAffineStudy, -chartAffineStudy, DiagonalMatrix[{-1, 1, 1, 1}]];"],"Input",CellTags->"affine_coordinates_step_2"],
 
 Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"AAffineStudy","[",RowBox[{RowBox[{"-","aDA"}]}],"]"}], ",", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates_step_3"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"tA", ",", "xA", ",", "yA", ",", "zA"}], "}"}], "=", RowBox[{"Through", "[", RowBox[{RowBox[{"CoordinatesOf", "[", "\"AffineStudy\"", "]"}], "[", "]"}], "]"}]}], ";"}]],"Input",CellTags->"affine_coordinates_step_4"],
+Cell[BoxData["tA = tAffineStudy[];"],"Input",CellTags->"affine_coordinates_step_4"],
 
 Cell[BoxData[RowBox[{RowBox[{"gammaDA", "=", RowBox[{"ConstantArray", "[", RowBox[{"0", ",", RowBox[{"{", RowBox[{"4", ",", "4", ",", "4"}], "}"}]}], "]"}]}], ";"}]],"Input",CellTags->"affine_coordinates_step_5"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"gammaDA", "\[LeftDoubleBracket]", RowBox[{"1", ",", "2", ",", "1"}], "\[RightDoubleBracket]"}], "=", "tA"}], ";"}]],"Input",CellTags->"affine_coordinates_step_6"],
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"gammaDA", "\[LeftDoubleBracket]", RowBox[{"1", ",", "2", ",", "1"}], "\[RightDoubleBracket]"}], "=", RowBox[{"tAffineStudy","[","]"}]}], ";"}]],"Input",CellTags->"affine_coordinates_step_6"],
 
 Cell[BoxData[RowBox[{RowBox[{"SetConnectionComponents", "[", RowBox[{"\"AffineStudy\"", ",", "\"Affine\"", ",", "gammaDA"}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates"],
 
@@ -1018,11 +1056,11 @@ Cell[BoxData[RowBox[{"delta2Abstract","=",RowBox[{RowBox[{"gM","[",RowBox[{"aM",
 
 Cell["Assign components of hM with LI[1] and LI[2]. LI labels the order; the remaining two abstract indices select the variance. The assignment uses the primary chart, not an output chart. xCoba computes other index configurations as required.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"AllComponentValues","[",RowBox[{RowBox[{"hM","[",RowBox[{RowBox[{"LI","[",RowBox[{"1"}],"]"}],",",RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],",",RowBox[{"DiagonalMatrix","[",RowBox[{RowBox[{"{",RowBox[{"0",",",SuperscriptBox["tM","2"],",","0",",","0"}],"}"}]}],"]"}]}],"]"}],";"}]],"Input",CellTags->"perturbation_profile_step_3"],
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues","[",RowBox[{RowBox[{"hM","[",RowBox[{RowBox[{"LI","[",RowBox[{"1"}],"]"}],",",RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],",",RowBox[{"DiagonalMatrix","[",RowBox[{RowBox[{"{",RowBox[{"0",",",SuperscriptBox[RowBox[{"tM","[","]"}],"2"],",","0",",","0"}],"}"}]}],"]"}]}],"]"}],";"}]],"Input",CellTags->"perturbation_profile_step_3"],
 
 Cell[BoxData[RowBox[{RowBox[{"AllComponentValues","[",RowBox[{RowBox[{"hM","[",RowBox[{RowBox[{"LI","[",RowBox[{"2"}],"]"}],",",RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],",",RowBox[{"ConstantArray","[",RowBox[{"0",",",RowBox[{"{",RowBox[{"4",",","4"}],"}"}]}],"]"}]}],"]"}],";"}]],"Input",CellTags->"perturbation_profile_step_4"],
 
-Cell[BoxData[RowBox[{RowBox[{"tP","=","tM"}],";"}]],"Input",CellTags->"perturbation_profile"],
+Cell[BoxData[RowBox[{RowBox[{"tP","=",RowBox[{"tM","[","]"}]}],";"}]],"Input",CellTags->"perturbation_profile"],
 
 Cell["Convert the abstract variations into components separately. The second inverse variation is not zero even though the second covariant metric variation vanishes.","Text"],
 
@@ -1122,7 +1160,7 @@ Cell[BoxData[RowBox[{RowBox[{"recipe","=",RowBox[{"ReconstructionData","[",RowBo
 
 Cell[BoxData[RowBox[{"Keys","[",RowBox[{"recipe"}],"]"}]],"Input",CellTags->"lifecycle_recipe_keys"],
 
-Cell["The source xAct definitions must remain alive. Native assignments outside xPlorer and saved derived results are not a complete part of this recipe. The old object identities will not survive deletion.","Text"],
+Cell["The source xAct definitions must remain alive. The recipe preserves managed primary-chart inputs, including captured native assignments, named chart maps and independent rules. Arbitrary external native definitions and saved derived results are not restored. The old object identities will not survive deletion.","Text"],
 
 Cell["8.5. Preview deletion before changing anything","Subsubsection"],
 
@@ -1217,11 +1255,13 @@ Cell["The independent connection is no longer present; the Levi-Civita connectio
 
 Cell[BoxData[RowBox[{RowBox[{"DeleteBackground", "[", "\"AffineStudy\"", "]"}], ";"}]],"Input",CellTags->"close_affine_study"],
 
-Cell["Deleting a chart removes its coordinate setup, additional managed charts, metric component assignment and managed field/connection inputs. It does not delete the abstract metric or manifold. Save a recipe first if these inputs matter.","Text"],
+Cell["Deleting a chart family removes primary and secondary charts, coordinate aliases, managed basis changes, metric component assignment and managed field/connection inputs. Direct UndefChart or UndefBasis is blocked for managed charts; individual secondary-chart deletion and primary promotion are not supported. Save a recipe first.","Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"chartPlan","=",RowBox[{"DeletionPlan","[",RowBox[{"\"MinkowskiFields\"",",","\"Chart\"",",",RowBox[{"Cascade","\[Rule]","True"}]}],"]"}]}],";"}]],"Input",CellTags->"lifecycle_chart_plan"],
 
 Cell[BoxData[RowBox[{"chartPlan","[","\"CanDelete\"","]"}]],"Input",CellTags->"lifecycle_chart_plan_allowed"],
+
+Cell[BoxData["ChartQ[chartCylindricalM]"],"Input",CellTags->"dev31_chart_guard_note"],
 
 Cell["The following are optional destructive operations, not part of the automatic workflow. Run only on a study whose inputs you can afford to lose. Metric deletion removes its dependent geometric family; parameter deletion can remove perturbation dependencies. Inspect the corresponding plan before each operation.","Text"],
 
