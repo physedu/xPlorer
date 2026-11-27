@@ -9,9 +9,10 @@ checks["Repeated held curvature read reuses native computation"]=r===r2&&ShowBac
 checks["Held scalar geometry read"]=Last[With[{head=rs},HeldComponentValue[head[]]]]===-2;
 checks["Held geometry alternate variance"]=Simplify[Last[With[{head=ri,chart=ch},HeldComponentValue[head[{0,chart},{0,chart}]]]]-Exp[-2x]]===0;
 checks["Unrequested geometry and other background untouched"]=TensorValIDs[we]==={}&&TensorValIDs[ei]==={}&&TensorValIDs[ro]==={};
-gamma=Christoffel[ConnectionOf["N"],PDOfBasis[ch]];
+gamma=GiveSymbol[Christoffel,Sequence@@Sort[{ConnectionOf["N"],PDOfBasis[ch]}]];
 gr=With[{head=gamma,chart=ch},HeldComponentValue[head[{0,chart},{0,-chart},{1,-chart}]]];
-checks["Held Christoffel read uses native geometry"]=MatchQ[gr,_Rule]&&Last[gr]===1;
+checks["Held literal Christoffel head uses native geometry"]=MatchQ[gr,_Rule]&&Last[gr]===1;
+checks["Compound Christoffel head is not a literal held symbol"]=With[{head=Christoffel[ConnectionOf["N"],PDOfBasis[ch]],chart=ch},!xPlorer`Private`managedHeldGeometryReadQ[head,head[{0,chart},{0,-chart},{1,-chart}]]];
 data=xPlorer`Private`geometryNativeData[ShowBackground["N"]];
 dm=xPlorer`Private`nativeGeometrySpecHead["DMetric"[-1,-1,-1],data];
 ddm=xPlorer`Private`nativeGeometrySpecHead["DDMetric"[-1,-1,-1,-1],data];
