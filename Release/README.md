@@ -20,7 +20,7 @@ The intended audience is researchers and students already using Mathematica and 
 
 ## Getting started
 
-Extract the complete ZIP and install xAct separately. Open **xPlorer_Install.nb** to install, verify or uninstall the supplied paclet. Then open **xPlorer_Workflow.nb** in a fresh kernel and choose Needs (installed) or Get (direct source). No installation is required for Get. Follow the six numbered sections; the main groups are folded and their subsections are open. **xPlorer_API_Examples.nb** is the advanced reference.
+Extract the complete ZIP and install xAct separately. Open **xPlorer_Install.nb** to install, verify or uninstall the supplied paclet. Then open **xPlorer_Workflow.nb** in a fresh kernel and choose Needs (installed) or Get (direct source). No installation is required for Get. Follow the five numbered sections; the main groups are folded and their subsections are open. The tutorial teaches xPlorer through an Einstein-scalar theory, tensor test fields, first-order gravitational waves on Minkowski and FLRW, and a quadratic wave-energy example. **xPlorer_API_Examples.nb** is the advanced reference.
 
 ## Installation options
 

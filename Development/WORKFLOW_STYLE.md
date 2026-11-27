@@ -19,6 +19,8 @@ Maintainer's requirements (27 November 2026). Apply these before editing either 
 - Demonstrate rules on meaningful expressions and show that another background remains unaffected. Keep components straightforward with DefineChart, MetricInBasis, ComponentValue and ToComponents. Place perturbations immediately after the component calculation section. Move exhaustive variations and lifecycle details to API Examples.
 - Keep the introductory tutorial concise; do not turn it into the full API reference. Never sacrifice clarity simply to reduce the cell count.
 
+- Keep xPlorer itself the subject of the tutorial: the physical calculation motivates its syntax and features, not the other way around. Introduce the metric perturbation, vector and tensor fields at theory registration; do not present non-scalar support as a late extension. Compare a common metric-perturbation calculation across at least two backgrounds. Distinguish a quadratic wave source or high-frequency averaged energy from a complete, self-consistent backreaction calculation. Use physically meaningful full expressions for notation examples, but do not add redundant views or unsupported formatting paths.
+
 ## Acceptance
 
 - Review prose paragraph by paragraph and the output of examples against the current API notebook and maintainer's reference.
