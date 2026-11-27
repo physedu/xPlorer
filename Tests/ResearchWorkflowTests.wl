@@ -34,7 +34,7 @@ checks=<|
  "second inverse variation"->TrueQ[Simplify[delta2G-DiagonalMatrix[{0,2 gam[tM[],zM[]]^2,2 gam[tM[],zM[]]^2,0}]]===ConstantArray[0,{4,4}]],
  "Taylor coefficient"->TrueQ[Simplify[First[outputs["taylor"]]-delta2G/2]===ConstantArray[0,{4,4}]],
  "Minkowski tensor wave"->TrueQ[Simplify[gwM-(Derivative[2,0][gam][tM[],zM[]]-Derivative[0,2][gam][tM[],zM[]])]==0],
- "FLRW tensor wave"->TrueQ[Simplify[gwF-(Derivative[2,0][gam][tFLRW[],zFLRW[]]+3 s\'[tFLRW[]]/s[tFLRW[]] Derivative[1,0][gam][tFLRW[],zFLRW[]]-Derivative[0,2][gam][tFLRW[],zFLRW[]]/s[tFLRW[]]^2)]==0],
+ "FLRW tensor wave"->TrueQ[Simplify[gwF-(Derivative[2,0][gam][tFLRW[],zFLRW[]]+3 Derivative[1][s][tFLRW[]]/s[tFLRW[]] Derivative[1,0][gam][tFLRW[],zFLRW[]]-Derivative[0,2][gam][tFLRW[],zFLRW[]]/s[tFLRW[]]^2)]==0],
  "quadratic wave energy"->TrueQ[Simplify[gwEnergy-Derivative[1,0][gam][tM[],zM[]]^2/(2 kap)]==0],
  "phase average"->TrueQ[Simplify[outputs["gw_average"]-amp^2 w^2/(4 kap)]==0],
  "wave notation"->hasText[rendered["wave_pretty"],"FLRW"]&&SameQ[Normal[outputs["wave_pretty"]],dGF],
