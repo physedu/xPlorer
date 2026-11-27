@@ -14,6 +14,19 @@ The release staging helper was exercised with a synthetic ZIP containing the six
 
 These results describe the recorded candidate, not a fresh run on the reorganized repository. Subsequent source changes are limited to the introductory banner and AboutXPlorer output; the scientific source and both public notebooks are unchanged by this organization. The supplemental integration notebook has been relocated into Tests/Fixtures/ and its runner path adjusted; the relocated runner has not been executed here.
 
+## Revalidation of the clean public source tree — 27 November 2026
+
+Exact tested commit: [d67e5b8](https://github.com/physedu/xPlorer/commit/d67e5b8f09d99ccd457f3237569e992de57ad9aa). Fresh remote Wolfram Language 15.0.1 Linux kernels, xAct 1.3.0, portable permutation backend, native printing enabled, repository direct-source loading.
+
+| Test | Result |
+| --- | --- |
+| Research Workflow | 131/131 cells, 26/26 checks |
+| API Examples | 419/419 cells, 109/109 checks, 33/33 stages |
+| Warnings, parse errors and unexpected failures | None reported by the respective runners |
+| Startup banner | Correct version 1.0.0-beta.1 and GitHub URL observed |
+
+CreatePacletArchive failed in the remote evaluator because of a Java security restriction; no actual installable archive or Desktop acceptance is claimed. The integration fixture and complete regression suite have not been rerun.
+
 ## Reproduce
 
 Install xAct separately. Use a fresh Mathematica kernel for each runner, adjusting paths to your checkout:
