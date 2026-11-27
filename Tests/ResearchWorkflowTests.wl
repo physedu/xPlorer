@@ -6,7 +6,7 @@ inputs=DeleteCases[Cases[nb,Cell[BoxData[b_],"Input",CellTags->id_String]:>{id,b
 warnings={}; outputs=<||>; rendered=<||>;
 loadCell=First@Select[inputs,First[#]==="load"&];
 AssociateTo[outputs,"load"->Check[Block[{NotebookDirectory=Function[root]},ToExpression[Last[loadCell],StandardForm]],AppendTo[warnings,"load"];$Failed]];
-renderTags={"kg_m_abstract","abstract_copies","rank_two_s","postfix_view","caption","rename_view","eq_m_view","partial_compare","eq_s_view","prime","profile_c","density_caption"};
+renderTags={"kg_m_abstract","abstract_copies","rank_two_s","postfix_view","caption","rename_view","eq_m_view","partial_compare","eq_s_view","prime","profile_c","density_caption","wave_abstract_f","wave_pretty"};
 Block[{xAct`xPerm`$xpermQ=False,NotebookDirectory=Function[root]},
  Scan[Function[cell,Module[{id=First[cell],value,display},value=Check[ToExpression[Last[cell],StandardForm],AppendTo[warnings,id];$Failed];AssociateTo[outputs,id->value];If[MemberQ[renderTags,id],display=If[ValueQ[$PrePrint],$PrePrint[value],value];AssociateTo[rendered,id->With[{v=display},MakeBoxes[v,StandardForm]]]]]],DeleteCases[inputs,{"load",_}]]];
 hasText[b_,str_]:=MemberQ[Cases[b,_String,Infinity],str];
@@ -31,8 +31,13 @@ checks=<|
  "FLRW equation"->TrueQ[Simplify[eqF+q''[tFLRW[]]+3 s'[tFLRW[]]q'[tFLRW[]]/s[tFLRW[]]+m^2 q[tFLRW[]]]==0],
  "FLRW energy density"->TrueQ[Simplify[rhoFLRW-(q'[tFLRW[]]^2+m^2 q[tFLRW[]]^2)/2]==0],
  "caption for density"->hasText[rendered["density_caption"],"FLRW"]&&SameQ[Normal[outputs["density_caption"]],rhoFLRW],
- "second inverse variation"->SameQ[delta2G,DiagonalMatrix[{0,2tM[]^4,0,0}]],
- "Taylor coefficient"->SameQ[First[outputs["taylor"]],DiagonalMatrix[{0,tM[]^4,0,0}]],
+ "second inverse variation"->TrueQ[Simplify[delta2G-DiagonalMatrix[{0,2 gam[tM[],zM[]]^2,2 gam[tM[],zM[]]^2,0}]]===ConstantArray[0,{4,4}]],
+ "Taylor coefficient"->TrueQ[Simplify[First[outputs["taylor"]]-delta2G/2]===ConstantArray[0,{4,4}]],
+ "Minkowski tensor wave"->TrueQ[Simplify[gwM-(Derivative[2,0][gam][tM[],zM[]]-Derivative[0,2][gam][tM[],zM[]])]==0],
+ "FLRW tensor wave"->TrueQ[Simplify[gwF-(Derivative[2,0][gam][tFLRW[],zFLRW[]]+3 s\'[tFLRW[]]/s[tFLRW[]] Derivative[1,0][gam][tFLRW[],zFLRW[]]-Derivative[0,2][gam][tFLRW[],zFLRW[]]/s[tFLRW[]]^2)]==0],
+ "quadratic wave energy"->TrueQ[Simplify[gwEnergy-Derivative[1,0][gam][tM[],zM[]]^2/(2 kap)]==0],
+ "phase average"->TrueQ[Simplify[outputs["gw_average"]-amp^2 w^2/(4 kap)]==0],
+ "wave notation"->hasText[rendered["wave_pretty"],"FLRW"]&&SameQ[Normal[outputs["wave_pretty"]],dGF],
  "quadratic field equation"->TrueQ[Simplify[outputs["profile_equation"]-(4-m^2(xM[]^2+yM[]^2))]==0],
  "cylindrical scalar"->SameQ[outputs["profile_c"],rCylindricalM[]^2],
  "cylindrical label"->hasText[rendered["profile_c"],"C"],
