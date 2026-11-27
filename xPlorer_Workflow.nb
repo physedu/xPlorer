@@ -653,7 +653,7 @@ Cell["A new observable without registering another formula","Subsection"],
 
 Cell["For the minimally coupled scalar, the stress-energy tensor is the gradient product plus the metric times the scalar Lagrangian. PortExpression transfers this newly constructed expression to an existing background; there is no need to register every observable in advance. On a homogeneous FLRW profile, its time-time component is the scalar energy density.","Text"],
 
-Cell[BoxData["stressTensor = CD[-a][phi[]] CD[-b][phi[]] + g[-a,-b] lagrangian;"],"Input",CellTags->"stress_tensor"],
+Cell[BoxData["stressTensor = CD[-a][phi[]] CD[-b][phi[]] + g[-a,-b] ReplaceDummies[lagrangian];"],"Input",CellTags->"stress_tensor"],
 
 Cell[BoxData["stressFLRW = PortExpression[\"FLRW\", stressTensor]"],"Input",CellTags->"stress_flrw"],
 
