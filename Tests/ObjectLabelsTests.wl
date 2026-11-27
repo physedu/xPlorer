@@ -12,16 +12,20 @@ Block[{xAct`xPerm`$xpermQ=False,xAct`xTensor`$DefInfoQ=False,xAct`xCoba`$CVVerbo
  auto[ex_]:=xPlorer`Private`notebookPrint[ex];
  CreateBackground["One",SymbolSuffix->"O",BackgroundLabel->"ONE",ShowObjectLabels->True];
  CreateBackground["Two",SymbolSuffix->"T"];
- DefineChart["One",{t[],x[],y[],z[]}]; DefineChart["Two",{t[],x[],y[],z[]}];
+ DefineChart["One",{t[],x[],y[],z[]}]; DefineChart["Two",{t[],x[],y[],z[]},BackgroundLabel->"T2",ShowObjectLabels->False];
  DefineChart["One","Scaled",{T[],u[],v[],w[]},Function[{tt,xx,yy,zz},{tt,2 xx,yy,zz}]];
  MetricInBasis[gO,-chartO,DiagonalMatrix[{-1,1,1,1}]]; ComponentValue[phiO[],xO[]^2];
  ex=CDO[-aO][phiO[]]; math=ToComponents[CDO[aO][CDO[-aO][phiO[]]]]; SaveResult["One","math",math];
  originalPrint=With[{h=BackgroundObject["One","phi"]},PrintAs[h]]; originalCD=SymbolOfCovD[CDO];
  checks["scalar"]=label[auto[phiO[]],"ONE"];
  checks["metric"]=label[auto[gO[-aO,-bO]],"ONE"];
+ checks["inverse metric"]=label[auto[gO[aO,bO]],"ONE"];
+ checks["vector"]=label[auto[AO[-aO]],"ONE"];
  checks["curvature"]=label[auto[RiemannCDO[-aO,-bO,-cO,-dO]],"ONE"];
  checks["coordinate"]=label[auto[xO[]],"ONE"];
- checks["coordinate other off"]=!label[auto[xT[]],"T"];
+ checks["coordinate other off"]=!label[auto[xT[]],"T2"];
+ SetNotation["Two","Primary",ShowObjectLabels->True]; checks["chart creation label"]=label[auto[xT[]],"T2"];
+ SetNotation["Two","Primary",ShowObjectLabels->False];
  checks["secondary coordinate"]=label[auto[uScaledO[]],"ONE:Scaled"];
  SetNotation["One","Scaled",BackgroundLabel->"C2"]; checks["chart custom label"]=label[auto[uScaledO[]],"C2"];
  SetNotation["One","Scaled",ShowObjectLabels->False]; checks["chart local off"]=!label[auto[uScaledO[]],"C2"]&&label[auto[xO[]],"ONE"];
@@ -42,6 +46,7 @@ Block[{xAct`xPerm`$xpermQ=False,xAct`xTensor`$DefInfoQ=False,xAct`xCoba`$CVVerbo
  checks["one view off"]=!label[PrettyExp[ex,ShowObjectLabels->False],"ONE"];
  SetPresentation["One",phi,ShowObjectLabels->False];
  checks["individual off"]=!label[auto[phiO[]],"ONE"]&&label[auto[gO[-aO,-bO]],"ONE"];
+ Do[checks["derivative own mark "<>style]=label[PrettyExp[ex,CovariantStyle->style],"ONE"],{style,{"Native","Prefix","Postfix"}}];
  checks["view wins"]=label[PrettyExp[phiO[],ShowObjectLabels->True],"ONE"];
  SetPresentation["One",phi,ShowObjectLabels->Automatic];
  checks["individual inherits"]=label[auto[phiO[]],"ONE"];
@@ -58,6 +63,13 @@ Block[{xAct`xPerm`$xpermQ=False,xAct`xTensor`$DefInfoQ=False,xAct`xCoba`$CVVerbo
  rec=ReconstructionData["One"]; DeleteBackground["One"]; RecreateBackground["One",rec];
  checks["reconstruction"]=label[auto[phiO[]],"ONE"]&&!label[auto[xO[]],"ONE"]&&label[auto[uScaledO[]],"RestoredChart"];
  checks["registration rejects label option"]=FailureQ[RegisterTheory["Field",phi,ShowObjectLabels->True]];
+ DefTensor[B[-a,-b],M]; RegisterTheory["Field",B]; AddField["One",B];
+ checks["new tensor inherits"]=label[auto[BO[-aO,-bO]],"ONE"];
+ DefMetricPerturbation[g,h,eps]; RegisterTheory["Field",h]; AddField["One",h];
+ checks["perturbation inherits"]=label[auto[hO[LI[1],-aO,-bO]],"ONE"];
+ DefCovD[DA[-a],{},SymbolOfCovD->{"|","D"},Torsion->True]; RegisterTheory["Connection","Affine",DA]; AddConnection["One","Affine",DA];
+ checks["new connection inherits"]=label[PrettyExp[ConnectionOf["One","Affine"][-aO][AO[-bO]],CovariantStyle->"Prefix"],"ONE"];
+ checks["affine curvature inherits"]=label[auto[RiemannOf["One","Affine"][-aO,-bO,-cO,dO]],"ONE"];
  result=<|"Version"->$XPlorerVersion,"Passed"->Count[Values[checks],True],"Total"->Length[checks],"Failures"->Keys@Select[checks,!TrueQ[#]&],"Examples"-><|"Scalar"->display[auto[phiO[]]],"Coordinate"->display[auto[uScaledO[]]],"Derivative"->display[PrettyExp[CDO[-aO][phiO[]],CovariantStyle->"Prefix"]]|>|>;
  result
 ]
