@@ -2,7 +2,7 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-**Development candidate: 14.0.0-beta.13-dev.33.** The public beta release has not yet been published.
+**Development candidate: 14.0.0-beta.13-dev.34.** The public beta release has not yet been published.
 
 xPlorer is a Wolfram Language research package that reuses an abstract xAct theory on independent geometric backgrounds, transports equations and calculates components. It connects xTensor, xCoba and xPert rather than replacing their mathematics.
 

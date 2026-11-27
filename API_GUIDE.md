@@ -1,4 +1,4 @@
-# Using xPlorer — beta.13-dev.33
+# Using xPlorer — beta.13-dev.34
 
 xPlorer_Workflow.nb is the principal worked guide, updated for the consolidated API (dev.31, corrected in dev.32). xPlorer_Consolidated.nb is retained as a supplementary integration-test notebook. Sections labeled with earlier versions are historical checkpoints; the dev.31 contract below takes precedence. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
@@ -374,3 +374,6 @@ RegisterTheory[savedRegistry];
 ```
 
 The snapshot symbol is evaluated only in the single-argument registration form. Native declarations retain their held evaluation contract. The two public notebooks are xPlorer_QuickStart.nb (first successful scientific calculation) and xPlorer_Workflow.nb (extended reference). The consolidated notebook is an internal integration test. Tools/PrepareRelease.wl prepares an explicit whitelisted public ZIP after the author builds a matching paclet locally; it does not publish a release.
+
+
+In dev.34, explicit PrettyExp views capture resolved object-label settings at creation. Re-evaluating the original mathematical expression uses current preferences; a previously saved display view retains its visibility and label choices. ShowTheory uses compact, top-aligned tables and lists sector collections in separate rows. SaveResult is optional in-memory storage with invalidation on mathematical edits; it is not file persistence or automatic recalculation.
