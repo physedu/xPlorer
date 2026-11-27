@@ -146,6 +146,13 @@ Added a portable notebook, 75 regression checks, an MUnit report runner, and an 
 
 - Stage native covariant/contravariant metric-component edits and validate before replacing the managed metric. Preserve geometry and revisions on exact repeated metric assignments with matching native fingerprints. Skip component hooks on identically vanishing tensors.
 
+## 14.0.0-beta.13-dev.27 (development)
+
+- Capture deletion of exact native authoritative primary-chart field groups in Rule state; derived groups remain native and independently recalculable.
+- Support component removal from complete fields, retaining remaining independent values in sparse recipes without zero filling.
+- Fix mixed-variance sparse canonicalization/replay tuple ordering and signs. Reassign affected old inputs; automatic recovery of malformed historical tuples is not possible.
+- 730/730 checks across 27 groups, including 22/22 deletion/symmetry tests; workflow 365/365, 84/84, 33/33. See Tests/dev27-results.json.
+
 ## 14.0.0-beta.13-dev.26 (development)
 
 - Capture literal rule-state HeldComponentValue reads and writes for owned primary-chart fields, preserving native HoldFirst and held value semantics.

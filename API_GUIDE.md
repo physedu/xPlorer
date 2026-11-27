@@ -1,4 +1,4 @@
-# Using xPlorer — beta.13-dev.26
+# Using xPlorer — beta.13-dev.27
 
 The principal worked guide is xPlorer_Workflow.nb. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
@@ -275,3 +275,18 @@ With[{head = BackgroundObject["N", "A"], chart = ChartOf["N"]},
 ```
 
 A held query of the raised component can use the same literal-head pattern. With inserts the evaluated owned symbols before HoldFirst acts. In native Set state or unsupported held expressions, xPlorer intentionally leaves native behavior alone; it does not promise to capture those writes in a reconstruction recipe. Use the existing managed setters for controlled inputs in that case, after restoring Rule state.
+
+
+## Removing native field input components and groups (dev.27)
+
+A native DeleteTensorValues call identifying the exact registered primary-chart authoritative field group, in Rule state, removes that input record and invalidates its dependent values; a ValID delegates through the native dispatch. Derived-only group deletion remains native and leaves the input record/revision intact. Existing replay conservatively rebuilds the affected field head and recorded dependents, including surviving LI orders, rather than promising to preserve every native cache on that head. ComponentValue[component,Null] and supported literal HeldComponentValue removal now downgrade a complete field input to a sparse record of remaining independent components; an unknown component remains symbolic, not zero. Removing the last sparse value removes the record. The existing stage/replay path still rejects unsupported self-referential incomplete edits. Sparse tuples must be expressed in their record's declared variance: if native ToCanonical interchanges opposite-variance slots, retain a representative in the declared input variance with its correctly signed value; mixed-variance edits deduplicate by native canonical identity. No custom permutation engine or new public command. Earlier affected mixed-variance sparse records may have stored incorrect tuples; no automatic recovery of original input is possible from those records, so reassign the affected field inputs from the original expressions. Native Set-state transitions, held metric/geometry, derivative/secondary-chart input deletion, and general native chart/basis and independent connection lifecycle remain open.
+
+```wl
+(* For the actual owned field A and primary chart ch: *)
+ComponentValue[A[{0, -ch}], Null]
+(* Remaining complete-array input becomes sparse if a value was removed. *)
+DeleteTensorValues[A, {{-ch}}]
+(* Deletes the recorded source group if it is the authoritative one. *)
+```
+
+Use the actual native ValID from TensorValIDs when a symmetry group or LI order needs exact selection. Removing a derived group does not remove the authoritative field record. Profiles are explicit snapshots and can intentionally restore previously saved inputs. Reassign earlier mixed-variance sparse inputs from their original expressions if affected by the previous tuple-order bug.
