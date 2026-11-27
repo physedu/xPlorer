@@ -27,7 +27,7 @@ The intended audience is researchers and students already using Mathematica and 
 | Notebook | Purpose |
 | --- | --- |
 | [xPlorer_Install.nb](xPlorer_Install.nb) | Install, verify and uninstall the supplied paclet. |
-| [xPlorer_Workflow.nb](xPlorer_Workflow.nb) | Start here: a practical six-section research tutorial, from abstract equations to labeled comparisons, specialization rules, components, profiles, tensors and metric perturbations. |
+| [xPlorer_Workflow.nb](xPlorer_Workflow.nb) | Start here: A five-section tutorial: Einstein-scalar theory, registration and notation, scalar/vector/tensor components, metric perturbations on Minkowski and FLRW, and reusable profiles and charts. |
 | [xPlorer_API_Examples.nb](xPlorer_API_Examples.nb) | Advanced executable reference: detailed API options, affine connections, lifecycle and special cases. |
 
 Install [xAct](https://www.xact.es/) separately. Use a fresh Mathematica kernel for either notebook. Keep the notebook beside xPlorer.wl in the release ZIP, or beside the Paclet directory in a repository checkout. Use xPlorer_Install.nb for installation or removal. Each scientific notebook begins with an introduction and two alternative loading cells: Needs for an installed paclet, or Get for direct source loading.

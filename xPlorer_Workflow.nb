@@ -2,14 +2,14 @@
 Notebook[{
 Cell["xPlorer - From an abstract theory to physical spacetimes","Title"],
 
-Cell["A massive scalar field on Minkowski, Schwarzschild and FLRW | 1.0.0-beta.1","Subtitle"],
+Cell["Einstein gravity, matter and metric perturbations | 1.0.0-beta.1","Subtitle"],
 
 Cell[TextData[{"Derive the field equations once, then use them on several independent spacetimes in the same Mathematica kernel.\n\nThis tutorial follows a single calculation from the abstract theory to physical results."}],"Text"],
 
 Cell[CellGroupData[{
 Cell["Introduction","Section"],
 
-Cell[TextData[{"We begin with a massive scalar field. After registration, we specialize its equations and calculate their components on Minkowski, Schwarzschild and FLRW.\n\nThe later sections introduce metric perturbations, changes of field profile and coordinate chart, and an extension to vectors and tensors.\n\nOpen the numbered sections in order. Their subsections are already open. For a complete reference, see ",StyleBox["xPlorer_API_Examples.nb",FontFamily->"Courier",FontSize->14],"."}],"Text"],
+Cell[TextData[{"We begin with Einstein gravity coupled to a real massive scalar field. We also define vector and two-form test fields and the metric perturbation before creating the backgrounds.\n\nThe tutorial teaches registration, retrieval, specialization and presentation before passing to components. We then compare tensor perturbations on Minkowski and FLRW, and explore changes of profiles and charts.\n\nOpen the numbered sections in order. Their subsections are already open. For the complete reference, see ",StyleBox["xPlorer_API_Examples.nb",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[TextData[{"Start with a fresh kernel and xAct installed. For installation or removal of xPlorer, see ",StyleBox["xPlorer_Install.nb",FontFamily->"Courier",FontSize->14],".\n\nEvaluate only one of the following loading cells."}],"Text"],
 
@@ -38,9 +38,9 @@ Cell[CellGroupData[{
 Cell["1. Define and register the theory","Section"],
 
 Cell[CellGroupData[{
-Cell["The abstract scalar theory","Subsection"],
+Cell["The abstract Einstein-scalar theory","Subsection"],
 
-Cell[TextData[{"Define a four-dimensional Lorentzian manifold, its metric and a real scalar field of mass m using native xTensor.\n\nThe kinetic and mass terms will form the scalar Lagrangian."}],"Text"],
+Cell[TextData[{"Define a four-dimensional Lorentzian manifold, its metric and a real scalar field of mass m using native xTensor.\n\nWe use signature (-,+,+,+), with kappa = 8 pi G in units c = 1. The action uses the invariant volume element multiplying the gravitational and matter Lagrangians."}],"Text"],
 
 Cell[BoxData["DefManifold[M, 4, {a,b,c,d,e,f,i,j}];"],"Input",CellTags->"manifold"],
 
@@ -50,11 +50,27 @@ Cell[BoxData["DefTensor[phi[], M, PrintAs -> \"\\[Phi]\"];"],"Input",CellTags->"
 
 Cell[BoxData["DefConstantSymbol[m];"],"Input",CellTags->"mass"],
 
+Cell[BoxData["DefConstantSymbol[kap, PrintAs -> \"\\[Kappa]\"];"],"Input",CellTags->"grav_constant"],
+
+Cell[TextData[{"Define the metric perturbation using native xPert. The tensor h carries an order label LI[n]; eps is the formal expansion parameter."}],"Text"],
+
+Cell[BoxData["DefMetricPerturbation[g,h,eps];"],"Input",CellTags->"def_h"],
+
+Cell[TextData[{"Define a covector and an antisymmetric two-form as independent test fields. They will be used to teach tensor components, not included in the Einstein-scalar source."}],"Text"],
+
+Cell[BoxData["DefTensor[A[-a], M];"],"Input",CellTags->"vector"],
+
+Cell[BoxData["DefTensor[F[-a,-b], M, Antisymmetric[{-a,-b}]];"],"Input",CellTags->"twoform"],
+
 Cell[BoxData["Lkin = -CD[-a][phi[]] CD[a][phi[]]/2;"],"Input",CellTags->"kinetic"],
 
 Cell[BoxData["Lmass = -m^2 phi[]^2/2;"],"Input",CellTags->"mass_lag"],
 
 Cell[BoxData["L = Lkin + Lmass"],"Input",CellTags->"lagrangian"],
+
+Cell[BoxData["Lgrav = RicciScalar[CD][]/(2 kap)"],"Input",CellTags->"grav_lag"],
+
+Cell[BoxData["Ltotal = Lgrav + L"],"Input",CellTags->"total_lag"],
 
 Cell[TextData[{"Vary the scalar at fixed metric, taking the variations to have compact support.\n\n",StyleBox["VarD",FontFamily->"Courier",FontSize->14]," gives the Euler-Lagrange expression. ",StyleBox["ContractMetric",FontFamily->"Courier",FontSize->14]," and ",StyleBox["ToCanonical",FontFamily->"Courier",FontSize->14]," simplify it using the native tensor algebra."}],"Text"],
 
@@ -62,11 +78,15 @@ Cell[BoxData["kg = VarD[phi[], CD][L] // ContractMetric // ToCanonical;"],"Input
 
 Cell[BoxData["kg == 0"],"Input",CellTags->"kg_abstract"],
 
-Cell[TextData[{"Define the Hessian and a rank-two expression containing the Hessian and a mass term.\n\nWe will use this second expression to illustrate transport and notation. It is not an additional field equation."}],"Text"],
+Cell[TextData[{"The scalar energy-momentum tensor follows from metric variation of the matter action. Here we write its known covariant form using native xTensor.\n\n",StyleBox["ReplaceDummies",FontFamily->"Courier",FontSize->14]," prevents collisions between the dummy indices of L and the free indices a and b."}],"Text"],
 
-Cell[BoxData["hessian = CD[-a][CD[-b][phi[]]];"],"Input",CellTags->"hessian"],
+Cell[BoxData["stress = CD[-a][phi[]] CD[-b][phi[]] + g[-a,-b] ReplaceDummies[L]"],"Input",CellTags->"stress"],
 
-Cell[BoxData["Eab = hessian + m^2 g[-a,-b] phi[]"],"Input",CellTags->"eab"]
+Cell[TextData[{"The Einstein equation is the vanishing of the following rank-two expression. Unlike the scalar equation, it couples the curvature to matter."}],"Text"],
+
+Cell[BoxData["Eab = Einstein[CD][-a,-b] - kap stress"],"Input",CellTags->"eab"],
+
+Cell[BoxData["hessian = CD[-a][CD[-b][phi[]]];"],"Input",CellTags->"hessian"]
 },Open]],
 
 Cell[CellGroupData[{
@@ -84,7 +104,15 @@ Cell[TextData[{"Pass the tensor head ",StyleBox["phi",FontFamily->"Courier",Font
 
 Cell[BoxData["RegisterTheory[\"Field\", phi, Sector -> \"Matter\"];"],"Input",CellTags->"register_field"],
 
+Cell[TextData[{"Register the perturbation tensor h like any other field. xPlorer detects its native metric-perturbation relation and copies it with each geometry.\n\nUse the plural ",StyleBox["Fields",FontFamily->"Courier",FontSize->14]," form to register the two test fields in a named sector."}],"Text"],
+
+Cell[BoxData["RegisterTheory[\"Field\", h, Sector -> \"Perturbations\"];"],"Input",CellTags->"register_h"],
+
+Cell[BoxData["RegisterTheory[\"Fields\", {{A, Sector -> \"TestFields\"}, {F, Sector -> \"TestFields\"}}];"],"Input",CellTags->"fields"],
+
 Cell[BoxData["RegisterTheory[\"Parameter\", m, Name -> \"Mass\", Sector -> \"Matter\"];"],"Input",CellTags->"register_parameter"],
+
+Cell[BoxData["RegisterTheory[\"Parameter\", kap, Name -> \"Coupling\", Sector -> \"Gravity\"];"],"Input",CellTags->"register_kap"],
 
 Cell[TextData[{"Register one Lagrangian with ",StyleBox["Lagrangian",FontFamily->"Courier",FontSize->14],", or several at once with ",StyleBox["Lagrangians",FontFamily->"Courier",FontSize->14],".\n\nBelow we store the kinetic term individually, then the mass term and the total together. These are separate named formulas; xPlorer does not add them automatically."}],"Text"],
 
@@ -92,17 +120,23 @@ Cell[BoxData["RegisterTheory[\"Lagrangian\", \"Kinetic\" -> Lkin, Sector -> \"Ma
 
 Cell[BoxData["RegisterTheory[\"Lagrangians\", {{\"MassTerm\" -> Lmass, Sector -> \"Matter\"}, {\"Matter\" -> L, Sector -> \"Matter\"}}];"],"Input",CellTags->"register_lag"],
 
-Cell[TextData[{"Equations and other formulas belong to the separate ",StyleBox["Expressions",FontFamily->"Courier",FontSize->14]," collection.\n\nThe keys ",StyleBox["KG",FontFamily->"Courier",FontSize->14],", ",StyleBox["Hessian",FontFamily->"Courier",FontSize->14]," and ",StyleBox["Eab",FontFamily->"Courier",FontSize->14]," identify the entries. Their Mathematica variable names determine the suffixed aliases."}],"Text"],
+Cell[BoxData["RegisterTheory[\"Lagrangians\", {{\"EinsteinHilbert\" -> Lgrav, Sector -> \"Gravity\"}, {\"Total\" -> Ltotal, Sector -> \"Gravity\"}}];"],"Input",CellTags->"register_gravity"],
 
-Cell[BoxData["RegisterTheory[\"Expressions\", {{\"KG\" -> kg, Sector -> \"Matter\"}, {\"Hessian\" -> hessian, Sector -> \"Matter\"}, {\"Eab\" -> Eab, Sector -> \"Matter\"}}];"],"Input",CellTags->"register_expr"],
+Cell[TextData[{"The ",StyleBox["Expressions",FontFamily->"Courier",FontSize->14]," collection stores the scalar equation, stress tensor, Hessian and Einstein equation separately from the Lagrangians.\n\nTheir lookup keys and their source variable names have different roles: the latter determine the automatically generated aliases."}],"Text"],
 
-Cell[BoxData["RegisterTheory[\"Title\", \"Massive scalar field\"];"],"Input",CellTags->"register_title"],
+Cell[BoxData["RegisterTheory[\"Expressions\", {{\"KG\" -> kg, Sector -> \"Matter\"}, {\"Hessian\" -> hessian, Sector -> \"Matter\"}, {\"Stress\" -> stress, Sector -> \"Matter\"}, {\"Eab\" -> Eab, Sector -> \"Gravity\"}}];"],"Input",CellTags->"register_expr"],
+
+Cell[BoxData["RegisterTheory[\"Title\", \"Einstein gravity with scalar matter\"];"],"Input",CellTags->"register_title"],
 
 Cell[TextData[{StyleBox["ShowTheory",FontFamily->"Courier",FontSize->14]," displays the registered geometry, fields and formulas.\n\nUse ",StyleBox["TheoryValue",FontFamily->"Courier",FontSize->14]," to retrieve a particular formula as a mathematical expression."}],"Text"],
 
 Cell[BoxData["ShowTheory[]"],"Input",CellTags->"show_theory"],
 
-Cell[BoxData["TheoryValue[\"Lagrangians\", \"Matter\"]"],"Input",CellTags->"registry_formula"]
+Cell[BoxData["TheoryValue[\"Lagrangians\", \"Matter\"]"],"Input",CellTags->"registry_formula"],
+
+Cell[TextData[{"Retrieve all objects registered in the Gravity sector without searching the other collections."}],"Text"],
+
+Cell[BoxData["TheorySector[\"Gravity\"]"],"Input",CellTags->"gravity_sector"]
 },Open]]
 },Closed]],
 
@@ -128,7 +162,7 @@ Cell[BoxData["kgM == 0"],"Input",CellTags->"kg_m_abstract"],
 
 Cell[BoxData["kgSchw == 0"],"Input",CellTags->"abstract_copies"],
 
-Cell[TextData[{"The source variable ",StyleBox["Eab",FontFamily->"Courier",FontSize->14]," gives the aliases ",StyleBox["EabM",FontFamily->"Courier",FontSize->14]," and ",StyleBox["EabSchw",FontFamily->"Courier",FontSize->14],".\n\nIf an alias is unknown or occupied, retrieve the formula by its key using ",StyleBox["BackgroundExpression",FontFamily->"Courier",FontSize->14],"."}],"Text"],
+Cell[TextData[{"The source variable ",StyleBox["Eab",FontFamily->"Courier",FontSize->14]," gives the aliases ",StyleBox["EabM",FontFamily->"Courier",FontSize->14]," and ",StyleBox["EabSchw",FontFamily->"Courier",FontSize->14],". These contain the copied curvature and matter tensors.\n\nUse ",StyleBox["BackgroundExpression",FontFamily->"Courier",FontSize->14]," to retrieve a formula by its key, independently of its alias."}],"Text"],
 
 Cell[BoxData["EabM"],"Input",CellTags->"rank_two_m"],
 
@@ -142,7 +176,7 @@ Cell[BoxData["gSchw[aSchw,cSchw] EabSchw // ContractMetric // ToCanonical"],"Inp
 Cell[CellGroupData[{
 Cell["Change notation when reading full expressions","Subsection"],
 
-Cell[TextData[{"In a longer expression such as Eab, postfix derivatives can make the notation more compact.\n\n",StyleBox["PrettyExp",FontFamily->"Courier",FontSize->14]," changes only the displayed expression. ",StyleBox["Normal",FontFamily->"Courier",FontSize->14]," recovers the original mathematical result."}],"Text"],
+Cell[TextData[{"The Einstein equation combines curvature, the metric and derivatives of matter. Postfix derivative notation can make its longer terms easier to read.\n\n",StyleBox["PrettyExp",FontFamily->"Courier",FontSize->14]," changes only the presentation. ",StyleBox["Normal",FontFamily->"Courier",FontSize->14]," recovers the original mathematical result."}],"Text"],
 
 Cell[BoxData["EabSchw // PrettyExp[CovariantStyle -> \"Postfix\"]"],"Input",CellTags->"postfix_view"],
 
@@ -191,7 +225,7 @@ Cell[BoxData["SetRuleGroup[\"Schwarzschild\", \"Massless\", {m -> 0}];"],"Input"
 Cell[CellGroupData[{
 Cell["3. Choose coordinates and calculate physical equations","Section"],
 
-Cell[TextData[{"To work with components, first define the coordinates with ",StyleBox["DefineChart",FontFamily->"Courier",FontSize->14]," and supply the metric with ",StyleBox["MetricInBasis",FontFamily->"Courier",FontSize->14],". The short metric syntax infers the primary chart.\n\nAssign the field using ",StyleBox["ComponentValue",FontFamily->"Courier",FontSize->14],", then apply ",StyleBox["ToComponents",FontFamily->"Courier",FontSize->14]," to the abstract expression. xPlorer uses the native xCoba machinery without requiring manual basis conversions.\n\nThe result is an ordinary scalar, vector or matrix that can be used in further calculations."}],"Text"],
+Cell[TextData[{"To work with components, first define the coordinates with ",StyleBox["DefineChart",FontFamily->"Courier",FontSize->14]," and supply the metric with ",StyleBox["MetricInBasis",FontFamily->"Courier",FontSize->14],". The short metric syntax infers the primary chart.\n\nAssign fields with ",StyleBox["ComponentValue",FontFamily->"Courier",FontSize->14]," or ",StyleBox["AllComponentValues",FontFamily->"Courier",FontSize->14],", then apply ",StyleBox["ToComponents",FontFamily->"Courier",FontSize->14],". xPlorer uses native xCoba without manual basis conversions.\n\nThe scalar profiles in this section are trial fields on prescribed geometries, not asserted to solve the coupled Einstein-scalar system."}],"Text"],
 
 Cell[CellGroupData[{
 Cell["Minkowski: a general field and a plane-wave solution","Subsection"],
@@ -228,7 +262,31 @@ Cell[BoxData["ComponentValue[phiM[], Cos[w tM[] - k zM[]]];"],"Input",CellTags->
 
 Cell[BoxData["waveResidual = kgM // ToComponents"],"Input",CellTags->"wave_residual"],
 
-Cell[BoxData["Simplify[waveResidual, w^2 == k^2 + m^2]"],"Input",CellTags->"wave_solution"]
+Cell[BoxData["Simplify[waveResidual, w^2 == k^2 + m^2]"],"Input",CellTags->"wave_solution"],
+
+Cell[TextData[{"The same component workflow works for tensors. Supply the covector components in chart order. With lower abstract indices, ",StyleBox["AllComponentValues",FontFamily->"Courier",FontSize->14]," infers the primary chart."}],"Text"],
+
+Cell[BoxData["AllComponentValues[AM[-aM], {tM[],xM[],0,0}];"],"Input",CellTags->"assign_a"],
+
+Cell[BoxData["AM[aM] // ToComponents // MatrixForm"],"Input",CellTags->"raised"],
+
+Cell[BoxData["AM[aM] AM[-aM] // ToComponents"],"Input",CellTags->"norm"],
+
+Cell[TextData[{"For the independent two-form, use symbolic electric and magnetic amplitudes and an antisymmetric component matrix."}],"Text"],
+
+Cell[BoxData["DefConstantSymbol[ef, PrintAs -> \"E\"];"],"Input",CellTags->"electric"],
+
+Cell[BoxData["DefConstantSymbol[bf, PrintAs -> \"B\"];"],"Input",CellTags->"magnetic"],
+
+Cell[BoxData["AllComponentValues[FM[-aM,-bM], {{0,ef,0,0},{-ef,0,0,0},{0,0,0,bf},{0,0,-bf,0}}];"],"Input",CellTags->"full_f"],
+
+Cell[BoxData["FM[aM,bM] // ToComponents // MatrixForm"],"Input",CellTags->"raised_f"],
+
+Cell[BoxData["FM[aM,bM] FM[-aM,-bM] // ToComponents"],"Input",CellTags->"invariant_f"],
+
+Cell[TextData[{"The invariant is 2(B^2-E^2) for our signature. ",StyleBox["ToCTensor",FontFamily->"Courier",FontSize->14]," instead returns a native xCoba snapshot with its basis."}],"Text"],
+
+Cell[BoxData["AM[aM] // ToCTensor"],"Input",CellTags->"ctensor"]
 },Open]],
 
 Cell[CellGroupData[{
@@ -310,15 +368,21 @@ Cell[TextData[{"The expanding geometry produces the Hubble friction term in the 
 
 Cell[BoxData["Einstein[CDFLRW][-aFLRW,-bFLRW] // ToComponents // MatrixForm"],"Input",CellTags->"einstein_f"],
 
-Cell[TextData[{"Construct the scalar stress-energy tensor on the source manifold. ",StyleBox["ReplaceDummies",FontFamily->"Courier",FontSize->14]," prevents collisions with the free indices.\n\n",StyleBox["PortExpression",FontFamily->"Courier",FontSize->14]," transfers the full formula to FLRW without requiring another registration."}],"Text"],
+Cell[TextData[{"The registered stress tensor already has a FLRW alias. Evaluate the energy density directly from this copied expression."}],"Text"],
 
-Cell[BoxData["stress = CD[-a][phi[]] CD[-b][phi[]] + g[-a,-b] ReplaceDummies[L];"],"Input",CellTags->"stress"],
-
-Cell[BoxData["stressFLRW = PortExpression[\"FLRW\", stress]"],"Input",CellTags->"stress_f"],
+Cell[BoxData["stressFLRW"],"Input",CellTags->"stress_f"],
 
 Cell[TextData[{"Use ",StyleBox["Components",FontFamily->"Courier",FontSize->14]," to request only the time-time entry. xCoba numbers the coordinates from zero.\n\nThe result is a list of the requested entries; ",StyleBox["First",FontFamily->"Courier",FontSize->14]," extracts the single scalar energy density."}],"Text"],
 
 Cell[BoxData["rhoFLRW = First[stressFLRW // ToComponents[Components -> {{0,0}}]]"],"Input",CellTags->"rho"],
+
+Cell[TextData[{"The time-time component of the Einstein equation is the Friedmann constraint for a homogeneous scalar. Evaluating it does not solve the background equations automatically."}],"Text"],
+
+Cell[BoxData["First[EabFLRW // ToComponents[FreeIndices -> {-aFLRW,-bFLRW}, Components -> {{0,0}}]] == 0"],"Input",CellTags->"friedmann"],
+
+Cell[TextData[{"For a new observable that was not registered, use ",StyleBox["PortExpression",FontFamily->"Courier",FontSize->14],". Here we transport the scalar trace of the stress tensor and evaluate it on FLRW."}],"Text"],
+
+Cell[BoxData["PortExpression[\"FLRW\", g[a,b] stress] // ToComponents"],"Input",CellTags->"trace_stress"],
 
 Cell[TextData[{"A caption keeps the origin of the energy density clear when reusing it elsewhere in the notebook.\n\n",StyleBox["ExpressionText",FontFamily->"Courier",FontSize->14]," exports the mathematical notation of a result to LaTeX."}],"Text"],
 
@@ -329,33 +393,75 @@ Cell[BoxData["ExpressionText[eqS == 0, \"TeX\"]"],"Input",CellTags->"tex_export"
 },Closed]],
 
 Cell[CellGroupData[{
-Cell["4. Metric perturbations on an existing background","Section"],
+Cell["4. Metric perturbations across spacetimes","Section"],
 
-Cell[TextData[{"Define a metric perturbation using native xPert and register it with xPlorer.\n\n",StyleBox["AddField",FontFamily->"Courier",FontSize->14]," attaches it to the existing Minkowski background, without reconstructing the geometry. ",StyleBox["PerturbOn",FontFamily->"Courier",FontSize->14]," expands the variation on that background."}],"Text"],
+Cell[TextData[{"We now compare the same transverse, traceless metric perturbation on Minkowski and spatially flat FLRW. The perturbation tensors were registered before creating the backgrounds.\n\nFor a wave traveling in the z direction, choose the plus polarization: the xx and yy perturbations have opposite signs. On FLRW their covariant components include the square of the scale factor."}],"Text"],
 
-Cell[BoxData["DefMetricPerturbation[g,h,eps];"],"Input",CellTags->"def_h"],
+Cell[CellGroupData[{
+Cell["First-order tensor waves","Subsection"],
 
-Cell[BoxData["RegisterTheory[\"Field\",h,Sector -> \"Perturbations\"];"],"Input",CellTags->"register_h"],
+Cell[TextData[{"",StyleBox["PerturbOn[1]",FontFamily->"Courier",FontSize->14]," computes the first variation using native xPert. The expression can be a copied tensor or a registered formula. We use the mixed Einstein tensor because the mixed spatial stress of homogeneous scalar matter has no tensor anisotropic part.\n\nThese are the vacuum tensor equation on Minkowski and the unsourced tensor sector on an on-shell FLRW background; the trial scalar profiles above need not themselves satisfy the background equations."}],"Text"],
 
-Cell[BoxData["AddField[\"Minkowski\",h];"],"Input",CellTags->"add_h"],
+Cell[BoxData["dGM = Einstein[CDM][aM,-bM] // PerturbOn[1]"],"Input",CellTags->"wave_abstract_m"],
 
-Cell[TextData[{"The second variation of the inverse metric contains products of first-order perturbations as well as a second-order perturbation."}],"Text"],
+Cell[BoxData["dGF = Einstein[CDFLRW][aFLRW,-bFLRW] // PerturbOn[1]"],"Input",CellTags->"wave_abstract_f"],
 
-Cell[BoxData["delta2 = gM[aM,bM] // PerturbOn[2]"],"Input",CellTags->"delta2"],
+Cell[TextData[{"The expressions have identical abstract structure but use independent metrics, perturbations and derivatives. For this longer expression, use one background caption instead of repeated object labels."}],"Text"],
 
-Cell[TextData[{"Choose g_xx = 1 + eps t^2, leaving the other metric components unchanged.\n\n",StyleBox["LI[1]",FontFamily->"Courier",FontSize->14]," and ",StyleBox["LI[2]",FontFamily->"Courier",FontSize->14]," select the perturbation orders. Supply both component matrices, then calculate the second inverse variation."}],"Text"],
+Cell[BoxData["PrettyExp[\"FLRW\", dGF, CovariantStyle -> \"Native\", ShowObjectLabels -> False, ShowBackgroundLabel -> True]"],"Input",CellTags->"wave_pretty"],
 
-Cell[BoxData["AllComponentValues[hM[LI[1],-aM,-bM], DiagonalMatrix[{0,tM[]^2,0,0}]];"],"Input",CellTags->"assign_h1"],
+Cell[TextData[{"Assign the tensor profile. ",StyleBox["LI[1]",FontFamily->"Courier",FontSize->14]," labels the first variation, not a component index. The primary metric matrices from section 3 are unchanged."}],"Text"],
+
+Cell[BoxData["DefScalarFunction[gam, PrintAs -> \"\\[Gamma]\"];"],"Input",CellTags->"gamma_fn"],
+
+Cell[BoxData["AllComponentValues[hM[LI[1],-aM,-bM], DiagonalMatrix[{0,gam[tM[],zM[]],-gam[tM[],zM[]],0}]];"],"Input",CellTags->"assign_h1"],
+
+Cell[BoxData["AllComponentValues[hFLRW[LI[1],-aFLRW,-bFLRW], s[tFLRW[]]^2 DiagonalMatrix[{0,gam[tFLRW[],zFLRW[]],-gam[tFLRW[],zFLRW[]],0}]];"],"Input",CellTags->"assign_h1_f"],
+
+Cell[TextData[{"Extract the mixed xx entry, with ",StyleBox["FreeIndices",FontFamily->"Courier",FontSize->14]," fixing the row and column order. Multiply by two to write the standard wave equation. Requesting only the needed component avoids producing an entire array."}],"Text"],
+
+Cell[BoxData["gwM = 2 First[dGM // ToComponents[FreeIndices -> {aM,-bM}, Components -> {{1,1}}]]"],"Input",CellTags->"gw_m"],
+
+Cell[BoxData["gwM == 0"],"Input",CellTags->"gw_m_eq"],
+
+Cell[BoxData["gwF = 2 First[dGF // ToComponents[FreeIndices -> {aFLRW,-bFLRW}, Components -> {{1,1}}]]"],"Input",CellTags->"gw_f"],
+
+Cell[BoxData["gwF == 0"],"Input",CellTags->"gw_f_eq"],
+
+Cell[TextData[{"The FLRW equation contains the expansion term 3 (s'/s) gamma_t and the spatial derivative divided by s^2. The Minkowski equation has neither modification.\n\nBoth were obtained from the same abstract operation, with independent component inputs."}],"Text"]
+},Open]],
+
+Cell[CellGroupData[{
+Cell["Second order and a quadratic wave source","Subsection"],
+
+Cell[TextData[{"A second variation is not the coefficient of eps^2: the Taylor coefficient is half the second variation.\n\nSet the independent second-order covariant metric perturbation to zero to isolate terms quadratic in the first-order wave. The inverse metric still acquires a second-order correction."}],"Text"],
 
 Cell[BoxData["AllComponentValues[hM[LI[2],-aM,-bM], ConstantArray[0,{4,4}]];"],"Input",CellTags->"assign_h2"],
+
+Cell[BoxData["delta2 = gM[aM,bM] // PerturbOn[2]"],"Input",CellTags->"delta2"],
 
 Cell[BoxData["delta2G = delta2 // ToComponents;"],"Input",CellTags->"d2g"],
 
 Cell[BoxData["delta2G // MatrixForm"],"Input",CellTags->"d2g_view"],
 
-Cell[TextData[{"The xx entry of the second inverse variation is 2 t^4.\n\nThe second-order Taylor coefficient is half this variation. Request that form explicitly when constructing a series."}],"Text"],
+Cell[BoxData["gM[aM,bM] // PerturbOn[2, PerturbationForm -> \"TaylorCoefficient\"] // ToComponents // MatrixForm"],"Input",CellTags->"taylor"],
 
-Cell[BoxData["gM[aM,bM] // PerturbOn[2, PerturbationForm -> \"TaylorCoefficient\"] // ToComponents // MatrixForm"],"Input",CellTags->"taylor"]
+Cell[TextData[{"In the short-wavelength, transverse-traceless approximation, the effective gravitational-wave stress tensor on a vacuum background is obtained by averaging the derivative bilinear below, with prefactor 1/(4 kappa).\n\nBuild the unaveraged expression from native copied tensors, then extract its energy-density component. This illustrates a quadratic source for backreaction, not the full second-order Einstein equation."}],"Text"],
+
+Cell[BoxData["waveSource = CDM[-aM][hM[LI[1],-cM,-dM]] CDM[-bM][hM[LI[1],cM,dM]]/(4 kap)"],"Input",CellTags->"gw_quadratic"],
+
+Cell[BoxData["gwEnergy = First[waveSource // ToComponents[FreeIndices -> {-aM,-bM}, Components -> {{0,0}}]]"],"Input",CellTags->"gw_energy"],
+
+Cell[TextData[{"For a monochromatic Minkowski wave gamma = amp Cos[w (t-z)], the phase average of Sin^2 is 1/2. Evaluate that average using the already calculated derivative expression."}],"Text"],
+
+Cell[BoxData["DefConstantSymbol[amp];"],"Input",CellTags->"gw_amp"],
+
+Cell[BoxData["gwModeEnergy = gwEnergy /. Derivative[1,0][gam][tM[],zM[]] -> -amp w Sin[w (tM[]-zM[])]"],"Input",CellTags->"gw_energy_mode"],
+
+Cell[BoxData["gwModeEnergy /. Sin[w (tM[]-zM[])]^2 -> 1/2"],"Input",CellTags->"gw_average"],
+
+Cell[TextData[{"The averaged density is amp^2 w^2/(4 kappa). A self-consistent backreaction calculation would also require second-order field equations, gauge choices and appropriate averaging; xPlorer does not impose these automatically."}],"Text"]
+},Open]]
 },Closed]],
 
 Cell[CellGroupData[{
@@ -402,54 +508,14 @@ Cell[TextData[{StyleBox["FreeIndices",FontFamily->"Courier",FontSize->14]," fixe
 
 Cell[BoxData["ActivateProfile[\"Minkowski\", \"PlaneWave\"];"],"Input",CellTags->"restore_wave"],
 
-Cell[BoxData["Simplify[(kgM // ToComponents)-waveResidual]"],"Input",CellTags->"wave_again"]
-},Open]]
-},Closed]],
+Cell[BoxData["Simplify[(kgM // ToComponents)-waveResidual]"],"Input",CellTags->"wave_again"],
 
-Cell[CellGroupData[{
-Cell["6. Extend the study with vector and tensor fields","Section"],
-
-Cell[TextData[{"Define a native covector and an antisymmetric two-form, register both and add them to the existing Minkowski background.\n\nThese are independent field inputs; we do not impose F = dA."}],"Text"],
-
-Cell[BoxData["DefTensor[A[-a], M];"],"Input",CellTags->"vector"],
-
-Cell[BoxData["DefTensor[F[-a,-b], M, Antisymmetric[{-a,-b}]];"],"Input",CellTags->"twoform"],
-
-Cell[BoxData["RegisterTheory[\"Fields\", {A,F}];"],"Input",CellTags->"fields"],
-
-Cell[BoxData["AddField[\"Minkowski\", A];"],"Input",CellTags->"add_a"],
-
-Cell[BoxData["AddField[\"Minkowski\", F];"],"Input",CellTags->"add_f"],
-
-Cell[TextData[{StyleBox["AllComponentValues",FontFamily->"Courier",FontSize->14]," assigns the full array of covariant components. With abstract lower indices, xPlorer infers the primary chart.\n\nUse the existing metric to raise the covector index and evaluate its invariant norm."}],"Text"],
-
-Cell[BoxData["AllComponentValues[AM[-aM], {tM[],xM[],0,0}];"],"Input",CellTags->"assign_a"],
-
-Cell[BoxData["AM[aM] // ToComponents // MatrixForm"],"Input",CellTags->"raised"],
-
-Cell[BoxData["AM[aM] AM[-aM] // ToComponents"],"Input",CellTags->"norm"],
-
-Cell[TextData[{StyleBox["ToCTensor",FontFamily->"Courier",FontSize->14]," returns a native xCoba snapshot, including the signed basis of its tensor slots."}],"Text"],
-
-Cell[BoxData["AM[aM] // ToCTensor"],"Input",CellTags->"ctensor"],
-
-Cell[TextData[{"Consider a two-form with electric and magnetic components of symbolic amplitudes E and B.\n\nThe antisymmetric matrix is supplied in chart order (t,x,y,z). Raising both indices uses the existing Minkowski metric."}],"Text"],
-
-Cell[BoxData["DefConstantSymbol[ef, PrintAs -> \"E\"];"],"Input",CellTags->"electric"],
-
-Cell[BoxData["DefConstantSymbol[bf, PrintAs -> \"B\"];"],"Input",CellTags->"magnetic"],
-
-Cell[BoxData["AllComponentValues[FM[-aM,-bM], {{0,ef,0,0},{-ef,0,0,0},{0,0,0,bf},{0,0,-bf,0}}];"],"Input",CellTags->"full_f"],
-
-Cell[BoxData["FM[aM,bM] // ToComponents // MatrixForm"],"Input",CellTags->"raised_f"],
-
-Cell[BoxData["FM[aM,bM] FM[-aM,-bM] // ToComponents"],"Input",CellTags->"invariant_f"],
-
-Cell[TextData[{"With signature (-,+,+,+), the invariant is 2(B^2-E^2).\n\nThe three geometries remain open in the same kernel."}],"Text"],
+Cell[TextData[{"The three independent geometries, their field values and perturbation tensors remain available in the same kernel."}],"Text"],
 
 Cell[BoxData["ShowBackground[]"],"Input",CellTags->"models_final"],
 
-Cell[TextData[{"The separate API Examples notebook covers sparse tensor inputs, independent connections, stored results, reconstruction and deletion."}],"Text"]
+Cell[TextData[{"For independent affine connections, additional presentation options, sparse tensor assignments and lifecycle operations, see the API Examples notebook."}],"Text"]
+},Open]]
 },Closed]]
 },PageWidth->WindowWidth,WindowTitle->"xPlorer - Research workflow",StyleDefinitions->Notebook[{
  Cell[StyleData[StyleDefinitions -> "Default.nb"]],
