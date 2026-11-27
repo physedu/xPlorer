@@ -5,7 +5,7 @@ RegisterTheory["Metric",g];RegisterTheory["CovD",CD];RegisterTheory["Indices",{a
 CreateBackground["N"];DefineChart["N",{"t","x","y","z"}];ch=ChartOf["N"];t=CoordinatesOf["N"][[1]][];
 mat={{-1,0,0,0},{0,2 Exp[2 t],Exp[2 t],0},{0,Exp[2 t],2 Exp[2 t],0},{0,0,0,Exp[2 t]}};
 MetricInBasis[gN,mat];ComponentValue[TN[{0,-ch},{1,-ch},{2,-ch},{3,-ch}],7];
-rev=ShowBackground["N"]["DataRevision"];calls=0;traceCalls=0;
+rev=BackgroundValue["N"]["DataRevision"];calls=0;traceCalls=0;
 Internal`InheritedBlock[{ChangeComponents,xPlorer`Private`traceValues},Unprotect[ChangeComponents];
  ChangeComponents[f_,i_] /; !TrueQ[countingCC] := Block[{countingCC=True},calls++;ChangeComponents[f,i]];
  Protect[ChangeComponents];
@@ -15,7 +15,7 @@ Internal`InheritedBlock[{ChangeComponents,xPlorer`Private`traceValues},Unprotect
  r2=ToValues[TN[{0,ch},{1,-ch},{2,-ch},{3,-ch}]];after=TensorValues[TN,{{ch,-ch,-ch,-ch}}]];
 checks=<|"Sparse rank-four result"->(r1===-7&&r2===-7),"Only one derived rule"->(Length[Last[before]]===1),
  "No native full conversion"->(calls===0),"Repeated query does not trace"->(firstTraces>0&&traceCalls===firstTraces&&before===after),
- "No physical revision"->(ShowBackground["N"]["DataRevision"]===rev)|>;
+ "No physical revision"->(BackgroundValue["N"]["DataRevision"]===rev)|>;
 unknown=TN[{0,-ch},{0,-ch},{2,-ch},{3,-ch}];
 checks["Unknown source remains symbolic"]=ToValues[TN[{0,ch},{0,-ch},{2,-ch},{3,-ch}]]===-unknown;
 checks["Two changed slots"]=Simplify[ToValues[TN[{0,ch},{1,-ch},{2,-ch},{3,ch}]]+7 Exp[-2 t]]===0;
@@ -25,8 +25,8 @@ ComponentValue[SN[{0,-ch},{2,-ch}],8];
 checks["Sparse update resolves prior symbolic derived rule"]=Simplify[ToValues[SN[{1,ch},{0,-ch}]]]===0;
 checks["ToComponents sparse selected symmetry"]=ToComponents["N",S[-a,-b],Components->{{1,0}}]==={-4};
 checks["ToComponents sparse full symmetry"]=ToComponents["N",S[-a,-b]][[2,1]]===-4;
-ComponentValue[VN[{0,-ch},{1,ch}],3];rev=ShowBackground["N"]["DataRevision"];
-checks["Symmetry-equivalent variance uses source group"]=ToValues[VN[{1,ch},{0,-ch}]]===3&&Length[TensorValIDs[VN]]===1&&ShowBackground["N"]["DataRevision"]===rev;
+ComponentValue[VN[{0,-ch},{1,ch}],3];rev=BackgroundValue["N"]["DataRevision"];
+checks["Symmetry-equivalent variance uses source group"]=ToValues[VN[{1,ch},{0,-ch}]]===3&&Length[TensorValIDs[VN]]===1&&BackgroundValue["N"]["DataRevision"]===rev;
 ComponentValue[hN[LI[2],{0,-ch},{0,-ch}],5];ComponentValue[hN[LI[1],{0,-ch},{0,-ch}],6];
 checks["Perturbative selected orders independent"]=ToValues[hN[LI[2],{0,ch},{0,ch}]]===5&&ToValues[hN[LI[1],{0,ch},{0,ch}]]===6;
 AllComponentValues[UN[-aN,-bN,-cN,-dN],ConstantArray[2,{4,4,4,4}]];calls=0;
