@@ -78,12 +78,12 @@ $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
 $XPlorerVersion = "14.0.0-beta.13-dev.33";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
-SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
+SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. ShowObjectLabels -> True or False overrides visibility for one owned head; Automatic restores inheritance. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
 PresentationOf::usage = "PresentationOf[tag] reports current labels and their defaults.";
 SetXPlorerPreferences::usage = "SetXPlorerPreferences[PartialStyle -> style] sets the session output style. Label rules set defaults for future backgrounds. SetXPlorerPreferences[] resets the session preferences.";
 BackgroundObject::usage = "BackgroundObject[tag, key] returns a field, connection or geometry head. BackgroundObject[tag, key, connection] retrieves geometry of a named connection.";
 
-SetNotation::usage = "SetNotation[tag, option -> value, ...] sets background display defaults; no mathematical data changes.";
+SetNotation::usage = "SetNotation[tag, option -> value, ...] sets background display defaults. SetNotation[tag, chartName, ShowObjectLabels -> value, BackgroundLabel -> label] sets chart label overrides. Automatic restores inheritance; no mathematical data changes.";
 PartialStyle::usage = "PartialStyle chooses Native, MultiIndex, Fraction, Partial, Comma or Prime (one argument) for notebook output and explicit views.";
 CovariantStyle::usage = "CovariantStyle chooses Native, Prefix, or Postfix in PrettyExp.";
 ShowBackgroundLabel::usage = "ShowBackgroundLabel adds a caption to an expression view.";
@@ -582,7 +582,7 @@ installChartAliases[tag_,chart_,coords_,labels_,base_] := Module[{b=$BG[tag],hea
  put[tag,<|"ObjectAliases"->Join[Lookup[b,"ObjectAliases",<||>],entries]|>];Null
 ];
 Options[DefineChart]={ShowObjectLabels->Automatic,BackgroundLabel->Automatic};
-chartNotationOptions[opts_] := Select[Association[(SymbolName[First[#]]->Last[#])& /@ opts],#=!=Automatic&];
+chartNotationOptions[opts_] := Module[{keys=First /@ opts},If[Complement[keys,{ShowObjectLabels,BackgroundLabel}]=!={},Return[$Failed]];Select[Association[(SymbolName[First[#]]->Last[#])& /@ opts],#=!=Automatic&]];
 DefineChart[tag_String, declarations_List,opts:OptionsPattern[]] := Module[{b = background[tag], chart, coords, result,names=coordinateLabels[declarations],nativeQ=AllTrue[declarations,coordinateDeclarationQ],notation=chartNotationOptions[{opts}]},
   If[!validNotation[notation],Return[failure["Notation","Invalid chart notation options."]]];
   If[FailureQ[b], Return[b]];
@@ -2482,6 +2482,14 @@ RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,c
 
 (* Public convenience forms accept source symbols and owned copied symbols. *)
 SetNotation[tag_String,rules__Rule] := SetNotation[tag,Association[(If[Head[First[#]]===Symbol,SymbolName[First[#]],First[#]] -> Last[#])& /@ {rules}]];
+SetNotation[tag_String,chart_String,rules__Rule] := Module[{b=background[tag],old,new},
+ If[FailureQ[b],Return[b]];
+ If[!(chart==="Primary"&&KeyExistsQ[b,"Chart"])&&!KeyExistsQ[Lookup[b,"AdditionalCharts",<||>],chart],Return[failure["Chart","Choose an existing primary or named chart."]]];
+ If[Complement[First /@ {rules},{ShowObjectLabels,BackgroundLabel}]=!={},Return[failure["Notation","Chart overrides support ShowObjectLabels and BackgroundLabel."]]];
+ old=Lookup[b,"ChartNotation",<||>];new=Select[Join[Lookup[old,chart,<||>],Association[(SymbolName[First[#]]->Last[#])& /@ {rules}]],#=!=Automatic&];
+ If[!validNotation[new],Return[failure["Notation","Invalid chart notation setting."]]];
+ put[tag,<|"ChartNotation"->Append[old,chart->new]|>];new
+];
 SetXPlorerPreferences[rules__Rule] := SetXPlorerPreferences[Association[(If[Head[First[#]]===Symbol,SymbolName[First[#]],First[#]] -> Last[#])& /@ {rules}]];
 SetXPlorerPreferences[] := SetXPlorerPreferences[Association[]];
 connectionKey[b_Association,selector_] := Module[{keys},
