@@ -226,13 +226,9 @@ Cell["Components -> {{0,0}} requests only the time-time entry. The result is a l
 
 Cell[BoxData["rhoFLRW = First[stressFLRW // ToComponents[Components -> {{0,0}}]]"],"Input",CellTags->"rho"],
 
-Cell["The same abstract equation now gives three physically different equations. ShowBackgroundLabel adds the study name to the output, which is useful when comparing saved component equations away from their original sections. ShowObjectLabels instead marks individual owned objects, and BackgroundLabel sets their short visual label. The original equations remain unchanged.","Text"],
+Cell["The three component equations above are different because the geometry and field profiles are different. To keep a result identifiable when copying it into another part of the notebook, use ShowBackgroundLabel on the expression itself.","Text"],
 
-Cell[BoxData["PrettyExp[\"Minkowski\", eqM == 0, ShowBackgroundLabel -> True]"],"Input",CellTags->"component_compare"],
-
-Cell[BoxData["PrettyExp[\"Schwarzschild\", eqS == 0, ShowBackgroundLabel -> True, PartialStyle -> \"Prime\"]"],"Input",CellTags->"component_compare_s"],
-
-Cell[BoxData["PrettyExp[\"FLRW\", eqF == 0, ShowBackgroundLabel -> True]"],"Input",CellTags->"component_compare_f"]
+Cell[BoxData["PrettyExp[\"Schwarzschild\", eqS == 0, ShowBackgroundLabel -> True, PartialStyle -> \"Prime\"]"],"Input",CellTags->"component_compare_s"]
 },Closed]]
 },Closed]],
 
@@ -302,13 +298,13 @@ Cell[BoxData["gM[-aM,-bM] // ToComponents[OutputChart -> \"Cylindrical\"] // Mat
 
 Cell[BoxData["phiM[] // ToComponents[OutputChart -> \"Cylindrical\"]"],"Input",CellTags->"profile_c"],
 
-Cell["The Cartesian and cylindrical coordinate systems coexist on Minkowski. Turn on their object labels with SetNotation for this study; the short M and C markers are independent of typed names such as rCylindricalM. Evaluate the field in each chart separately. PrettyExp uses the resolved labels even when the result contains only coordinates. Automatic removes a local override.","Text"],
+Cell["The Cartesian and cylindrical coordinate systems coexist on Minkowski. Turn on their object labels with SetNotation for this study; the short M and C markers are independent of typed names such as rCylindricalM. Evaluate the field in each chart separately. Ordinary output uses the resolved coordinate labels. Automatic removes a local override.","Text"],
 
 Cell[BoxData["SetNotation[\"Minkowski\", ShowObjectLabels -> True];"],"Input",CellTags->"chart_labels"],
 
-Cell[BoxData["phiM[] // ToComponents // PrettyExp"],"Input",CellTags->"chart_comparison"],
+Cell[BoxData["phiM[] // ToComponents"],"Input",CellTags->"chart_comparison"],
 
-Cell[BoxData["phiM[] // ToComponents[OutputChart -> \"Cylindrical\"] // PrettyExp"],"Input",CellTags->"chart_comparison_c"],
+Cell[BoxData["phiM[] // ToComponents[OutputChart -> \"Cylindrical\"]"],"Input",CellTags->"chart_comparison_c"],
 
 Cell[BoxData["SetNotation[\"Minkowski\", ShowObjectLabels -> Automatic];"],"Input",CellTags->"chart_labels_reset"],
 

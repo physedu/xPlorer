@@ -36,7 +36,7 @@ Block[{xAct`xPerm`$xpermQ=False,NotebookDirectory=Function[root]},
  "four independent studies"->Length[BackgroundValue[]]===4,
  "notation preserves math"->SameQ[Normal[outputs["partial_compare"]],eqM==0]&&SameQ[Normal[outputs["prime"]],eqS==0],
  "managed result invalidated"->TrueQ[outputs["saved_invalidated"]]&&SameQ[outputs["save_norm"],28],
- "component captions preserve math"->And[SameQ[Normal[outputs["component_compare"]],eqM==0],SameQ[Normal[outputs["component_compare_s"]],eqS==0],SameQ[Normal[outputs["component_compare_f"]],eqF==0]],
+ "caption preserves equation"->SameQ[Normal[outputs["component_compare_s"]],eqS==0],
  "visual inspection"->MatchQ[outputs["inspect_s"],_Column]&&MatchQ[outputs["models_final"],_Grid]
  |>;
 <|"Inputs"->Length[inputs],"Executed"->Length[outputs],"Warnings"->warnings,"UnexpectedFailures"->Keys@Select[outputs,!FreeQ[#,_Failure|$Failed|$Aborted]&],"Passed"->Count[Values[checks],True],"Total"->Length[checks],"FailedChecks"->Keys@Select[checks,!TrueQ[#]&]|>
