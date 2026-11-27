@@ -2597,11 +2597,7 @@ aboutXPlorerLines[] := Module[{separator=StringRepeat["-",60]},{
  "Package xPlorer` version "<>$XPlorerVersion,
  "Copyright (C) 2026 Eduardo Sanz-Romero (PhysEdu).",
  "Licensed under the GNU General Public License, version 3 or later.",
- separator,
- "A package for reusing abstract xAct theories on independent geometric",
- "backgrounds, transporting tensor expressions and computing components.",
- "Built on xTensor, xCoba and xPert.",
- "This software comes with ABSOLUTELY NO WARRANTY. See LICENSE for details.",
+ "https://github.com/physedu/xPlorer",
  separator
 }];
 AboutXPlorer[] := Column[aboutXPlorerLines[],Spacings->0.5];
