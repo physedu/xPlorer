@@ -728,7 +728,7 @@ Cell[BoxData[RowBox[{RowBox[{"DefConstantSymbol", "[", "omega", "]"}], ";"}]],"I
 
 Cell[BoxData[RowBox[{RowBox[{"DefConstantSymbol", "[", "k", "]"}], ";"}]],"Input",CellTags->"plane_wave_step_2"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{RowBox[{"phiM","[","]"}], ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"Cos", "[", RowBox[{RowBox[{"omega", " ", "t"}], "-", RowBox[{"k", " ", "z"}]}], "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"plane_wave_step_3"],
+Cell[BoxData["ComponentValue[phiM[], Cos[omega tM[] - k zM[]]];"],"Input",CellTags->"plane_wave_step_3"],
 
 Cell[BoxData[RowBox[{RowBox[{"waveResidual", "=", RowBox[{"scalarEqM", "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"plane_wave_step_4"],
 
@@ -808,7 +808,7 @@ Cell[BoxData[RowBox[{"gammaCyl", "\[LeftDoubleBracket]", RowBox[{"3", ",", "2", 
 
 Cell[TextData[{"Set \:03c6 = x\:00b2 + y\:00b2 in the primary chart. In cylindrical coordinates this is r\:00b2. Its angular Hessian component is 2r\:00b2 because the Levi-Civita connection acts on the gradient."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{RowBox[{"phiM","[","]"}], ",", RowBox[{SuperscriptBox[RowBox[{"xM","[","]"}], "2"], "+", SuperscriptBox[RowBox[{"yM","[","]"}], "2"]}]}], "]"}], ";"}]],"Input",CellTags->"two_hessian_charts_step_1"],
+Cell[BoxData["ComponentValue[phiM[], xM[]^2 + yM[]^2];"],"Input",CellTags->"two_hessian_charts_step_1"],
 
 Cell[BoxData[RowBox[{RowBox[{"phiCyl", "=", RowBox[{RowBox[{"phiM", "[", "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}]}], "]"}]}]}], ";"}]],"Input",CellTags->"two_hessian_charts_step_2"],
 
@@ -828,7 +828,7 @@ Cell[TextData[{"With ",StyleBox["ApplySpecialization -> False",FontFamily->"Cour
 
 Cell[BoxData[RowBox[{RowBox[{"eabCyl", "=", RowBox[{"EabM", "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "aM"}], ",", RowBox[{"-", "bM"}]}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"2", ",", "2"}], "}"}], "}"}]}], ",", RowBox[{"ApplySpecialization", "\[Rule]", "False"}]}], "]"}]}]}], ";"}]],"Input",CellTags->"general_cyl_equation_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"SetFieldComponents", "[", RowBox[{RowBox[{"phiM","[","]"}], ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "x", ",", "y", ",", "z"}], "}"}], ",", RowBox[{"Cos", "[", RowBox[{RowBox[{"omega", " ", "t"}], "-", RowBox[{"k", " ", "z"}]}], "]"}]}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"general_cyl_equation_step_2"],
+Cell[BoxData["ComponentValue[phiM[], Cos[omega tM[] - k zM[]]];"],"Input",CellTags->"general_cyl_equation_step_2"],
 
 Cell[BoxData["eabCyl"],"Input",CellTags->"general_cyl_equation"],
 
@@ -856,7 +856,7 @@ Cell[BoxData[RowBox[{RowBox[{"CreateBackground", "[", "\"MinkowskiFields\"", "]"
 
 Cell[BoxData["DefineChart[\"MinkowskiFields\", {t[], x[], y[], z[]}];"],"Input",CellTags->"field_background_step_2"],
 
-Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gMinkowskiFields", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"field_background"],
+Cell[BoxData["MetricInBasis[gMinkowskiFields, -chartMinkowskiFields, DiagonalMatrix[{-1, 1, 1, 1}]];"],"Input",CellTags->"field_background"],
 
 Cell["Native geometry can be computed explicitly with the chart basis, or read lazily through native component readers. Here the Cartesian Ricci scalar vanishes.","Text"],
 
@@ -891,6 +891,14 @@ Cell[BoxData["ctA = AMinkowskiFields[aMinkowskiFields] // ToCTensor"],"Input",Ce
 Cell[TextData[{"The contraction is \:22121 + 4 + 9 + 16 = 28. To retrieve the same covector with its abstract lower index, use ",StyleBox["PortExpression",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[BoxData[RowBox[{"PortExpression", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}]}], "]"}]],"Input",CellTags->"formal_vector"],
+
+Cell["A complete component array is not required for every field. Supply an independent component of the antisymmetric tensor F using native ComponentValue. Native symmetry determines its opposite slot; unrelated, unassigned entries remain symbolic, not zero. The complete array in the next example replaces this sparse input.","Text"],
+
+Cell[BoxData["ComponentValue[FMinkowskiFields[{1, -chartMinkowskiFields}, {0, -chartMinkowskiFields}], 3];"],"Input",CellTags->"dev31_sparse_input"],
+
+Cell[BoxData["ToValues[FMinkowskiFields[{0, -chartMinkowskiFields}, {1, -chartMinkowskiFields}]]"],"Input",CellTags->"dev31_sparse_antisym"],
+
+Cell[BoxData["ToValues[FMinkowskiFields[{0, -chartMinkowskiFields}, {2, -chartMinkowskiFields}]]"],"Input",CellTags->"dev31_sparse_unknown"],
 
 Cell[TextData[{"Assign matrices with the declared rank and symmetry. xPlorer checks both when it stores the components."}],"Text"],
 
