@@ -86,7 +86,7 @@ Module[{o=Global`$XPlorerWorkflowOutputs,sector},
  "Other profiles retained" -> SameQ[{ToComponents["Schwarzschild",phi[]],ToComponents["FLRW",phi[]]},{u[rSchw[]],q[tFLRW[]]}],
  "Source definitions retained" -> And[ManifoldQ[M],MetricQ[g],xTensorQ[phi],xTensorQ[S],xTensorQ[A]],
  "Source lagrangian retained" -> SameQ[TheoryValue["Lagrangians","Lagrangian"],lagrangian],
- "dev31 version" -> SameQ[o["workflow_version"],"14.0.0-beta.13-dev.34"],
+ "dev31 version" -> SameQ[o["workflow_version"],"14.0.0-beta.13-dev.35"],
  "dev31 native coordinates" -> SameQ[o["coordinate_aliases_step_1"],ScalarsOfChart[chartM]] && SameQ[o["coordinate_aliases_step_2"],ScalarsOfChart[chartSchw]] && SameQ[o["coordinate_aliases"],ScalarsOfChart[chartFLRW]],
  "dev31 native secondary coordinates" -> SameQ[o["second_chart"],ScalarsOfChart[chartCylindricalM]],
  "dev31 native basis transformation" -> TrueQ[Simplify[First[o["dev31_native_basis"]]-{0,Cos[thetaCylindricalM[]],-rCylindricalM[] Sin[thetaCylindricalM[]],0}]==={0,0,0,0}] && SameQ[o["dev31_native_basis"][[2]],{-chartCylindricalM}],
@@ -104,6 +104,8 @@ Module[{o=Global`$XPlorerWorkflowOutputs,sector},
  "FLRW label toggle" -> With[{v=o["labels_flrw"],w=o["labels_flrw_off"]},!FreeQ[MakeBoxes[v,StandardForm]//.InterpretationBox[d_,___]:>d,"F"] && FreeQ[MakeBoxes[w,StandardForm]//.InterpretationBox[d_,___]:>d,"F"]],
  "Short aliases" -> SameQ[SymbolName[BackgroundObject["MinkowskiFields","A"]],"AminkF"],
  "Scalar stress-energy density" -> TrueQ[Simplify[rhoFLRW-(q'[tFLRW[]]^2+m^2 q[tFLRW[]]^2)/2]==0],
+ "Background overview is visual" -> MatchQ[o["inspect_background"],_Grid] && MatchQ[o["dev31_background_summary"],_Column] && MatchQ[o["background_filled"],_Column] && MatchQ[o["background_fields"],_Grid],
+ "Background metric value" -> SameQ[First[o["background_metric_value"]],MetricMatrixOf["Schwarzschild"]],
  "PrintAs reset" -> SameQ[With[{hh=BackgroundObject["Schwarzschild","phi"]},PrintAs[hh]],PrintAs[phi]]
  |>
 ]
