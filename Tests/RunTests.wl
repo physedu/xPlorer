@@ -1,7 +1,7 @@
 (* Run with Get[.../Tests/RunTests.wl]. No Quit[] and no global ClearAll[]. *)
 Global`$XPlorerTestsDirectory = DirectoryName[$InputFileName];
 If[!MemberQ[$Packages,"xPlorer`"],
-  Get[FileNameJoin[{DirectoryName[Global`$XPlorerTestsDirectory],"xPlorer.wl"}]]];
+  Get[FileNameJoin[{DirectoryName[Global`$XPlorerTestsDirectory],"Paclet","xPlorer.wl"}]]];
 Global`$XPlorerTestsPreviousContextPath = $ContextPath;
 $ContextPath = DeleteCases[$ContextPath,"Global`"];
 Begin["XPlorerTestRun" <> StringReplace[CreateUUID[],"-"->""] <> "`"];

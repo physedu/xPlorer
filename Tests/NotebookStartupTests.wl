@@ -11,7 +11,7 @@ Global`$XPlorerStartupChecks = Module[
     "Checks" -> <|
       "SingleGetReturnsNull" -> SameQ[result,Null],
       "PackageLoaded" -> MemberQ[$Packages,"xPlorer`"],
-      "PackageVersion" -> SameQ[xPlorer`$XPlorerVersion,"14.0.0-beta.7"],
+      "PackageVersion" -> SameQ[xPlorer`$XPlorerVersion,"14.0.0-beta.13-dev.23"],
       "DependenciesAvailable" -> And @@ (MemberQ[$ContextPath,#] & /@
         {"xPlorer`","xAct`xTensor`","xAct`xPert`","xAct`xCoba`"})
     |>
