@@ -1,6 +1,6 @@
-# Using xPlorer — beta.13-dev.30
+# Using xPlorer — beta.13-dev.31
 
-The principal worked guide is xPlorer_Workflow.nb. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
+The focused native guide is xPlorer_Consolidated.nb; xPlorer_Workflow.nb remains the extended worked guide. Sections labeled with earlier versions are historical checkpoints; the dev.31 contract below takes precedence. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
 ## Responsibilities and defaults
 
@@ -93,13 +93,13 @@ ToComponents[tag,A[a],Output -> "CTensor"]
 ToComponents[tag,g[-a,-b],OutputChart -> "Cylindrical"]
 ```
 
-Output defaults to "Array". "CTensor" uses native xCoba CTensor with signed bases matching the ordered abstract free indices, including a named output chart. Requires a complete resolved positive-rank zero-weight tensor, not selected tuples or scalar results. Native xCoba may simplify a zero CTensor. The returned object is a snapshot, not a live linked field. Native changes of basis require native registered transformations. Secondary managed chart maps currently use a Jacobian pullback rather than native SetBasisChange.
+Output defaults to "Array". "CTensor" uses native xCoba CTensor with signed bases matching the ordered abstract free indices, including a named output chart. Requires a complete resolved positive-rank zero-weight tensor, not selected tuples or scalar results. Native xCoba may simplify a zero CTensor. The returned object is a snapshot, not a live linked field. Native changes of basis require native registered transformations. Managed secondary charts now register native SetBasisChange. ToComponents uses native tensor-slot transformations and separately substitutes the coordinate map.
 
 ### Native xCoba interoperability
 
 CreateBackground defines actual xAct objects. Use BackgroundObject[tag,"Manifold"], BackgroundObject[tag,"Metric"], ConnectionOf[tag], ChartOf[tag] and the copied tensor/index aliases. You can define a native chart or basis, use MetricInBasis, MetricCompute, AllComponentValues, DefBasis, SetBasisChange, ToBasis and ToCTensor directly. See Examples/NativeXCoba.wl and Tests/15_NativeInterop.wl for verified cases. BasisColor is native presentation, not a metric or tensor property. There is no new xPlorer general-basis API.
 
-**Boundary:** native-only chart/value assignments are not registered by xPlorer. Managed ToComponents expects a managed primary chart and metric; it uses abstract expressions, not arbitrary pre-based external expressions. External modifications of managed values do not update the registry, geometry cache, saved results or profile records. ClearComputedValues and managed setters may restore declared managed inputs and discard native edits; use one owner for each managed assignment. Native-only work remains available; no automatic synchronization is claimed. External dependents can block deletion; inspect DeletionPlan, undefine external objects explicitly. CMetricOf, ComponentCovDOf and ExprMatrixOf were removed because they duplicated BackgroundObject/ConnectionOf/ToComponents.
+**Boundary:** managed primary-chart writes are captured within the tested signatures described in the versioned sections below. Native-only charts, external bases, direct raw cache or Basis-value edits, and other writes outside the managed contract are not registered. Managed ToComponents expects a managed primary chart and metric and accepts abstract expressions. ClearComputedValues may restore declared inputs and discard untracked native edits; use one owner for each authoritative input. Native-only work remains available. External dependents can block deletion; inspect DeletionPlan, undefine external objects explicitly. CMetricOf, ComponentCovDOf and ExprMatrixOf were removed because they duplicated BackgroundObject/ConnectionOf/ToComponents.
 
 ### Named field profiles
 
@@ -118,7 +118,7 @@ RegisterProfile[tag,name] captures currently assigned managed field inputs; the 
 
 AddRules appends to the active rules and ReplaceAll uses the first match. ReplaceRules replaces that list. RemoveRules removes one-based list positions. ClearRules removes active rules. None changes a source constant's value.
 
-SetRuleGroup stores a named list; ShowRuleGroups inspects it. ActivateRuleGroups replaces the active list with the chosen groups in order. Editing/removing an active group refreshes active rules. Adding, replacing or selectively removing active rules detaches that list from named groups. Stored inactive groups remain available until explicitly removed.
+SetRuleGroup stores a named list. ActivateRuleGroups selects groups in first-match order, followed by independent rules. AddRules appends independent rules without deactivating groups. DeactivateRuleGroups removes selected active names without deleting definitions. ShowRuleGroups[tag,"Status"] displays active, independent and effective rules plus exact left-hand-side conflicts. ReplaceRules and ClearRules explicitly reset the active selection; RemoveRules edits the corresponding group or independent rule. Editing or removing a group refreshes effective rules.
 
 ComputeGeometry reuses compatible native geometry data. ClearComputedValues clears derived geometry and restores declared metric, field and connection inputs. Mathematical changes replay declared inputs and invalidate saved results. SaveResult/ResultOf is an optional managed store: invalidation is conservative at the whole-background level. Display-only changes preserve it. Ordinary Mathematica variables are not automatically updated. No speedup factor is claimed.
 
@@ -323,3 +323,28 @@ DeleteBackgroundObject["N", "Chart", Cascade -> True]
 ```
 
 This removes the primary and secondary chart family and resets chart-dependent inputs; it is not an individual secondary chart deletion. Use DeleteBackground for complete disposal. Recognize the coordinate partial derivatives of every registered managed chart (not just the primary) as owned derivative heads when classifying relative Christoffel tensors. Full background deletion now undefines only masterless owned relative tensors directly and leaves native Christoffel servants to their owning derivative destructor. Existing chart-family deletion via DeleteBackgroundObject[tag,"Chart",Cascade->True] works after native secondary geometry, retains the primary abstract connection and allows recreation. Actual external derivative dependencies remain blockers. Direct UndefChart/UndefBasis calls on registered chart symbols return an explicit ChartLifecycle failure instead of leaving registry, cached values and recipes dangling; internal managed destructors bypass the owned-head guard. A chart is also a native mapping, so UndefBasis is not its correct destructor. Partial managed object deletion preflights Set state and restores surviving metric inputs exactly, refreshing native metric fingerprints. Standalone removal of one secondary chart, native SetBasisChange/coordinate map integration, and native foreign bases remain open. No new public command.
+
+
+## Consolidated native workflow (dev.31)
+
+```wl
+CreateBackground["Schwarzschild", SymbolSuffix -> "Schw"];
+DefineChart["Schwarzschild", {t[], r[], theta[], varphi[]}];
+f = 1 - 2 Mbh/rSchw[];
+MetricInBasis[gSchw, -chartSchw, DiagonalMatrix[{-f, 1/f, rSchw[]^2, rSchw[]^2 Sin[thetaSchw[]]^2}]];
+ComponentValue[phiSchw[], rSchw[]^2];
+AllComponentValues[ASchw[{-aSchw, -chartSchw}], {1,2,3,4}];
+ASchw[-aSchw] // ToCTensor
+DefineChart["Schwarzschild", "Scaled", {T[],u[],th[],p[]}, Function[{tt,uu,hh,pp},{tt,2 uu,hh,pp}]];
+ToCTensor[CTensor[{1,2,3,4},{-chartSchw}],{-chartScaledSchw}]
+ShowBackground["Schwarzschild","Summary"]
+BackgroundObject["Schwarzschild","Ricci","Primary"]
+```
+
+Coordinate declarations introduce actual owned scalar heads and aliases such as rSchw and chartSchw; string label lists remain supported. The declarations must be distinct and their suffixed names unused. The registered secondary map defines primary coordinates as functions of the secondary coordinates. Native SetBasisChange changes tensor slots; scalar coordinate substitution is a separate step performed by ToComponents, not by arbitrary native CTensor conversion. Nonlinear affine coefficients also need the Hessian term, supplied by ConnectionMatrixOf with OutputChart. Singular maps are rejected if the Jacobian determinant is identically zero; local chart domain and invertibility assumptions remain the user's responsibility.
+
+The native unary ToCTensor extension is scoped to an expression with a unique managed owner; explicit-basis forms remain native. Output is a complete resolved positive-rank zero-weight CTensor snapshot, not a live field. Managed sparse entries remain unknown until assigned.
+
+Direct SetBasisChange replacement of an owned primary/secondary pair returns Failure["ManagedBasisPair",...] rather than desynchronize the coordinate map. Define a new named output chart or delete and recreate the managed chart family to change its map. Native pairs involving foreign bases remain available, subject to native dependencies. Direct UndefChart/UndefBasis are blocked for managed charts. Cleanup removes owned pair-specific values and aliases, not other backgrounds' basis rules. Raw edits to Basis values, native secondary field assignment, standalone removal or promotion of a secondary chart, and general foreign-basis replay are outside the managed contract.
+
+Use the consolidated notebook and the acceptance groups Consolidation and NativeCoordinates in Tests/RunGroup.wl. Earlier public convenience functions remain supported; no mass API removal is part of this candidate. See BETA13_CONSOLIDATION.md for exact evidence and release blockers.
