@@ -631,7 +631,7 @@ DefineChart[tag_String,name_String,declarations_List,map_Function] := Module[
   visitors=Union[VisitorsOf[chart],VisitorsOf[b["Chart"]]];
   created=guard[SetBasisChange[CTensor[Transpose[jac],{-chart,b["Chart"]}]]];
   nativeObjects=Select[Complement[Union[VisitorsOf[chart],VisitorsOf[b["Chart"]]],visitors],xTensorQ];
-  If[created===$Failed,
+  If[created===$Failed || FailureQ[created],
     clearNativeBasisPair[b["Chart"],chart];
     Scan[If[xTensorQ[#],guard[DeleteTensorValues[#];UndefTensor[#]]]&,nativeObjects];
     newAliases=KeyDrop[Lookup[$BG[tag],"ObjectAliases",<||>],Keys[Lookup[b,"ObjectAliases",<||>]]];
@@ -682,6 +682,18 @@ clearNativeBasisPair[old_,new_] := Module[{ids,prot},
  UpValues[Basis]=Select[UpValues[Basis],FreeQ[First[#],old]||FreeQ[First[#],new]&];
  Protect[Evaluate[prot]];Null
 ];
+(* A registered coordinate map and its native basis pair are one input.
+   Reject direct replacement of that pair rather than leave the chart map stale.
+   Foreign bases and pairs not owned by xPlorer retain native dispatch. *)
+managedBasisPairQ[ct_CTensor] := Module[{bases=(If[MatchQ[#,-_Symbol],-#,#]& /@ xAct`xCoba`Private`CTensorBases[ct])},
+ If[Length[bases]=!=2,Return[False]];
+ AnyTrue[Values[$BG],Function[b,KeyExistsQ[b,"Chart"] &&
+  AnyTrue[Values@Lookup[b,"AdditionalCharts",<||>],Sort[bases]===Sort[{b["Chart"],#["Chart"]}]&]]]];
+managedBasisPairFailure[] := failure["ManagedBasisPair","The basis change belongs to a managed coordinate map. Delete and recreate the chart family to change its map."];
+SetBasisChange[ct_CTensor,chart_,opts:OptionsPattern[]] /;
+ (!TrueQ[$insideNativePrintGuard] && !TrueQ[$insideManagedCalculation] && managedBasisPairQ[ct]) := managedBasisPairFailure[];
+SetBasisChange[pair:{_CTensor,_CTensor},chart_,opts:OptionsPattern[]] /;
+ (!TrueQ[$insideNativePrintGuard] && !TrueQ[$insideManagedCalculation] && AnyTrue[pair,managedBasisPairQ]) := managedBasisPairFailure[];
 clearManagedBasisPairs[b_] := Scan[Function[rec,If[KeyExistsQ[rec,"NativeBasisObjects"],clearNativeBasisPair[b["Chart"],rec["Chart"]]]],Values@Lookup[b,"AdditionalCharts",<||>]];
 nativeBasisObjects[b_] := Flatten[Lookup[Values@Lookup[b,"AdditionalCharts",<||>],"NativeBasisObjects",{}]];
 ChartOf[tag_String] := getter[tag, "Chart"];
