@@ -16,25 +16,16 @@ xPlorer lets you reuse one abstract xAct theory on independent geometric backgro
 
 Download the curated distribution ZIP from GitHub Releases (not GitHub's automatic source-code ZIP). Extract the complete folder. The versioned .paclet must sit beside both notebooks; the source stays in Paclet/xPlorer.wl. Option A in either notebook installs the matching archive when it is not already installed, then calls Needs. Option B uses Get without installation. If an older package is found, the version check stops the tutorial. Restart the kernel before changing loading methods.
 
-### No installation: load the included source
+### A. Install and load the supplied paclet (recommended)
 
-The notebooks already contain the following cell:
-
-```wl
-Get[FileNameJoin[{NotebookDirectory[], "Paclet", "xPlorer.wl"}]];
-$XPlorerVersion
-```
-
-### Install the supplied paclet
-
-In a fresh kernel, select the supplied .paclet with Mathematica's file browser:
+Run the A cell in either notebook. If the matching version is already registered, it skips installation and calls Needs. If you have downloaded only the separate .paclet asset, install that file manually:
 
 ```wl
 archive = SystemDialogInput["FileOpen"];
 If[StringQ[archive], PacletInstall[archive]];
 ```
 
-Choose the local xPlorer .paclet file. Restart the kernel, then evaluate:
+Restart the kernel, then evaluate:
 
 ```wl
 Needs["xPlorer`"];
@@ -42,6 +33,16 @@ $XPlorerVersion
 ```
 
 The version should be "14.0.0-beta.13-dev.36". Do not load a second copy of xPlorer in the same kernel; remove or move conflicting older traditional installations out of the Applications path before using a paclet. To uninstall, inspect PacletFind["xPlorer"] and use PacletUninstall on the specific installed PacletObject. Restart before testing a different version.
+
+### B. Load the source without installation
+
+The B cell in either notebook uses:
+
+```wl
+Get[FileNameJoin[{NotebookDirectory[], "Paclet", "xPlorer.wl"}]];
+```
+
+Check $XPlorerVersion in the next cell.
 
 ## Inspect your models
 
