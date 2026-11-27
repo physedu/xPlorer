@@ -2,7 +2,7 @@
    This does not publish to GitHub. Load from the repository root or Tools. *)
 With[{root=DirectoryName[DirectoryName[$InputFileName]]},
  PrepareXPlorerRelease[archive_String] := Module[
-  {source=FileNameJoin[{root,"Paclet"}],version="14.0.0-beta.13-dev.36",required,files,temp,copy,extract,meta,packRoot,mismatch,build,stage,zip,asset,archiveResult,result},
+  {source=FileNameJoin[{root,"Paclet"}],version="1.0.0-beta.1",required,files,temp,copy,extract,meta,packRoot,mismatch,build,stage,zip,asset,archiveResult,result},
   required={"PacletInfo.wl","xPlorer.wl","Kernel/init.m","Kernel/init.wl","LICENSE","CITATION.cff"};
   files={"xPlorer_Workflow.nb","xPlorer_API_Examples.nb","LICENSE","CITATION.cff","Release/README.md"};
   If[FileType[archive]=!=File||ToLowerCase[FileExtension[archive]]=!="paclet",Return[Failure["ReleaseArchive",<|"MessageTemplate"->"Choose an existing local .paclet file."|>]]];
@@ -22,8 +22,8 @@ With[{root=DirectoryName[DirectoryName[$InputFileName]]},
   If[mismatch=!={},Return[Failure["ArchiveMismatch",<|"Files"->mismatch,"MessageTemplate"->"The paclet does not match the current source tree. Rebuild before distribution."|>]]];
   If[!DirectoryQ[build],CreateDirectory[build]];
   result=Check[
-   CreateDirectory[stage];CreateDirectory[FileNameJoin[{stage,"Paclet","Kernel"}],CreateIntermediateDirectories->True];
-   Scan[CopyFile[FileNameJoin[{source,#}],FileNameJoin[{stage,"Paclet",#}]]&,required];
+   CreateDirectory[stage];
+   CopyFile[FileNameJoin[{source,"xPlorer.wl"}],FileNameJoin[{stage,"xPlorer.wl"}]];
    Scan[CopyFile[FileNameJoin[{root,#}],FileNameJoin[{stage,FileNameTake[#]}]]&,files];
    asset=FileNameJoin[{stage,"xPlorer-"<>version<>".paclet"}];CopyFile[archive,asset];
    Null,$Failed];
