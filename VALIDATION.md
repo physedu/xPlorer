@@ -45,6 +45,10 @@ SHA-256:
 
 The revised Workflow at [e32d96a](https://github.com/physedu/xPlorer/commit/e32d96a47bfb5ca1cdda752c7c2131e0d0478514) passed 140/140 selected input cells and 28/28 checks, with no warnings or unexpected failures. The revision removes grouped display wrappers and retains meaningful notation examples. API Examples and the supplied paclet are unchanged. The regenerated seven-file ZIP at [5a80400](https://github.com/physedu/xPlorer/commit/5a8040085d8d1f5c4f3fa5b6b7bbc640a25a5a01) was downloaded and extracted; its paclet, source, notebooks, license and citation all match the corresponding repository files. Its SHA-256 is `bbaa456c5c29875e301c339dc19a59bcf0dd437391c8eda9e30febf5eb929b53` (supersedes the previous ZIP hash above). Full Desktop visual acceptance remains pending.
 
+## Greek frequency notation revision — 27 November 2026
+
+Both public notebooks now use the symbol `w` with native xAct `PrintAs -> "\[Omega]"`. Fresh runs of [3f64d1b](https://github.com/physedu/xPlorer/commit/3f64d1b6f62dcfcf0d907ab1241341390c156d92) passed 140/140 Workflow cells, 28/28 checks, 419/419 API cells, 109/109 checks and 33/33 stages; no warnings or unexpected failures were reported. The PrintAs value was verified as Greek omega in both runs. The seven-file ZIP at [9eb6cb2](https://github.com/physedu/xPlorer/commit/9eb6cb29718100e8a54fb54b2e3e549d6ac4f567) contains the revised notebooks byte-for-byte; SHA-256 `6592c63ff8d9aa10d41d5b2bc6fef46cfc0737122cb5af3213fdaeac188c78a9` supersedes the earlier ZIP checksums. The paclet is unchanged.
+
 ## Reproduce
 
 Install xAct separately. Check out the tested revisions on the development branch for the test runners, which are not distributed on main. Use a fresh Mathematica kernel for each runner, adjusting paths to your checkout:
