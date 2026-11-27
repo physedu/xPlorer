@@ -27,16 +27,20 @@ Exact tested commit: [d67e5b8](https://github.com/physedu/xPlorer/commit/d67e5b8
 
 CreatePacletArchive failed in the remote evaluator because of a Java security restriction; no actual installable archive or Desktop acceptance is claimed. The integration fixture and complete regression suite have not been rerun.
 
+## Revised public notebooks — 27 November 2026
+
+The revised Workflow at [7c7b2e1](https://github.com/physedu/xPlorer/commit/7c7b2e1915269a919991ae59b6b835ba5e052dd3) passed 136/136 selected input cells and 28/28 checks, with no warnings or unexpected failures. API Examples at [5e58e9f](https://github.com/physedu/xPlorer/commit/5e58e9f26de3f95279664fe22f4f78525bc95045) passed 419/419 cells, 109/109 checks and 33/33 stages; it is unchanged at the newer revision. Both used fresh Wolfram Language 15.0.1 Linux kernels with xAct 1.3.0 and direct-source loading. The Needs cell also loaded version 1.0.0-beta.1 from a registered paclet development directory. Actual archive installation and Desktop visual acceptance remain pending.
+
 ## Reproduce
 
-Install xAct separately. Use a fresh Mathematica kernel for each runner, adjusting paths to your checkout:
+Install xAct separately. Check out the tested revisions on the development branch for the test runners, which are not distributed on main. Use a fresh Mathematica kernel for each runner, adjusting paths to your checkout:
 
 ```wl
 Get["/path/to/xPlorer/Tests/ResearchWorkflowTests.wl"]
 Get["/path/to/xPlorer/Tests/WorkflowTests.wl"]
 ```
 
-Run each line in a separate fresh kernel. See [Tests/README.md](Tests/README.md) for grouped regression tests and additional checks.
+Run each line in a separate fresh kernel. See [test sources on develop](https://github.com/physedu/xPlorer/tree/develop/Tests) for grouped regression tests and additional checks.
 
 ## Before public release
 

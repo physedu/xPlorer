@@ -4,27 +4,39 @@ Cell["xPlorer - Research workflow","Title"],
 
 Cell["From one abstract theory to several physical spacetimes | beta.1","Subtitle"],
 
-Cell["A practical research tutorial for users familiar with Mathematica and xAct. Work through the seven sections in order, opening the folded groups as needed. For detailed syntax, additional options, affine connections and special cases, use xPlorer_API_Examples.nb in a fresh kernel. Install xAct separately.","Text"],
+Cell["A practical tutorial: define a theory once, compare physical backgrounds, specialize its equations, and change inputs without rebuilding the theory. Seven short sections introduce the commands as they become useful. Open the folded groups in order; the separate API Examples notebook is the exhaustive reference, including independent affine connections.","Text"],
 
-Cell["Install xAct separately and start a fresh Mathematica kernel. If you tested a previous internal xPlorer version (14.0.0-beta.*), uninstall that version before using A; Mathematica may otherwise prefer the higher version. Extract the complete distribution ZIP, rather than opening a notebook inside the archive. Choose A or B, never both. If you already have the matching paclet installed, A simply loads it.","Text"],
+Cell[CellGroupData[{
+Cell["Start here | Load xPlorer","Section"],
 
-Cell["A. Install and load the released paclet (recommended)","Text",FontWeight->"Bold"],
+Cell["Requires Mathematica and xAct. Extract the complete release folder, start a fresh kernel and evaluate ONE of the following loading cells (Shift+Enter).","Text"],
 
-Cell["The release ZIP contains the matching .paclet beside these notebooks. This cell installs it if needed and then loads xPlorer. If the file is absent, obtain the release ZIP or use option B.","Text"],
+Cell["A   Install and load  |  First use","Text",FontWeight->"Bold"],
 
-Cell[BoxData["archive = FileNameJoin[{NotebookDirectory[], \"xPlorer-1.0.0-beta.1.paclet\"}];\nIf[!AnyTrue[PacletFind[\"xPlorer\"], #[\"Version\"] === \"1.0.0-beta.1\" &],\n  If[!FileExistsQ[archive], Print[\"Matching paclet not found. Extract the release ZIP or use option B.\"]; Abort[]];\n  If[!MatchQ[PacletInstall[archive], _PacletObject], Abort[]]\n];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"],
+Cell["Use the .paclet supplied beside this notebook. Installation is needed only once.","Text"],
 
-Cell["B. Load the source without installation","Text",FontWeight->"Bold"],
+Cell[BoxData["If[!MatchQ[PacletInstall[FileNameJoin[{NotebookDirectory[],\n    \"xPlorer-1.0.0-beta.1.paclet\"}]], _PacletObject], Abort[]];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"],
 
-Cell["Use this alternative in the extracted ZIP or development checkout. The cell loads xPlorer.wl beside the notebook, or Paclet/xPlorer.wl in the repository. It does not install a paclet.","Text"],
+Cell["B   Load  |  Already installed","Text",FontWeight->"Bold"],
 
-Cell[BoxData["Get[If[FileExistsQ[FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}]], FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}], FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]]];"],"Input",CellTags->"load"],
+Cell["Use this on subsequent sessions; no installation or archive is needed.","Text"],
 
-Cell["Confirm the version before continuing. If the wrong version is loaded, restart the kernel and remove conflicting internal paclets or traditional installations.","Text"],
+Cell[BoxData["Needs[\"xPlorer`\"];"],"Input",CellTags->"load_existing"],
 
-Cell[BoxData["If[$XPlorerVersion === \"1.0.0-beta.1\", $XPlorerVersion, Print[\"Unexpected xPlorer version: \", $XPlorerVersion]; Abort[]]"],"Input",CellTags->"workflow_version"],
+Cell["C   Direct source  |  No installation","Text",FontWeight->"Bold"],
 
-Cell["Optional presentation: show short background labels on mathematical objects, and use fraction notation for partial derivatives. These settings are purely visual. Turn ShowObjectLabels off to use ordinary xAct notation.","Text"],
+Cell["Use Get to load xPlorer.wl from the extracted release folder or the Paclet directory in a GitHub checkout.","Text"],
+
+Cell[BoxData["With[{file = FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}]},\n  Get[If[FileExistsQ[file], file,\n    FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]]]\n];"],"Input",CellTags->"load"],
+
+Cell["Check the version","Text",FontWeight->"Bold"],
+
+Cell["Continue only if this returns 1.0.0-beta.1. If an old internal 14.x paclet is selected, remove it with PacletUninstall and restart the kernel before loading again.","Text"],
+
+Cell[BoxData["If[$XPlorerVersion === \"1.0.0-beta.1\",\n  $XPlorerVersion,\n  Print[\"Wrong xPlorer version. Restart the kernel and check your installation.\"]; Abort[]\n]"],"Input",CellTags->"workflow_version"]
+},Open]],
+
+Cell["SetXPlorerPreferences sets session-wide display defaults. Here we enable short background labels on tensors and coordinates and fraction notation for partial derivatives. ShowObjectLabels -> False restores ordinary xAct appearance. Neither option changes the mathematical expression.","Text"],
 
 Cell[BoxData["SetXPlorerPreferences[ShowObjectLabels -> True, PartialStyle -> \"Fraction\"];"],"Input",CellTags->"session_notation"],
 
@@ -53,7 +65,7 @@ Cell[BoxData["kg == 0"],"Input",CellTags->"kg_abstract"],
 
 Cell[BoxData["hessian = CD[-a][CD[-b][phi[]]];"],"Input",CellTags->"hessian"],
 
-Cell["Register the geometry, scalar and parameter, separately named Lagrangian terms and derived expressions. Only registered objects are copied automatically; a new observable can be transported later.","Text"],
+Cell["RegisterTheory is the bridge from native xAct to xPlorer. Metric, CovD and Indices identify the source geometry; Field identifies tensor heads to copy and Parameter records shared constants. Sector groups related fields or parameters for inspection. Lagrangians and Expressions store named formulas, so a background can expose their suffixed aliases. Registration does not yet create a chart or evaluate components.","Text"],
 
 Cell[BoxData["RegisterTheory[\"Metric\", g];\nRegisterTheory[\"CovD\", CD];\nRegisterTheory[\"Indices\", {a,b,c,d,e,f,i,j}];"],"Input",CellTags->"register_geometry"],
 
@@ -67,13 +79,15 @@ Cell[BoxData["RegisterTheory[\"Expressions\", {\"KG\" -> kg, \"Hessian\" -> hess
 
 Cell[BoxData["RegisterTheory[\"Title\", \"Massive scalar field\"];"],"Input",CellTags->"register_title"],
 
+Cell["ShowTheory[] summarizes what was registered. Check the fields, parameters and named formulas before creating any backgrounds.","Text"],
+
 Cell[BoxData["ShowTheory[]"],"Input",CellTags->"show_theory"]
 },Closed]],
 
 Cell[CellGroupData[{
 Cell["2. Independent backgrounds and notation","Section"],
 
-Cell["Create three independent native copies. The tag is a study name; SymbolSuffix controls typed names and BackgroundLabel controls visual labels. The shared mass m is not cloned.","Text"],
+Cell["CreateBackground copies the registered geometry, fields and formulas into an independent native xAct study. The tag identifies the study, SymbolSuffix selects typed aliases (gSchw, phiSchw, kgSchw), and BackgroundLabel selects a short visual marker (S). The shared mass m is not cloned. No metric components have been assigned yet.","Text"],
 
 Cell[BoxData["CreateBackground[\"Minkowski\", SymbolSuffix -> \"M\", BackgroundLabel -> \"M\"];"],"Input",CellTags->"minkowski"],
 
@@ -81,14 +95,16 @@ Cell[BoxData["CreateBackground[\"Schwarzschild\", SymbolSuffix -> \"Schw\", Back
 
 Cell[BoxData["CreateBackground[\"FLRW\", BackgroundLabel -> \"F\"];"],"Input",CellTags->"flrw"],
 
+Cell["ShowBackground[] lists the studies. The transported Klein-Gordon equations already exist as abstract expressions, with independent tensors and indices.","Text"],
+
 Cell[BoxData["ShowBackground[]"],"Input",CellTags->"open_models"],
 
-Cell[BoxData["{kgM == 0, kgSchw == 0, kgFLRW == 0}"],"Input",CellTags->"abstract_copies"],
+Cell[BoxData["Column[{PrettyExp[\"Minkowski\", kgM == 0, ShowBackgroundLabel -> True], PrettyExp[\"Schwarzschild\", kgSchw == 0, ShowBackgroundLabel -> True], PrettyExp[\"FLRW\", kgFLRW == 0, ShowBackgroundLabel -> True]}, Spacings -> 1]"],"Input",CellTags->"abstract_copies"],
 
 Cell[CellGroupData[{
-Cell["Choose the appearance of an equation","Subsection"],
+Cell["Read and compare the transported equations","Subsection"],
 
-Cell["Change notation without changing tensor identities. Use a short label for a whole expression, or labels on individual objects. Automatic restores inherited visibility.","Text"],
+Cell["When comparing three otherwise identical abstract equations, the short M, S and F labels identify the owning tensors. For the Schwarzschild calculation we use prefix covariant derivatives; SetNotation sets the background default. PrettyExp can override it for one result, for example to compare with a paper using postfix notation. Normal recovers the original expression.","Text"],
 
 Cell[BoxData["SetNotation[\"Schwarzschild\", CovariantStyle -> \"Prefix\"];"],"Input",CellTags->"prefix"],
 
@@ -96,24 +112,24 @@ Cell[BoxData["kgSchw == 0"],"Input",CellTags->"prefix_view"],
 
 Cell[BoxData["(kgSchw == 0) // PrettyExp[CovariantStyle -> \"Postfix\"]"],"Input",CellTags->"postfix_view"],
 
+Cell["When the entire equation belongs to a single background, a caption alone can be enough. ShowBackgroundLabel identifies the study, while ShowObjectLabels identifies individual tensor and coordinate occurrences. BackgroundLabel controls the short object marker, not the typed name.","Text"],
+
 Cell[BoxData["PrettyExp[\"Schwarzschild\", kgSchw == 0, ShowBackgroundLabel -> True, ShowObjectLabels -> False]"],"Input",CellTags->"caption"],
 
-Cell[BoxData["SetNotation[\"FLRW\", ShowObjectLabels -> False];"],"Input",CellTags->"hide_local"],
+Cell["In a long equation, repeated labels on the same field can become distracting. SetPresentation can hide only the scalar's object label while retaining the labels on the derivative and metric. The field name and mathematical expression are unchanged.","Text"],
 
-Cell[BoxData["kgFLRW == 0"],"Input",CellTags->"hide_local_view"],
+Cell[BoxData["SetPresentation[\"Schwarzschild\", phi, ShowObjectLabels -> False];"],"Input",CellTags->"rename_phi"],
 
-Cell[BoxData["SetNotation[\"FLRW\", ShowObjectLabels -> Automatic];"],"Input",CellTags->"restore_local"],
+Cell[BoxData["PrettyExp[\"Schwarzschild\", kgSchw == 0, ShowBackgroundLabel -> True]"],"Input",CellTags->"rename_view"],
 
-Cell[BoxData["SetPresentation[\"Schwarzschild\", phi, PrintAs -> \"\\[Psi]\"];"],"Input",CellTags->"rename_phi"],
+Cell[BoxData["SetPresentation[\"Schwarzschild\", phi, ShowObjectLabels -> Automatic];"],"Input",CellTags->"reset_phi"],
 
-Cell[BoxData["kgSchw == 0"],"Input",CellTags->"rename_view"],
+Cell[BoxData["SetNotation[\"Schwarzschild\", CovariantStyle -> Automatic];"],"Input",CellTags->"reset_prefix"],
 
-Cell[BoxData["SetPresentation[\"Schwarzschild\", phi, PrintAs -> Automatic];"],"Input",CellTags->"reset_phi"],
-
-Cell[BoxData["SetNotation[\"Schwarzschild\", CovariantStyle -> Automatic];"],"Input",CellTags->"reset_prefix"]
+Cell["Restore the inherited settings before comparing the component equations. A local or one-object override can always be removed with Automatic.","Text"]
 },Closed]],
 
-Cell["Native abstract operations work directly with the copied heads. PortExpression transports an unregistered expression without modifying the source.","Text"],
+Cell["The copied heads are native xAct objects: CDSchw and phiSchw can be used directly. PortExpression transports a new source expression to a chosen background without registering it or changing the source. It is still abstract until components are requested.","Text"],
 
 Cell[BoxData["CDSchw[-aSchw][phiSchw[]]"],"Input",CellTags->"gradient"],
 
@@ -125,7 +141,7 @@ Cell[BoxData["Ricci[CDSchw][-aSchw,-bSchw]"],"Input",CellTags->"ricci_abstract"]
 Cell[CellGroupData[{
 Cell["3. Coordinates and physical equations","Section"],
 
-Cell["Define each chart and assign the metric using MetricInBasis. xCoba performs the component calculations; xPlorer manages the independent inputs and automatically evaluates the registered formulas.","Text"],
+Cell["The component workflow has three steps: DefineChart creates coordinates, MetricInBasis assigns the metric matrix, and ComponentValue assigns the field profile. Then expr // ToComponents evaluates the abstract expression through xCoba. xPlorer infers the background from the copied heads and manages their inputs; there is no need to specify a basis conversion or manually compute curvature first.","Text"],
 
 Cell[CellGroupData[{
 Cell["Minkowski: wave equation","Subsection"],
@@ -136,13 +152,23 @@ Cell[BoxData["MetricInBasis[gM, -chartM, DiagonalMatrix[{-1,1,1,1}]];"],"Input",
 
 Cell[BoxData["DefScalarFunction[v];"],"Input",CellTags->"wavefn"],
 
+Cell["ComponentValue is the native xCoba assignment. The owned scalar phiM receives a general function of the owned coordinates tM, xM, yM and zM; other backgrounds are unaffected.","Text"],
+
 Cell[BoxData["ComponentValue[phiM[], v[tM[],xM[],yM[],zM[]]];"],"Input",CellTags->"general_profile"],
+
+Cell["ToComponents returns an ordinary mathematical result, not a display wrapper. A scalar gives an expression, a vector a list and a rank-two tensor a matrix. The explicit form ToComponents[\"Minkowski\", kg] is useful when starting from an abstract source expression instead of a copied one.","Text"],
 
 Cell[BoxData["eqM = kgM // ToComponents;"],"Input",CellTags->"eq_m"],
 
 Cell[BoxData["eqM == 0"],"Input",CellTags->"eq_m_view"],
 
+Cell["The general wave equation contains several second derivatives. Fraction notation is familiar, but Comma notation is much more compact for a long expression. Compare these two useful forms without recomputing components. Partial, MultiIndex and Native are also available in the API reference.","Text"],
+
+Cell[BoxData["Column[{PrettyExp[\"Minkowski\", eqM == 0, PartialStyle -> \"Fraction\"], PrettyExp[\"Minkowski\", eqM == 0, PartialStyle -> \"Comma\"]}, Spacings -> 1]"],"Input",CellTags->"partial_compare"],
+
 Cell[BoxData["DefConstantSymbol[omega]; DefConstantSymbol[k];"],"Input",CellTags->"wave_params"],
+
+Cell["Replace the general profile with a plane wave. Managed component inputs are updated automatically; the original abstract equation kgM does not need to be rebuilt.","Text"],
 
 Cell[BoxData["ComponentValue[phiM[], Cos[omega tM[] - k zM[]]];"],"Input",CellTags->"wave_profile"],
 
@@ -162,6 +188,8 @@ Cell[BoxData["DefConstantSymbol[Mbh];"],"Input",CellTags->"bh"],
 
 Cell[BoxData["fSchw = 1 - 2 Mbh/rSchw[];"],"Input",CellTags->"f"],
 
+Cell["The shorter MetricInBasis[gSchw, matrix] infers the primary chart from the metric. Assumptions specifies the physical domain for simplification (here outside the horizon).","Text"],
+
 Cell[BoxData["MetricInBasis[gSchw, DiagonalMatrix[{-fSchw,1/fSchw,rSchw[]^2,rSchw[]^2 Sin[thetaSchw[]]^2}], Assumptions -> Mbh>0 && rSchw[]>2 Mbh && 0<thetaSchw[]<Pi];"],"Input",CellTags->"metric_s"],
 
 Cell[BoxData["DefScalarFunction[u];"],"Input",CellTags->"radialfn"],
@@ -170,13 +198,17 @@ Cell[BoxData["ComponentValue[phiSchw[], u[rSchw[]]];"],"Input",CellTags->"profil
 
 Cell[BoxData["eqS = kgSchw // ToComponents;"],"Input",CellTags->"eq_s"],
 
-Cell[BoxData["eqS == 0"],"Input",CellTags->"eq_s_view"],
+Cell[BoxData["PrettyExp[\"Schwarzschild\", eqS == 0, ShowBackgroundLabel -> True]"],"Input",CellTags->"eq_s_view"],
 
-Cell[BoxData["(eqS == 0) // PrettyExp[PartialStyle -> \"Prime\"]"],"Input",CellTags->"prime"],
+Cell["The radial equation depends only on r. Prime notation is shorter here than fractions: u' and u'' already identify the only derivative. Use PrettyExp for this one equation without changing the saved result.","Text"],
+
+Cell[BoxData["PrettyExp[\"Schwarzschild\", eqS == 0, PartialStyle -> \"Prime\"]"],"Input",CellTags->"prime"],
 
 Cell[BoxData["RicciScalar[CDSchw][] // ToComponents"],"Input",CellTags->"ricci_s"],
 
 Cell[BoxData["Kretschmann[CDSchw][] // ToComponents"],"Input",CellTags->"kretschmann_s"],
+
+Cell["ShowBackground[tag] displays the actual declared geometry, fields and rules in a readable inspection table. BackgroundValue[tag, \"MetricMatrix\"] is the corresponding programmatic access to the matrix, not a display function.","Text"],
 
 Cell[BoxData["ShowBackground[\"Schwarzschild\"]"],"Input",CellTags->"inspect_s"]
 },Closed]],
@@ -194,7 +226,9 @@ Cell[BoxData["ComponentValue[phiFLRW[], q[tFLRW[]]];"],"Input",CellTags->"profil
 
 Cell[BoxData["eqF = kgFLRW // ToComponents;"],"Input",CellTags->"eq_f"],
 
-Cell[BoxData["eqF == 0"],"Input",CellTags->"eq_f_view"],
+Cell[BoxData["PrettyExp[\"FLRW\", eqF == 0, ShowBackgroundLabel -> True]"],"Input",CellTags->"eq_f_view"],
+
+Cell["A rank-two expression evaluated with ToComponents returns its component matrix. MatrixForm is only for display; keep the raw array when you need to calculate with it.","Text"],
 
 Cell[BoxData["Einstein[CDFLRW][-aFLRW,-bFLRW] // ToComponents // MatrixForm"],"Input",CellTags->"einstein_f"],
 
@@ -204,7 +238,13 @@ Cell[BoxData["stress = CD[-a][phi[]] CD[-b][phi[]] + g[-a,-b] ReplaceDummies[L];
 
 Cell[BoxData["stressFLRW = PortExpression[\"FLRW\", stress];"],"Input",CellTags->"stress_f"],
 
-Cell[BoxData["rhoFLRW = First[stressFLRW // ToComponents[Components -> {{0,0}}]]"],"Input",CellTags->"rho"]
+Cell["Components -> {{0,0}} requests only the time-time entry. The result is a list of the requested entries in order, so First extracts the single scalar. No need to compute or print the entire stress tensor.","Text"],
+
+Cell[BoxData["rhoFLRW = First[stressFLRW // ToComponents[Components -> {{0,0}}]]"],"Input",CellTags->"rho"],
+
+Cell["Compare the three stored field equations in one column. The explicit background tags keep the captions and coordinate labels unambiguous even after the abstract tensors have disappeared.","Text"],
+
+Cell[BoxData["Column[{PrettyExp[\"Minkowski\", eqM == 0, ShowBackgroundLabel -> True], PrettyExp[\"Schwarzschild\", eqS == 0, ShowBackgroundLabel -> True, PartialStyle -> \"Prime\"], PrettyExp[\"FLRW\", eqF == 0, ShowBackgroundLabel -> True]}, Spacings -> 1]"],"Input",CellTags->"component_compare"]
 },Closed]]
 },Closed]],
 
@@ -214,7 +254,15 @@ Cell["4. Explore physical models","Section"],
 Cell[CellGroupData[{
 Cell["Change an assumption only on one background","Subsection"],
 
-Cell["Rules apply during managed component evaluation; they do not change the abstract source or the other backgrounds.","Text"],
+Cell["Specialization rules are local physical assumptions, not Mathematica assignments. AddRules adds independent rules; ApplyRules applies them to any expression in the background. UseExpression retrieves a registered formula with the active rules applied. ToComponents uses active rules automatically. Here we take the massless limit only in Schwarzschild.","Text"],
+
+Cell[BoxData["AddRules[\"Schwarzschild\", {m -> 0}];"],"Input",CellTags->"individual_rules"],
+
+Cell[BoxData["Column[{PrettyExp[\"Schwarzschild\", kgSchw == 0, ShowBackgroundLabel -> True], PrettyExp[\"Schwarzschild\", ApplyRules[\"Schwarzschild\", kgSchw] == 0, ShowBackgroundLabel -> True], PrettyExp[\"Schwarzschild\", UseExpression[\"Schwarzschild\", \"Lagrangians\", \"Matter\"], ShowBackgroundLabel -> True]}, Spacings -> 1]"],"Input",CellTags->"formal_rule_compare"],
+
+Cell[BoxData["ClearRules[\"Schwarzschild\"];"],"Input",CellTags->"clear_individual"],
+
+Cell["For reusable assumptions, SetRuleGroup stores a named list and ActivateRuleGroups selects which groups participate. DeactivateRuleGroups switches them off without deleting them; ClearRules resets the active selection.","Text"],
 
 Cell[BoxData["SetRuleGroup[\"Schwarzschild\", \"Massless\", {m -> 0}];"],"Input",CellTags->"massless"],
 
@@ -224,7 +272,9 @@ Cell[BoxData["kgSchw // ToComponents"],"Input",CellTags->"eq_massless"],
 
 Cell[BoxData["Simplify[(kgFLRW // ToComponents) - eqF]"],"Input",CellTags->"other_unchanged"],
 
-Cell[BoxData["ShowBackground[\"Schwarzschild\", \"Rules\"]"],"Input",CellTags->"rule_view"],
+Cell["Inspect the active groups, independent rules and effective substitutions. Deactivating Massless must restore the massive equation, while FLRW never changed.","Text"],
+
+Cell[BoxData["ShowRuleGroups[\"Schwarzschild\", \"Status\"]"],"Input",CellTags->"rule_view"],
 
 Cell[BoxData["DeactivateRuleGroups[\"Schwarzschild\", {\"Massless\"}];"],"Input",CellTags->"deactivate_massless"],
 
@@ -233,6 +283,8 @@ Cell[BoxData["Simplify[(kgSchw // ToComponents)-eqS]"],"Input",CellTags->"mass_r
 
 Cell[CellGroupData[{
 Cell["Switch profiles without rebuilding the metric","Subsection"],
+
+Cell["RegisterProfile stores declared field values under a name. With no field argument it captures the current inputs; the explicit form accepts a new function of the chart coordinates. ActivateProfile switches the input without reconstructing the geometry.","Text"],
 
 Cell[BoxData["RegisterProfile[\"Minkowski\", \"PlaneWave\"];"],"Input",CellTags->"wave_save"],
 
@@ -257,6 +309,12 @@ Cell[BoxData["PrintAs[Evaluate[thetaCylindricalM]] ^= \"\\[Theta]\";"],"Input",C
 Cell[BoxData["gM[-aM,-bM] // ToComponents[OutputChart -> \"Cylindrical\"] // MatrixForm"],"Input",CellTags->"metric_c"],
 
 Cell[BoxData["phiM[] // ToComponents[OutputChart -> \"Cylindrical\"]"],"Input",CellTags->"profile_c"],
+
+Cell["The same field now has two coordinate representations. The M and C labels distinguish the Cartesian and cylindrical coordinates without long suffixes; neither the field nor its primary input has changed.","Text"],
+
+Cell[BoxData["Column[{phiM[] // ToComponents // PrettyExp, phiM[] // ToComponents[OutputChart -> \"Cylindrical\"] // PrettyExp}, Spacings -> 1]"],"Input",CellTags->"chart_comparison"],
+
+Cell["FreeIndices explicitly fixes the tensor-axis order when it matters. OutputChart changes the output basis; it does not overwrite the primary metric or field assignments.","Text"],
 
 Cell[BoxData["hessianM // ToComponents[OutputChart -> \"Cylindrical\", FreeIndices -> {-aM,-bM}] // MatrixForm"],"Input",CellTags->"hess_c"],
 
@@ -283,9 +341,11 @@ Cell[BoxData["DefineChart[\"MinkowskiFields\", {t[],x[],y[],z[]}];"],"Input",Cel
 
 Cell[BoxData["MetricInBasis[gminkF, -chartminkF, DiagonalMatrix[{-1,1,1,1}]];"],"Input",CellTags->"fields_metric"],
 
+Cell["AllComponentValues assigns a full component array. The sign of the basis or abstract index sets the slot variance. xPlorer tracks these native writes, so requesting raised components uses the current metric. ToCTensor instead gives a native xCoba CTensor snapshot with its basis.","Text"],
+
 Cell[BoxData["AllComponentValues[AminkF[{-aminkF,-chartminkF}], {1,2,3,4}];"],"Input",CellTags->"assign_a"],
 
-Cell[BoxData["AminkF[aminkF] // ToComponents"],"Input",CellTags->"raised"],
+Cell[BoxData["AminkF[aminkF] // ToComponents // MatrixForm"],"Input",CellTags->"raised"],
 
 Cell[BoxData["normA = AminkF[aminkF] AminkF[-aminkF] // ToComponents"],"Input",CellTags->"norm"],
 
@@ -299,9 +359,11 @@ Cell[BoxData["ToValues[FminkF[{0,-chartminkF},{1,-chartminkF}]]"],"Input",CellTa
 
 Cell[BoxData["ToValues[FminkF[{0,-chartminkF},{2,-chartminkF}]]"],"Input",CellTags->"unknown"],
 
+Cell["Now supply the complete antisymmetric matrix. Select individual entries with Components, rather than calculating all entries simply to display two.","Text"],
+
 Cell[BoxData["AllComponentValues[FminkF[-aminkF,-bminkF], {{0,2,0,0},{-2,0,0,0},{0,0,0,0},{0,0,0,0}}];"],"Input",CellTags->"full_f"],
 
-Cell[BoxData["FminkF[-aminkF,-bminkF] // ToComponents[Components -> {{0,1},{1,0}}]"],"Input",CellTags->"selected_f"],
+Cell[BoxData["selectedF = FminkF[-aminkF,-bminkF] // ToComponents[Components -> {{0,1},{1,0}}];\nColumn[{Row[{\"F01 = \", selectedF[[1]]}], Row[{\"F10 = \", selectedF[[2]]}]}]"],"Input",CellTags->"selected_f"],
 
 Cell[BoxData["FminkF[aminkF,bminkF] FminkF[-aminkF,-bminkF] // ToComponents"],"Input",CellTags->"invariant_f"]
 },Closed]],
@@ -315,11 +377,15 @@ Cell[BoxData["DefMetricPerturbation[g,h,eps];"],"Input",CellTags->"def_h"],
 
 Cell[BoxData["RegisterTheory[\"Field\",h,Sector -> \"Perturbations\"];"],"Input",CellTags->"register_h"],
 
+Cell["AddField extends an existing background with a registered field; it is not necessary to recreate the Minkowski study. PerturbOn expands the native xPert variation on the owning background.","Text"],
+
 Cell[BoxData["AddField[\"Minkowski\",h];"],"Input",CellTags->"add_h"],
 
 Cell[BoxData["delta1 = gM[-aM,-bM] // PerturbOn[1]"],"Input",CellTags->"delta1"],
 
 Cell[BoxData["delta2 = gM[aM,bM] // PerturbOn[2]"],"Input",CellTags->"delta2"],
+
+Cell["LI[1] and LI[2] identify perturbation orders. Supply the first and second variation of the covariant metric, then evaluate the previously derived abstract expressions with ToComponents.","Text"],
 
 Cell[BoxData["AllComponentValues[hM[LI[1],-aM,-bM], DiagonalMatrix[{0,tM[]^2,0,0}]];"],"Input",CellTags->"assign_h1"],
 
@@ -345,11 +411,19 @@ Cell["7. Modify and recover a study","Section"],
 
 Cell["Use the existing vector study to explore changes without restarting the kernel. A metric change affects raised components, not the supplied covariant components.","Text"],
 
+Cell["SaveResult stores an optional managed result. Unlike an ordinary Mathematica variable, ResultOf detects when the stored value has become invalid after a managed mathematical change.","Text"],
+
+Cell[BoxData["SaveResult[\"MinkowskiFields\", \"VectorNorm\", normA]"],"Input",CellTags->"save_norm"],
+
 Cell[BoxData["MetricInBasis[gminkF, DiagonalMatrix[{-4,1,1,1}]];"],"Input",CellTags->"metric_changed"],
 
-Cell[BoxData["AminkF[aminkF] // ToComponents"],"Input",CellTags->"raised_changed"],
+Cell[BoxData["AminkF[aminkF] // ToComponents // MatrixForm"],"Input",CellTags->"raised_changed"],
 
 Cell[BoxData["AminkF[aminkF] AminkF[-aminkF] // ToComponents"],"Input",CellTags->"norm_changed"],
+
+Cell[BoxData["FailureQ[ResultOf[\"MinkowskiFields\", \"VectorNorm\"]]"],"Input",CellTags->"saved_invalidated"],
+
+Cell["True means the old stored norm is no longer valid. Recompute it using the updated metric; restoring the metric recovers the original norm.","Text"],
 
 Cell[BoxData["MetricInBasis[gminkF, DiagonalMatrix[{-1,1,1,1}]];"],"Input",CellTags->"metric_restored"],
 
@@ -368,12 +442,12 @@ Cell[BoxData["DeleteBackground[\"MinkowskiFields\"];"],"Input",CellTags->"delete
 
 Cell[BoxData["RecreateBackground[\"MinkowskiFields\", recipe];"],"Input",CellTags->"recreate"],
 
-Cell[BoxData["AminkF[aminkF] // ToComponents"],"Input",CellTags->"raised_recovered"],
+Cell[BoxData["AminkF[aminkF] // ToComponents // MatrixForm"],"Input",CellTags->"raised_recovered"],
 
 Cell[BoxData["ShowBackground[]"],"Input",CellTags->"models_final"]
 },Closed]],
 
-Cell["The studies are available for further work. Consult xPlorer_API_Examples.nb for cache controls, SaveResult, individual deletion, more presentation options and independent affine connections. Start that notebook with a fresh kernel. Report reproducible problems in GitHub Issues.","Text"]
+Cell["The studies remain available for further work. The core workflow is register once, create backgrounds, assign native inputs, evaluate, and specialize independently. Use xPlorer_API_Examples.nb in a fresh kernel for the complete API, independent affine connections and advanced cases. Report reproducible problems in GitHub Issues.","Text"]
 },Closed]]
 },PageWidth->WindowWidth,WindowTitle->"xPlorer - Research workflow",StyleDefinitions->Notebook[{
  Cell[StyleData[StyleDefinitions -> "Default.nb"]],

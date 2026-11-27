@@ -24,10 +24,10 @@ The intended audience is researchers and students already using Mathematica and 
 
 | Notebook | Purpose |
 | --- | --- |
-| [xPlorer_Workflow.nb](xPlorer_Workflow.nb) | Start here: a practical seven-section research tutorial, from abstract equations to components, profiles, tensors and metric perturbations. |
+| [xPlorer_Workflow.nb](xPlorer_Workflow.nb) | Start here: a practical seven-section research tutorial, from abstract equations to labeled comparisons, specialization rules, components, profiles, tensors and metric perturbations. |
 | [xPlorer_API_Examples.nb](xPlorer_API_Examples.nb) | Advanced executable reference: detailed API options, affine connections, lifecycle and special cases. |
 
-Install [xAct](https://www.xact.es/) separately. Use a fresh Mathematica kernel for either notebook. Keep the notebook beside xPlorer.wl in the release ZIP, or beside the Paclet directory in a repository checkout. Choose exactly one startup cell: A installs the matching released paclet if needed and loads it with Needs; B loads the source directly using Get. The distribution ZIP places the versioned paclet and plain xPlorer.wl beside both notebooks.
+Install [xAct](https://www.xact.es/) separately. Use a fresh Mathematica kernel for either notebook. Keep the notebook beside xPlorer.wl in the release ZIP, or beside the Paclet directory in a repository checkout. Choose exactly one startup cell: A installs and loads the supplied paclet, B loads an already installed paclet with Needs, and C loads the source directly with Get. The distribution ZIP places the versioned paclet and plain xPlorer.wl beside both notebooks.
 
 ```wl
 Get[FileNameJoin[{NotebookDirectory[], "Paclet", "xPlorer.wl"}]];
@@ -85,7 +85,7 @@ Needs["xPlorer`"];
 $XPlorerVersion
 ```
 
-Do not mix conflicting traditional applications and paclets. If you tested the internal 14.0.0-beta.* series, uninstall those higher-numbered versions before installing public beta 1. The traditional installer [Install.wl](Install.wl) is available for development/source use. It refuses to overwrite an existing application. See [xPlorer_Install.nb](xPlorer_Install.nb) for local archive construction and installation. xAct is a separate dependency; optional xTras is not required.
+Do not mix conflicting traditional applications and paclets. If you tested the internal 14.0.0-beta.* series, uninstall those higher-numbered versions before installing public beta 1. Source developers can find the optional installer and archive-building notebook on [develop](https://github.com/physedu/xPlorer/tree/develop). xAct is a separate dependency; optional xTras is not required.
 
 ## Feedback and scope
 
@@ -95,9 +95,9 @@ The managed scope includes abstract tangent-bundle tensors, perturbations and na
 
 ## Validation and source development
 
-See [VALIDATION.md](VALIDATION.md) for the exact tested revision, environment and remaining acceptance checks. The [Tests/](Tests/) directory contains executable regression and notebook tests. [Tools/](Tools/) contains the paclet and curated ZIP build helpers; the user-facing distribution contains only the two notebooks, source, paclet, README, license and citation.
+See [VALIDATION.md](VALIDATION.md) for the exact tested revision, environment and remaining acceptance checks. Executable tests and build helpers are maintained separately on [develop](https://github.com/physedu/xPlorer/tree/develop). The public source branch contains only the package, two public notebooks and documentation; the curated release ZIP contains seven files.
 
-The complete internal development record is preserved on the [develop branch](https://github.com/physedu/xPlorer/tree/59030c6df0ad282b18b279ae620bf6ec215e8206/Development). See [CHANGELOG.md](CHANGELOG.md) for public version history. The first public beta is pending local archive and Desktop acceptance.
+The complete internal development record is preserved on the [develop branch](https://github.com/physedu/xPlorer/tree/develop/Development). See [CHANGELOG.md](CHANGELOG.md) for public version history. The first public beta is pending local archive and Desktop acceptance.
 
 ## Author, citation and license
 
