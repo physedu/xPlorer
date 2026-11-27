@@ -26,10 +26,11 @@ The intended audience is researchers and students already using Mathematica and 
 
 | Notebook | Purpose |
 | --- | --- |
-| [xPlorer_Workflow.nb](xPlorer_Workflow.nb) | Start here: a practical seven-section research tutorial, from abstract equations to labeled comparisons, specialization rules, components, profiles, tensors and metric perturbations. |
+| [xPlorer_Install.nb](xPlorer_Install.nb) | Install, verify and uninstall the supplied paclet. |
+| [xPlorer_Workflow.nb](xPlorer_Workflow.nb) | Start here: a practical six-section research tutorial, from abstract equations to labeled comparisons, specialization rules, components, profiles, tensors and metric perturbations. |
 | [xPlorer_API_Examples.nb](xPlorer_API_Examples.nb) | Advanced executable reference: detailed API options, affine connections, lifecycle and special cases. |
 
-Install [xAct](https://www.xact.es/) separately. Use a fresh Mathematica kernel for either notebook. Keep the notebook beside xPlorer.wl in the release ZIP, or beside the Paclet directory in a repository checkout. Choose exactly one startup cell: A installs and loads the supplied paclet, B loads an already installed paclet with Needs, and C loads the source directly with Get. The distribution ZIP places the versioned paclet and plain xPlorer.wl beside both notebooks.
+Install [xAct](https://www.xact.es/) separately. Use a fresh Mathematica kernel for either notebook. Keep the notebook beside xPlorer.wl in the release ZIP, or beside the Paclet directory in a repository checkout. Use xPlorer_Install.nb for installation or removal. Each scientific notebook begins with an introduction and two alternative loading cells: Needs for an installed paclet, or Get for direct source loading.
 
 ```wl
 Get[FileNameJoin[{NotebookDirectory[], "Paclet", "xPlorer.wl"}]];
@@ -80,7 +81,7 @@ Visual labels are separate from typed names. Labels are off by default; session,
 
 ## Installation
 
-The public release will supply a matching .paclet and a compact distribution ZIP with the two notebooks, source, README, license and citation. The release ZIP contains xPlorer.wl at its root; the repository source remains in Paclet/xPlorer.wl. To use a supplied local paclet, run PacletInstall with its path, restart the kernel, then:
+The public release will supply a matching .paclet and a compact distribution ZIP with the three notebooks, source, README, license and citation. The release ZIP contains xPlorer.wl at its root; the repository source remains in Paclet/xPlorer.wl. To use a supplied local paclet, run PacletInstall with its path, restart the kernel, then:
 
 ```wl
 Needs["xPlorer`"];
@@ -97,7 +98,7 @@ The managed scope includes abstract tangent-bundle tensors, perturbations and na
 
 ## Validation and source development
 
-See [VALIDATION.md](VALIDATION.md) for the exact tested revision, environment and remaining acceptance checks. Executable tests and build helpers are maintained separately on [develop](https://github.com/physedu/xPlorer/tree/develop). The public source branch contains only the package, two public notebooks and documentation; the curated release ZIP contains seven files.
+See [VALIDATION.md](VALIDATION.md) for the exact tested revision, environment and remaining acceptance checks. Executable tests and build helpers are maintained separately on [develop](https://github.com/physedu/xPlorer/tree/develop). The public source branch contains only the package, three public notebooks and documentation; the curated release ZIP contains eight files.
 
 The complete internal development record is preserved on the [develop branch](https://github.com/physedu/xPlorer/tree/develop/Development). See [CHANGELOG.md](CHANGELOG.md) for public version history. The paclet and curated ZIP have been verified; the first public beta is pending Desktop visual acceptance and publication.
 

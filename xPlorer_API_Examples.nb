@@ -4,36 +4,24 @@ Cell[TextData[{"xPlorer - API Examples"}],"Title"],
 
 Cell[TextData[{"A massive scalar field on Minkowski, Schwarzschild and FLRW backgrounds | beta.1"}],"Subtitle"],
 
-Cell["Advanced executable reference. Start with xPlorer_Workflow.nb for the main scientific tutorial, then restart the kernel before using this notebook. All scientific groups are folded. The examples share a running kernel: evaluate the earlier setup and prerequisite sections before a later example. Sections 1-6 establish the scalar backgrounds, 7 defines the extended tensor study, 8 uses the cylindrical chart from 6, 9 and 11 use the tensor study, and 12 uses the source vector from 7. Section 10 demonstrates advanced notation and restores preferences. You can run all scientific sections in order after choosing one loading method. This is a reference, not a second introductory tutorial.","Text"],
+Cell["Advanced executable reference. Start with xPlorer_Workflow.nb for the main scientific tutorial, then restart the kernel before using this notebook. Main scientific sections are folded; their subsections are open. The examples share a running kernel: evaluate the earlier setup and prerequisite sections before a later example. Sections 1-6 establish the scalar backgrounds, 7 defines the extended tensor study, 8 uses the cylindrical chart from 6, 9 and 11 use the tensor study, and 12 uses the source vector from 7. Section 10 demonstrates advanced notation and restores preferences. You can run all scientific sections in order after choosing one loading method. This is a reference, not a second introductory tutorial.","Text"],
 
 Cell[CellGroupData[{
-Cell["Start here | Load xPlorer","Section"],
+Cell["Introduction","Section"],
 
-Cell["Requires Mathematica and xAct. Extract the complete release folder, start a fresh kernel and evaluate ONE of the following loading cells (Shift+Enter).","Text"],
+Cell["This reference develops the same scalar theory and then explores the wider API, including additional charts, tensor fields, independent connections and presentation settings. Examples share definitions: work through prerequisite sections in order.","Text"],
 
-Cell["A   Install and load  |  First use","Text",FontWeight->"Bold"],
+Cell["Use a fresh kernel with xAct installed. If you have not installed xPlorer, see xPlorer_Install.nb. Choose just one of these two loading methods.","Text"],
 
-Cell["Use the .paclet supplied beside this notebook. Installation is needed only once.","Text"],
-
-Cell[BoxData["If[!MatchQ[PacletInstall[FileNameJoin[{NotebookDirectory[],\n    \"xPlorer-1.0.0-beta.1.paclet\"}]], _PacletObject], Abort[]];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"],
-
-Cell["B   Load  |  Already installed","Text",FontWeight->"Bold"],
-
-Cell["Use this on subsequent sessions; no installation or archive is needed.","Text"],
+Cell["Installed paclet:","Text"],
 
 Cell[BoxData["Needs[\"xPlorer`\"];"],"Input",CellTags->"load_existing"],
 
-Cell["C   Direct source  |  No installation","Text",FontWeight->"Bold"],
+Cell["Direct source, without installation:","Text"],
 
-Cell["Use Get to load xPlorer.wl from the extracted release folder or the Paclet directory in a GitHub checkout.","Text"],
+Cell[BoxData["Get[If[FileExistsQ[FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}]],\n  FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}],\n  FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]]];"],"Input",CellTags->"load"],
 
-Cell[BoxData["With[{file = FileNameJoin[{NotebookDirectory[], \"xPlorer.wl\"}]},\n  Get[If[FileExistsQ[file], file,\n    FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]]]\n];"],"Input",CellTags->"load"],
-
-Cell["Check the version","Text",FontWeight->"Bold"],
-
-Cell["Continue only if this returns 1.0.0-beta.1. If an old internal 14.x paclet is selected, remove it with PacletUninstall and restart the kernel before loading again.","Text"],
-
-Cell[BoxData["If[$XPlorerVersion === \"1.0.0-beta.1\",\n  $XPlorerVersion,\n  Print[\"Wrong xPlorer version. Restart the kernel and check your installation.\"]; Abort[]\n]"],"Input",CellTags->"workflow_version"]
+Cell[BoxData["If[$XPlorerVersion === \"1.0.0-beta.1\", $XPlorerVersion, Print[\"Unexpected xPlorer version. See xPlorer_Install.nb.\"]; Abort[]]"],"Input",CellTags->"workflow_version"]
 },Open]],
 
 Cell["Optional presentation: show short background labels on mathematical objects, and use fraction notation for partial derivatives. These settings are purely visual. Turn ShowObjectLabels off to use ordinary xAct notation.","Text"],
@@ -120,7 +108,7 @@ Cell[TextData[{StyleBox["Inspecting registered objects",FontWeight->"Bold"]}],"T
 Cell[BoxData[RowBox[{"ShowTheory", "[", "\"Fields\"", "]"}]],"Code",Evaluatable->False,CellTags->"reference_registration_4_0"],
 
 Cell[BoxData[RowBox[{"TheoryValue", "[", RowBox[{"\"Fields\"", ",", "\"phi\""}], "]"}]],"Code",Evaluatable->False,CellTags->"reference_registration_4_1"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell[TextData[{"Register the scalar and its mass"}],"Subsubsection"],
@@ -192,8 +180,8 @@ Cell[BoxData[RowBox[{"ShowTheory","[","\"Lagrangians\"","]"}]],"Input",CellTags-
 Cell[BoxData[RowBox[{"TheoryValue", "[", RowBox[{"\"Lagrangians\"", ",", "\"Lagrangian\""}], "]"}]],"Input",CellTags->"registered_lagrangian"],
 
 Cell[TextData[{StyleBox["ClearTheory[]",FontFamily->"Courier",FontSize->14]," clears the registry. The original xAct objects g, CD and \:03c6 remain defined. Re-register the objects to use them in another theory."}],"Important"]
-},Closed]]
-},Closed]]
+},Open]]
+},Open]]
 },Closed]],
 
 Cell[CellGroupData[{
@@ -261,7 +249,7 @@ Cell[BoxData["ShowBackground[\"Schwarzschild\"]"],"Input",CellTags->"dev31_backg
 Cell[TextData[{"The geometry, fields and indices have their own entries. The ",StyleBox["\"Theory\"",FontFamily->"Courier",FontSize->14]," entry records the theory as it stood at creation.\n\nFields registered later appear in subsequent backgrounds."}],"Text"],
 
 Cell[TextData[{"Several backgrounds can coexist in one kernel. The tag selects the study, and its tensors and indices belong to its manifold."}],"Important"]
-},Closed]]
+},Open]]
 },Closed]],
 
 Cell[CellGroupData[{
@@ -352,7 +340,7 @@ Cell[TextData[{"Clear the active rules and request the equation again to recover
 Cell[BoxData[RowBox[{RowBox[{"ClearRules", "[", "\"Schwarzschild\"", "]"}], ";"}]],"Input",CellTags->"restore_massive_step_1"],
 
 Cell[BoxData[RowBox[{"UseExpression", "[", RowBox[{"\"Schwarzschild\"", ",", "\"ScalarEq\""}], "]"}]],"Input",CellTags->"restore_massive"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["Named groups of physical assumptions","Subsection"],
@@ -394,7 +382,7 @@ Cell[BoxData[RowBox[{"ShowRules", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Numb
 Cell[TextData[{"The massless rule now occupies position 1. Clear it to restore the general case."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"ClearRules", "[", "\"Schwarzschild\"", "]"}], ";"}]],"Input",CellTags->"clear_mass_rules"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["Flat geometry as an abstract assumption","Subsection"],
@@ -410,7 +398,7 @@ Cell[BoxData[RowBox[{"ApplyRules","[",RowBox[{"\"Minkowski\"",",",RowBox[{RowBox
 Cell[BoxData[RowBox[{"ApplyRules","[",RowBox[{"\"Minkowski\"",",",RowBox[{RowBox[{"Kretschmann","[",RowBox[{"CDM"}],"]"}],"[","]"}]}],"]"}]],"Input",CellTags->"flat_rules_part_2"],
 
 Cell[BoxData[RowBox[{RowBox[{"ClearRules", "[", "\"Minkowski\"", "]"}], ";"}]],"Input",CellTags->"clear_flat_rules"]
-},Closed]]
+},Open]]
 },Closed]],
 
 Cell[CellGroupData[{
@@ -442,7 +430,7 @@ Cell[TextData[{"Minkowski spacetime"}],"Subsection"],
 Cell[TextData[{"Supply the constant metric matrix in chart order {t,x,y,z}. ",StyleBox["MetricInBasis",FontFamily->"Courier",FontSize->14]," accepts the copied metric and infers its managed primary chart when the basis is omitted. xCoba stores the components; xPlorer remembers the input. The original explicit-basis xCoba syntax remains available. Further geometry is computed on request."}],"Text"],
 
 Cell[BoxData["MetricInBasis[gM, DiagonalMatrix[{-1, 1, 1, 1}], Assumptions -> assumptions];"],"Input",CellTags->"minkowski_metric"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell[TextData[{"Inspect the metric as an xCoba component tensor"}],"Subsection"],
@@ -476,8 +464,8 @@ Cell["MetricInBasis[g, -cart, mat]","Program",Evaluatable->False],
 Cell[TextData[{"If you start with a CTensor, designate it as the metric with SetCMetric. The signature counts three positive, one negative and zero null directions."}],"Text"],
 
 Cell["SetCMetric[CTensor[mat, {-cart,-cart}], cart, SignatureOfMetric -> {3,1,0}]","Program",Evaluatable->False]
-},Closed]]
-},Closed]],
+},Open]]
+},Open]],
 
 Cell[CellGroupData[{
 Cell[TextData[{"Schwarzschild exterior"}],"Subsection"],
@@ -487,7 +475,7 @@ Cell[TextData[{"For a coordinate-dependent metric, supply a function whose argum
 Cell[BoxData[RowBox[{RowBox[{"DefConstantSymbol", "[", "Mbh", "]"}], ";"}]],"Input",CellTags->"schwarzschild_metric_step_1"],
 
 Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gSchw", ",", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "r", ",", "theta", ",", "varphi"}], "}"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", RowBox[{"(", RowBox[{"1", "-", FractionBox[RowBox[{"2", " ", "Mbh"}], "r"]}], ")"}]}], ",", FractionBox["1", RowBox[{"1", "-", FractionBox[RowBox[{"2", " ", "Mbh"}], "r"]}]], ",", SuperscriptBox["r", "2"], ",", RowBox[{SuperscriptBox["r", "2"], " ", SuperscriptBox[RowBox[{"Sin", "[", "theta", "]"}], "2"]}]}], "}"}], "]"}]}], "]"}], ",", RowBox[{"Assumptions", "\[Rule]", RowBox[{"Function", "[", RowBox[{RowBox[{"{", RowBox[{"t", ",", "r", ",", "theta", ",", "varphi"}], "}"}], ",", RowBox[{"assumptions", "&&", RowBox[{"Mbh", ">", "0"}], "&&", RowBox[{"r", ">", RowBox[{"2", " ", "Mbh"}]}], "&&", RowBox[{"0", "<", "theta", "<", "\[Pi]"}]}]}], "]"}]}]}], "]"}], ";"}]],"Input",CellTags->"schwarzschild_metric"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell[TextData[{"Spatially flat FLRW"}],"Subsection"],
@@ -508,7 +496,7 @@ Cell[BoxData[RowBox[{RowBox[{"ToComponents","[",RowBox[{"\"Schwarzschild\"",",",
 
 
 Cell[BoxData[RowBox[{RowBox[{RowBox[{"gFLRW","[",RowBox[{RowBox[{"-","aFLRW"}],",",RowBox[{"-","bFLRW"}]}],"]"}], "//", "ToComponents"}],"//","MatrixForm"}]],"Input",CellTags->"metric_matrix_flrw"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell[TextData[{"A general scalar field in Minkowski"}],"Subsection"],
@@ -563,7 +551,7 @@ Cell[BoxData[TagBox[FormBox[RowBox[{RowBox[{RowBox[{"-", TagBox[FractionBox[RowB
 Cell[TextData[{"Evaluate the registered Lagrangian with the same Minkowski profile."}],"Text"],
 
 Cell[BoxData[RowBox[{"lagMink", "=", RowBox[{"lagrangianM", "//", "ToComponents"}]}]],"Input",CellTags->"minkowski_lagrangian"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell[TextData[{"A static radial field in Schwarzschild"}],"Subsection"],
@@ -602,7 +590,7 @@ Cell[TextData[{"Differentiate the divergence form with ",StyleBox["D",FontFamily
 Cell[BoxData[RowBox[{RowBox[{"radialEq", "=", RowBox[{FractionBox[RowBox[{SubscriptBox["\[PartialD]", RowBox[{RowBox[{"rSchw","[","]"}]}]], RowBox[{"(", RowBox[{SuperscriptBox[RowBox[{"rSchw","[","]"}], "2"], " ", RowBox[{"(", RowBox[{"1", "-", FractionBox[RowBox[{"2", " ", "Mbh"}], RowBox[{"rSchw","[","]"}]]}], ")"}], " ", RowBox[{SuperscriptBox["u", "\[Prime]", MultilineFunction -> None], "[", RowBox[{"rSchw","[","]"}], "]"}]}], ")"}]}], SuperscriptBox[RowBox[{"rSchw","[","]"}], "2"]], "-", RowBox[{SuperscriptBox["m", "2"], " ", RowBox[{"u", "[", RowBox[{"rSchw","[","]"}], "]"}]}]}]}], ";"}]],"Input",CellTags->"schwarzschild_check_step_1"],
 
 Cell[BoxData[RowBox[{"radialCheck", "=", RowBox[{"Simplify", "[", RowBox[{"eqSchw", "-", "radialEq"}], "]"}]}]],"Input",CellTags->"schwarzschild_check"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell[TextData[{"Export the radial equation and recover an abstract formula"}],"Subsection"],
@@ -620,7 +608,7 @@ Cell[BoxData[RowBox[{"ToExpression","[",RowBox[{"replayEab"}],"]"}]],"Input",Cel
 Cell[BoxData[RowBox[{"ExpressionText","[",RowBox[{"\"Schwarzschild\"",",","\"Eab\"",",","\"TeX\""}],"]"}]],"Input",CellTags->"tex_abstract"],
 
 Cell[TextData[{"With TexAct installed, choose ",StyleBox["\"TexAct\"",FontFamily->"Courier",FontSize->14]," in ",StyleBox["ExpressionText",FontFamily->"Courier",FontSize->14]," for its tensor-specific LaTeX notation. To reproduce the calculation in another kernel, supply the notebook and its matching package."}],"Text"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell[TextData[{"Curvature of the Schwarzschild exterior"}],"Subsection"],
@@ -636,7 +624,7 @@ Cell[BoxData["ricciSchw"],"Input",CellTags->"schwarzschild_curvature_part_1"],
 Cell[BoxData["kretschmannSchw"],"Input",CellTags->"schwarzschild_curvature_part_2"],
 
 Cell[TextData[{"For component values of a specified metric, this calculation uses xCoba. For symbolic identities among curvature scalars, the separate Invar package provides a database of abstract contractions."}],"Tip"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell[TextData[{"A homogeneous scalar in FLRW"}],"Subsection"],
@@ -664,7 +652,7 @@ Cell[BoxData[RowBox[{RowBox[{"lagFLRW", "=", RowBox[{"lagrangianFLRW", "//", "To
 Cell[BoxData["einstein00"],"Input",CellTags->"flrw_geometry_part_1"],
 
 Cell[BoxData["lagFLRW"],"Input",CellTags->"flrw_geometry_part_2"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["Presentation applied to physical results","Subsection"],
@@ -706,7 +694,7 @@ Cell["The label preferences can also be chosen when creating a background or def
 Cell["CreateBackground[\"Schwarzschild\", SymbolSuffix -> \"Schw\", BackgroundLabel -> \"S\", ShowObjectLabels -> True]","Program",Evaluatable->False],
 
 Cell["DefineChart[\"Schwarzschild\", {t[],r[],theta[],varphi[]}, BackgroundLabel -> \"S\"]","Program",Evaluatable->False]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["A new observable without registering another formula","Subsection"],
@@ -728,7 +716,7 @@ Cell[BoxData["ShowBackground[\"Schwarzschild\"]"],"Input",CellTags->"background_
 Cell[BoxData["ShowBackground[\"FLRW\", \"Fields\"]"],"Input",CellTags->"background_fields"],
 
 Cell[BoxData["BackgroundValue[\"Schwarzschild\", \"MetricMatrix\"] // MatrixForm"],"Input",CellTags->"background_metric_value"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell[TextData[{"Checking a solution"}],"Subsection"],
@@ -750,7 +738,7 @@ Cell[BoxData[RowBox[{"onShell", "=", RowBox[{"Simplify", "[", RowBox[{"waveResid
 Cell[TextData[{"A zero residual verifies the plane wave for the stated dispersion relation."}],"Text"],
 
 Cell["The three physical geometries and their scalar profiles are now available in the same kernel. The next section explores changes without recreating a geometry.","Text"]
-},Closed]]
+},Open]]
 },Closed]],
 
 Cell[CellGroupData[{
@@ -790,7 +778,7 @@ Cell[BoxData[RowBox[{RowBox[{"phiM","[","]"}], "//", "ToComponents"}]],"Input",C
 Cell[BoxData[RowBox[{"boxPhiM", "//", "ToComponents"}]],"Input",CellTags->"profile_wave_box_after"],
 
 Cell[BoxData["MetricCompute[gM, {\"Metric\"}]"],"Input",CellTags->"profile_cached_geometry"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell[TextData[{"One Minkowski metric, two coordinate charts"}],"Subsection"],
@@ -864,7 +852,7 @@ Cell[BoxData["ComponentValue[phiM[], Cos[w tM[] - k zM[]]];"],"Input",CellTags->
 Cell[BoxData["eabCyl"],"Input",CellTags->"general_cyl_equation"],
 
 Cell[TextData[{"For the radial profile the angular component is 2r\:00b2 + m\:00b2r\:2074."}],"Text"]
-},Closed]]
+},Open]]
 },Closed]],
 
 Cell[CellGroupData[{
@@ -950,7 +938,7 @@ Cell[TextData[{StyleBox["FreeIndices",FontFamily->"Courier",FontSize->14]," fixe
 Cell[BoxData[RowBox[{RowBox[{RowBox[{"FminkF", "[", RowBox[{RowBox[{"-", "aminkF"}], ",", RowBox[{"-", "bminkF"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "bminkF"}], ",", RowBox[{"-", "aminkF"}]}], "}"}]}]}], "]"}]}],"//","MatrixForm"}]],"Input",CellTags->"tensor_selection_part_1"],
 
 Cell[BoxData[RowBox[{RowBox[{"FminkF", "[", RowBox[{RowBox[{"-", "aminkF"}], ",", RowBox[{"-", "bminkF"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "1"}], "}"}], ",", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}], "}"}]}]}], "]"}]}]],"Input",CellTags->"tensor_selection_part_2"]
-},Closed]]
+},Open]]
 },Closed]],
 
 Cell[CellGroupData[{
@@ -1022,7 +1010,7 @@ Cell[TextData[{"Request the Ricci and Einstein tensors twice. With the same metr
 Cell[BoxData[RowBox[{"MetricCompute", "[", RowBox[{"gminkF", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_1"],
 
 Cell[BoxData[RowBox[{"MetricCompute", "[", RowBox[{"gminkF", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_2"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["Optional: detect stale notebook results","Subsection"],
@@ -1058,7 +1046,7 @@ Cell[TextData[{"Restore the Minkowski metric."}],"Text"],
 Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gminkF", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"restore_metric"],
 
 Cell["The vector study has been restored to its original metric. The scalar backgrounds and their perturbations have not changed.","Text"]
-},Closed]]
+},Open]]
 },Closed]],
 
 Cell[CellGroupData[{
@@ -1106,7 +1094,7 @@ Cell[BoxData[RowBox[{RowBox[{"UnregisterTheory", "[", RowBox[{"\"Fields\"", ",",
 Cell[BoxData[RowBox[{"Keys", "[", RowBox[{"TheoryValue", "[", "\"Fields\"", "]"}], "]"}]],"Input",CellTags->"close_naming"],
 
 Cell[BoxData["ClearTheory[]; RegisterTheory[namingRegistry];"],"Input",CellTags->"naming_restore"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["Change the appearance of the original physical tensors and full equations without changing the calculations.","Subsection"],
@@ -1145,7 +1133,7 @@ Cell[CellGroupData[{
 Cell["Notation and expression views","Subsubsection"],
 
 Cell["SetXPlorerPreferences changes session-wide defaults. SetNotation overrides them for one background. PrettyExp changes only the display of one expression.\n\nThese commands do not change tensor identities or mathematical results.","Text"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["Covariant derivatives: compare actual tensor expressions","Subsubsection"],
@@ -1159,7 +1147,7 @@ Cell[BoxData[RowBox[{"EabSchw","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"Cov
 Cell[BoxData[RowBox[{"EabSchw","//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Postfix\""}]}],"]"}]}]],"Input",CellTags->"eab_postfix"],
 
 Cell[BoxData[RowBox[{RowBox[{"(",RowBox[{"scalarEqSchw","\[Equal]","0"}],")"}],"//",RowBox[{"PrettyExp","[",RowBox[{RowBox[{"CovariantStyle","\[Rule]","\"Postfix\""}]}],"]"}]}]],"Input",CellTags->"kg_postfix"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["Session preferences and local overrides","Subsubsection"],
@@ -1211,8 +1199,8 @@ Cell[BoxData[RowBox[{"SetXPlorerPreferences","[",RowBox[{RowBox[{"\"Metric\"","\
 Cell["Restore the initial label and fraction preferences for the remaining examples.","Text"],
 
 Cell[BoxData["SetXPlorerPreferences[ShowObjectLabels -> True, PartialStyle -> \"Fraction\"];"],"Input",CellTags->"session_fraction"]
-},Closed]]
-},Closed]]
+},Open]]
+},Open]]
 },Closed]],
 
 Cell[CellGroupData[{
@@ -1242,7 +1230,7 @@ Cell[BoxData[RowBox[{RowBox[{"ClearComputedValues","[",RowBox[{"\"MinkowskiField
 Cell[BoxData[RowBox[{"MetricCompute","[",RowBox[{"gminkF",",",RowBox[{"{",RowBox[{"\"Ricci\"",",","\"Einstein\""}],"}"}]}],"]"}]],"Input",CellTags->"lifecycle_recompute"],
 
 Cell[BoxData[RowBox[{RowBox[{"AminkF","[",RowBox[{"aminkF"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_after_clear_geometry"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["11.2. Clear field values, preserve the tensor","Subsubsection"],
@@ -1270,7 +1258,7 @@ Cell[BoxData[RowBox[{RowBox[{"RemoveProfile","[",RowBox[{"\"MinkowskiFields\"","
 Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{"ShowProfiles","[",RowBox[{"\"MinkowskiFields\""}],"]"}]}],"]"}]],"Input",CellTags->"lifecycle_profiles_remaining"],
 
 Cell[BoxData[RowBox[{RowBox[{"AminkF","[",RowBox[{"aminkF"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_profile_removal_value"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["11.3. Remove a stored specialization","Subsubsection"],
@@ -1284,7 +1272,7 @@ Cell[BoxData[RowBox[{RowBox[{"RemoveRuleGroup","[",RowBox[{"\"Schwarzschild\"","
 Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{"ShowRuleGroups","[",RowBox[{"\"Schwarzschild\""}],"]"}]}],"]"}]],"Input",CellTags->"lifecycle_rule_groups_after"],
 
 Cell[BoxData[RowBox[{"scalarEqSchw","//","PrettyExp"}]],"Input",CellTags->"lifecycle_rule_group_eq"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["11.4. Save a complete reconstruction recipe","Subsubsection"],
@@ -1296,7 +1284,7 @@ Cell[BoxData[RowBox[{RowBox[{"recipe","=",RowBox[{"ReconstructionData","[",RowBo
 Cell[BoxData[RowBox[{"Keys","[",RowBox[{"recipe"}],"]"}]],"Input",CellTags->"lifecycle_recipe_keys"],
 
 Cell["The source xAct definitions must remain alive. The recipe preserves managed primary-chart inputs, including captured native assignments, named chart maps and independent rules. Arbitrary external native definitions and saved derived results are not restored. The old object identities will not survive deletion.","Text"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["11.5. Preview deletion before changing anything","Subsubsection"],
@@ -1318,7 +1306,7 @@ Cell[BoxData[RowBox[{RowBox[{"oldMetric", "=", RowBox[{"BackgroundObject", "[", 
 Cell["The old metric reference will be used to verify that the actual xAct definition has been removed. This is different from clearing a value.","Text"],
 
 Cell[BoxData[RowBox[{"MetricQ", "[", "oldMetric", "]"}]],"Input",CellTags->"before_deletion"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["11.6. Delete the study, then recover it","Subsubsection"],
@@ -1342,7 +1330,7 @@ Cell[BoxData["BackgroundValue[\"MinkowskiFields\", \"MetricMatrix\"] // MatrixFo
 Cell[BoxData[RowBox[{RowBox[{"AminkF","[",RowBox[{"aminkF"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"recreate_background"],
 
 Cell["The metric and raised vector agree with the values before deletion. Any aliases assigned manually to the old symbols must be refreshed. The automatic aliases are created again.","Text"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["11.7. Change the restored study without recreating it","Subsubsection"],
@@ -1357,7 +1345,7 @@ Cell[BoxData[RowBox[{RowBox[{"Aup", "=", RowBox[{RowBox[{"AminkF", "[", "aminkF"
 Cell[BoxData["Aup"],"Input",CellTags->"fresh_vector"],
 
 Cell["The upper time component is now -5. This is a new physical input, not a change of tensor definition.","Text"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["11.8. Delete only one owned tensor","Subsubsection"],
@@ -1381,7 +1369,7 @@ Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{RowBox[{"BackgroundValue","[",Ro
 Cell[BoxData[RowBox[{RowBox[{"AminkF","[",RowBox[{"aminkF"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_vector_preserved"],
 
 Cell["For dependent fields, Cascade -> True authorizes deletion of tracked dependent objects, expressions and rules within this background. Always inspect the cascade plan first. External xAct dependents remain protected.","Text"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["11.9. Preview removal of a chart or metric","Subsubsection"],
@@ -1401,7 +1389,7 @@ Cell["DeleteBackgroundObject[\"MinkowskiFields\", \"Chart\", Cascade -> True]","
 Cell["DeletionPlan[\"MinkowskiFields\", \"Metric\", Cascade -> True]","Program",Evaluatable->False],
 
 Cell["DeleteBackgroundObject[\"MinkowskiFields\", \"Metric\", Cascade -> True]","Program",Evaluatable->False]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["11.10. Unregister a theory or close the entire session","Subsubsection"],
@@ -1427,7 +1415,7 @@ Cell["ClearBackgrounds[]","Program",Evaluatable->False],
 Cell["ClearTheory[]","Program",Evaluatable->False],
 
 Cell["These two commands are deliberately not evaluated by the tutorial. The scalar backgrounds and the restored vector study remain available for further work. The optional affine example follows. The initial scalar definitions in section 1 can be reused in a separate notebook.","Text"]
-},Closed]]
+},Open]]
 },Closed]],
 
 Cell[CellGroupData[{
@@ -1519,7 +1507,7 @@ Cell[TextData[{"Restore the source registry, including its metric perturbation. 
 Cell[BoxData["ClearTheory[]; RegisterTheory[affineRegistry];"],"Input",CellTags->"unregister_affine"],
 
 Cell[TextData[{"Use ",StyleBox["StrictComponents -> True",FontFamily->"Courier",FontSize->14]," when every requested component must be explicit. An unresolved component then returns a Failure."}],"Tip"]
-},Closed]],
+},Open]],
 
 Cell[CellGroupData[{
 Cell["Remove an independent connection and close the study","Subsection"],
@@ -1539,7 +1527,7 @@ Cell["The independent connection is no longer present; the Levi-Civita connectio
 Cell[BoxData[RowBox[{RowBox[{"DeleteBackground", "[", "\"AffineStudy\"", "]"}], ";"}]],"Input",CellTags->"close_affine_study"],
 
 Cell["This deliberately undefines the copied affine objects. Their names may become blue in earlier input cells after evaluation. This is normal Mathematica syntax highlighting; the source derivative and other backgrounds remain defined.","Text"]
-},Closed]]
+},Open]]
 },Closed]]
 },PageWidth->WindowWidth,WindowTitle->"xPlorer - Theory and backgrounds",StyleDefinitions->Notebook[{
  Cell[StyleData[StyleDefinitions -> "Default.nb"]],
