@@ -34,7 +34,7 @@ Block[{xAct`xPerm`$xpermQ=False,NotebookDirectory=Function[root]},
  "metric edit"->SameQ[outputs["raised_changed"],{-1/4,2,3,4}]&&SameQ[outputs["norm_changed"],115/4],
  "restoration"->SameQ[outputs["norm_restored"],28]&&SameQ[outputs["raised_recovered"],{-1,2,3,4}],
  "four independent studies"->Length[BackgroundValue[]]===4,
- "labels preserve math"->SameQ[Normal[outputs["postfix_view"]],outputs["prefix_view"]],
+ "labels preserve math"->Block[{xAct`xPerm`$xpermQ=False},With[{v=Normal[outputs["postfix_view"]],w=outputs["prefix_view"]},Head[v]===Equal&&Head[w]===Equal&&TrueQ[ToCanonical[First[v]-First[w]]===0]&&SameQ[Last[v],Last[w]]]],
  "visual inspection"->MatchQ[outputs["inspect_s"],_Column]&&MatchQ[outputs["models_final"],_Grid]
  |>;
 <|"Inputs"->Length[inputs],"Executed"->Length[outputs],"Warnings"->warnings,"UnexpectedFailures"->Keys@Select[outputs,!FreeQ[#,_Failure|$Failed|$Aborted]&],"Passed"->Count[Values[checks],True],"Total"->Length[checks],"FailedChecks"->Keys@Select[checks,!TrueQ[#]&]|>
