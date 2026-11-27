@@ -18,12 +18,12 @@ ClearTheory::usage = "ClearTheory[] resets $Theory to an empty association.";
 
 CreateBackground::usage = "CreateBackground[tag] creates a background from $Theory. Use CreateBackground[tag, Indices -> Automatic] to reuse theory indices or CreateBackground[tag, Indices -> {...}] to choose a background-specific index list. Free suffixed names in the calling context refer directly to the created objects, indices and registered expressions. Use SymbolSuffix for the symbol names, PrintAs for the metric label and MetricSignature for its signature.";
 AddField::usage = "AddField[tag, source] copies one registered source field into an existing background, preserving its geometry and inputs. It does not import new formulas.";
-PortExpression::usage = "PortExpression[tag, expr] ports an abstract expression expr to the background tag.";
+PortExpression::usage = "PortExpression[tag, expr] or expr // PortExpression[tag] ports an abstract source expression to the selected background.";
 PrettyExp::usage = "PrettyExp[expr, opts], expr // PrettyExp, expr // PrettyExp[tag], expr // PrettyExp[opts], or PrettyExp[tag, expr, opts] creates an interpreted presentation view. Normal returns the original expression. Infer a unique background when possible; otherwise use session defaults.";
 AddRules::usage = "AddRules[tag, rules] adds specialization rules to the background tag.";
 ClearRules::usage = "ClearRules[tag] removes specialization rules from the background tag.";
 ShowRules::usage = "ShowRules[tag] returns active rules in order. ShowRules[tag, \"Numbered\"] pairs them with their one-based positions.";
-ApplyRules::usage = "ApplyRules[tag, expr] applies the specialization rules stored for tag to expr.";
+ApplyRules::usage = "ApplyRules[tag, expr], expr // ApplyRules[tag], or expr // ApplyRules applies specialization rules. The last form infers a unique owning background; otherwise specify the tag explicitly.";
 UseExpression::usage = "UseExpression[tag,key] or UseExpression[tag,section,key] transports a registered formula and applies active background rules.";
 DefineChart::usage = "DefineChart[tag, {t[],r[],theta[],varphi[]}] defines the primary chart and exposes suffixed coordinate aliases. DefineChart[tag, name, coordinates, map] defines another chart; map supplies primary coordinates as a function of the new coordinates. String label lists are also supported for compatibility; scalar declarations install coordinate aliases.";
 DeleteBackground::usage = "DeleteBackground[tag] undefines owned xAct objects and removes the background from the registry.";
@@ -459,6 +459,7 @@ AddField[tag_String,source_Symbol] := Module[{b=background[tag],specs,key,spec,r
 sourceIndexQ[s_Symbol, bundle_] := Module[{known = Flatten[IndicesOfVBundle[bundle]], name = SymbolName[s]},
   MemberQ[known, s] || (StringContainsQ[name, "$"] && AnyTrue[known, StringStartsQ[name, SymbolName[#] <> "$"] &] && AIndexQ[s, bundle])
 ];
+PortExpression[tag_String][expr_] := PortExpression[tag,expr];
 PortExpression[tag_String, expr_] := Module[{bg = background[tag], held, indices, extras, ir, output, leftovers},
   If[FailureQ[bg], Return[bg]];
   held = With[{ex = expr}, HoldComplete[ex]];
@@ -477,6 +478,11 @@ AddRules[tag_String, rules_List] := Module[{bg = background[tag]}, If[FailureQ[b
   refreshRules[tag,<|"IndividualRules"->Join[individualRules[bg],rules]|>];$BG[tag]];
 ClearRules[tag_String] := ReplaceRules[tag,{}];
 ShowRules[tag_String] := Module[{b = background[tag]}, If[FailureQ[b], b, b["SpecializationRules"]]];
+ApplyRules[tag_String][expr_] := ApplyRules[tag,expr];
+ApplyRules[expr:Except[_String]] := Module[{tag=notationOwner[expr]},
+  If[!StringQ[tag],Return[failure["RulesBackground","Cannot infer a unique background. Use ApplyRules[tag, expr]."]]];
+  ApplyRules[tag,expr]
+];
 ApplyRules[tag_String, expr_] := Module[{b = background[tag]}, If[FailureQ[b], b, expr /. b["SpecializationRules"]]];
 SetFlatRules[tag_String] := Module[{b = background[tag], heads, rules}, If[FailureQ[b], Return[b]];
   heads = Lookup[b, {"Riemann", "Ricci", "Einstein", "Weyl"}];
@@ -2051,7 +2057,8 @@ objectLabelPlan[e_,a_] := Module[{symbols,plan=<||>,b,settings,rec,chart,local,o
 ];
 applyObjectLabel[h_,rec_] := Module[{label=rec["Label"],base,markers},
  If[CovDQ[h],markers=SymbolOfCovD[h];
-   With[{hh=h,mm={RowBox[{First[markers],RowBox[{"(",label,")"}]}],labelBox[Last[markers],label,False]}},SymbolOfCovD[hh]^=mm],
+   (* Native xTensor postfix formatting uses DerSymbolLength and StringJoin. Its first marker must remain a string. *)
+   With[{hh=h,mm={First[markers]<>"("<>label<>")",labelBox[Last[markers],label,False]}},SymbolOfCovD[hh]^=mm],
    base=PrintAs[h];With[{hh=h,bb=labelBox[base,label,rec["Coordinate"]]},PrintAs[hh]^=bb]]
 ];
 labelledNotationBoxes[e_,a_] := Module[{plan=If[KeyExistsQ[a,"ResolvedObjectLabels"],a["ResolvedObjectLabels"],objectLabelPlan[e,a]]},
@@ -2059,16 +2066,20 @@ labelledNotationBoxes[e_,a_] := Module[{plan=If[KeyExistsQ[a,"ResolvedObjectLabe
  With[{heads=Keys[plan]},Internal`InheritedBlock[heads,KeyValueMap[applyObjectLabel,plan];notationBoxes[e,a]]]
 ];
 nativeBoxes[e_] := With[{ex=e},MakeBoxes[ex,StandardForm]];
-notationAtom /: MakeBoxes[notationAtom[b_, original_], StandardForm] := b;
-notationAtom /: MakeBoxes[notationAtom[b_, original_], TraditionalForm] := b;
-notationDisplayTree[e_,a_] := Which[
-  MatchQ[e,Derivative[__][_][__]] && a["PartialStyle"]=!="Native",
-    notationAtom[notationBoxes[e,a],e],
-  MatchQ[e,_?CovDQ[_][_]] && a["CovariantStyle"]=!="Native",
-    notationAtom[notationBoxes[e,a],e],
-  AtomQ[e] || xTensorQ[Head[e]] || FreeQ[e,Derivative|_?CovDQ],e,
-  MemberQ[{Plus,Times,Power,Equal,List},Head[e]],Map[notationDisplayTree[#,a]&,e],
-  True,notationAtom[RowBox[{nativeBoxes[Head[e]],"[",RowBox[Riffle[notationBoxes[#,a]& /@ (List@@e),","]],"]"}],e]
+(* Build a pure Wolfram arithmetic skeleton from temporary scalar leaves. Do not mix
+   inert box wrappers with indexed xAct tensors inside a Times/Plus expression:
+   xTensor's formatting and index validation can interpret the wrapper as a tensor. *)
+notationComposeBoxes[e_,a_] := Module[{rules={},leaf,walk,tree},
+  leaf[b_] := Module[{token},AppendTo[rules,nativeBoxes[token]->b];token];
+  walk[x_] := Which[
+    NumberQ[x],x,
+    MemberQ[{Plus,Times,Power,Equal,List},Head[x]],Map[walk,x],
+    MatchQ[x,Derivative[__][_][__]] && a["PartialStyle"]=!="Native",leaf[notationBoxes[x,a]],
+    MatchQ[x,_?CovDQ[_][_]] && a["CovariantStyle"]=!="Native",leaf[notationBoxes[x,a]],
+    AtomQ[x] || xTensorQ[Head[x]] || FreeQ[x,Derivative|_?CovDQ],leaf[nativeBoxes[x]],
+    True,leaf[RowBox[{nativeBoxes[Head[x]],"[",RowBox[Riffle[notationBoxes[#,a]& /@ (List@@x),","]],"]"}]]
+  ];
+  tree=walk[e];nativeBoxes[tree]/.rules
 ];
 notationGroup[e_,b_] := If[Head[e]===Plus || Head[e]===Times || Head[e]===Equal,RowBox[{"(",b,")"}],b];
 (* TeX is generated from presentation boxes, not private symbol names.
@@ -2108,7 +2119,7 @@ notationBoxes[e_,a_] := Module[{orders,args,fn,n,terms,den,body,mark,ix,h=Head[e
   (* Delegate operator precedence, signs, fractions and powers to Mathematica.
      Only the display copy contains inert box atoms. The InterpretationBox
      and Normal retain the original mathematical expression. *)
-  nativeBoxes[notationDisplayTree[e,a]]
+  notationComposeBoxes[e,a]
 
 ];
 

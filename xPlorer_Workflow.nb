@@ -198,7 +198,7 @@ Cell[BoxData["SetPresentation[\"Schwarzschild\", \"phi\" -> Automatic, \"Metric\
 Cell[CellGroupData[{
 Cell["Specialize a theory without changing the others","Subsection"],
 
-Cell[TextData[{"Take the massless limit only on Schwarzschild using ",StyleBox["AddRules",FontFamily->"Courier",FontSize->14],". This stores a local replacement, rather than assigning a global value to m.\n\n",StyleBox["UseExpression",FontFamily->"Courier",FontSize->14]," retrieves a registered formula with the active rules applied. The original alias remains general, so we can compare the massive and massless forms."}],"Text"],
+Cell[TextData[{"Take the massless limit only on Schwarzschild using ",StyleBox["AddRules",FontFamily->"Courier",FontSize->14],". This stores a local replacement, rather than assigning a global value to m.\n\n",StyleBox["UseExpression",FontFamily->"Courier",FontSize->14]," retrieves a registered formula with the active rules applied. The original alias remains general, so we can compare the massive and massless forms. ApplyRules can infer the background from the copied expression."}],"Text"],
 
 Cell[BoxData["AddRules[\"Schwarzschild\", {m -> 0}];"],"Input",CellTags->"individual_rules"],
 
@@ -208,7 +208,7 @@ Cell[BoxData["UseExpression[\"Schwarzschild\", \"Lagrangians\", \"Matter\"]"],"I
 
 Cell[BoxData["LSchw"],"Input",CellTags->"general_lagrangian"],
 
-Cell[BoxData["ApplyRules[\"Schwarzschild\", EabSchw]"],"Input",CellTags->"rule_eab"],
+Cell[BoxData["EabSchw // ApplyRules"],"Input",CellTags->"rule_eab"],
 
 Cell[BoxData["kgM == 0"],"Input",CellTags->"other_abstract"],
 
@@ -382,7 +382,7 @@ Cell[BoxData["First[EabFLRW // ToComponents[FreeIndices -> {-aFLRW,-bFLRW}, Comp
 
 Cell[TextData[{"For a new observable that was not registered, use ",StyleBox["PortExpression",FontFamily->"Courier",FontSize->14],". Here we transport the scalar trace of the stress tensor and evaluate it on FLRW."}],"Text"],
 
-Cell[BoxData["PortExpression[\"FLRW\", g[a,b] stress] // ToComponents"],"Input",CellTags->"trace_stress"],
+Cell[BoxData["g[a,b] stress // PortExpression[\"FLRW\"] // ToComponents"],"Input",CellTags->"trace_stress"],
 
 Cell[TextData[{"A caption keeps the origin of the energy density clear when reusing it elsewhere in the notebook.\n\n",StyleBox["ExpressionText",FontFamily->"Courier",FontSize->14]," exports the mathematical notation of a result to LaTeX."}],"Text"],
 
@@ -408,7 +408,7 @@ Cell[BoxData["dGF = Einstein[CDFLRW][aFLRW,-bFLRW] // PerturbOn[1]"],"Input",Cel
 
 Cell[TextData[{"The expressions have identical abstract structure but use independent metrics, perturbations and derivatives. For this longer expression, use one background caption instead of repeated object labels."}],"Text"],
 
-Cell[BoxData["dGF // PrettyExp[CovariantStyle -> \"Native\", ShowObjectLabels -> False, ShowBackgroundLabel -> True]"],"Input",CellTags->"wave_pretty"],
+Cell[BoxData["dGF // PrettyExp[CovariantStyle -> \"Postfix\", ShowObjectLabels -> False, ShowBackgroundLabel -> True]"],"Input",CellTags->"wave_pretty"],
 
 Cell[TextData[{"Assign the tensor profile. ",StyleBox["LI[1]",FontFamily->"Courier",FontSize->14]," labels the first variation, not a component index. The primary metric matrices from section 3 are unchanged."}],"Text"],
 

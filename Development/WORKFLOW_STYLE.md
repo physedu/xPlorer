@@ -23,7 +23,7 @@ Maintainer's requirements (27 November 2026). Apply these before editing either 
 
 - After SetPresentation or SetNotation, demonstrate the persistent change with a bare expression in an ordinary output cell. Do not append PrettyExp to force an already configured appearance. Reserve PrettyExp for meaningful, temporary per-expression overrides.
 
-- Prefer the supported postfix syntax for owned expressions (ToComponents, ToCTensor, PerturbOn, PrettyExp). Omit redundant background tags when ownership is inferable. Check the actual package definitions before using an overload; in public beta 1 ApplyRules and PortExpression require explicit tag and expression arguments, and UseExpression retrieves a named registry entry. Do not invent postfix overloads or add anonymous-function wrappers just for style.
+- Prefer the supported postfix syntax for owned expressions (ToComponents, ToCTensor, PerturbOn, PrettyExp). Omit redundant background tags when ownership is inferable. Check the actual package definitions before using an overload; ApplyRules infers ownership or accepts an explicit tag; PortExpression needs the destination tag (including its postfix form), and UseExpression retrieves a named registry entry. Do not invent postfix overloads or add anonymous-function wrappers just for style.
 
 ## Acceptance
 

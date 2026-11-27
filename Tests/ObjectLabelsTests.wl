@@ -7,7 +7,7 @@ Block[{xAct`xPerm`$xpermQ=False,xAct`xTensor`$DefInfoQ=False,xAct`xCoba`$CVVerbo
  checks=<||>; checks["direct snapshot"]=SameQ[TheorySnapshot[],snap];
  boxes[ex_]:=With[{ee=ex},MakeBoxes[ee,StandardForm]];
  display[ex_]:=boxes[ex]//.InterpretationBox[d_,___]:>d;
- label[ex_,s_]:=!FreeQ[display[ex],s];
+ label[ex_,s_]:=AnyTrue[Cases[display[ex],_String,Infinity],#===s||StringContainsQ[#,"("<>s<>")"]&];
  roundtrip[ex_]:=ToExpression[boxes[ex],StandardForm,HoldComplete]===With[{v=Normal[ex]},HoldComplete[v]];
  auto[ex_]:=xPlorer`Private`notebookPrint[ex];
  CreateBackground["One",SymbolSuffix->"O",BackgroundLabel->"ONE",ShowObjectLabels->True];
@@ -67,6 +67,10 @@ Block[{xAct`xPerm`$xpermQ=False,xAct`xTensor`$DefInfoQ=False,xAct`xCoba`$CVVerbo
  checks["new tensor inherits"]=label[auto[BO[-aO,-bO]],"ONE"];
  DefMetricPerturbation[g,h,eps]; RegisterTheory["Field",h]; AddField["One",h];
  checks["perturbation inherits"]=label[auto[hO[LI[1],-aO,-bO]],"ONE"];
+ dg=Einstein[CDO][aO,-bO]//PerturbOn[1];
+ Do[Do[checks["Einstein variation "<>native<>"/"<>style]=Block[{$CovDFormat=native},Module[{view=PrettyExp[dg,CovariantStyle->style],bb},bb=Check[boxes[view],$Failed];bb=!=$Failed&&FreeQ[bb,_StringJoin|_Table|_ErrorBox]&&label[view,"ONE"]&&roundtrip[view]]],{style,{"Native","Prefix","Postfix"}}],{native,{"Prefix","Postfix"}}];
+ checks["Einstein native automatic"]=Block[{$CovDFormat="Postfix"},Check[label[auto[dg],"ONE"],False]];
+ AddRules["One",{m->0}]; checks["ApplyRules inferred"]=SameQ[(m phiO[]//ApplyRules),0]; checks["ApplyRules explicit postfix"]=SameQ[(m phiO[]//ApplyRules["One"]),0]; checks["ApplyRules independent"]=SameQ[(m phiT[]//ApplyRules),m phiT[]]; checks["ApplyRules ambiguous"]=FailureQ[(phiO[]+phiT[])//ApplyRules]; checks["ApplyRules ownerless"]=FailureQ[m//ApplyRules]; checks["PortExpression postfix"]=SameQ[(phi[]//PortExpression["One"]),phiO[]]; checks["PortExpression missing"]=FailureQ[phi[]//PortExpression["Missing"]];
  DefCovD[DA[-a],{},SymbolOfCovD->{"|","D"},Torsion->True]; RegisterTheory["Connection","Affine",DA]; AddConnection["One","Affine",DA];
  checks["new connection inherits"]=label[PrettyExp[ConnectionOf["One","Affine"][-aO][AO[-bO]],CovariantStyle->"Prefix"],"ONE"];
  checks["affine curvature inherits"]=label[auto[RiemannOf["One","Affine"][-aO,-bO,-cO,dO]],"ONE"];
