@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.33";
+$XPlorerVersion = "14.0.0-beta.13-dev.34";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. ShowObjectLabels -> True or False overrides visibility for one owned head; Automatic restores inheritance. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -1800,9 +1800,18 @@ b13Sectors[t_] := Sort@DeleteDuplicates@Cases[
  Flatten[Values[b13Collection[t,#]]& /@ {"Fields","Parameters","Lagrangians","Expressions"},1],
  a_Association /; StringQ[Lookup[a,"Sector",None]] :> a["Sector"]];
 b13SectorLabel[a_] := Replace[Lookup[a,"Sector",None],None->"-"];
+(* Compact theme-independent inspection tables. Keep mathematical entries native. *)
+b13TableCell[x_String] := Style[x,FontFamily->"Helvetica"];
+b13TableCell[x_] := x;
 b13Table[headers_,rows_] := Grid[
- Prepend[If[rows==={}, {Join[{"(none)"},ConstantArray["",Length[headers]-1]]},rows],Style[#,Bold]& /@ headers],
- Alignment->Left,Spacings->{2,0.7},Dividers->{None,{False,True}}];
+ Prepend[Map[b13TableCell,If[rows==={}, {Join[{"(none)"},ConstantArray["",Length[headers]-1]]},rows],{2}],Style[#,Bold,FontFamily->"Helvetica"]& /@ headers],
+ Alignment->{Left,Top},Spacings->{1.25,0.35},BaseStyle->{FontSize->12},Dividers->{None,{False,True}}];
+b13SectorKeys[keys_List] := Column[Row[Riffle[Style[#,FontFamily->"Helvetica"]& /@ #,", "]]& /@ (TakeList[keys,Append[ConstantArray[3,Quotient[Length[keys],3]],Mod[Length[keys],3]]]/.{}->Nothing),Alignment->Left,Spacings->0.15];
+b13SectorRows[t_] := Flatten[Table[Module[{groups,rows},
+ groups=Select[AssociationMap[Select[b13Collection[t,#],Lookup[#,"Sector",None]===sector&]&,{"Fields","Parameters","Lagrangians","Expressions"}],Length[#]>0&];
+ rows=KeyValueMap[{#1<>" ("<>ToString[Length[#2]]<>")",b13SectorKeys[Keys[#2]]}&,groups];
+ MapIndexed[Prepend[#1,If[First[#2]===1,sector,""]]& ,rows]
+ ],{sector,b13Sectors[t]}],1];
 b13KeyTable[a_] := b13Table[{"Property","Value"},KeyValueMap[{#1,#2}&,a]];
 b13TheoryView[t_,section_,detail_] := Module[{a},
  Switch[section,
@@ -1821,20 +1830,17 @@ b13TheoryView[t_,section_,detail_] := Module[{a},
     KeyValueMap[{#1,#2["AliasBase"],b13SectorLabel[#2]}&,a]]],
  "Connections",b13Table[{"Key","Derivative"},
    KeyValueMap[{#1,#2["Head"]}&,Lookup[t,"Connections",<||>]]],
- "Sectors",b13Table[{"Sector","Fields","Parameters","Lagrangians","Expressions"},
-   Table[Prepend[Map[Function[records,If[records===<||>,0,Column[Join[{Style[Length[records],Bold]},Keys[records]],Spacings->0.25]]],Values[AssociationMap[
-    Select[b13Collection[t,#],Lookup[#,"Sector",None]===sector&]&,
-    {"Fields","Parameters","Lagrangians","Expressions"}]]],sector],{sector,b13Sectors[t]}]],
+ "Sectors",b13Table[{"Sector","Collection","Keys"},b13SectorRows[t]],
  _,failure["TheoryKey","Unknown theory display section.",<|"Key"->section|>]
  ]];
 ShowTheory[] := Module[{t=$Theory,header,sections,extra},
- header=Join[{Style[Lookup[t,"Title","Registered theory"],Bold,20]},
+ header=Join[{Style[Lookup[t,"Title","Registered theory"],Bold,16,FontFamily->"Helvetica"]},
   If[KeyExistsQ[t,"Description"],{Lookup[t,"Description"]},{}],
   (Column[{Style[#,Bold],t[#]},Spacings->0.5]& /@ Select[{"Assumptions","Conditions"},KeyExistsQ[t,#]&])];
  sections=Select[b13Sections,Switch[#,"Geometry",Length[b13Geometry[t]]>0,"Sectors",b13Sectors[t]=!={},"Connections",Length[Lookup[t,"Connections",<||>]]>0,_,Length[b13Collection[t,#]]>0]&];
  extra=KeyDrop[b13Metadata[t],{"Title","Description","Assumptions","Conditions"}];
- Column[Join[header,(Column[{Style[#,Bold],b13TheoryView[t,#,False]},Spacings->0.5]& /@ sections),
-  If[extra===<||>,{},{Column[{Style["Additional information",Bold],b13KeyTable[extra]}]}]],Spacings->1.3]
+ Column[Join[header,(Column[{Style[#,Bold,13,FontFamily->"Helvetica"],b13TheoryView[t,#,False]},Alignment->Left,Spacings->0.25]& /@ sections),
+  If[extra===<||>,{},{Column[{Style["Additional information",Bold,13,FontFamily->"Helvetica"],b13KeyTable[extra]}]}]],Alignment->Left,Spacings->0.75]
 ];
 ShowTheory[section_String] := b13TheoryView[$Theory,section,True];
 
@@ -1918,7 +1924,7 @@ notationSettings[tag_] := Join[$notationDefaults,$sessionNotation,
 automaticView[e_] := Module[{tag,style},
   If[!FreeQ[e,_expressionView] || MatchQ[e,_Association|_Failure|_String|_Rule|_RuleDelayed],Return[e]];
   tag=notationOwner[e];style=notationSettings[tag];
-  If[objectLabelPlan[e,style]=!=<||>,Return[expressionView[e,style,tag]]];
+  If[objectLabelPlan[e,style]=!=<||> || (StringQ[tag] && TrueQ[style["ShowBackgroundLabel"]]),Return[expressionView[e,style,tag]]];
   If[!MatchQ[e,_Plus|_Times|_Power|_Equal|_Scalar|_?xTensorQ[___]|_?CovDQ[_][_]|Derivative[__][_][__]],Return[e]];
   If[(!FreeQ[e,Derivative|_?CovDQ] || TrueQ[style["ShowBackgroundLabel"]]) && style=!=$notationDefaults,Return[expressionView[e,style,tag]]];
   If[hasGeneratedIndexQ[e],expressionView[e,$notationDefaults,None],e]
