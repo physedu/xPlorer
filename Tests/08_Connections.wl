@@ -1,10 +1,10 @@
 DefCovD[DD[-a],{},SymbolOfCovD->{"|","D"},Torsion->True];
 RegisterTheory["Connection","Affine",DD];
 CreateBackground["ConnectionsCase"];
-cc=ConnectionOf["ConnectionsCase","Affine"]; gg=ShowBackground["ConnectionsCase"]["Metric"];
+cc=ConnectionOf["ConnectionsCase","Affine"]; gg=BackgroundValue["ConnectionsCase"]["Metric"];
 assert["connection-copied",CovDQ[cc],True];
 assert["connection-torsion",TorsionQ[cc],True];
-assert["connection-primary-default",ConnectionOf["ConnectionsCase"],ShowBackground["ConnectionsCase"]["CovD"]];
+assert["connection-primary-default",ConnectionOf["ConnectionsCase"],BackgroundValue["ConnectionsCase"]["CovD"]];
 assert["connection-marker-inherited",With[{c=cc},SymbolOfCovD[c]],{"|","D"}];
 assert["nonmetric-no-scalar",FailureQ[RicciScalarOf["ConnectionsCase","Affine"]],True];
 assert["connection-real-curvature",xTensorQ[RiemannOf["ConnectionsCase","Affine"]],True];
@@ -27,7 +27,7 @@ DeleteBackground["ComplexCase"];UnregisterTheory["Fields","chi"];UndefTensor[chi
 DefCovD[DT[-a],{},FromMetric->g,Torsion->True];
 RegisterTheory["Connection","MetricTorsion",DT];CreateBackground["MetricConnectionCase"];
 mc=ConnectionOf["MetricConnectionCase","MetricTorsion"];
-assert["connection-metric-reference",MetricOfCovD[mc],ShowBackground["MetricConnectionCase"]["Metric"]];
+assert["connection-metric-reference",MetricOfCovD[mc],BackgroundValue["MetricConnectionCase"]["Metric"]];
 assert["metric-torsion-has-scalar",xTensorQ[RicciScalarOf["MetricConnectionCase","MetricTorsion"]],True];
 assert["metric-torsion-delete",DeleteBackground["MetricConnectionCase"],Null];
 UnregisterTheory["Connections"];UndefCovD[DT];
