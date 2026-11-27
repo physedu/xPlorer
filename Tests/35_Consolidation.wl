@@ -38,6 +38,8 @@ check["Nonsymmetric Jacobian covector",ToComponents["Flat",A[-a],OutputChart->"S
 check["Nonsymmetric Jacobian vector",ToComponents["Flat",A[a],OutputChart->"Shear"],{-1,4/5,3/5,4}];
 check["Nonsymmetric Jacobian metric",ToComponents["Flat",g[-a,-b],OutputChart->"Shear"],{{-1,0,0,0},{0,10,5,0},{0,5,5,0},{0,0,0,1}}];
 check["Native nonsymmetric basis conversion",ToCTensor[CTensor[{1,2,3,4},{-chartFlat}],{-chartShearFlat}],CTensor[{1,11,7,4},{-chartShearFlat}]];
+check["Reject direct managed basis replacement",MatchQ[SetBasisChange[CTensor[2 IdentityMatrix[4],{-chartShearFlat,chartFlat}]],Failure["ManagedBasisPair",_Association]],True];
+check["Original map unchanged after rejected native edit",ToComponents["Flat",A[-a],OutputChart->"Shear"],{1,11,7,4}];
 DefineChart["Flat","Quadratic",{T[],u[],v[],w[]},Function[{tt,uu,vv,ww},{tt,uu^2,vv,ww}]];
 SetConnectionComponents["Flat","Affine",ConstantArray[0,{4,4,4}]];
 check["Affine Hessian term",Simplify[ConnectionMatrixOf["Flat","Affine",OutputChart->"Quadratic"][[2,2,2]]-1/uQuadraticFlat[]],0];
