@@ -3,6 +3,7 @@ Global`$XPlorerConsolidatedDirectory=DirectoryName[DirectoryName[$InputFileName]
 Global`$XPlorerConsolidatedReport=Module[{dir=Global`$XPlorerConsolidatedDirectory,nb,inputs,parsed,results=<||>,warnings={},parseFailures={},checks,failures,unexpected},
  nb=Get[FileNameJoin[{dir,"xPlorer_Consolidated.nb"}]];
  inputs=Cases[nb,Cell[BoxData[boxes_],"Input",CellTags->id_String]:>{id,boxes},Infinity];
+ Block[{Print=(Null&)},Needs["xAct`xPert`"];Needs["xAct`xCoba`"]];
  Block[{Print=(Null&),NotebookDirectory=Function[dir],xAct`xPerm`$xpermQ=False,xAct`xCoba`$CVVerbose=False},
   Do[parsed=Quiet[ToExpression[cell[[2]],StandardForm,HoldComplete]];
    If[parsed===$Failed,AppendTo[parseFailures,cell[[1]]];Continue[]];
