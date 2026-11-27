@@ -11,7 +11,7 @@ build = Get[FileNameJoin[{NotebookDirectory[], "Tools", "BuildPaclet.wl"}]];
 build["PacletArchive"]
 ```
 
-4. Install that archive in a clean environment with xAct present. Restart and confirm Needs["xPlorer`"] loads the matching version, run Workflow and API Examples; inspect labels on/off, copy/paste and TeX, including different chart coordinates. Check uninstallation and reinstall if practical.
+4. Remove any internal 14.0.0-beta.* paclets first, then install that archive in a clean environment with xAct present. Restart and confirm Needs["xPlorer`"] loads the matching version, run Workflow and API Examples; inspect labels on/off, copy/paste and TeX, including different chart coordinates. Check uninstallation and reinstall if practical.
 5. Produce a clean local distribution with:
 
 ```wl
@@ -22,7 +22,7 @@ PrepareXPlorerRelease[build["PacletArchive"]]
 The preparation script compares SHA-256 hashes of all required files within the local paclet to the current Paclet directory, then copies only an explicit whitelist. It refuses an existing staging folder/ZIP or a mismatched archive. If ZIP compression fails after staging, manually compress the reported directory. Do not include an archive from an older candidate.
 
 Public distribution:
-- Paclet/ (xPlorer.wl, metadata, native loaders, license and citation).
+- xPlorer.wl (standalone source). Metadata and loaders remain inside the paclet, not duplicated in the ZIP.
 - xPlorer-<version>.paclet.
 - xPlorer_Workflow.nb and xPlorer_API_Examples.nb.
 - README.md (tester guide), LICENSE and CITATION.cff.

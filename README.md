@@ -2,7 +2,7 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-**Development candidate: 14.0.0-beta.13-dev.36.** The public beta release has not yet been published.
+**First public beta candidate: 1.0.0-beta.1.** The public beta release has not yet been published.
 
 xPlorer is a Wolfram Language research package for theoretical physics and general relativity, built on xAct. It addresses a practical problem: after deriving tensor equations on an abstract manifold, how can the same theory be studied on different metrics, coordinate charts and field configurations without redefining all the tensors or restarting the Mathematica kernel?
 
@@ -27,7 +27,7 @@ The intended audience is researchers and students already using Mathematica and 
 | [xPlorer_Workflow.nb](xPlorer_Workflow.nb) | Start here: a practical seven-section research tutorial, from abstract equations to components, profiles, tensors and metric perturbations. |
 | [xPlorer_API_Examples.nb](xPlorer_API_Examples.nb) | Advanced executable reference: detailed API options, affine connections, lifecycle and special cases. |
 
-Install [xAct](https://www.xact.es/) separately. Use a fresh Mathematica kernel for either notebook. Keep the notebook beside the Paclet directory. Choose exactly one startup cell: A installs the matching released paclet if needed and loads it with Needs; B loads the source directly using Get. The distribution ZIP places the versioned paclet beside both notebooks.
+Install [xAct](https://www.xact.es/) separately. Use a fresh Mathematica kernel for either notebook. Keep the notebook beside xPlorer.wl in the release ZIP, or beside the Paclet directory in a repository checkout. Choose exactly one startup cell: A installs the matching released paclet if needed and loads it with Needs; B loads the source directly using Get. The distribution ZIP places the versioned paclet and plain xPlorer.wl beside both notebooks.
 
 ```wl
 Get[FileNameJoin[{NotebookDirectory[], "Paclet", "xPlorer.wl"}]];
@@ -63,7 +63,7 @@ ShowBackground["Schwarzschild"]
 ShowBackground["Schwarzschild", "Fields"]
 ```
 
-The first call lists the studies in the current kernel; the others show the declared geometry, actual managed input values or a selected section. No new geometry is computed. Use BackgroundValue["Schwarzschild", "MetricMatrix"] for programmatic data access, or BackgroundObject for native xAct heads. In dev.35, use BackgroundValue instead of the former raw ShowBackground association.
+The first call lists the studies in the current kernel; the others show the declared geometry, actual managed input values or a selected section. No new geometry is computed. Use BackgroundValue["Schwarzschild", "MetricMatrix"] for programmatic data access, or BackgroundObject for native xAct heads. 
 
 ## Optional presentation
 
@@ -78,14 +78,14 @@ Visual labels are separate from typed names. Labels are off by default; session,
 
 ## Installation
 
-The public release will supply a matching .paclet and a compact distribution ZIP with the two notebooks, source, README, license and citation. The package source remains available in Paclet/xPlorer.wl. To use a supplied local paclet, run PacletInstall with its path, restart the kernel, then:
+The public release will supply a matching .paclet and a compact distribution ZIP with the two notebooks, source, README, license and citation. The release ZIP contains xPlorer.wl at its root; the repository source remains in Paclet/xPlorer.wl. To use a supplied local paclet, run PacletInstall with its path, restart the kernel, then:
 
 ```wl
 Needs["xPlorer`"];
 $XPlorerVersion
 ```
 
-Do not mix conflicting traditional applications and paclets. The traditional installer [Install.wl](Install.wl) is available for development/source use. It refuses to overwrite an existing application. See [xPlorer_Install.nb](xPlorer_Install.nb) for local archive construction and installation. xAct is a separate dependency; optional xTras is not required.
+Do not mix conflicting traditional applications and paclets. If you tested the internal 14.0.0-beta.* series, uninstall those higher-numbered versions before installing public beta 1. The traditional installer [Install.wl](Install.wl) is available for development/source use. It refuses to overwrite an existing application. See [xPlorer_Install.nb](xPlorer_Install.nb) for local archive construction and installation. xAct is a separate dependency; optional xTras is not required.
 
 ## Feedback and scope
 
@@ -99,7 +99,7 @@ The public distribution is intentionally different from this repository's develo
 
 - [API guide](API_GUIDE.md) and [design decisions](DECISIONS.md).
 - [Consolidation and validation](BETA13_CONSOLIDATION.md), [development progress](BETA13_PROGRESS.md), [plan](BETA13_PLAN.md), [implementation instructions](IMPLEMENTATION_PROMPT.md).
-- Tests/, Tools/, Examples/, and the internal xPlorer_Consolidated.nb and historical xPlorer_QuickStart.nb are development material, not public distribution contents. Historical checkpoints are preserved in Git history.
+- Tests/, Tools/, Examples/, and the internal xPlorer_Consolidated.nb and historical xPlorer_QuickStart.nb are development material, not public distribution contents. Historical checkpoints are preserved in Git history. See [development history and version transition](DEVELOPMENT_HISTORY.md) for the mapping from internal versions to public beta 1.
 
 ## Author, citation and license
 

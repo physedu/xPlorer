@@ -1,4 +1,4 @@
-# Using xPlorer — beta.13-dev.36
+# Using xPlorer — beta.1
 
 xPlorer_Workflow.nb is the principal worked guide, updated for the consolidated API (dev.31, corrected in dev.32). xPlorer_Consolidated.nb is retained as a supplementary integration-test notebook. Sections labeled with earlier versions are historical checkpoints; the dev.31 contract below takes precedence. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
@@ -402,4 +402,4 @@ Prefer known native heads: CDSchw or CovDOfMetric[gSchw], Riemann[CDSchw], Ricci
 
 ## Final public notebook pair (dev.36)
 
-The main xPlorer_Workflow.nb is the seven-section research tutorial. xPlorer_API_Examples.nb preserves the exhaustive executable reference with shared prerequisites and folded sections. The former xPlorer_QuickStart.nb is retained only as historical development material, not included in the release whitelist. Both public notebooks have inline A/B loading alternatives and unchanged package version. Tests/ResearchWorkflowTests.wl runs the main tutorial, while Tests/WorkflowTests.wl now runs the exhaustive reference. No public API change accompanies this documentation reorganization.
+The main xPlorer_Workflow.nb is the seven-section research tutorial. xPlorer_API_Examples.nb preserves the exhaustive executable reference with shared prerequisites and folded sections. The former xPlorer_QuickStart.nb is retained only as historical development material, not included in the release whitelist. Both public notebooks have inline A/B loading alternatives. The public version is 1.0.0-beta.1; the source loader supports the flat release ZIP and the development checkout. Tests/ResearchWorkflowTests.wl runs the main tutorial, while Tests/WorkflowTests.wl now runs the exhaustive reference. No public API change accompanies this documentation reorganization.

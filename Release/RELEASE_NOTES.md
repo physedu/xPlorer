@@ -1,18 +1,20 @@
 # xPlorer - First public beta (draft)
 
-**Candidate:** 14.0.0-beta.13-dev.36
+**Candidate:** 1.0.0-beta.1
 
 xPlorer connects abstract xAct calculations with concrete geometric studies. Define and register your theory once, then explore different spacetimes, metric and field configurations, coordinate charts and physical limits in the same Mathematica kernel. The underlying tensor algebra remains xAct's.
 
 ## Included in the intended distribution
 
 - A matching installable xPlorer paclet, to be attached only after archive verification.
-- Wolfram Language source and paclet metadata/loaders.
+- Plain xPlorer.wl source; paclet metadata and loaders are inside the paclet only.
 - xPlorer_Workflow.nb: the main research tutorial, covering scalar equations in Minkowski, Schwarzschild and FLRW, profiles, coordinate transformations, vector/tensor fields, perturbations and reconstruction.
 - xPlorer_API_Examples.nb: the exhaustive executable reference with advanced presentation, affine connections, lifecycle and other API examples.
 - README, GPL-3.0-or-later license and citation information.
 
 Install xAct separately. Extract the curated ZIP and open xPlorer_Workflow.nb in a fresh Mathematica kernel. Choose A to install/load the included paclet, or B to load the source. Start the reference notebook in a separate fresh kernel.
+
+The internal development series used 14.0.0-beta.* identifiers; public numbering now starts at 1.0.0-beta.1. Internal testers must remove those older, numerically higher paclets before installing this one.
 
 ## Tested and known limitations
 
@@ -22,4 +24,4 @@ The supported managed scope is tangent-bundle tensors, perturbations, named inde
 
 Please report reproducible issues at https://github.com/physedu/xPlorer/issues. Include Mathematica, xAct and xPlorer versions, OS, smallest input and expected versus actual output.
 
-**Maintainer gate:** this text is a draft, not an announcement of publication. Before posting it, verify the actual dev.36 paclet against source, test installation/uninstallation and both notebooks in Desktop, verify the curated ZIP, and update the tested-platform and asset statements to reflect observed results. Publish as a GitHub pre-release only after approval.
+**Maintainer gate:** this text is a draft, not an announcement of publication. Before posting it, verify the actual 1.0.0-beta.1 paclet against source, test installation/uninstallation and both notebooks in Desktop, verify the curated ZIP, and update the tested-platform and asset statements to reflect observed results. Publish as a GitHub pre-release only after approval.
