@@ -44,9 +44,9 @@ check["Native scalar rejection preserves target",ToComponents["Two",phiaT[]],7];
 foreignHeldScalar=HeldComponentValue[psiaT[],psiaO[]];
 check["HeldComponentValue rejects unevaluated foreign scalar",MatchQ[foreignHeldScalar,Failure["ForeignBackground",_Association]],True];
 
-foreignPartial=ComponentValue[VaT[-aaT],psiaO[]];
+foreignPartial=ComponentValue[VaT[{0,-chartT}],psiaO[]];
 check["Managed partial component rejects foreign scalar",MatchQ[foreignPartial,Failure["ForeignBackground",_Association]],True];
-foreignArray=AllComponentValues[VaT[-aaT],{1,psiaO[],3,4}];
+foreignArray=AllComponentValues[VaT[{-aaT,-chartT}],{1,psiaO[],3,4}];
 check["Managed complete array rejects foreign scalar",MatchQ[foreignArray,Failure["ForeignBackground",_Association]],True];
 
 foreignMetric=SetCMetricSystem["Two",DiagonalMatrix[{-1,1+xxO[]^2,1,1}],ComputeOnSet->None];
