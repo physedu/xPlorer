@@ -16,12 +16,12 @@ DefineChart["One",{tt[],xx[],yy[],zz[]}];
 DefineChart["Two",{tt[],xx[],yy[],zz[]}];
 SetCMetricSystem["One",DiagonalMatrix[{-1,1,1,1}],ComputeOnSet->None];
 SetCMetricSystem["Two",DiagonalMatrix[{-1,1,1,1}],ComputeOnSet->None];
-recipe=ReconstructionData["One"];
 DefCovD[DAa[-aa],{},FromMetric->gg,Torsion->True];
 AddConnection["One","Affine",DAa];
 AddConnection["Two","Affine",DAa];
 SetFieldComponents["One",phia,2];
 SetFieldComponents["Two",phia,7];
+recipe=ReconstructionData["One"];
 
 checks=<||>;
 SetAttributes[check,HoldRest];
@@ -43,7 +43,7 @@ foreignNativeScalar=ComponentValue[phiaT[],phiaO[]];
 check["Managed ComponentValue rejects foreign scalar",MatchQ[foreignNativeScalar,Failure["ForeignBackground",_Association]],True];
 check["Native scalar rejection preserves target",ToComponents["Two",phiaT[]],7];
 
-foreignHeldScalar=HeldComponentValue[psiaT[],psiaO[]];
+foreignHeldScalar=With[{head=psiaT},HeldComponentValue[head[],psiaO[]]];
 check["HeldComponentValue rejects unevaluated foreign scalar",MatchQ[foreignHeldScalar,Failure["ForeignBackground",_Association]],True];
 
 foreignPartial=ComponentValue[VaT[{0,-chartT}],psiaO[]];
@@ -76,7 +76,7 @@ check["Reconstruction permits its declared source owner",AssociationQ[validRecre
 check["Reconstructed field snapshot",ToComponents["Copy",phiaCopy[]],2];
 
 (* Explicitly evaluated numbers are snapshots, not live foreign references. *)
-snapshotWrite=HeldComponentValue[phiaT[],phiaO[]];
+snapshotWrite=With[{head=phiaT},HeldComponentValue[head[],phiaO[]]];
 check["Held scalar accepts an already evaluated numeric snapshot",MatchQ[snapshotWrite,_Rule],True];
 check["Held numeric snapshot is stored as a value",ToComponents["Two",phiaT[]],2];
 
