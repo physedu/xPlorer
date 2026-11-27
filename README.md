@@ -107,11 +107,11 @@ Developed by **Eduardo Sanz-Romero** ([PhysEdu](https://github.com/physedu)). Ci
 
 ### A note from the author
 
-I recently completed my master's degree, and xPlorer is my first scientific software project of this kind. It grew out of a practical problem I encountered while working with xAct, and I decided to turn what began as a tool for my own research into something that others could use.
+I recently completed my master's degree, and xPlorer is my first scientific software project of this kind. The project originated from a research problem motivated by Gonzalo J. Olmo: how to take a theory formulated on an abstract manifold and study it on different metric backgrounds using xAct. What began as a tool for my own research, in the context of the [Grupo de Gravedad y Campos](http://uv-qg.es/), gradually became a project that I wanted to share with the scientific community.
 
-My hope is that xPlorer will help students and researchers spend less time on repetitive symbolic calculations and more time exploring the physics behind them. This first public beta is a starting point, and I would love to hear how others use it, what works for them, and what could be improved.
+I am particularly grateful to Gonzalo for motivating this work, and to Jose M. Martin-Garcia and the developers of xTensor, xCoba and xPert for building the tools on which xPlorer relies.
 
-I thank Gonzalo J. Olmo for motivating the research problem of particularizing abstract theories on different metric backgrounds, and acknowledge the research context of the [Grupo de Gravedad y Campos](http://uv-qg.es/). I also acknowledge Jose M. Martin-Garcia and the developers of xTensor, xCoba and xPert.
+My hope is that xPlorer will help students and researchers spend less time on repetitive symbolic calculations and more time exploring the physics behind them. This first public beta is a starting point, and feedback, suggestions and contributions are very welcome.
 
 Copyright (C) 2026 Eduardo Sanz-Romero. Distributed under GPL-3.0-or-later; see [LICENSE](LICENSE). No warranty. xAct is a separately installed dependency with its own license.
 
