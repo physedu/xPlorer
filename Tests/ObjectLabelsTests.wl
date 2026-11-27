@@ -23,6 +23,11 @@ Block[{xAct`xPerm`$xpermQ=False,xAct`xTensor`$DefInfoQ=False,xAct`xCoba`$CVVerbo
  checks["coordinate"]=label[auto[xO[]],"ONE"];
  checks["coordinate other off"]=!label[auto[xT[]],"T"];
  checks["secondary coordinate"]=label[auto[uScaledO[]],"ONE:Scaled"];
+ SetNotation["One","Scaled",BackgroundLabel->"C2"]; checks["chart custom label"]=label[auto[uScaledO[]],"C2"];
+ SetNotation["One","Scaled",ShowObjectLabels->False]; checks["chart local off"]=!label[auto[uScaledO[]],"C2"]&&label[auto[xO[]],"ONE"];
+ SetNotation["One","Scaled",ShowObjectLabels->Automatic]; checks["chart local inherit"]=label[auto[uScaledO[]],"C2"];
+ SetNotation["One","Scaled",BackgroundLabel->Automatic]; checks["chart label inherit"]=label[auto[uScaledO[]],"ONE:Scaled"];
+ checks["bad chart notation"]=FailureQ[SetNotation["One","Unknown",ShowObjectLabels->True]];
  checks["derivative prefix"]=label[PrettyExp[ex,CovariantStyle->"Prefix"],"ONE"];
  checks["derivative postfix"]=label[PrettyExp[ex,CovariantStyle->"Postfix"],"ONE"];
  checks["native derivative"]=label[PrettyExp[ex,CovariantStyle->"Native"],"ONE"];
@@ -49,8 +54,9 @@ Block[{xAct`xPerm`$xpermQ=False,xAct`xTensor`$DefInfoQ=False,xAct`xCoba`$CVVerbo
  SetNotation["Two",ShowObjectLabels->Automatic]; checks["local inherits"]=label[auto[phiT[]],"T"];
  checks["native formatting unchanged"]=SameQ[With[{h=BackgroundObject["One","phi"]},PrintAs[h]],originalPrint]&&SameQ[SymbolOfCovD[CDO],originalCD];
  checks["math unaffected"]=SameQ[ResultOf["One","math"],math]&&SameQ[ToComponents[CDO[aO][CDO[-aO][phiO[]]]],math];
+ SetNotation["One","Scaled",BackgroundLabel->"RestoredChart"];
  rec=ReconstructionData["One"]; DeleteBackground["One"]; RecreateBackground["One",rec];
- checks["reconstruction"]=label[auto[phiO[]],"ONE"]&&!label[auto[xO[]],"ONE"]&&label[auto[uScaledO[]],"ONE:Scaled"];
+ checks["reconstruction"]=label[auto[phiO[]],"ONE"]&&!label[auto[xO[]],"ONE"]&&label[auto[uScaledO[]],"RestoredChart"];
  checks["registration rejects label option"]=FailureQ[RegisterTheory["Field",phi,ShowObjectLabels->True]];
  result=<|"Version"->$XPlorerVersion,"Passed"->Count[Values[checks],True],"Total"->Length[checks],"Failures"->Keys@Select[checks,!TrueQ[#]&],"Examples"-><|"Scalar"->display[auto[phiO[]]],"Coordinate"->display[auto[uScaledO[]]],"Derivative"->display[PrettyExp[CDO[-aO][phiO[]],CovariantStyle->"Prefix"]]|>|>;
  result
