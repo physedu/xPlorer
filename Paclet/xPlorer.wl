@@ -1921,13 +1921,13 @@ notationOwner[e_] := Module[{owners},
 ];
 notationSettings[tag_] := Join[$notationDefaults,$sessionNotation,
   If[StringQ[tag],Lookup[$BG[tag],"Notation",<||>],<||>]];
-automaticView[e_] := Module[{tag,style},
+automaticView[e_] := Module[{tag,style,plan},
   If[!FreeQ[e,_expressionView] || MatchQ[e,_Association|_Failure|_String|_Rule|_RuleDelayed],Return[e]];
-  tag=notationOwner[e];style=notationSettings[tag];
-  If[objectLabelPlan[e,style]=!=<||> || (StringQ[tag] && TrueQ[style["ShowBackgroundLabel"]]),Return[expressionView[e,style,tag]]];
+  tag=notationOwner[e];style=notationSettings[tag];plan=objectLabelPlan[e,style];
+  If[plan=!=<||> || (StringQ[tag] && TrueQ[style["ShowBackgroundLabel"]]),Return[expressionView[e,Join[style,<|"ResolvedObjectLabels"->plan|>],tag]]];
   If[!MatchQ[e,_Plus|_Times|_Power|_Equal|_Scalar|_?xTensorQ[___]|_?CovDQ[_][_]|Derivative[__][_][__]],Return[e]];
-  If[(!FreeQ[e,Derivative|_?CovDQ] || TrueQ[style["ShowBackgroundLabel"]]) && style=!=$notationDefaults,Return[expressionView[e,style,tag]]];
-  If[hasGeneratedIndexQ[e],expressionView[e,$notationDefaults,None],e]
+  If[(!FreeQ[e,Derivative|_?CovDQ] || TrueQ[style["ShowBackgroundLabel"]]) && style=!=$notationDefaults,Return[expressionView[e,Join[style,<|"ResolvedObjectLabels"->plan|>],tag]]];
+  If[hasGeneratedIndexQ[e],expressionView[e,Join[$notationDefaults,<|"ResolvedObjectLabels"-><||>|>],None],e]
 ];
 notebookPrint[e_] := If[$previousPrint === ScreenDollarIndices,
   With[{view=automaticView[e]},If[view === e,$previousPrint[e],view]],
@@ -1953,7 +1953,8 @@ prettyView[tag_, input_, opts:OptionsPattern[PrettyExp]] := Module[{b,a,local,ex
   local=Select[<|"PartialStyle"->OptionValue[PartialStyle],"CovariantStyle"->OptionValue[CovariantStyle],"ShowBackgroundLabel"->OptionValue[ShowBackgroundLabel],"ShowObjectLabels"->OptionValue[ShowObjectLabels],"BackgroundLabel"->OptionValue[BackgroundLabel]|>,# =!= Automatic &];
   a=Join[notationSettings[tag],local];
   If[!validNotation[a],Return[failure["Notation","Unknown notation setting."]]];
-  expressionView[expr,Join[a,<|"ObjectLabelCall"->KeyTake[local,{"ShowObjectLabels","BackgroundLabel"}]|>],tag]
+  a=Join[a,<|"ObjectLabelCall"->KeyTake[local,{"ShowObjectLabels","BackgroundLabel"}]|>];
+  expressionView[expr,Join[a,<|"ResolvedObjectLabels"->objectLabelPlan[expr,a]|>],tag]
 ];
 PrettyExp[tag_String, expr:Except[_Rule|_RuleDelayed], opts:OptionsPattern[]] := prettyView[tag,expr,opts];
 PrettyExp[tag_String][expr_] := prettyView[tag,expr];
@@ -2001,7 +2002,7 @@ applyObjectLabel[h_,rec_] := Module[{label=rec["Label"],base,markers},
    With[{hh=h,mm={RowBox[{First[markers],RowBox[{"(",label,")"}]}],labelBox[Last[markers],label,False]}},SymbolOfCovD[hh]^=mm],
    base=PrintAs[h];With[{hh=h,bb=labelBox[base,label,rec["Coordinate"]]},PrintAs[hh]^=bb]]
 ];
-labelledNotationBoxes[e_,a_] := Module[{plan=objectLabelPlan[e,a]},
+labelledNotationBoxes[e_,a_] := Module[{plan=If[KeyExistsQ[a,"ResolvedObjectLabels"],a["ResolvedObjectLabels"],objectLabelPlan[e,a]]},
  If[plan===<||>,Return[notationBoxes[e,a]]];
  With[{heads=Keys[plan]},Internal`InheritedBlock[heads,KeyValueMap[applyObjectLabel,plan];notationBoxes[e,a]]]
 ];
