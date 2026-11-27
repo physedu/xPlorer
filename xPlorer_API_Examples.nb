@@ -735,17 +735,17 @@ Cell[TextData[{"Checking a solution"}],"Subsection"],
 
 Cell[TextData[{"Test a plane wave on Minkowski. Evaluate the scalar equation on the new profile, then use Wolfram\:2019s ",StyleBox["Simplify",FontFamily->"Courier",FontSize->14]," with the dispersion relation \:03c9\:00b2 = k\:00b2 + m\:00b2."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"DefConstantSymbol", "[", "omega", "]"}], ";"}]],"Input",CellTags->"plane_wave_step_1"],
+Cell[BoxData[RowBox[{RowBox[{"DefConstantSymbol", "[", RowBox[{"w", ",", RowBox[{"PrintAs", "\[Rule]", "\"\[Omega]\""}]}], "]"}], ";"}]],"Input",CellTags->"plane_wave_step_1"],
 
 Cell[BoxData[RowBox[{RowBox[{"DefConstantSymbol", "[", "k", "]"}], ";"}]],"Input",CellTags->"plane_wave_step_2"],
 
-Cell[BoxData["ComponentValue[phiM[], Cos[omega tM[] - k zM[]]];"],"Input",CellTags->"plane_wave_step_3"],
+Cell[BoxData["ComponentValue[phiM[], Cos[w tM[] - k zM[]]];"],"Input",CellTags->"plane_wave_step_3"],
 
 Cell[BoxData[RowBox[{RowBox[{"waveResidual", "=", RowBox[{"scalarEqM", "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"plane_wave_step_4"],
 
 Cell[BoxData["waveResidual"],"Input",CellTags->"plane_wave"],
 
-Cell[BoxData[RowBox[{"onShell", "=", RowBox[{"Simplify", "[", RowBox[{"waveResidual", ",", RowBox[{"Assumptions", "\[Rule]", RowBox[{"assumptions", "&&", RowBox[{RowBox[{"{", RowBox[{"omega", ",", "k"}], "}"}], "\[Element]", TemplateBox[{}, "Reals"]}], "&&", RowBox[{SuperscriptBox["omega", "2"], "\[Equal]", RowBox[{SuperscriptBox["k", "2"], "+", SuperscriptBox["m", "2"]}]}]}]}]}], "]"}]}]],"Input",CellTags->"dispersion_condition"],
+Cell[BoxData[RowBox[{"onShell", "=", RowBox[{"Simplify", "[", RowBox[{"waveResidual", ",", RowBox[{"Assumptions", "\[Rule]", RowBox[{"assumptions", "&&", RowBox[{RowBox[{"{", RowBox[{"w", ",", "k"}], "}"}], "\[Element]", TemplateBox[{}, "Reals"]}], "&&", RowBox[{SuperscriptBox["w", "2"], "\[Equal]", RowBox[{SuperscriptBox["k", "2"], "+", SuperscriptBox["m", "2"]}]}]}]}]}], "]"}]}]],"Input",CellTags->"dispersion_condition"],
 
 Cell[TextData[{"A zero residual verifies the plane wave for the stated dispersion relation."}],"Text"],
 
@@ -859,7 +859,7 @@ Cell[TextData[{"With ",StyleBox["ApplySpecialization -> False",FontFamily->"Cour
 
 Cell[BoxData[RowBox[{RowBox[{"eabCyl", "=", RowBox[{"EabM", "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"OutputChart", "\[Rule]", "\"Cylindrical\""}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "aM"}], ",", RowBox[{"-", "bM"}]}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"2", ",", "2"}], "}"}], "}"}]}], ",", RowBox[{"ApplySpecialization", "\[Rule]", "False"}]}], "]"}]}]}], ";"}]],"Input",CellTags->"general_cyl_equation_step_1"],
 
-Cell[BoxData["ComponentValue[phiM[], Cos[omega tM[] - k zM[]]];"],"Input",CellTags->"general_cyl_equation_step_2"],
+Cell[BoxData["ComponentValue[phiM[], Cos[w tM[] - k zM[]]];"],"Input",CellTags->"general_cyl_equation_step_2"],
 
 Cell[BoxData["eabCyl"],"Input",CellTags->"general_cyl_equation"],
 
