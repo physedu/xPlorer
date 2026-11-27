@@ -182,13 +182,13 @@ Cell[BoxData["EabSchw // PrettyExp[CovariantStyle -> \"Postfix\"]"],"Input",Cell
 
 Cell[TextData[{"When all terms belong to one background, a caption can replace repeated object labels.\n\n",StyleBox["ShowBackgroundLabel",FontFamily->"Courier",FontSize->14]," identifies the result as a whole; ",StyleBox["ShowObjectLabels",FontFamily->"Courier",FontSize->14]," marks individual tensors. The options are independent."}],"Text"],
 
-Cell[BoxData["PrettyExp[\"Schwarzschild\", EabSchw, ShowBackgroundLabel -> True, ShowObjectLabels -> False, CovariantStyle -> \"Postfix\"]"],"Input",CellTags->"caption"],
+Cell[BoxData["EabSchw // PrettyExp[ShowBackgroundLabel -> True, ShowObjectLabels -> False, CovariantStyle -> \"Postfix\"]"],"Input",CellTags->"caption"],
 
-Cell[TextData[{"Suppose we want to use psi for the field, q for the metric and D for the derivative, as in another notation convention.\n\n",StyleBox["SetPresentation",FontFamily->"Courier",FontSize->14]," changes these printed names throughout Schwarzschild, without changing its typed symbols or mathematical identities. The result is visible in the full expression."}],"Text"],
+Cell[TextData[{"Suppose we want to use psi for the field, q for the metric and D for the derivative, as in another notation convention.\n\n",StyleBox["SetPresentation",FontFamily->"Courier",FontSize->14]," changes these printed names throughout Schwarzschild, without changing its typed symbols or mathematical identities. Evaluate the ordinary expression again: its output already uses the new names, without a PrettyExp wrapper."}],"Text"],
 
 Cell[BoxData["SetPresentation[\"Schwarzschild\", \"phi\" -> \"\\[Psi]\", \"Metric\" -> \"q\", \"CovD\" -> {\"|\", \"D\"}];"],"Input",CellTags->"rename_objects"],
 
-Cell[BoxData["EabSchw // PrettyExp[CovariantStyle -> \"Prefix\"]"],"Input",CellTags->"rename_view"],
+Cell[BoxData["EabSchw"],"Input",CellTags->"rename_view"],
 
 Cell[TextData[{"Use ",StyleBox["Automatic",FontFamily->"Courier",FontSize->14]," to restore the inherited printed names. The other backgrounds are unaffected."}],"Text"],
 
@@ -408,7 +408,7 @@ Cell[BoxData["dGF = Einstein[CDFLRW][aFLRW,-bFLRW] // PerturbOn[1]"],"Input",Cel
 
 Cell[TextData[{"The expressions have identical abstract structure but use independent metrics, perturbations and derivatives. For this longer expression, use one background caption instead of repeated object labels."}],"Text"],
 
-Cell[BoxData["PrettyExp[\"FLRW\", dGF, CovariantStyle -> \"Native\", ShowObjectLabels -> False, ShowBackgroundLabel -> True]"],"Input",CellTags->"wave_pretty"],
+Cell[BoxData["dGF // PrettyExp[CovariantStyle -> \"Native\", ShowObjectLabels -> False, ShowBackgroundLabel -> True]"],"Input",CellTags->"wave_pretty"],
 
 Cell[TextData[{"Assign the tensor profile. ",StyleBox["LI[1]",FontFamily->"Courier",FontSize->14]," labels the first variation, not a component index. The primary metric matrices from section 3 are unchanged."}],"Text"],
 
