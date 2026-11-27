@@ -10,7 +10,7 @@ AssociateTo[outputs,"load"->Check[Block[{NotebookDirectory=Function[root]},ToExp
 Block[{xAct`xPerm`$xpermQ=False,NotebookDirectory=Function[root]},
  Scan[Function[cell,AssociateTo[outputs,First[cell]->Check[ToExpression[Last[cell],StandardForm],AppendTo[warnings,First[cell]];$Failed]]],DeleteCases[inputs,{"load",_}]]];
  checks=<|
- "version"->SameQ[$XPlorerVersion,"14.0.0-beta.13-dev.36"],
+ "version"->SameQ[$XPlorerVersion,"1.0.0-beta.1"],
  "wave solution"->SameQ[outputs["wave_solution"],0],
  "Schwarzschild radial equation"->TrueQ[Simplify[eqS-((1-2 Mbh/rSchw[])u''[rSchw[]]+(2/rSchw[]-2 Mbh/rSchw[]^2)u'[rSchw[]]-m^2 u[rSchw[]])]==0],
  "Schwarzschild Ricci scalar"->SameQ[outputs["ricci_s"],0],
