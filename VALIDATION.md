@@ -41,6 +41,10 @@ SHA-256:
 - Paclet: `1502273632ab33859fd836f00208da83e11c1ded90fb4cd60066368b00d74798`
 - ZIP: `1ffd03f34e22a3eefb777a7d306b55923a10816c48308f38559c7d226d068621`
 
+## Final Workflow presentation revision — 27 November 2026
+
+The revised Workflow at [e32d96a](https://github.com/physedu/xPlorer/commit/e32d96a47bfb5ca1cdda752c7c2131e0d0478514) passed 140/140 selected input cells and 28/28 checks, with no warnings or unexpected failures. The revision removes grouped display wrappers and retains meaningful notation examples. API Examples and the supplied paclet are unchanged. The regenerated seven-file ZIP at [5a80400](https://github.com/physedu/xPlorer/commit/5a8040085d8d1f5c4f3fa5b6b7bbc640a25a5a01) was downloaded and extracted; its paclet, source, notebooks, license and citation all match the corresponding repository files. Its SHA-256 is `bbaa456c5c29875e301c339dc19a59bcf0dd437391c8eda9e30febf5eb929b53` (supersedes the previous ZIP hash above). Full Desktop visual acceptance remains pending.
+
 ## Reproduce
 
 Install xAct separately. Check out the tested revisions on the development branch for the test runners, which are not distributed on main. Use a fresh Mathematica kernel for each runner, adjusting paths to your checkout:
@@ -56,4 +60,4 @@ Run each line in a separate fresh kernel. See [test sources on develop](https://
 
 The actual archive installation/uninstallation and curated ZIP verification have passed in the remote kernel. Review both notebooks in Mathematica Desktop, including the first-use installation path and visual output, before publication. A full historical regression rerun remains pending. Mathematica 13.0+ is the declared minimum; the recorded environment does not establish compatibility with every supported version.
 
-No final Desktop appearance, archive installation or performance speedup is claimed. Historical results and their original versions are preserved under [Development/ValidationHistory](https://github.com/physedu/xPlorer/tree/59030c6df0ad282b18b279ae620bf6ec215e8206/Development/ValidationHistory) and [development decisions](https://github.com/physedu/xPlorer/tree/59030c6df0ad282b18b279ae620bf6ec215e8206/Development/DECISIONS.md).
+No full Desktop visual acceptance or performance speedup is claimed; actual archive installation was verified in the remote kernel as documented above. Historical results and their original versions are preserved under [Development/ValidationHistory](https://github.com/physedu/xPlorer/tree/59030c6df0ad282b18b279ae620bf6ec215e8206/Development/ValidationHistory) and [development decisions](https://github.com/physedu/xPlorer/tree/59030c6df0ad282b18b279ae620bf6ec215e8206/Development/DECISIONS.md).
