@@ -87,7 +87,7 @@ Cell[BoxData["DefConstantSymbol[Mbh];"],"Input",CellTags->"bh_mass"],
 
 Cell[BoxData["fSchw=1-2 Mbh/rSchw[];"],"Input",CellTags->"f"],
 
-Cell[BoxData["MetricInBasis[gSchw,-chartSchw,DiagonalMatrix[{-fSchw,1/fSchw,rSchw[]^2,rSchw[]^2 Sin[thetaSchw[]]^2}],Assumptions->Mbh>0 && rSchw[]>2 Mbh && 0<thetaSchw[]<Pi];"],"Input",CellTags->"metric_s"],
+Cell[BoxData["MetricInBasis[gSchw,DiagonalMatrix[{-fSchw,1/fSchw,rSchw[]^2,rSchw[]^2 Sin[thetaSchw[]]^2}],Assumptions->Mbh>0 && rSchw[]>2 Mbh && 0<thetaSchw[]<Pi];"],"Input",CellTags->"metric_s"],
 
 Cell[BoxData["DefScalarFunction[u];"],"Input",CellTags->"profile_fn"],
 
@@ -107,7 +107,7 @@ Cell[BoxData["DefineChart[\"FLRW\",{t[],x[],y[],z[]}];"],"Input",CellTags->"char
 
 Cell[BoxData["DefScalarFunction[s]; DefScalarFunction[q];"],"Input",CellTags->"fn_f"],
 
-Cell[BoxData["MetricInBasis[gFLRW,-chartFLRW,DiagonalMatrix[{-1,s[tFLRW[]]^2,s[tFLRW[]]^2,s[tFLRW[]]^2}],Assumptions->s[tFLRW[]]>0];"],"Input",CellTags->"metric_f"],
+Cell[BoxData["MetricInBasis[gFLRW,DiagonalMatrix[{-1,s[tFLRW[]]^2,s[tFLRW[]]^2,s[tFLRW[]]^2}],Assumptions->s[tFLRW[]]>0];"],"Input",CellTags->"metric_f"],
 
 Cell[BoxData["ComponentValue[phiFLRW[],q[tFLRW[]]];"],"Input",CellTags->"profile_f"],
 
