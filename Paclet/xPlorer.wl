@@ -589,7 +589,7 @@ DefineChart[tag_String, declarations_List,opts:OptionsPattern[]] := Module[{b = 
   If[Length[names] =!= b["Dimension"] || !VectorQ[names, StringQ] || !DuplicateFreeQ[names],
     Return[failure["Coordinates", "Supply distinct coordinate labels matching the dimension."]]];
   If[KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]],
-    Return[If[Lookup[b, "CoordinateLabels", {}] === names, b, failure["ChartExists", "The primary chart already exists. Use DefineChart[tag,name,labels,map] to add an output chart."]]]];
+    Return[If[Lookup[b, "CoordinateLabels", {}] === names, If[Length[{opts}]>0,put[tag,<|"ChartNotation"->Join[Lookup[b,"ChartNotation",<||>],<|"Primary"->notation|>]|>],b], failure["ChartExists", "The primary chart already exists. Use DefineChart[tag,name,labels,map] to add an output chart."]]]];
   chart = If[nativeQ,freshOwnedSymbol[b["Context"],"chart"<>b["SymbolSuffix"]],Symbol[b["Context"] <> "chart"]];
   coords = If[nativeQ,freshOwnedSymbol[b["Context"],#<>b["SymbolSuffix"]]& /@ names,
      Table[Symbol[b["Context"] <> "coord" <> ToString[n]], {n, Length[names]}]];
@@ -1969,8 +1969,8 @@ labelBox[base_,label_,coordinate_] := If[TrueQ[coordinate],SubscriptBox[base,lab
 labelHeadRecords[b_] := Module[{coords,chartHeads,chartRecords,baseHeads},
  chartRecords=Join[If[KeyExistsQ[b,"Chart"],<|"Primary"-><|"Chart"->b["Chart"],"Coordinates"->b["Coordinates"]|>|>,<||>],Lookup[b,"AdditionalCharts",<||>]];
  coords=Association@Flatten@KeyValueMap[Function[{key,rec},(#->key)& /@ rec["Coordinates"]],chartRecords];
- chartHeads=Association@Flatten@KeyValueMap[Function[{key,rec},(#->key)& /@ Select[Join[{rec["Chart"]},VisitorsOf[rec["Chart"]]],(xTensorQ[#]||CovDQ[#])&]],chartRecords];
- baseHeads=DeleteDuplicates@Select[Join[Values@recipeObjects[b],Lookup[Values[b["Field"]],"NewHead",{}],Lookup[b,"RelativeHeads",{}],Keys[coords],Keys[chartHeads],Flatten[ServantsOf /@ Select[Values@recipeObjects[b],MatchQ[#,_Symbol]&&(xTensorQ[#]||CovDQ[#]||ManifoldQ[#])&]]],MatchQ[#,_Symbol]&&(xTensorQ[#]||CovDQ[#])&];
+ chartHeads=Association@Flatten@KeyValueMap[Function[{key,rec},(#->key)& /@ Select[servantClosure[{rec["Chart"]}],(xTensorQ[#]||CovDQ[#])&]],chartRecords];
+ baseHeads=DeleteDuplicates@Select[Join[ownedObjects[b],Keys[coords],Keys[chartHeads]],MatchQ[#,_Symbol]&&(xTensorQ[#]||CovDQ[#])&];
  AssociationMap[Function[h,<|"Coordinate"->KeyExistsQ[coords,h],"Chart"->Lookup[coords,h,Lookup[chartHeads,h,None]]|>],baseHeads]
 ];
 objectLabelPlan[e_,a_] := Module[{symbols,plan=<||>,b,settings,rec,chart,local,overrides,show,label,head},
@@ -2161,6 +2161,8 @@ DeleteBackgroundObject[tag_String,key_String,OptionsPattern[]] := Module[{b=back
  newb["ObjectAliases"]=KeyDrop[Lookup[b,"ObjectAliases",<||>],aliasNames];
  newb["UnavailableObjectAliases"]=Complement[Lookup[b,"UnavailableObjectAliases",{}],aliasNames];
  deadKeys=Keys@Select[managedObjects[newb],!objectRegisteredQ[#]&];
+ newb["ObjectLabelOverrides"]=KeyDrop[Lookup[newb,"ObjectLabelOverrides",<||>],removed];
+ If[key==="Chart",newb["ChartNotation"]=<||>];
  newb["Field"]=Select[newb["Field"],xTensorQ[#["NewHead"]]&];
  newb["Connections"]=Select[Lookup[newb,"Connections",<||>],CovDQ[#["Head"]]&];
  newb["ConnectionComponents"]=KeyTake[Lookup[newb,"ConnectionComponents",<||>],Keys[newb["Connections"]]];
@@ -2473,7 +2475,7 @@ RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,c
  result=KeyValueMap[SetConnectionComponents[tag,#1,#2["Values"]/.rules,ReferenceConnection->#2["Reference"]]&,Lookup[recipe,"ConnectionComponents",<||>]];
  If[AnyTrue[result,FailureQ],Return[First@Select[result,FailureQ]]];
  put[tag,<|"FieldProfiles"->Map[Function[records,Association[(fieldRecordKey[#]->#)& /@ (Values[records]/.rules)]],Lookup[recipe,"FieldProfiles",<||>]],"RuleGroups"->(Lookup[recipe,"RuleGroups",<||>]/.rules),"SpecializationRules"->(Lookup[recipe,"SpecializationRules",{}]/.rules),"IndividualRules"->(individualRules[recipe]/.rules),
-   "ActiveRuleGroups"->Lookup[recipe,"ActiveRuleGroups",{}],"Notation"->Lookup[recipe,"Notation",<||>],"ObjectLabelOverrides"->(Lookup[recipe,"ObjectLabelOverrides",<||>]/.rules),"ChartNotation"->Lookup[recipe,"ChartNotation",<||>]|>];
+   "ActiveRuleGroups"->Lookup[recipe,"ActiveRuleGroups",{}],"Notation"->Lookup[recipe,"Notation",<||>],"ObjectLabelOverrides"->KeyTake[Lookup[recipe,"ObjectLabelOverrides",<||>]/.rules,Keys[labelHeadRecords[$BG[tag]]]],"ChartNotation"->Lookup[recipe,"ChartNotation",<||>]|>];
  updatePrintHook[];$BG[tag]
 ];
 
