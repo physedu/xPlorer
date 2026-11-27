@@ -105,6 +105,12 @@ The complete internal development record is preserved on the [develop branch](ht
 
 Developed by **Eduardo Sanz-Romero** ([PhysEdu](https://github.com/physedu)). Cite the exact version using [CITATION.cff](CITATION.cff) and cite the relevant xAct packages separately.
 
+### A note from the author
+
+I recently completed my master's degree, and xPlorer is my first scientific software project of this kind. It grew out of a practical problem I encountered while working with xAct, and I decided to turn what began as a tool for my own research into something that others could use.
+
+My hope is that xPlorer will help students and researchers spend less time on repetitive symbolic calculations and more time exploring the physics behind them. This first public beta is a starting point, and I would love to hear how others use it, what works for them, and what could be improved.
+
 I thank Gonzalo J. Olmo for motivating the research problem of particularizing abstract theories on different metric backgrounds, and acknowledge the research context of the [Grupo de Gravedad y Campos](http://uv-qg.es/). I also acknowledge Jose M. Martin-Garcia and the developers of xTensor, xCoba and xPert.
 
 Copyright (C) 2026 Eduardo Sanz-Romero. Distributed under GPL-3.0-or-later; see [LICENSE](LICENSE). No warranty. xAct is a separately installed dependency with its own license.
