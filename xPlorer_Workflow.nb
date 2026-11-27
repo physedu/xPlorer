@@ -2,19 +2,41 @@
 Notebook[{
 Cell[TextData[{"xPlorer - From an abstract theory to physical spacetimes"}],"Title"],
 
-Cell[TextData[{"A massive scalar field on Minkowski, Schwarzschild and FLRW backgrounds | beta.13-dev.35"}],"Subtitle"],
+Cell[TextData[{"A massive scalar field on Minkowski, Schwarzschild and FLRW backgrounds | beta.13-dev.36"}],"Subtitle"],
 
-Cell["This is the extended scientific reference. If you are new to xPlorer, start with xPlorer_QuickStart.nb instead. With xAct installed, start a fresh kernel. Choose just one of the two loading cells below, then evaluate the remaining input cells in order with Shift+Enter. Standalone recipes marked Alternative are for reference. xTensor defines the abstract theory; xCoba stores and transforms components; xPlorer manages isolated copies and transports registered expressions.","Text"],
+Cell["Extended scientific reference. Start with Quick Start if you are new to xPlorer. Evaluate the scientific sections in order after choosing one loading method. Non-evaluatable reference snippets are marked separately.","Text"],
 
-Cell["Option A: Load the source directly (keep this notebook beside the Paclet directory).","Text"],
+Cell[CellGroupData[{
 
-Cell[BoxData[RowBox[{RowBox[{"Get", "[", RowBox[{"FileNameJoin", "[", RowBox[{"{", RowBox[{RowBox[{"NotebookDirectory", "[", "]"}], ",", "\"Paclet\"", ",", "\"xPlorer.wl\""}], "}"}], "]"}], "]"}], ";"}]],"Input",CellTags->"load"],
+Cell["0. Start here - choose one loading method","Section"],
 
-Cell["Option B: Load the installed xPlorer application or paclet. Skip Option A if you use this cell.","Text"],
+Cell["Install xAct separately and start a fresh Mathematica kernel. Extract the complete distribution ZIP, rather than opening a notebook inside the archive. Choose A or B, never both. If you already have the matching paclet installed, A simply loads it.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"Needs","[","\"xPlorer`\"","]"}],";"}]],"Input",CellTags->"load_installed"],
+Cell[CellGroupData[{
 
-Cell[BoxData["$XPlorerVersion"],"Input",CellTags->"workflow_version"],
+Cell["A. Install and load the released paclet (recommended)","Subsection"],
+
+Cell["The release ZIP contains the matching .paclet beside these notebooks. This cell installs it if needed and then loads xPlorer. If the file is absent, obtain the release ZIP or use option B.","Text"],
+
+Cell[BoxData["archive = FileNameJoin[{NotebookDirectory[], \"xPlorer-14.0.0-beta.13-dev.36.paclet\"}];\nIf[!AnyTrue[PacletFind[\"xPlorer\"], #[\"Version\"] === \"14.0.0-beta.13-dev.36\" &],\n  If[!FileExistsQ[archive], Print[\"Matching paclet not found. Extract the release ZIP or use option B.\"]; Abort[]];\n  If[!MatchQ[PacletInstall[archive], _PacletObject], Abort[]]\n];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"]
+
+},Open]],
+
+Cell[CellGroupData[{
+
+Cell["B. Load the source without installation","Subsection"],
+
+Cell["Use this alternative in the extracted ZIP or the development repository. It does not install a paclet.","Text"],
+
+Cell[BoxData["Get[FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]];"],"Input",CellTags->"load"]
+
+},Open]],
+
+Cell["Confirm the version before continuing. If the wrong version is loaded, restart the kernel and check for conflicting older applications or paclets.","Text"],
+
+Cell[BoxData["If[$XPlorerVersion === \"14.0.0-beta.13-dev.36\", $XPlorerVersion, Print[\"Unexpected xPlorer version: \", $XPlorerVersion]; Abort[]]"],"Input",CellTags->"workflow_version"]
+
+},Open]],
 
 Cell["Optional presentation: show short background labels on mathematical objects, and use fraction notation for partial derivatives. These settings are purely visual. Turn ShowObjectLabels off to use ordinary xAct notation.","Text"],
 
@@ -205,7 +227,7 @@ Cell[TextData[{"If you know the background tag but want to look up a head or ind
 
 Cell[BoxData[RowBox[{"BackgroundObject", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Metric\""}], "]"}]],"Input",CellTags->"inspect_short_names_part_1"],
 
-Cell[BoxData[RowBox[{"RiemannOf", "[", "\"Schwarzschild\"", "]"}]],"Input",CellTags->"inspect_short_names_part_2"],
+Cell[BoxData["Riemann[CDSchw]"],"Input",CellTags->"inspect_short_names_part_2"],
 
 Cell[BoxData[RowBox[{"BackgroundObject", "[", RowBox[{"\"Schwarzschild\"", ",", "\"phi\""}], "]"}]],"Input",CellTags->"inspect_short_names_part_3"],
 
@@ -388,6 +410,8 @@ Cell["DefineChart calls native DefChart on the selected manifold. Use scalar dec
 Cell[BoxData["DefineChart[\"Minkowski\", {t[], x[], y[], z[]}];"],"Input",CellTags->"charts_step_1"],
 
 Cell[BoxData["DefineChart[\"Schwarzschild\", {t[], r[], theta[], varphi[]}];"],"Input",CellTags->"charts_step_2"],
+
+Cell[BoxData["PrintAs[Evaluate[thetaSchw]] ^= \"\\[Theta]\"; PrintAs[Evaluate[varphiSchw]] ^= \"\\[CurlyPhi]\";"],"Input",CellTags->"charts_step_2_print"],
 
 Cell[BoxData["DefineChart[\"FLRW\", {t[], x[], y[], z[]}];"],"Input",CellTags->"charts"],
 
@@ -733,17 +757,19 @@ Cell[TextData[{"One Minkowski metric, two coordinate charts"}],"Subsection"],
 
 Cell[TextData[{"Add cylindrical coordinates to the existing Minkowski background. Supply the primary Cartesian coordinates as functions of the new ones, in the order (t, r cos \:03b8, r sin \:03b8, z).\n\nThe map applies on r > 0 within one angular patch."}],"Text"],
 
-Cell[BoxData["DefineChart[\"Minkowski\", \"Cylindrical\", {t[], r[], theta[], z[]}, Function[{tt, rr, th, zz}, {tt, rr Cos[th], rr Sin[th], zz}]];"],"Input",CellTags->"second_chart_step_1"],
+Cell[BoxData["DefineChart[\"Minkowski\", \"Cylindrical\", {t[], r[], theta[], z[]}, Function[{tt, rr, th, zz}, {tt, rr Cos[th], rr Sin[th], zz}], BackgroundLabel -> \"C\"];"],"Input",CellTags->"second_chart_step_1"],
+
+Cell[BoxData["PrintAs[Evaluate[thetaCylindricalM]] ^= \"\\[Theta]\";"],"Input",CellTags->"second_chart_step_1_print"],
 
 Cell[BoxData["{tCylindricalM[], rCylindricalM[], thetaCylindricalM[], zCylindricalM[]}"],"Input",CellTags->"second_chart"],
 
-Cell["Optional chart-specific notation: display the cylindrical coordinates with a short C label, without changing the Cartesian chart or its basis transformation. Automatic removes a local override.","Text"],
+Cell["The short label C was chosen when defining the cylindrical chart. Hide its object labels temporarily, then restore inherited visibility without removing the short label. Neither operation changes coordinates or basis transformations.","Text"],
 
-Cell[BoxData["SetNotation[\"Minkowski\", \"Cylindrical\", ShowObjectLabels -> True, BackgroundLabel -> \"C\"];"],"Input",CellTags->"labels_chart_set"],
+Cell[BoxData["SetNotation[\"Minkowski\", \"Cylindrical\", ShowObjectLabels -> False];"],"Input",CellTags->"labels_chart_set"],
 
 Cell[BoxData["{rCylindricalM[], thetaCylindricalM[]}"],"Input",CellTags->"labels_chart_view"],
 
-Cell[BoxData["SetNotation[\"Minkowski\", \"Cylindrical\", ShowObjectLabels -> Automatic, BackgroundLabel -> Automatic];"],"Input",CellTags->"labels_chart_reset"],
+Cell[BoxData["SetNotation[\"Minkowski\", \"Cylindrical\", ShowObjectLabels -> Automatic];"],"Input",CellTags->"labels_chart_reset"],
 
 Cell["The registered map also installs native xCoba basis transformations. A pure component tensor can therefore change its slots with explicit ToCTensor. For coordinate-dependent components, ToComponents with OutputChart additionally substitutes the scalar coordinate map.","Text"],
 
@@ -1039,13 +1065,13 @@ Cell[BoxData["CreateBackground[\"AffineStudy\", SymbolSuffix -> \"Aff\"];"],"Inp
 
 Cell[BoxData[RowBox[{"ConnectionsOf", "[", "\"AffineStudy\"", "]"}]],"Input",CellTags->"register_affine"],
 
-Cell[TextData[{"The default connection is the metric\:2019s Levi-Civita derivative, keyed by ",StyleBox["\"Primary\"",FontFamily->"Courier",FontSize->14],". Select DA explicitly to obtain its derivative and Riemann tensor.\n\nIts curvature family also has a Ricci tensor. A native Ricci scalar requires an associated metric, and requesting one for DA returns a Failure."}],"Text"],
+Cell[TextData[{"The default connection is the metric\:2019s Levi-Civita derivative, keyed by ",StyleBox["\"Primary\"",FontFamily->"Courier",FontSize->14],". Use the copied native derivative AffineAff directly and obtain its curvature through xAct Riemann[AffineAff]. ConnectionOf is useful only when selecting a derivative by its registered key programmatically.\n\nIts curvature family also has a Ricci tensor. A native Ricci scalar requires an associated metric, and requesting one for DA returns a Failure."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"{", RowBox[{"aDA", ",", "bDA", ",", "cDA", ",", "dDA"}], "}"}], "=", RowBox[{"BackgroundIndices", "[", RowBox[{"\"AffineStudy\"", ",", "4"}], "]"}]}], ";"}]],"Input",CellTags->"formal_affine_step_1"],
+Cell[BoxData["{aDA,bDA,cDA,dDA} = {aAff,bAff,cAff,dAff};"],"Input",CellTags->"formal_affine_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"ConnectionOf", "[", RowBox[{"\"AffineStudy\"", ",", "DA"}], "]"}], "[", RowBox[{"-", "aDA"}], "]"}], "[", RowBox[{RowBox[{"BackgroundObject", "[", RowBox[{"\"AffineStudy\"", ",", "\"phi\""}], "]"}], "[", "]"}], "]"}]],"Input",CellTags->"formal_affine_part_1"],
+Cell[BoxData["AffineAff[-aAff][phiAff[]]"],"Input",CellTags->"formal_affine_part_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"RiemannOf", "[", RowBox[{"\"AffineStudy\"", ",", "DA"}], "]"}], "[", RowBox[{RowBox[{"-", "aDA"}], ",", RowBox[{"-", "bDA"}], ",", RowBox[{"-", "cDA"}], ",", "dDA"}], "]"}]],"Input",CellTags->"formal_affine_part_2"],
+Cell[BoxData["Riemann[AffineAff][-aAff,-bAff,-cAff,dAff]"],"Input",CellTags->"formal_affine_part_2"],
 
 Cell[BoxData["BackgroundObject[\"AffineStudy\", \"Riemann\", \"Affine\"]"],"Input",CellTags->"dev31_connection_lookup"],
 
@@ -1079,17 +1105,17 @@ Cell[TextData[{"Compare the same (x,t) entry using CD and DA. The Levi-Civita de
 
 Cell["Levi-Civita connection (CD):","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{RowBox[{"ConnectionOf","[",RowBox[{"\"AffineStudy\"",",","\"Primary\""}],"]"}],"[",RowBox[{"-","aDA"}],"]","[",RowBox[{"AAff","[",RowBox[{RowBox[{"-","bDA"}]}],"]"}],"]"}],"//",RowBox[{"ToComponents","[",RowBox[{RowBox[{"FreeIndices","\[Rule]",RowBox[{"{",RowBox[{RowBox[{"-","aDA"}],",",RowBox[{"-","bDA"}]}],"}"}]}],",",RowBox[{"Components","\[Rule]",RowBox[{"{",RowBox[{RowBox[{"{",RowBox[{"1",",","0"}],"}"}]}],"}"}]}]}],"]"}]}],"//","First"}]],"Input",CellTags->"compare_affine_component_part_1"],
+Cell[BoxData["CDAff[-aAff][AAff[-bAff]] // ToComponents[FreeIndices -> {-aAff,-bAff}, Components -> {{1,0}}] // First"],"Input",CellTags->"compare_affine_component_part_1"],
 
 Cell["Independent connection (DA):","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{RowBox[{RowBox[{"ConnectionOf","[",RowBox[{"\"AffineStudy\"",",","\"Affine\""}],"]"}],"[",RowBox[{"-","aDA"}],"]","[",RowBox[{"AAff","[",RowBox[{RowBox[{"-","bDA"}]}],"]"}],"]"}],"//",RowBox[{"ToComponents","[",RowBox[{RowBox[{"FreeIndices","\[Rule]",RowBox[{"{",RowBox[{RowBox[{"-","aDA"}],",",RowBox[{"-","bDA"}]}],"}"}]}],",",RowBox[{"Components","\[Rule]",RowBox[{"{",RowBox[{RowBox[{"{",RowBox[{"1",",","0"}],"}"}]}],"}"}]}]}],"]"}]}],"//","First"}]],"Input",CellTags->"compare_affine_component_part_2"],
+Cell[BoxData["AffineAff[-aAff][AAff[-bAff]] // ToComponents[FreeIndices -> {-aAff,-bAff}, Components -> {{1,0}}] // First"],"Input",CellTags->"compare_affine_component_part_2"],
 
 Cell[BoxData[RowBox[{"CheckConnection", "[", RowBox[{"\"AffineStudy\"", ",", "\"Affine\""}], "]"}]],"Input",CellTags->"affine_checks"],
 
-Cell[TextData[{StyleBox["ConnectionDifference",FontFamily->"Courier",FontSize->14]," gives the difference tensor for the two connections. Use ",StyleBox["AddConnection",FontFamily->"Courier",FontSize->14]," when the target background already exists."}],"Text"],
+Cell[TextData[{StyleBox["Christoffel[AffineAff, CDAff]",FontFamily->"Courier",FontSize->14]," is the native difference tensor for the two connections. ConnectionDifference is a lookup-based convenience wrapper. Use ",StyleBox["AddConnection",FontFamily->"Courier",FontSize->14]," when the target background already exists."}],"Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"diffDA", "=", RowBox[{"ConnectionDifference", "[", RowBox[{"\"AffineStudy\"", ",", "\"Affine\"", ",", "\"Primary\""}], "]"}]}], ";"}]],"Input",CellTags->"affine_difference_step_1"],
+Cell[BoxData["diffDA = Christoffel[AffineAff,CDAff][aAff,-bAff,-cAff];"],"Input",CellTags->"affine_difference_step_1"],
 
 Cell[BoxData["diffDA"],"Input",CellTags->"affine_difference"],
 
@@ -1097,9 +1123,9 @@ Cell[TextData[{"Inspect the manifolds of DA and its copy. In a formula the deriv
 
 Cell[BoxData[RowBox[{"ManifoldOfCovD", "[", "DA", "]"}]],"Input",CellTags->"compare_derivatives_part_1"],
 
-Cell[BoxData[RowBox[{"ManifoldOfCovD", "[", RowBox[{"ConnectionOf", "[", RowBox[{"\"AffineStudy\"", ",", "DA"}], "]"}], "]"}]],"Input",CellTags->"compare_derivatives_part_2"],
+Cell[BoxData["ManifoldOfCovD[AffineAff]"],"Input",CellTags->"compare_derivatives_part_2"],
 
-Cell[BoxData[RowBox[{RowBox[{"ConnectionDifference", "[", RowBox[{"\"AffineStudy\"", ",", "DA", ",", "CD"}], "]"}], "===", "diffDA"}]],"Input",CellTags->"compare_derivatives_part_3"],
+Cell[BoxData["ConnectionDifference[\"AffineStudy\", \"Affine\", \"Primary\"] === diffDA"],"Input",CellTags->"compare_derivatives_part_3"],
 
 Cell[TextData[{"Unregister DA to omit it from future backgrounds. Its source definition and the existing affine study remain available."}],"Text"],
 
@@ -1418,21 +1444,21 @@ Cell["ClearBackgrounds[]","Program",Evaluatable->False],
 
 Cell["ClearTheory[]","Program",Evaluatable->False],
 
-Cell["These final two commands are deliberately not evaluated by the tutorial. The scalar backgrounds and the restored vector study remain available for further work. The optional ScalarTheory.wl contains the initial scalar definitions for reuse in a separate notebook.","Text"]
+Cell["These final two commands are deliberately not evaluated by the tutorial. The scalar backgrounds and the restored vector study remain available for further work. The initial scalar definitions in section 1 can be reused in a separate notebook.","Text"]
 },Open]]
-},WindowTitle->"xPlorer - Theory and backgrounds",StyleDefinitions->Notebook[{
+},PageWidth->WindowWidth,WindowTitle->"xPlorer - Theory and backgrounds",StyleDefinitions->Notebook[{
  Cell[StyleData[StyleDefinitions -> "Default.nb"]],
- Cell[StyleData["Code"], FontSize -> 15],
+ Cell[StyleData["Code"], FontSize -> 13, FontWeight -> "Plain"],
  Cell[StyleData["Subsubsection"], FontSize -> 18, FontWeight -> "Bold"],
- Cell[StyleData["Title"], FontSize -> 32, FontWeight -> "Bold"],
+ Cell[StyleData["Title"], FontSize -> 28, FontWeight -> "Bold"],
  Cell[StyleData["Subtitle"], FontSize -> 14, FontSlant -> "Italic"],
- Cell[StyleData["Section"], FontSize -> 24, FontWeight -> "Bold"],
- Cell[StyleData["Subsection"], FontSize -> 19, FontWeight -> "Bold"],
- Cell[StyleData["Text"], FontSize -> 14, LineSpacing -> {1.25,2}, CellMargins -> {{56,20},{6,6}}],
- Cell[StyleData["Input"], FontSize -> 15, CellFrame -> {{1,0},{0,0}}, CellFrameMargins -> {{10,8},{6,6}}],
- Cell[StyleData["Output"], FontSize -> 14, FormatType -> StandardForm],
+ Cell[StyleData["Section"], FontSize -> 22, FontWeight -> "Bold"],
+ Cell[StyleData["Subsection"], FontSize -> 18, FontWeight -> "Bold"],
+ Cell[StyleData["Text"], FontSize -> 14, LineSpacing -> {1.25,2}, CellMargins -> {{40,24},{6,6}}, PageWidth -> WindowWidth],
+ Cell[StyleData["Input"], FontSize -> 14, PageWidth -> WindowWidth, CellFrame -> {{1,0},{0,0}}, CellFrameMargins -> {{10,8},{6,6}}],
+ Cell[StyleData["Output"], FontSize -> 14, PageWidth -> WindowWidth, FormatType -> StandardForm],
  Cell[StyleData["DisplayFormula"], FontSize -> 17],
  Cell[StyleData["Important"], FontSize -> 15, FontWeight -> "Bold", LineSpacing -> {1.2,0}, CellMargins -> {{66,10},{8,8}}, CellFrame -> {{2,0},{0,0}}, CellFrameMargins -> {{10,8},{7,7}}],
  Cell[StyleData["Tip"], FontSize -> 15, FontSlant -> "Italic", LineSpacing -> {1.2,0}, CellMargins -> {{78,10},{8,8}}, CellFrameMargins -> {{10,8},{6,6}}],
- Cell[StyleData["Program"], FontSize -> 20, FontWeight -> "Bold", LineSpacing -> {1.25,4}, CellFrame -> {{0.5,0},{0,0}}, CellFrameMargins -> {{10,8},{6,6}}]
+ Cell[StyleData["Program"], FontSize -> 13, FontFamily -> "Courier", FontWeight -> "Plain", LineSpacing -> {1.1,2}, CellFrame -> {{0.5,0},{0,0}}, CellFrameMargins -> {{8,8},{4,4}}, PageWidth -> WindowWidth]
 },Visible->False,StyleDefinitions->"PrivateStylesheetFormatting.nb"],Saveable->True]
