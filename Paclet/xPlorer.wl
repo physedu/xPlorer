@@ -25,7 +25,7 @@ ClearRules::usage = "ClearRules[tag] removes specialization rules from the backg
 ShowRules::usage = "ShowRules[tag] returns active rules in order. ShowRules[tag, \"Numbered\"] pairs them with their one-based positions.";
 ApplyRules::usage = "ApplyRules[tag, expr] applies the specialization rules stored for tag to expr.";
 UseExpression::usage = "UseExpression[tag,key] or UseExpression[tag,section,key] transports a registered formula and applies active background rules.";
-DefineChart::usage = "DefineChart[tag, {t[],r[],theta[],varphi[]}] defines the primary chart and exposes suffixed coordinate aliases. DefineChart[tag, name, coordinates, map] defines another chart; map supplies primary coordinates as a function of the new coordinates. Legacy string lists remain temporarily during notebook migration.";
+DefineChart::usage = "DefineChart[tag, {t[],r[],theta[],varphi[]}] defines the primary chart and exposes suffixed coordinate aliases. DefineChart[tag, name, coordinates, map] defines another chart; map supplies primary coordinates as a function of the new coordinates. String label lists are also supported for compatibility; scalar declarations install coordinate aliases.";
 DeleteBackground::usage = "DeleteBackground[tag] undefines owned xAct objects and removes the background from the registry.";
 ClearBackgrounds::usage = "ClearBackgrounds[] deletes each registered background and its owned xAct objects.";
 SetFlatRules::usage = "SetFlatRules[tag] imposes flat-curvature rules for the connection of the background tag.";
@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.30";
+$XPlorerVersion = "14.0.0-beta.13-dev.31";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
