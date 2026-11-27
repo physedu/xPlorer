@@ -1,12 +1,12 @@
 tagLife = "XPTestLife" <> StringTake[CreateUUID[],8];
 makeBackground[tagLife,{"t","x","y","z"},DiagonalMatrix[{-1,1,1,1}]];
-oldBackground = ShowBackground[tagLife];
+oldBackground = BackgroundValue[tagLife];
 oldManifoldName = ToString[oldBackground["Manifold"],InputForm];
 oldMetricName = ToString[oldBackground["Metric"],InputForm];
 oldChartName = ToString[oldBackground["Chart"],InputForm];
 oldParameterName = ToString[oldBackground["PerturbationParameter"],InputForm];
 SetFieldComponents[tagLife,A,{9,8,7,6}];
-With[{mm=ShowBackground[tagLife]["Manifold"],ii=First[BackgroundIndices[tagLife]]},DefTensor[outsideField[-ii],mm]];
+With[{mm=BackgroundValue[tagLife]["Manifold"],ii=First[BackgroundIndices[tagLife]]},DefTensor[outsideField[-ii],mm]];
 assert["external-dependent-protected", FailureQ[DeleteBackground[tagLife]], True];
 assert["external-dependent-preserves-state", ToComponents[tagLife,A[-a]], {9,8,7,6}];
 UndefTensor[outsideField];
@@ -19,7 +19,7 @@ assert["delete-perturbation-parameter", ToExpression[oldParameterName,InputForm,
 assert["deletion-preserves-other-background", ToComponents[tagMink,A[-a]], {1,2,3,4}];
 makeBackground[tagLife,{"t","x","y","z"},DiagonalMatrix[{-4,2,3,5}]];
 assert["recreate-same-tag", ToComponents[tagLife,"metric"], DiagonalMatrix[{-4,2,3,5}]];
-assert["recreated-symbols-are-new", ToString[ShowBackground[tagLife]["Metric"],InputForm] =!= oldMetricName, True];
+assert["recreated-symbols-are-new", ToString[BackgroundValue[tagLife]["Metric"],InputForm] =!= oldMetricName, True];
 assert["recreated-fields-have-no-stale-values", FailureQ[ToComponents[tagLife,A[-a],StrictComponents->True]], True];
 assert["double-delete-fails-clearly", (DeleteBackground[tagLife];FailureQ[DeleteBackground[tagLife]]), True];
 (* A two-dimensional example exercises dimension-dependent charts and metrics. *)
@@ -28,7 +28,7 @@ DefManifold[sphereSourceM,2,{p,q,u,v}]; DefMetric[1,sphereG[-p,-q],sphereCD];
 ClearTheory[]; RegisterTheory["Metric",sphereG]; RegisterTheory["CovD",sphereCD]; RegisterTheory["Indices",{p,q,u,v}];
 tagSphere = "XPTestSphere" <> StringTake[CreateUUID[],8];
 makeBackground[tagSphere,{"theta","varphi"},Function[{th,ph},DiagonalMatrix[{1,Sin[th]^2}]],Assumptions->Function[{th,ph},0<th<Pi]];
-assert["dimension-is-inferred", ShowBackground[tagSphere]["Dimension"], 2];
+assert["dimension-is-inferred", BackgroundValue[tagSphere]["Dimension"], 2];
 assert["sphere-curvature", ToComponents[tagSphere,RicciScalar[sphereCD][]], 2];
 ClearTheory[];With[{tt=saved4DTheory},RegisterTheory[tt]];
 
