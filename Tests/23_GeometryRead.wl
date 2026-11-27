@@ -5,9 +5,9 @@ CreateBackground["N"];CreateBackground["O"];DefineChart["N",{"t","x","y","z"}];D
 ch=ChartOf["N"];co=ChartOf["O"];x=CoordinatesOf["N"][[2]][];
 MetricInBasis[gN,{-Exp[2 x],1,1,1}];MetricInBasis[gO,{-1,1,1,1}];AllComponentValues[AN[-aN],{1,2,3,4}];
 ri=Ricci[ConnectionOf["N"]];rs=RicciScalar[ConnectionOf["N"]];ro=Ricci[ConnectionOf["O"]];ei=Einstein[ConnectionOf["N"]];we=Weyl[ConnectionOf["N"]];
-r0=ToValues[ri[{0,-ch},{0,-ch}]];n=ShowBackground["N"]["GeometryRuns"];
-r1=ToValues[ri[{0,-ch},{0,-ch}]];n1=ShowBackground["N"]["GeometryRuns"];
-checks=<|"First native read computes Ricci"->(r0===Exp[2 x]&&MemberQ[ShowBackground["N"]["ComputedGeometry"],"Ricci"]),
+r0=ToValues[ri[{0,-ch},{0,-ch}]];n=BackgroundValue["N"]["GeometryRuns"];
+r1=ToValues[ri[{0,-ch},{0,-ch}]];n1=BackgroundValue["N"]["GeometryRuns"];
+checks=<|"First native read computes Ricci"->(r0===Exp[2 x]&&MemberQ[BackgroundValue["N"]["ComputedGeometry"],"Ricci"]),
 "Repeated native read reuses results"->(r1===r0&&n===n1),
 "Unrequested Weyl and Einstein absent"->(TensorValIDs[we]==={}&&TensorValIDs[ei]==={}),
 "Independent background untouched"->(TensorValIDs[ro]==={})|>;
