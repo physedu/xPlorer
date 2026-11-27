@@ -14,8 +14,8 @@ RegisterTheory["Connection","Affine",DAa];
 
 CreateBackground["One",SymbolSuffix->"O"];
 CreateBackground["Two",SymbolSuffix->"T"];
-DefineChart["One",{t[],x[],y[],z[]}];
-DefineChart["Two",{t[],x[],y[],z[]}];
+DefineChart["One",{tt[],xx[],yy[],zz[]}];
+DefineChart["Two",{tt[],xx[],yy[],zz[]}];
 SetCMetricSystem["One",DiagonalMatrix[{-1,1,1,1}],ComputeOnSet->None];
 SetCMetricSystem["Two",DiagonalMatrix[{-1,1,1,1}],ComputeOnSet->None];
 SetFieldComponents["One",phia,2];
