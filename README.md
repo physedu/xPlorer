@@ -4,14 +4,28 @@
 
 **Development candidate: 14.0.0-beta.13-dev.36.** The public beta release has not yet been published.
 
-xPlorer is a Wolfram Language research package that reuses an abstract xAct theory on independent geometric backgrounds, transports equations and calculates components. It connects xTensor, xCoba and xPert rather than replacing their mathematics.
+xPlorer is a Wolfram Language research package for theoretical physics and general relativity, built on xAct. It addresses a practical problem: after deriving tensor equations on an abstract manifold, how can the same theory be studied on different metrics, coordinate charts and field configurations without redefining all the tensors or restarting the Mathematica kernel?
+
+With xPlorer, register the abstract theory once, create independent backgrounds, and assign concrete metric and field components. The same equations can then be transported and evaluated on Minkowski, Schwarzschild, FLRW or other user-defined geometries in the same session. Each study has its own native xAct objects and managed component inputs.
+
+xPlorer is not a new tensor algebra engine. It uses xTensor, xCoba and xPert for the mathematics and provides the management layer connecting abstract derivations to concrete calculations. Native xAct operations remain available on the copied objects.
+
+### What can you do with xPlorer?
+
+- Reuse registered tensors, Lagrangians and equations on independent spacetimes.
+- Calculate components of tensor equations, curvature and new observables using xCoba.
+- Explore physical limits, change scalar/vector/tensor profiles, and evaluate in registered secondary coordinate charts.
+- Compute metric perturbations using xPert, including inverse metric variations and their components.
+- Modify or reconstruct a model without restarting the kernel; inspect declared inputs and customize mathematical notation.
+
+The intended audience is researchers and students already using Mathematica and xAct, particularly those comparing geometric backgrounds or specializing abstract field equations. This is experimental research software; feedback and reproducible bug reports are welcome.
 
 ## Start here
 
 | Notebook | Purpose |
 | --- | --- |
-| [xPlorer_QuickStart.nb](xPlorer_QuickStart.nb) | First scientific calculation: massive scalar theory, Minkowski, Schwarzschild and FLRW. |
-| [xPlorer_Workflow.nb](xPlorer_Workflow.nb) | Full scientific reference: registration, abstract formulas, notation, specialization, charts, vector/tensor fields, affine connections, perturbations and lifecycle. |
+| [xPlorer_Workflow.nb](xPlorer_Workflow.nb) | Start here: a practical seven-section research tutorial, from abstract equations to components, profiles, tensors and metric perturbations. |
+| [xPlorer_API_Examples.nb](xPlorer_API_Examples.nb) | Advanced executable reference: detailed API options, affine connections, lifecycle and special cases. |
 
 Install [xAct](https://www.xact.es/) separately. Use a fresh Mathematica kernel for either notebook. Keep the notebook beside the Paclet directory. Choose exactly one startup cell: A installs the matching released paclet if needed and loads it with Needs; B loads the source directly using Get. The distribution ZIP places the versioned paclet beside both notebooks.
 
@@ -39,7 +53,7 @@ ComponentValue[phiSchw[], u[rSchw[]]];
 kgSchw // ToComponents
 ```
 
-Here the source metric, derivative, field and equation must already be defined with xAct; matrix and u must be supplied by the user. The Quick Start contains all these definitions. Owned fields and charts can use native xCoba assignments, with managed primary-chart capture and native basis transformations. Unknown components stay unknown. Named rules and profiles allow exploration without recreating the geometry.
+Here the source metric, derivative, field and equation must already be defined with xAct; matrix and u must be supplied by the user. The main Workflow contains all these definitions. Owned fields and charts can use native xCoba assignments, with managed primary-chart capture and native basis transformations. Unknown components stay unknown. Named rules and profiles allow exploration without recreating the geometry.
 
 ## Inspect your models
 
@@ -85,7 +99,7 @@ The public distribution is intentionally different from this repository's develo
 
 - [API guide](API_GUIDE.md) and [design decisions](DECISIONS.md).
 - [Consolidation and validation](BETA13_CONSOLIDATION.md), [development progress](BETA13_PROGRESS.md), [plan](BETA13_PLAN.md), [implementation instructions](IMPLEMENTATION_PROMPT.md).
-- Tests/, Tools/, Examples/, and the internal xPlorer_Consolidated.nb are development material, not public distribution contents. Historical checkpoints are preserved in Git history.
+- Tests/, Tools/, Examples/, and the internal xPlorer_Consolidated.nb and historical xPlorer_QuickStart.nb are development material, not public distribution contents. Historical checkpoints are preserved in Git history.
 
 ## Author, citation and license
 
