@@ -201,7 +201,7 @@ Cell[BoxData["phi1"],"Input",CellTags->"scalar_alias_part_1"],
 
 Cell[BoxData[RowBox[{"phi1", "[", "]"}]],"Input",CellTags->"scalar_alias_part_2"],
 
-Cell[TextData[{"If you know the background tag but want to look up a head or index, use these accessors. If a notebook name is occupied, xPlorer keeps its existing definition and lists it under ",StyleBox["\"UnavailableObjectAliases\"",FontFamily->"Courier",FontSize->14]," in ",StyleBox["ShowBackground",FontFamily->"Courier",FontSize->14],"."}],"Text"],
+Cell[TextData[{"If you know the background tag but want to look up a head or index, use these accessors. If a notebook name is occupied, xPlorer keeps its existing definition and lists it under ",StyleBox["\"UnavailableObjectAliases\"",FontFamily->"Courier",FontSize->14]," in ",StyleBox["BackgroundValue",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[BoxData[RowBox[{"BackgroundObject", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Metric\""}], "]"}]],"Input",CellTags->"inspect_short_names_part_1"],
 
@@ -1356,9 +1356,9 @@ Cell[BoxData[RowBox[{RowBox[{"DeleteBackgroundObject", "[", RowBox[{"\"Minkowski
 
 Cell["The field key S is gone from this background, but the source tensor S and other independent copies remain.","Text"],
 
-Cell[BoxData[RowBox[{"KeyExistsQ", "[", RowBox[{RowBox[{RowBox[{"ShowBackground", "[", "\"MinkowskiFields\"", "]"}], "[", "\"Field\"", "]"}], ",", "\"S\""}], "]"}]],"Input",CellTags->"delete_single_field"],
+Cell[BoxData[RowBox[{"KeyExistsQ", "[", RowBox[{RowBox[{RowBox[{"BackgroundValue", "[", "\"MinkowskiFields\"", "]"}], "[", "\"Field\"", "]"}], ",", "\"S\""}], "]"}]],"Input",CellTags->"delete_single_field"],
 
-Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{RowBox[{"ShowBackground","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"[","\"Field\"","]"}]}],"]"}]],"Input",CellTags->"lifecycle_remaining_fields"],
+Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{RowBox[{"BackgroundValue","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"[","\"Field\"","]"}]}],"]"}]],"Input",CellTags->"lifecycle_remaining_fields"],
 
 Cell[BoxData[RowBox[{RowBox[{"AminkF","[",RowBox[{"aminkF"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_vector_preserved"],
 
