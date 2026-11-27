@@ -37,7 +37,8 @@ RiemannOf::usage = "RiemannOf[tag] returns the Riemann head associated with the 
 WeylOf::usage = "WeylOf[tag] returns the Weyl head associated with the background tag.";
 ChristoffelOf::usage = "ChristoffelOf[tag] returns the Christoffel head associated with the background tag.";
 BackgroundIndices::usage = "BackgroundIndices[tag, n] returns the first n internal indices of the background tag.";
-ShowBackground::usage = "ShowBackground[tag] returns the managed background record. ShowBackground[tag, section] selects Geometry, Fields, Connections, Charts, Rules, Profiles, Results, Presentation or Summary.";
+ShowBackground::usage = "ShowBackground[] lists existing studies. ShowBackground[tag] displays a readable scientific summary; ShowBackground[tag, section] displays Geometry, Fields, Connections, Charts, Rules, Profiles, Results, Presentation, Lagrangians, Expressions or Summary. Use BackgroundValue for data.";
+BackgroundValue::usage = "BackgroundValue[tag] returns the raw managed record. BackgroundValue[tag, section] returns a logical section or raw key; BackgroundValue[tag, section, key] retrieves one entry. BackgroundValue[] returns the records of all backgrounds. These are read-only queries."
 ChartOf::usage = "ChartOf[tag] returns the chart symbol stored for the background tag.";
 CoordinatesOf::usage = "CoordinatesOf[tag] returns the coordinate symbols stored for the background tag.";
 BasisOf::usage = "BasisOf[tag] returns the basis symbol stored for the background tag.";
@@ -75,7 +76,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.34";
+$XPlorerVersion = "14.0.0-beta.13-dev.35";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. ShowObjectLabels -> True or False overrides visibility for one owned head; Automatic restores inheritance. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -661,8 +662,8 @@ installManagedChartSyntax[tag_,chart_Symbol] := With[{hh=chart,tt=tag},
 ];
 ChartOf[tag_String,"Primary"] := ChartOf[tag];
 CoordinatesOf[tag_String,"Primary"] := CoordinatesOf[tag];
-ChartOf[tag_String,name_String] := Module[{rec=chartRecord[ShowBackground[tag],name]},If[FailureQ[rec],rec,rec["Chart"]]];
-CoordinatesOf[tag_String,name_String] := Module[{rec=chartRecord[ShowBackground[tag],name]},If[FailureQ[rec],rec,rec["Coordinates"]]];
+ChartOf[tag_String,name_String] := Module[{rec=chartRecord[BackgroundValue[tag],name]},If[FailureQ[rec],rec,rec["Chart"]]];
+CoordinatesOf[tag_String,name_String] := Module[{rec=chartRecord[BackgroundValue[tag],name]},If[FailureQ[rec],rec,rec["Coordinates"]]];
 (* xCoba transforms tensor slots; the chart map substitutes scalar coordinates. *)
 chartPullback[arr_,b_,rec_,indices_] := Module[{source,target,ct,result},
  If[indices==={},Return[arr/.Thread[coordinateValues[b]->rec["Values"]]]];
@@ -1772,8 +1773,8 @@ WeylOf[tag_String] := getter[tag, "Weyl"];
 ChristoffelOf[tag_String] := getter[tag, "Christoffel"];
 BackgroundIndices[tag_String, n_: Automatic] := Module[{b = background[tag]}, If[FailureQ[b], Return[b]];
   If[n === Automatic, b["Indices"], If[IntegerQ[n] && 0 <= n <= Length[b["Indices"]], Take[b["Indices"], n], failure["IndexCount", "Invalid number of indices."]]]];
-ShowBackground[tag_String] := background[tag];
-ShowBackground[tag_String,section_String] := Module[{b=background[tag]},If[FailureQ[b],Return[b]];
+BackgroundValue[tag_String] := background[tag];
+BackgroundValue[tag_String,section_String] := Module[{b=background[tag]},If[FailureQ[b],Return[b]];
  Switch[section,
   "Geometry",KeyTake[b,{"Manifold","Dimension","Metric","CovD","Signature","ComputedGeometry","MetricRevision","GeometryRuns"}],
   "Fields",Map[KeyTake[#,{"NewHead","Type","Rank","IndexPositions"}]&,b["Field"]],
@@ -1784,11 +1785,61 @@ ShowBackground[tag_String,section_String] := Module[{b=background[tag]},If[Failu
   "Profiles",ShowProfiles[tag],
   "Results",Keys[Lookup[b,"SavedResults",<||>]],
   "Presentation",PresentationOf[tag],
-  "Summary",<|"Tag"->tag,"Geometry"->ShowBackground[tag,"Geometry"],"Fields"->Keys[b["Field"]],"Connections"->Keys[Lookup[b,"Connections",<||>]],
-    "Charts"->Keys[ShowBackground[tag,"Charts"]],"Profiles"->Keys[ShowProfiles[tag]],"ActiveRuleGroups"->Lookup[b,"ActiveRuleGroups",{}],
-    "SavedResults"->ShowBackground[tag,"Results"]|>,
-  _,failure["BackgroundSection","Choose Geometry, Fields, Connections, Charts, Rules, Profiles, Results, Presentation or Summary."]]
+  "Summary",<|"Tag"->tag,"Geometry"->BackgroundValue[tag,"Geometry"],"Fields"->Keys[b["Field"]],"Connections"->Keys[Lookup[b,"Connections",<||>]],
+    "Charts"->Keys[BackgroundValue[tag,"Charts"]],"Profiles"->Keys[ShowProfiles[tag]],"ActiveRuleGroups"->Lookup[b,"ActiveRuleGroups",{}],
+    "SavedResults"->BackgroundValue[tag,"Results"]|>,
+  "Lagrangians"|"Expressions",b13Collection[b["Theory"],section],
+  _,Lookup[b,section,failure["BackgroundSection","Unknown background section or record key.",<|"Key"->section|>]]]
 ];
+
+BackgroundValue[] := $BG;
+BackgroundValue[tag_String,section_String,key_] := Module[{a=BackgroundValue[tag,section]},
+ If[FailureQ[a],a,If[AssociationQ[a],Lookup[a,key,failure["BackgroundKey","The entry does not exist."]],failure["BackgroundKey","The selected section is not an association."]]]];
+
+(* Scientific inspection. Only declared inputs and existing metadata are read.
+   Never call ToComponents, ComputeGeometry or native cache readers here. *)
+bgViewMath[tag_,x_] := prettyView[tag,x,ShowBackgroundLabel->False];
+bgViewNames[x_List] := If[x==={},"None",b13SectorKeys[Map[If[StringQ[#],#,ToString[#,InputForm]]&,x]]];
+bgViewNames[x_] := x;
+bgViewHead[x_Symbol] := SymbolName[x];
+bgViewHead[_] := "Not defined";
+bgViewArray[tag_,x_] := Which[
+ MatrixQ[x] && Length[Flatten[x]]<=36,bgViewMath[tag,MatrixForm[x]],
+ ListQ[x] && Length[Flatten[x]]>36,Row[{"Array ",Dimensions[x]}],
+ True,bgViewMath[tag,x]];
+bgFieldRecords[b_,f_] := Select[Values[Lookup[b,"FieldComponents",<||>]],Lookup[#,"Head",None]===Lookup[f,"NewHead",None]&];
+bgFieldValue[tag_,r_] := If[TrueQ[Lookup[r,"Partial",False]],
+ Column[Join[{"Partial input (unassigned slots unknown)"},Take[KeyValueMap[Row[{#1," : ",bgViewMath[tag,#2]}]&,Association[r["Values"]]],UpTo[6]],If[Length[r["Values"]]>6,{"More entries in BackgroundValue"},{}]],Alignment->Left,Spacings->0.15],
+ bgViewArray[tag,r["Values"]]];
+bgFieldRow[tag_,b_,key_,f_] := Module[{rs=bgFieldRecords[b,f]},
+ {key,bgViewHead[Lookup[f,"NewHead",None]],Lookup[f,"Type","Tensor"],
+ If[rs==={},"Not assigned",Column[Map[Function[r,Column[Join[If[Lookup[r,"Order",None]===None,{}, {Row[{"Order ",r["Order"]}]}],If[Lookup[r,"IndexPositions",{}]==={}, {},{Row[{"Slot variance: ",r["IndexPositions"]}]}],{bgFieldValue[tag,r]}],Alignment->Left,Spacings->0.1]],rs],Alignment->Left,Spacings->0.3]]}];
+bgViewSection[tag_,b_,section_] := Module[{a,rows,inds,metric,coords},
+ Switch[section,
+ "Geometry",inds=Lookup[b,"Indices",{}];metric=Lookup[b,"Metric",None];
+  a=<|"Dimension"->b["Dimension"],"Metric"->If[Length[inds]>=2&&MetricQ[metric],bgViewMath[tag,metric[-inds[[1]],-inds[[2]]]],"Not defined"],"Metric symbol"->bgViewHead[metric],"Connection"->bgViewHead[Lookup[b,"CovD",None]],"Signature"->b["Signature"],"Metric components"->If[KeyExistsQ[b,"MetricMatrix"],bgViewArray[tag,b["MetricMatrix"]],"Not assigned"],"Assumptions"->bgViewMath[tag,Lookup[b,"Assumptions",True]],"Computed geometry"->bgViewNames[Lookup[b,"ComputedGeometry",{}]]|>;b13KeyTable[a],
+ "Fields",b13Table[{"Key","Symbol","Type","Assigned primary-chart input"},KeyValueMap[bgFieldRow[tag,b,#1,#2]&,Lookup[b,"Field",<||>]]],
+ "Charts",a=BackgroundValue[tag,"Charts"];b13Table[{"Chart","Basis symbol","Coordinates"},KeyValueMap[{#1,bgViewHead[#2["Chart"]],bgViewMath[tag,Map[Function[h,h[]],#2["Coordinates"]]]}&,a]],
+ "Connections",a=Lookup[b,"Connections",<||>];b13Table[{"Key","Symbol","Kind","Assigned coefficients"},KeyValueMap[{#1,bgViewHead[#2["Head"]],If[#1==="Primary","Levi-Civita","Independent"],If[#1==="Primary",If[KeyExistsQ[b,"MetricMatrix"],"From metric","Metric not assigned"],If[KeyExistsQ[Lookup[b,"ConnectionComponents",<||>],#1],"Assigned","Not assigned"]]}&,a]],
+ "Rules",a=BackgroundValue[tag,"Rules"];Column[{b13KeyTable[<|"Active groups"->bgViewNames[a["Active"]],"Available groups"->bgViewNames[Keys[a["Groups"]]]|>],b13Table[{"Effective rule"},List /@ (bgViewMath[tag,#]& /@ a["Effective"])]},Alignment->Left,Spacings->0.3],
+ "Profiles",a=BackgroundValue[tag,"Profiles"];b13Table[{"Stored profile","Input records"},KeyValueMap[{#1,Length[#2]}&,a]],
+ "Results",a=Lookup[b,"SavedResults",<||>];b13Table[{"Stored result key"},List /@ Keys[a]],
+ "Presentation",a=notationSettings[tag];b13KeyTable[Join[<|"Symbol suffix"->b["SymbolSuffix"]|>,a]],
+ "Lagrangians"|"Expressions",a=b13Collection[b["Theory"],section];b13Table[{"Key","Alias","Registered source formula"},KeyValueMap[{#1,#2["AliasBase"]<>b["SymbolSuffix"],#2["Value"]}&,a]],
+ _,failure["BackgroundSection","Choose Summary, Geometry, Fields, Connections, Charts, Rules, Profiles, Results, Presentation, Lagrangians or Expressions."]
+ ]];
+bgViewHeading[s_] := Style[s,Bold,13,FontFamily->"Helvetica"];
+bgViewSummary[tag_,b_] := Module[{sections,header,summary},
+ header={Style[tag,Bold,16,FontFamily->"Helvetica"],Style[Lookup[b["Theory"],"Title","Registered theory"],FontFamily->"Helvetica",12]};
+ summary=b13KeyTable[<|"Symbol suffix"->b["SymbolSuffix"],"Registered lagrangians"->bgViewNames[Keys[b13Collection[b["Theory"],"Lagrangians"]]],"Registered expressions"->bgViewNames[Keys[b13Collection[b["Theory"],"Expressions"]]],"Stored profiles"->bgViewNames[Keys[Lookup[b,"FieldProfiles",<||>]]],"Saved results"->bgViewNames[Keys[Lookup[b,"SavedResults",<||>]]]|>];
+ sections={"Geometry","Charts","Fields","Connections","Rules"};
+ Column[Join[header,(Column[{bgViewHeading[#],bgViewSection[tag,b,#]},Alignment->Left,Spacings->0.25]& /@ sections),{Column[{bgViewHeading["Registered formulas and stored work"],summary},Alignment->Left,Spacings->0.25]}],Alignment->Left,Spacings->0.75]];
+ShowBackground[] := b13Table[{"Background","Suffix","Fields","Charts","Metric components"},
+ KeyValueMap[{#1,#2["SymbolSuffix"],bgViewNames[Keys[Lookup[#2,"Field",<||>]]],If[KeyExistsQ[#2,"Chart"],1+Length[Lookup[#2,"AdditionalCharts",<||>]],0],If[KeyExistsQ[#2,"MetricMatrix"],"Assigned","Not assigned"]}&,$BG]];
+ShowBackground[tag_String] := ShowBackground[tag,"Summary"];
+ShowBackground[tag_String,section_String] := Module[{b=background[tag]},If[FailureQ[b],Return[b]];
+ If[section==="Summary",bgViewSummary[tag,b],bgViewSection[tag,b,section]]];
+
 (* Presentation is deliberately separate from the registry and mathematical access. *)
 TheorySnapshot[] := $Theory;
 b13Sections = {"Geometry","Fields","Parameters","Lagrangians","Expressions","Connections","Sectors"};
