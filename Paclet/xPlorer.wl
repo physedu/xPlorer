@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.25";
+$XPlorerVersion = "14.0.0-beta.13-dev.26";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -807,9 +807,9 @@ storeField[b_, spec_] := Module[{head = spec["Head"], signs = spec["IndexPositio
   inds = indicesFor[b, Length[signs]];
   expression = head @@ Join[If[spec["Order"] === None, {}, {LI[spec["Order"]]}], MapThread[{#1 #2, #2 b["Basis"]} &, {inds, signs}]];
   If[TrueQ[Lookup[spec,"Partial",False]],
-   Return[guard[Block[{$CVVerbose=False,$CVReplace=True,$insideManagedCalculation=True},
+   Return[guard[Block[{$CVVerbose=False,$CVReplace=True,$CVSimplify=Identity,$insideManagedCalculation=True},
     Scan[Function[r,ComponentValue[partialFieldExpression[b,spec,First[r]],Last[r]]],spec["Values"]];Null]]]];
-  guard[Block[{$CVVerbose = False,$insideManagedCalculation=True}, If[signs === {}, ComponentValue[expression, spec["Values"]], AllComponentValues[expression, spec["Values"]]]]]
+  guard[Block[{$CVVerbose = False,$CVSimplify=If[TrueQ[Lookup[spec,"ExactNativeValues",False]],Identity,$CVSimplify],$insideManagedCalculation=True}, If[signs === {}, ComponentValue[expression, spec["Values"]], AllComponentValues[expression, spec["Values"]]]]]
 ];
 (* Fingerprints describe only native input rule groups, not duplicate arrays.
    A replay records the actual stored source; a later metric change can keep
@@ -928,17 +928,19 @@ SetFieldComponents[expr:Except[_String],input_,opts:OptionsPattern[]] := Module[
    Internal writes execute in a dynamically scoped calculation/replay guard.
    Capture only rank-zero field assignments in a managed primary chart; leave
    native derivatives, external charts, and individual positive-rank components native. *)
-captureManagedScalar[tag_,expr_,input_] := Block[{$insideManagedCalculation=True},
+captureManagedScalar[tag_,expr_,input_,operation_:ComponentValue] := Block[{$insideManagedCalculation=True},
  Module[{r,actual,b=$BG[tag],head=Head[expr],rec,key,old,ids,status,previous,affected},
   If[ListQ[input],Return[failure["FieldDimensions","A rank-zero field requires a scalar value."]]];
   previous=Last[ComponentValue[expr]];
-  r=ComponentValue[expr,input];If[!MatchQ[r,_Rule],Return[r]];
+  r=nativeFieldWrite[operation,expr,input];If[!MatchQ[r,_Rule],Return[r]];
   actual=Last[ComponentValue[expr]];
-  If[ListQ[actual],Block[{$CVReplace=True},ComponentValue[expr,previous]];
+  If[ListQ[actual],Block[{$CVReplace=True,$CVSimplify=Identity},ComponentValue[expr,previous]];
     Return[failure["FieldDimensions","The supplied function returned a list for a scalar field."]]];
   rec=<|"Head"->head,"IndexPositions"->{},"Order"->None,"Values"->actual|>;
   key=fieldRecordKey[rec];old=Lookup[b["FieldComponents"],key,Missing[]];
   If[actual===expr,rec=Missing[]];
+  If[AssociationQ[old]&&AssociationQ[rec]&&KeyDrop[old,"ExactNativeValues"]===rec,Return[r]];
+  If[AssociationQ[rec]&&(operation===HeldComponentValue||TrueQ[Lookup[old,"ExactNativeValues",False]]),rec=Append[rec,"ExactNativeValues"->True]];
   If[old===rec,Return[r]];
   ids=Select[TensorValIDs[head],Length[List@@#]>2&];
   status=guard[Scan[DeleteTensorValues,ids]];
@@ -1145,7 +1147,7 @@ managedPartialComponentQ[tag_,expr_,rank_] := Module[{b=Lookup[$BG,tag,<||>],sig
  args=Select[List@@expr,MatchQ[#,_LI]&];fs=fieldSpec[b,Head[expr]];
  AssociationQ[fs]&&If[fs["Type"]==="MetricPert",MatchQ[args,{LI[_Integer?Positive]}],args==={}]
 ];
-capturePartialComponent[tag_,expr_,value_] := Block[{$insideManagedCalculation=True},
+capturePartialComponent[tag_,expr_,value_,operation_:ComponentValue] := Block[{$insideManagedCalculation=True},
  Module[{b=$BG[tag],head=Head[expr],signs,order,args,rec,key,old,can,tuple,stage,r,actual,entries,new},
   signs=managedPrimaryIndices[b,expr,CIndexQ];args=Select[List@@expr,MatchQ[#,_LI]&];
   order=If[args==={},None,First[First[args]]];
@@ -1153,7 +1155,7 @@ capturePartialComponent[tag_,expr_,value_] := Block[{$insideManagedCalculation=T
   key=fieldRecordKey[rec];old=Lookup[b["FieldComponents"],key,Missing[]];
   If[AssociationQ[old]&&old["IndexPositions"]=!=signs,
    Return[failure["FieldInputVariance","Edit components in the registered input variance, or supply a complete replacement array with AllComponentValues.",<|"InputVariance"->old["IndexPositions"],"RequestedVariance"->signs|>]]];
-  If[AssociationQ[old]&&!TrueQ[Lookup[old,"Partial",False]],Return[captureManagedComponent[tag,expr,value]]];
+  If[AssociationQ[old]&&!TrueQ[Lookup[old,"Partial",False]],Return[captureManagedComponent[tag,expr,value,operation]]];
   If[AssociationQ[old],rec=old];
   can=guard[ToCanonical[expr]];
   If[can===$Failed,Return[failure["FieldComponents","Could not canonicalize the component."]]];
@@ -1165,7 +1167,7 @@ capturePartialComponent[tag_,expr_,value_] := Block[{$insideManagedCalculation=T
      native symmetry and CVReplace/Function behavior, without adopting
      unregistered native values in the other slots. *)
   stage=guard[With[{hh=head},Internal`InheritedBlock[{hh},
-   r=ComponentValue[expr,value];{r,ToValues[can,hh]}
+   r=nativeFieldWrite[operation,expr,value];{r,ToValues[can,hh]}
   ]]];
   If[stage===$Failed||!MatchQ[stage,{_Rule,_}],Return[failure["FieldAssignment","Could not stage the native component assignment."]]];
   actual=Last[stage];
@@ -1184,15 +1186,21 @@ managedPrimarySourceRecord[tag_,expr_] := Module[{b=Lookup[$BG,tag,<||>],signs,r
  recs=Select[managedNativeReadRecords[b,expr],#["IndexPositions"]===signs&];
  If[Length[recs]===1,First[recs],None]
 ];
-captureManagedComponent[tag_,expr_,value_] := Block[{$insideManagedCalculation=True},
- Module[{b=$BG[tag],record,head=Head[expr],signs,recs,r,arr,updated,result},
+captureManagedComponent[tag_,expr_,value_,operation_:ComponentValue] := Block[{$insideManagedCalculation=True},
+ Module[{b=$BG[tag],record,head=Head[expr],signs,recs,r,arr,updated,result,stage},
   signs=managedPrimaryIndices[b,expr,CIndexQ];recs=Select[managedNativeReadRecords[b,expr],#["IndexPositions"]===signs&];
   record=First[recs];
-  r=ComponentValue[expr,value];If[!MatchQ[r,_Rule],Return[r]];
-  arr=ToValues[ComponentArray[fieldBasisExpression[b,record,signs]],head];
+  (* Stage edits so an incomplete candidate cannot corrupt the native source. *)
+  stage=guard[With[{hh=head},Internal`InheritedBlock[{hh},
+   r=nativeFieldWrite[operation,expr,value];
+   {r,ToValues[ComponentArray[fieldBasisExpression[b,record,signs]],hh]}
+  ]]];
+  If[stage===$Failed||!MatchQ[stage,{_Rule,_List}],Return[failure["FieldAssignment","Could not stage the native field assignment."]]];
+  r=First[stage];arr=Last[stage];
   If[!FreeQ[arr,head],Return[failure["IncompleteField","The native edit left an incomplete source array."]]];
   updated=Join[record,<|"Values"->arr|>];
   If[updated===record,Return[r]];
+  If[operation===HeldComponentValue,updated=Append[updated,"ExactNativeValues"->True]];
   result=applyFieldRecords[tag,Append[b["FieldComponents"],fieldRecordKey[updated]->updated],{head}];
   If[FailureQ[result],result,r]
  ]];
@@ -1292,14 +1300,28 @@ vanishingOwnedFieldQ[tag_,head_,rank_] := Module[{b=$BG[tag],fs},
  TrueQ[(head@@Join[If[fs["Type"]==="MetricPert",{LI[1]},{}],
   MapThread[Times,{fs["IndexPositions"],indicesFor[b,rank]}]])===0]
 ];
+(* HeldComponentValue has HoldFirst and intentionally bypasses CVSimplify.
+   Only intercept literal owned expressions that do not evaluate differently.
+   Computed arguments, aliases and native Set-state expressions stay native. *)
+nativeFieldWrite[operation_,expr_,value_] := With[{e=expr},operation[e,value]];
+SetAttributes[heldManagedLiteralQ,HoldAllComplete];
+heldManagedLiteralQ[tag_,e_] := Module[{b=Lookup[$BG,tag,<||>],head},
+ If[TrueQ[$insideManagedCalculation]||TrueQ[$insideNativePrintGuard]||!KeyExistsQ[b,"Basis"],Return[False]];
+ If[!With[{bb=b["Basis"]},MatchQ[HoldComplete[e],HoldComplete[_[(LI[_Integer?Positive]|{_Integer,bb}|{_Integer,-bb})...]]]],Return[False]];
+ If[!SameQ[HoldComplete[e],With[{v=e},HoldComplete[v]]],Return[False]];
+ head=Head[e];!AnyTrue[TensorValIDs[head],StateOfValID[#]===Set&]
+];
 installManagedFieldSyntax[tag_,head_Symbol,rank_Integer] := If[!vanishingOwnedFieldQ[tag,head,rank],With[{hh=head,tt=tag,rr=rank},
  If[rr===0,
   hh /: ComponentValue[e:hh[],value_] /; (!TrueQ[$insideManagedCalculation] && KeyExistsQ[$BG[tt],"Chart"]) := captureManagedScalar[tt,e,value];
+  hh /: HeldComponentValue[e:hh[],value_] /; heldManagedLiteralQ[tt,e] := captureManagedScalar[tt,e,value,HeldComponentValue];
   hh /: ComponentValue[e:hh[],value_,Managed->True] := SetFieldComponents[e,value],
   hh /: AllComponentValues[e:hh[___],value_] /; managedFieldAbstractQ[e,rr] := SetFieldComponents[e,value];
   hh /: ComponentValue[e:hh[___],value_] /; managedPartialComponentQ[tt,e,rr] := capturePartialComponent[tt,e,value];
+  hh /: HeldComponentValue[e:hh[___],value_] /; (heldManagedLiteralQ[tt,e]&&managedPartialComponentQ[tt,e,rr]) := capturePartialComponent[tt,e,value,HeldComponentValue];
   hh /: AllComponentValues[e:hh[___],value_] /; managedExplicitArrayQ[tt,e,rr,value] := captureManagedArray[tt,e,value]
  ];
+ hh /: HeldComponentValue[e:hh[___]] /; heldManagedLiteralQ[tt,e] := managedSingleRead[e,HeldComponentValue];
  hh /: ChangeComponents[e:hh[___],init_,args___] /; !TrueQ[$insideManagedCalculation] := Block[{$insideManagedCalculation=True},ChangeComponents[e,init,args]];
  hh /: DeleteTensorValues[hh] /; (!TrueQ[$insideManagedCalculation] && !TrueQ[$insideNativePrintGuard] && KeyExistsQ[$BG[tt],"Chart"]) := ClearFieldComponents[tt,hh];
  hh /: DeleteTensorValues[hh,Managed->True] := ClearFieldComponents[tt,hh];
@@ -2178,7 +2200,7 @@ RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,c
  inputs=Lookup[recipe,"FieldInputs",<||>];
  result=KeyValueMap[Function[{key,records},
    source=recipe["Theory"]["Field"][key]["Head"];
-   Map[Function[rec,If[TrueQ[Lookup[rec,"Partial",False]],
+   Map[Function[rec,If[TrueQ[Lookup[rec,"Partial",False]]||TrueQ[Lookup[rec,"ExactNativeValues",False]],
     With[{rr=Join[rec/.rules,<|"Head"->BackgroundObject[tag,key]|>]},
       applyFieldRecords[tag,Append[$BG[tag]["FieldComponents"],fieldRecordKey[rr]->rr],{rr["Head"]}]],
     SetFieldComponents[tag,source,rec["Values"]/.rules,IndexPositions->rec["IndexPositions"],PerturbationOrderLabel->Replace[rec["Order"],None->1]]]],records]
