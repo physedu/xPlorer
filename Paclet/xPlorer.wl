@@ -994,8 +994,9 @@ fieldRecordKey[rec_] := SymbolName[rec["Head"]] <> ":" <> ToString[rec["Order"]]
 dependentFieldHeads[records_,heads_] := FixedPoint[Function[affected,
  DeleteDuplicates@Join[affected,Lookup[Select[Values[records],Function[r,
   AnyTrue[affected,!FreeQ[r["Values"],#]&]]],"Head",{}]]],DeleteDuplicates[heads]];
-applyFieldRecords[tag_, records_Association, explicitHeads_:{}] := Module[{b=background[tag],old,heads,result,rollback,changed,repeated},
+applyFieldRecords[tag_, records_Association, explicitHeads_:{}] := Module[{b=background[tag],old,heads,result,rollback,changed,repeated,status},
   If[FailureQ[b],Return[b]];
+  status=backgroundExpressionGuard[tag,records];If[FailureQ[status],Return[status]];
   If[!KeyExistsQ[b,"Basis"],Return[failure["NoChart","Define the chart before assigning field components."]]];
   old=b["FieldComponents"];
   result=nativeSetGuard[dependentFieldHeads[Join[old,records],explicitHeads]];If[FailureQ[result],Return[result]];
@@ -1039,12 +1040,18 @@ SetFieldComponents[expr:Except[_String],input_,opts:OptionsPattern[]] := Module[
    Capture only rank-zero field assignments in a managed primary chart; leave
    native derivatives, external charts, and individual positive-rank components native. *)
 captureManagedScalar[tag_,expr_,input_,operation_:ComponentValue] := Block[{$insideManagedCalculation=True},
- Module[{r,actual,b=$BG[tag],head=Head[expr],rec,key,old,ids,status,previous,affected},
+ Module[{r,actual,b=$BG[tag],head=Head[expr],rec,key,old,ids,status,previous,affected,rollback},
+  status=backgroundExpressionGuard[tag,input];If[FailureQ[status],Return[status]];
   status=nativeSetGuard[dependentFieldHeads[b["FieldComponents"],{head}]];If[FailureQ[status],Return[status]];
   If[ListQ[input],Return[failure["FieldDimensions","A rank-zero field requires a scalar value."]]];
   previous=Last[ComponentValue[expr]];
   r=nativeFieldWrite[operation,expr,input];If[!MatchQ[r,_Rule],Return[r]];
   actual=Last[ComponentValue[expr]];
+  status=backgroundExpressionGuard[tag,actual];
+  If[FailureQ[status],
+    rollback=Block[{$CVReplace=True,$CVSimplify=Identity},ComponentValue[expr,previous]];
+    If[rollback===$Failed||FailureQ[rollback],Return[failure["FieldRollback","A foreign dependency was produced by the native scalar assignment and the previous value could not be restored.",<|"Assignment"->status,"Restoration"->rollback|>]]];
+    Return[status]];
   If[ListQ[actual],Block[{$CVReplace=True,$CVSimplify=Identity},ComponentValue[expr,previous]];
     Return[failure["FieldDimensions","The supplied function returned a list for a scalar field."]]];
   rec=<|"Head"->head,"IndexPositions"->{},"Order"->None,"Values"->actual|>;
@@ -1294,7 +1301,8 @@ managedPartialComponentQ[tag_,expr_,rank_] := Module[{b=Lookup[$BG,tag,<||>],sig
  AssociationQ[fs]&&If[fs["Type"]==="MetricPert",MatchQ[args,{LI[_Integer?Positive]}],args==={}]
 ];
 capturePartialComponent[tag_,expr_,value_,operation_:ComponentValue] := Block[{$insideManagedCalculation=True},
- Module[{b=$BG[tag],head=Head[expr],signs,order,args,rec,key,old,can,canonical,tuple,stage,r,actual,entries,new,representative},
+ Module[{b=$BG[tag],head=Head[expr],signs,order,args,rec,key,old,can,canonical,tuple,stage,r,actual,entries,new,representative,status},
+  status=backgroundExpressionGuard[tag,value];If[FailureQ[status],Return[status]];
   r=nativeSetGuard[dependentFieldHeads[b["FieldComponents"],{head}]];If[FailureQ[r],Return[r]];
   signs=managedPrimaryIndices[b,expr,CIndexQ];args=Select[List@@expr,MatchQ[#,_LI]&];
   order=If[args==={},None,First[First[args]]];
@@ -1318,6 +1326,7 @@ capturePartialComponent[tag_,expr_,value_,operation_:ComponentValue] := Block[{$
   ]]];
   If[stage===$Failed||!MatchQ[stage,{_Rule,_}],Return[failure["FieldAssignment","Could not stage the native component assignment."]]];
   actual=Last[stage];
+  status=backgroundExpressionGuard[tag,actual];If[FailureQ[status],Return[status]];
   If[!FreeQ[actual,head]&&actual=!=can,Return[failure["FieldComponents","Self-referential component input is not supported."]]];
   entries=If[SameQ@@signs,Select[rec["Values"],First[#]=!=tuple&],
    Select[rec["Values"],positiveComponent[ToCanonical[partialFieldExpression[b,rec,First[#]]]]=!=can&]];
@@ -1336,7 +1345,8 @@ managedPrimarySourceRecord[tag_,expr_] := Module[{b=Lookup[$BG,tag,<||>],signs,r
  If[Length[recs]===1,First[recs],None]
 ];
 captureManagedComponent[tag_,expr_,value_,operation_:ComponentValue] := Block[{$insideManagedCalculation=True},
- Module[{b=$BG[tag],record,head=Head[expr],signs,recs,r,arr,updated,result,stage,components,records},
+ Module[{b=$BG[tag],record,head=Head[expr],signs,recs,r,arr,updated,result,stage,components,records,status},
+  status=backgroundExpressionGuard[tag,value];If[FailureQ[status],Return[status]];
   signs=managedPrimaryIndices[b,expr,CIndexQ];recs=Select[managedNativeReadRecords[b,expr],#["IndexPositions"]===signs&];
   record=First[recs];
   (* Stage edits so an incomplete candidate cannot corrupt the native source. *)
@@ -1346,6 +1356,7 @@ captureManagedComponent[tag_,expr_,value_,operation_:ComponentValue] := Block[{$
   ]]];
   If[stage===$Failed||!MatchQ[stage,{_Rule,_List}],Return[failure["FieldAssignment","Could not stage the native field assignment."]]];
   r=First[stage];arr=Last[stage];
+  status=backgroundExpressionGuard[tag,arr];If[FailureQ[status],Return[status]];
   If[!FreeQ[arr,head],
    If[!MemberQ[{Null,-Null},value],Return[failure["IncompleteField","The native edit left an incomplete source array."]]];
    components=ComponentArray[fieldBasisExpression[b,record,signs]];
@@ -1394,12 +1405,15 @@ managedPrimaryMetricArrayQ[tag_,basis_,input_,opts_List] := Module[{b=Lookup[$BG
  TrueQ[$CVReplace] && Complement[First/@opts,First/@Options[MetricInBasis]]==={}
 ];
 captureManagedMetricArray[tag_,basis_,input_,opts___Rule] := Block[{$insideManagedCalculation=True},
- Module[{b=$BG[tag],mat,lower,r,fun,inv,metric,other,known,requested},
+ Module[{b=$BG[tag],mat,lower,r,fun,inv,metric,other,known,requested,status},
+  status=backgroundExpressionGuard[tag,input];If[FailureQ[status],Return[status]];
   metric=b["Metric"];mat=If[VectorQ[input],DiagonalMatrix[input],input];
+  status=backgroundExpressionGuard[tag,mat];If[FailureQ[status],Return[status]];
   fun=CVSimplify/.Join[{opts},Options[MetricInBasis]];
   inv=Inverse/.Join[{opts},Options[MetricInBasis]];
   lower=If[basis===-b["Basis"],mat,guard[fun[Inverse[mat]]]];
   If[lower===$Failed,Return[failure["MetricAssignment","The contravariant metric could not be inverted."]]];
+  status=backgroundExpressionGuard[tag,lower];If[FailureQ[status],Return[status]];
   r=SetCMetricSystem[tag,lower,Assumptions->Lookup[b,"Assumptions",True],ComputeOnSet->None];
   If[FailureQ[r],Return[r]];
   (* Preserve an already identical native group. An inverse requested but
@@ -1421,7 +1435,8 @@ managedMetricComponentQ[tag_,expr_] := Module[{b=Lookup[$BG,tag,<||>],signs},
  MemberQ[{{-1,-1},{1,1}},signs]
 ];
 captureManagedMetricComponent[tag_,expr_,input_,operation_:ComponentValue] := Block[{$insideManagedCalculation=True},
- Module[{b=$BG[tag],metric,signs,basis,stage,r,mat},
+ Module[{b=$BG[tag],metric,signs,basis,stage,r,mat,status},
+  status=backgroundExpressionGuard[tag,input];If[FailureQ[status],Return[status]];
   r=backgroundNativeSetGuard[b];If[FailureQ[r],Return[r]];
   metric=b["Metric"];signs=managedPrimaryIndices[b,expr,CIndexQ];basis=First[signs] b["Basis"];
   If[!nativeGeometryRulePresentQ["Metric"[-1,-1],geometryNativeData[b]],
@@ -1437,6 +1452,7 @@ captureManagedMetricComponent[tag_,expr_,input_,operation_:ComponentValue] := Bl
   ]]];
   If[stage===$Failed||!MatchQ[stage,{_Rule,_List}],Return[failure["MetricInput","The native component assignment could not be staged."]]];
   mat=Last[stage];
+  status=backgroundExpressionGuard[tag,mat];If[FailureQ[status],Return[status]];
   If[!FreeQ[mat,metric],Return[failure["MetricInput","The staged metric is incomplete."]]];
   r=Block[{$CVSimplify=If[operation===HeldComponentValue,Identity,$CVSimplify]},
    captureManagedMetricArray[tag,basis,mat,CVSimplify->managedReadPolicy[b]]];
