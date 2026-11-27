@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.27";
+$XPlorerVersion = "14.0.0-beta.13-dev.28";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -684,6 +684,7 @@ Options[SetCMetricSystem] = {ComputeOnSet -> {"Metric"}, Assumptions -> True, CV
 SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background[tag], mat, det, result, ass = OptionValue[Assumptions], sym},
   If[FailureQ[b], Return[b]];
   If[!KeyExistsQ[b, "Chart"], Return[failure["NoChart", "Define the chart before assigning a metric."]]];
+  result=backgroundNativeSetGuard[b];If[FailureQ[result],Return[result]];
   ass = profile[ass, b];
   mat = profile[input, b];
   If[SameQ[Lookup[b,"MetricMatrix",Missing[]],mat]&&SameQ[Lookup[b,"Assumptions",Missing[]],ass]&&nativeMetricCurrentQ[b],
@@ -757,6 +758,7 @@ managedNativeMetricComputeQ[tag_,ch_,opts_List] := Module[{b=Lookup[$BG,tag,<||>
 ];
 captureNativeMetricCompute[tag_,ch_,what_,opts___Rule] := Block[{$insideManagedCalculation=True},
  Module[{b=$BG[tag],result,deps,covered,old,new,seconds,before},
+  result=backgroundNativeSetGuard[b];If[FailureQ[result],Return[result]];
   old=refreshGeometryCoverage[tag];
   repairMissingGeometryCache[b];before=nativeMetricState[b];
   {seconds,result}=AbsoluteTiming[guard[MetricCompute[b["Metric"],Zero,ch,what,opts]]];
@@ -774,6 +776,7 @@ ComputeGeometry[tag_String, targets_: {"Metric"}, OptionsPattern[]] := Module[
   {b = background[tag], wanted, todo, policy, ass, fun = OptionValue[CVSimplify], result, seconds, specs,before},
   If[FailureQ[b], Return[b]];
   If[!KeyExistsQ[b, "MetricMatrix"], Return[failure["NoMetricComponents", "Assign the metric matrix first."]]];
+  result=backgroundNativeSetGuard[b];If[FailureQ[result],Return[result]];
   wanted = If[targets === All, Keys[$geometryTargets], Flatten[{targets}]];
   If[!VectorQ[wanted, StringQ] || !SubsetQ[Keys[$geometryTargets], wanted], Return[failure["GeometryTargets", "Unknown geometry target.", <|"Allowed" -> Keys[$geometryTargets]|>]]];
   ass = Replace[OptionValue[Assumptions], Automatic :> Lookup[b, "Assumptions", True]];
@@ -851,6 +854,7 @@ replayFields[tag_, selection_:All] := Module[{b = $BG[tag], records, heads, resu
   records = Values[b["FieldComponents"]];
   heads = If[selection===All,DeleteDuplicates[Lookup[records,"Head",{}]],DeleteDuplicates[selection]];
   records=Select[records,MemberQ[heads,#["Head"]]&];
+  result=nativeSetGuard[heads];If[FailureQ[result],Return[result]];
   result = guard[Block[{$insideManagedCalculation=True},Scan[DeleteTensorValues,heads]]];
   If[result===$Failed,Return[failure["FieldAssignment","Could not clear existing field values."]]];
   result = storeField[b, #] & /@ records;
@@ -890,11 +894,13 @@ applyFieldRecords[tag_, records_Association, explicitHeads_:{}] := Module[{b=bac
   If[FailureQ[b],Return[b]];
   If[!KeyExistsQ[b,"Basis"],Return[failure["NoChart","Define the chart before assigning field components."]]];
   old=b["FieldComponents"];
+  result=nativeSetGuard[dependentFieldHeads[Join[old,records],explicitHeads]];If[FailureQ[result],Return[result]];
   changed=Select[Union[Keys[old],Keys[records]],Lookup[old,#,Missing[]]=!=Lookup[records,#,Missing[]]&];
   repeated=Select[explicitHeads,Function[h,AnyTrue[Select[Values[records],#["Head"]===h&],!nativeInputCurrentQ[b,#]&]]];
   heads=dependentFieldHeads[Join[old,records],Join[repeated,Lookup[Values@KeyTake[old,changed],"Head",{}],Lookup[Values@KeyTake[records,changed],"Head",{}]]];
   If[heads==={},Return[Null]];
   If[!AllTrue[heads,xTensorQ],Return[failure["FieldAssignment","A stored field definition no longer exists."]]];
+  result=nativeSetGuard[heads];If[FailureQ[result],Return[result]];
   put[tag,<|"FieldComponents"->records|>];
   result=replayFields[tag,heads];
   If[FailureQ[result],
@@ -930,6 +936,7 @@ SetFieldComponents[expr:Except[_String],input_,opts:OptionsPattern[]] := Module[
    native derivatives, external charts, and individual positive-rank components native. *)
 captureManagedScalar[tag_,expr_,input_,operation_:ComponentValue] := Block[{$insideManagedCalculation=True},
  Module[{r,actual,b=$BG[tag],head=Head[expr],rec,key,old,ids,status,previous,affected},
+  status=nativeSetGuard[dependentFieldHeads[b["FieldComponents"],{head}]];If[FailureQ[status],Return[status]];
   If[ListQ[input],Return[failure["FieldDimensions","A rank-zero field requires a scalar value."]]];
   previous=Last[ComponentValue[expr]];
   r=nativeFieldWrite[operation,expr,input];If[!MatchQ[r,_Rule],Return[r]];
@@ -1069,6 +1076,7 @@ prepareManagedRead[expr_,list_] := Module[{owners=managedReadOwners[list],atoms,
  atoms=DeleteDuplicates@Cases[expr,e:_[___]/;KeyExistsQ[owners,Head[e]],{0,Infinity}];
  Do[tag=owners[Head[atom]];b=$BG[tag];
   If[!KeyExistsQ[b,"MetricMatrix"],Continue[]];
+  r=nativeSetGuard[{Head[atom],b["Metric"]}];If[FailureQ[r],Return[r]];
   signs=If[List@@atom==={}, {},managedPrimaryIndices[b,atom,Function[i,BIndexQ[i]||CIndexQ[i]]]];
   If[signs===None,Continue[]];
   specs=Lookup[geometryReadSpecs[b],Head[atom],{}];
@@ -1168,6 +1176,7 @@ managedPartialComponentQ[tag_,expr_,rank_] := Module[{b=Lookup[$BG,tag,<||>],sig
 ];
 capturePartialComponent[tag_,expr_,value_,operation_:ComponentValue] := Block[{$insideManagedCalculation=True},
  Module[{b=$BG[tag],head=Head[expr],signs,order,args,rec,key,old,can,canonical,tuple,stage,r,actual,entries,new,representative},
+  r=nativeSetGuard[dependentFieldHeads[b["FieldComponents"],{head}]];If[FailureQ[r],Return[r]];
   signs=managedPrimaryIndices[b,expr,CIndexQ];args=Select[List@@expr,MatchQ[#,_LI]&];
   order=If[args==={},None,First[First[args]]];
   rec=<|"Head"->head,"IndexPositions"->signs,"Order"->order,"Partial"->True,"Values"->{}|>;
@@ -1294,6 +1303,7 @@ managedMetricComponentQ[tag_,expr_] := Module[{b=Lookup[$BG,tag,<||>],signs},
 ];
 captureManagedMetricComponent[tag_,expr_,input_] := Block[{$insideManagedCalculation=True},
  Module[{b=$BG[tag],metric,signs,basis,stage,r,mat},
+  r=backgroundNativeSetGuard[b];If[FailureQ[r],Return[r]];
   metric=b["Metric"];signs=managedPrimaryIndices[b,expr,CIndexQ];basis=First[signs] b["Basis"];
   If[!nativeGeometryRulePresentQ["Metric"[-1,-1],geometryNativeData[b]],
    Return[failure["MetricInput","Restore a complete managed metric before editing one component."]]];
@@ -1333,11 +1343,13 @@ vanishingOwnedFieldQ[tag_,head_,rank_] := Module[{b=$BG[tag],fs},
    Computed arguments, aliases and native Set-state expressions stay native. *)
 nativeFieldWrite[operation_,expr_,value_] := With[{e=expr},operation[e,value]];
 SetAttributes[heldManagedLiteralQ,HoldAllComplete];
-heldManagedLiteralQ[tag_,e_] := Module[{b=Lookup[$BG,tag,<||>],head},
- If[TrueQ[$insideManagedCalculation]||TrueQ[$insideNativePrintGuard]||!KeyExistsQ[b,"Basis"],Return[False]];
- If[!With[{bb=b["Basis"]},MatchQ[HoldComplete[e],HoldComplete[_[(LI[_Integer?Positive]|{_Integer,bb}|{_Integer,-bb})...]]]],Return[False]];
- If[!SameQ[HoldComplete[e],With[{v=e},HoldComplete[v]]],Return[False]];
- head=Head[e];!AnyTrue[TensorValIDs[head],StateOfValID[#]===Set&]
+heldManagedLiteralQ[tag_,e_] := heldManagedSyntaxQ[tag,e] &&
+ SameQ[HoldComplete[e],With[{v=e},HoldComplete[v]]] &&
+ !nativeSetActiveQ[Head[e]];
+SetAttributes[heldManagedSyntaxQ,HoldAllComplete];
+heldManagedSyntaxQ[tag_,e_] := Module[{b=Lookup[$BG,tag,<||>]},
+ !TrueQ[$insideManagedCalculation]&&!TrueQ[$insideNativePrintGuard]&&KeyExistsQ[b,"Basis"]&&
+ With[{bb=b["Basis"]},MatchQ[HoldComplete[e],HoldComplete[_[(LI[_Integer?Positive]|{_Integer,bb}|{_Integer,-bb})...]]]]
 ];
 (* Native ValID deletion dispatches through DeleteTensorValues[head,bases].
    Only a registered source group is an authoritative input deletion.
@@ -1346,7 +1358,7 @@ heldManagedLiteralQ[tag_,e_] := Module[{b=Lookup[$BG,tag,<||>],head},
 managedSourceGroupRecord[tag_,head_,bases_List] := Module[{b=Lookup[$BG,tag,<||>],recs,ids},
  If[TrueQ[$insideManagedCalculation]||TrueQ[$insideNativePrintGuard]||!KeyExistsQ[b,"Basis"],Return[None]];
  ids=TensorValIDs[head];
- If[!MemberQ[ids,ValID[head,bases]]||AnyTrue[ids,StateOfValID[#]===Set&],Return[None]];
+ If[!MemberQ[ids,ValID[head,bases]],Return[None]];
  recs=Select[Values[b["FieldComponents"]],#["Head"]===head&&MemberQ[bases,fieldNativeBases[b,#,#["IndexPositions"]]]&];
  If[Length[recs]===1,First[recs],None]
 ];
@@ -1354,6 +1366,16 @@ captureManagedSourceGroupDeletion[tag_,head_,bases_] := Module[{b=$BG[tag],rec},
  rec=managedSourceGroupRecord[tag,head,bases];
  applyFieldRecords[tag,KeyDrop[b["FieldComponents"],fieldRecordKey[rec]],{head}]
 ];
+(* Native Set state installs evaluative definitions on tensor heads.
+   Do not use ComponentArray or replay against evaluated component arguments.
+   Native read-only RuleToSet/SetToRule/WithSetValues remain untouched. *)
+nativeSetIDs[heads_List] := Select[Flatten[TensorValIDs /@ Select[DeleteDuplicates[heads],xTensorQ]],
+ xAct`xCoba`Private`StateOfValID[#]===Set&];
+nativeSetActiveQ[head_] := nativeSetIDs[{head}]=!={};
+nativeSetGuard[heads_List] := Module[{ids=nativeSetIDs[heads]},
+ If[ids==={},Null,failure["NativeSetState","Restore the listed native ValIDs to Rule state with SetToRule before managed calculation or input mutation.",<|"ValIDs"->ids|>]]];
+backgroundNativeSetGuard[b_] := nativeSetGuard[Join[Values[recipeObjects[b]],relativeHeads[b],Keys[geometryReadSpecs[b]],
+ If[KeyExistsQ[b,"Chart"],Flatten[nativeGeometryDerivativeHeads[b,#]& /@ Join[{b["Chart"]},Lookup[Values[Lookup[b,"AdditionalCharts",<||>]],"Chart",{}]]],{}]]];
 installManagedFieldSyntax[tag_,head_Symbol,rank_Integer] := If[!vanishingOwnedFieldQ[tag,head,rank],With[{hh=head,tt=tag,rr=rank},
  If[rr===0,
   hh /: ComponentValue[e:hh[],value_] /; (!TrueQ[$insideManagedCalculation] && KeyExistsQ[$BG[tt],"Chart"]) := captureManagedScalar[tt,e,value];
@@ -1365,6 +1387,8 @@ installManagedFieldSyntax[tag_,head_Symbol,rank_Integer] := If[!vanishingOwnedFi
   hh /: AllComponentValues[e:hh[___],value_] /; managedExplicitArrayQ[tt,e,rr,value] := captureManagedArray[tt,e,value]
  ];
  hh /: HeldComponentValue[e:hh[___]] /; heldManagedLiteralQ[tt,e] := managedSingleRead[e,HeldComponentValue];
+ hh /: HeldComponentValue[e:hh[___],value_] /; (heldManagedSyntaxQ[tt,e]&&nativeSetActiveQ[hh]) := nativeSetGuard[{hh}];
+ hh /: HeldComponentValue[e:hh[___]] /; (heldManagedSyntaxQ[tt,e]&&nativeSetActiveQ[hh]) := nativeSetGuard[{hh}];
  hh /: ChangeComponents[e:hh[___],init_,args___] /; !TrueQ[$insideManagedCalculation] := Block[{$insideManagedCalculation=True},ChangeComponents[e,init,args]];
  hh /: DeleteTensorValues[hh] /; (!TrueQ[$insideManagedCalculation] && !TrueQ[$insideNativePrintGuard] && KeyExistsQ[$BG[tt],"Chart"]) := ClearFieldComponents[tt,hh];
  hh /: DeleteTensorValues[hh,bases:{___List}] /; AssociationQ[managedSourceGroupRecord[tt,hh,bases]] := captureManagedSourceGroupDeletion[tt,hh,bases];
@@ -1449,6 +1473,7 @@ ToComponents[tag_String, input_, OptionsPattern[]] := Module[
   {b = background[tag], ex, inds, actual, basisinds, result, geometry, arr, selected, simp = OptionValue[Simplification], ass, unresolved, rec=None, chart=OptionValue[OutputChart], subset,output=OptionValue[Output],outbasis,fieldRecord=None},
   If[FailureQ[b], Return[b]];
   If[!KeyExistsQ[b, "MetricMatrix"], Return[failure["NoMetricComponents", "Assign metric components before evaluating components."]]];
+  result=backgroundNativeSetGuard[b];If[FailureQ[result],Return[result]];
   If[!MemberQ[{"Array","CTensor"},output],Return[failure["ComponentOutput","Choose Array or CTensor."]]];
   If[output==="CTensor" && OptionValue[Components]=!=All,Return[failure["ComponentOutput","CTensor requires all components, not a selection."]]];
   If[!MemberQ[{Automatic,"Primary"},chart],rec=chartRecord[b,chart];If[FailureQ[rec],Return[rec]]];
@@ -1875,6 +1900,7 @@ notationBoxes[e_,a_] := Module[{orders,args,fn,n,terms,den,body,mark,ix,h=Head[e
 
 (* Explicit lifecycle operations. Registration never transfers ownership. *)
 ClearComputedValues[tag_String] := Module[{b=background[tag],r},If[FailureQ[b],Return[b]];
+  r=backgroundNativeSetGuard[b];If[FailureQ[r],Return[r]];
   clearGeometry[tag];
   If[KeyExistsQ[b,"MetricMatrix"],r=guard[MetricInBasis[b["Metric"],-b["Basis"],b["MetricMatrix"]]];If[r===$Failed,Return[failure["ClearValues","Metric values could not be restored."]]];recordNativeMetricState[tag]];
   invalidateResults[tag];
@@ -1884,6 +1910,7 @@ ClearComputedValues[tag_String] := Module[{b=background[tag],r},If[FailureQ[b],R
 ClearFieldComponents[tag_String,field_] := Module[{b=background[tag],fs,records,r},If[FailureQ[b],Return[b]];
   fs=If[StringQ[field],Lookup[b["Field"],field,Missing[]],fieldSpec[b,field]];
   If[!AssociationQ[fs],Return[failure["UnknownField","Choose a registered field."]]];
+  r=nativeSetGuard[{fs["NewHead"]}];If[FailureQ[r],Return[r]];
   r=guard[DeleteTensorValues[fs["NewHead"]]];If[r===$Failed,Return[failure["ClearValues","Could not clear the field values."]]];
   records=Select[b["FieldComponents"],#["Head"]=!=fs["NewHead"]&];
   put[tag,<|"FieldComponents"->records|>];recordNativeInputStamps[tag,{fs["NewHead"]}];invalidateResults[tag];Null
@@ -2107,6 +2134,7 @@ SetConnectionComponents[tag_String,key_String,input_,OptionsPattern[]] := Module
  cc=ConnectionOf[tag,key];If[FailureQ[cc],Return[cc]];
  If[key==="Primary",Return[failure["PrimaryConnection","Set the primary connection through the metric matrix."]]];
  If[!KeyExistsQ[b,"MetricMatrix"],Return[failure["NoMetricComponents","Define coordinates and metric components first."]]];
+ r=backgroundNativeSetGuard[b];If[FailureQ[r],Return[r]];
  If[!MemberQ[{"Coordinates","Primary"},ref],Return[failure["ConnectionReference","Choose Coordinates or Primary."]]];
  vals=profile[input,b];n=b["Dimension"];
  If[Dimensions[vals]=!={n,n,n},Return[failure["ConnectionDimensions","Use an array with slots {upper output, lower derivative, lower input}."]]];
@@ -2212,7 +2240,8 @@ ResultOf[tag_String,key_String] := Module[{b=background[tag]},If[FailureQ[b],b,
 (* Portable managed recipes require the original source xAct definitions to remain alive. *)
 recipeObjects[b_] := Join[managedObjects[b],KeyTake[b,{"Christoffel","Torsion","Riemann","Ricci","RicciScalar","Einstein","Weyl","TFRicci","Kretschmann","Epsilon","DetMetric"}],
  Association@Flatten@KeyValueMap[Function[{key,rec},KeyValueMap[("Connection:"<>key<>":"<>#1 -> #2)&,rec["Geometry"]]],Lookup[b,"Connections",<||>]]];
-ReconstructionData[tag_String] := Module[{b=background[tag],inputs},If[FailureQ[b],Return[b]];
+ReconstructionData[tag_String] := Module[{b=background[tag],inputs,r},If[FailureQ[b],Return[b]];
+ r=backgroundNativeSetGuard[b];If[FailureQ[r],Return[r]];
  inputs=Association@KeyValueMap[Function[{key,fs},key -> (KeyDrop[#,"Head"]& /@ Select[Values[b["FieldComponents"]],#["Head"]===fs["NewHead"]&])],b["Field"]];
  Join[KeyTake[b,{"Theory","Signature","SymbolSuffix","DisplayIndices","CoordinateLabels","Coordinates","MetricMatrix","Assumptions","SpecializationRules","RuleGroups","ActiveRuleGroups","PresentationOverrides","Notation","ConnectionComponents","FieldProfiles"}],
  <|"RecipeVersion"->1,"OriginalTag"->tag,"ChartMaps"->Map[KeyTake[#,{"Labels","Map","Chart","Coordinates"}]&,Lookup[b,"AdditionalCharts",<||>]],"Objects"->recipeObjects[b],"Indices"->b["Indices"],"FieldInputs"->inputs,
