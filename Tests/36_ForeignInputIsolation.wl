@@ -1,5 +1,6 @@
 (* Phase 1 regression: every managed input path rejects live references owned by another background.
    Run in a fresh kernel with xAct installed, through RunGroup["ForeignInputIsolation"]. *)
+$DefInfoQ=False;$CVVerbose=False;xAct`xPerm`$xpermQ=False;
 DefManifold[ForeignM,4,{aa,bb,cc,dd,ee,ff,ii,jj}];
 DefMetric[-1,gg[-aa,-bb],CDa];
 DefTensor[phia[],ForeignM];
