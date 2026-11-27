@@ -71,7 +71,7 @@ Cell[BoxData["FailureQ[ResultOf[\"Schwarzschild\",\"cached\"]]"],"Input",CellTag
 Cell[BoxData["ShowRules[\"Schwarzschild\"]==={mass->0,Mbh->7}"],"Input",CellTags->"check_independent"],
 Cell[BoxData["recipe=ReconstructionData[\"Schwarzschild\"]; RecreateBackground[\"Copy\",recipe];"],"Input",CellTags->"recipe"],
 Cell[BoxData["ShowRules[\"Copy\"]==={mass->0,Mbh->7} && ToComponents[phiCopy[]]===rCopy[]^2"],"Input",CellTags->"check_recipe"],
-Cell[BoxData["ShowBackground[\"Copy\",\"Summary\"]"],"Input",CellTags->"inspect"],
+Cell[BoxData["BackgroundValue[\"Copy\",\"Summary\"]"],"Input",CellTags->"inspect"],
 Cell["7. Lifecycle: safe deletion","Section"],
 Cell["A managed chart cannot be removed behind the registry. Deleting its chart family or entire background is explicit. External xAct dependents remain protected.","Text"],
 Cell[BoxData["FailureQ[UndefChart[chartScaledSchw]]"],"Input",CellTags->"check_chart_guard"],
