@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.26";
+$XPlorerVersion = "14.0.0-beta.13-dev.27";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -1141,6 +1141,25 @@ installManagedReadSyntax[] := If[!TrueQ[$managedReadSyntaxInstalled],
 partialFieldExpression[b_,rec_,tuple_] := rec["Head"]@@Join[
  If[rec["Order"]===None,{},{LI[rec["Order"]]}],
  MapThread[List,{tuple,rec["IndexPositions"] b["Basis"]}]];
+(* A sparse tuple is in the declared input variance. Native canonicalization
+   can permute opposite-variance slots; never replay a tuple in the wrong basis. *)
+positiveComponent[expr_] := If[Head[expr]===Times&&First[expr]===-1,-expr,expr];
+componentTuple[expr_] := First/@DeleteCases[List@@expr,_LI];
+sparseInputRepresentative[b_,rec_,expr_,canonical_] := Module[{can=positiveComponent[canonical]},
+ If[managedPrimaryIndices[b,can,CIndexQ]===rec["IndexPositions"],
+  {componentTuple[can],If[canonical===can,1,-1]},
+  {componentTuple[expr],1}]
+];
+sparseRecordFromArray[b_,record_,components_,values_] := Module[{entries,rr,can,representative},
+ entries=MapThread[Function[{expr,val},
+   If[expr===0||!FreeQ[val,record["Head"]],Nothing,
+    can=ToCanonical[expr];If[can===0,Nothing,
+     representative=sparseInputRepresentative[b,record,expr,can];
+     {positiveComponent[can],First[representative]->(Last[representative] val)}]]],
+   {Flatten[components],Flatten[values]}];
+ rr=KeyDrop[record,"ExactNativeValues"];
+ Join[rr,<|"Partial"->True,"Values"->SortBy[Last/@DeleteDuplicatesBy[entries,First],First]|>]
+];
 managedPartialComponentQ[tag_,expr_,rank_] := Module[{b=Lookup[$BG,tag,<||>],signs,args,fs},
  If[TrueQ[$insideManagedCalculation]||TrueQ[$insideNativePrintGuard]||!KeyExistsQ[b,"Basis"],Return[False]];
  signs=managedPrimaryIndices[b,expr,CIndexQ];If[signs===None||Length[signs]=!=rank,Return[False]];
@@ -1148,7 +1167,7 @@ managedPartialComponentQ[tag_,expr_,rank_] := Module[{b=Lookup[$BG,tag,<||>],sig
  AssociationQ[fs]&&If[fs["Type"]==="MetricPert",MatchQ[args,{LI[_Integer?Positive]}],args==={}]
 ];
 capturePartialComponent[tag_,expr_,value_,operation_:ComponentValue] := Block[{$insideManagedCalculation=True},
- Module[{b=$BG[tag],head=Head[expr],signs,order,args,rec,key,old,can,tuple,stage,r,actual,entries,new},
+ Module[{b=$BG[tag],head=Head[expr],signs,order,args,rec,key,old,can,canonical,tuple,stage,r,actual,entries,new,representative},
   signs=managedPrimaryIndices[b,expr,CIndexQ];args=Select[List@@expr,MatchQ[#,_LI]&];
   order=If[args==={},None,First[First[args]]];
   rec=<|"Head"->head,"IndexPositions"->signs,"Order"->order,"Partial"->True,"Values"->{}|>;
@@ -1157,12 +1176,12 @@ capturePartialComponent[tag_,expr_,value_,operation_:ComponentValue] := Block[{$
    Return[failure["FieldInputVariance","Edit components in the registered input variance, or supply a complete replacement array with AllComponentValues.",<|"InputVariance"->old["IndexPositions"],"RequestedVariance"->signs|>]]];
   If[AssociationQ[old]&&!TrueQ[Lookup[old,"Partial",False]],Return[captureManagedComponent[tag,expr,value,operation]]];
   If[AssociationQ[old],rec=old];
-  can=guard[ToCanonical[expr]];
+  canonical=guard[ToCanonical[expr]];can=canonical;
   If[can===$Failed,Return[failure["FieldComponents","Could not canonicalize the component."]]];
   If[can===0,Return[If[TrueQ[value===0],expr->0,failure["FieldSymmetry","This component vanishes by tensor symmetry."]]]];
-  If[Head[can]===Times&&First[can]===-1,can=-can];
+  can=positiveComponent[can];
   If[Head[can]=!=head,Return[failure["FieldComponents","The component does not have a supported canonical tensor form."]]];
-  tuple=First/@DeleteCases[List@@can,_LI];
+  representative=sparseInputRepresentative[b,rec,expr,canonical];tuple=First[representative];
   (* Stage the native write; record its actual canonical value, including
      native symmetry and CVReplace/Function behavior, without adopting
      unregistered native values in the other slots. *)
@@ -1172,8 +1191,10 @@ capturePartialComponent[tag_,expr_,value_,operation_:ComponentValue] := Block[{$
   If[stage===$Failed||!MatchQ[stage,{_Rule,_}],Return[failure["FieldAssignment","Could not stage the native component assignment."]]];
   actual=Last[stage];
   If[!FreeQ[actual,head]&&actual=!=can,Return[failure["FieldComponents","Self-referential component input is not supported."]]];
-  entries=Select[rec["Values"],First[#]=!=tuple&];
-  If[actual=!=can,AppendTo[entries,tuple->actual]];
+  entries=If[SameQ@@signs,Select[rec["Values"],First[#]=!=tuple&],
+   Select[rec["Values"],positiveComponent[ToCanonical[partialFieldExpression[b,rec,First[#]]]]=!=can&]];
+  If[actual=!=can,
+   AppendTo[entries,tuple->(If[canonical===can,1,-1] Last[representative] actual)]];
   new=Join[rec,<|"Values"->SortBy[entries,First]|>];
   If[MissingQ[old]&&new["Values"]==={},Return[First[stage]]];
   r=applyFieldRecords[tag,If[new["Values"]==={},KeyDrop[b["FieldComponents"],key],Append[b["FieldComponents"],key->new]],{head}];
@@ -1187,7 +1208,7 @@ managedPrimarySourceRecord[tag_,expr_] := Module[{b=Lookup[$BG,tag,<||>],signs,r
  If[Length[recs]===1,First[recs],None]
 ];
 captureManagedComponent[tag_,expr_,value_,operation_:ComponentValue] := Block[{$insideManagedCalculation=True},
- Module[{b=$BG[tag],record,head=Head[expr],signs,recs,r,arr,updated,result,stage},
+ Module[{b=$BG[tag],record,head=Head[expr],signs,recs,r,arr,updated,result,stage,components,records},
   signs=managedPrimaryIndices[b,expr,CIndexQ];recs=Select[managedNativeReadRecords[b,expr],#["IndexPositions"]===signs&];
   record=First[recs];
   (* Stage edits so an incomplete candidate cannot corrupt the native source. *)
@@ -1197,7 +1218,14 @@ captureManagedComponent[tag_,expr_,value_,operation_:ComponentValue] := Block[{$
   ]]];
   If[stage===$Failed||!MatchQ[stage,{_Rule,_List}],Return[failure["FieldAssignment","Could not stage the native field assignment."]]];
   r=First[stage];arr=Last[stage];
-  If[!FreeQ[arr,head],Return[failure["IncompleteField","The native edit left an incomplete source array."]]];
+  If[!FreeQ[arr,head],
+   If[!MemberQ[{Null,-Null},value],Return[failure["IncompleteField","The native edit left an incomplete source array."]]];
+   components=ComponentArray[fieldBasisExpression[b,record,signs]];
+   updated=guard[sparseRecordFromArray[b,record,components,arr]];
+   If[updated===$Failed,Return[failure["FieldAssignment","Could not retain the remaining native source components."]]];
+   records=If[updated["Values"]==={},KeyDrop[b["FieldComponents"],fieldRecordKey[record]],Append[b["FieldComponents"],fieldRecordKey[updated]->updated]];
+   result=applyFieldRecords[tag,records,{head}];Return[If[FailureQ[result],result,r]]
+  ];
   updated=Join[record,<|"Values"->arr|>];
   If[updated===record&&nativeInputCurrentQ[b,record],Return[r]];
   If[operation===HeldComponentValue&&updated=!=record,updated=Append[updated,"ExactNativeValues"->True]];
@@ -1311,6 +1339,21 @@ heldManagedLiteralQ[tag_,e_] := Module[{b=Lookup[$BG,tag,<||>],head},
  If[!SameQ[HoldComplete[e],With[{v=e},HoldComplete[v]]],Return[False]];
  head=Head[e];!AnyTrue[TensorValIDs[head],StateOfValID[#]===Set&]
 ];
+(* Native ValID deletion dispatches through DeleteTensorValues[head,bases].
+   Only a registered source group is an authoritative input deletion.
+   Native derived/derivative/foreign groups keep their original dispatch.
+   Defer mixed native Set-state synchronization. *)
+managedSourceGroupRecord[tag_,head_,bases_List] := Module[{b=Lookup[$BG,tag,<||>],recs,ids},
+ If[TrueQ[$insideManagedCalculation]||TrueQ[$insideNativePrintGuard]||!KeyExistsQ[b,"Basis"],Return[None]];
+ ids=TensorValIDs[head];
+ If[!MemberQ[ids,ValID[head,bases]]||AnyTrue[ids,StateOfValID[#]===Set&],Return[None]];
+ recs=Select[Values[b["FieldComponents"]],#["Head"]===head&&MemberQ[bases,fieldNativeBases[b,#,#["IndexPositions"]]]&];
+ If[Length[recs]===1,First[recs],None]
+];
+captureManagedSourceGroupDeletion[tag_,head_,bases_] := Module[{b=$BG[tag],rec},
+ rec=managedSourceGroupRecord[tag,head,bases];
+ applyFieldRecords[tag,KeyDrop[b["FieldComponents"],fieldRecordKey[rec]],{head}]
+];
 installManagedFieldSyntax[tag_,head_Symbol,rank_Integer] := If[!vanishingOwnedFieldQ[tag,head,rank],With[{hh=head,tt=tag,rr=rank},
  If[rr===0,
   hh /: ComponentValue[e:hh[],value_] /; (!TrueQ[$insideManagedCalculation] && KeyExistsQ[$BG[tt],"Chart"]) := captureManagedScalar[tt,e,value];
@@ -1324,6 +1367,7 @@ installManagedFieldSyntax[tag_,head_Symbol,rank_Integer] := If[!vanishingOwnedFi
  hh /: HeldComponentValue[e:hh[___]] /; heldManagedLiteralQ[tt,e] := managedSingleRead[e,HeldComponentValue];
  hh /: ChangeComponents[e:hh[___],init_,args___] /; !TrueQ[$insideManagedCalculation] := Block[{$insideManagedCalculation=True},ChangeComponents[e,init,args]];
  hh /: DeleteTensorValues[hh] /; (!TrueQ[$insideManagedCalculation] && !TrueQ[$insideNativePrintGuard] && KeyExistsQ[$BG[tt],"Chart"]) := ClearFieldComponents[tt,hh];
+ hh /: DeleteTensorValues[hh,bases:{___List}] /; AssociationQ[managedSourceGroupRecord[tt,hh,bases]] := captureManagedSourceGroupDeletion[tt,hh,bases];
  hh /: DeleteTensorValues[hh,Managed->True] := ClearFieldComponents[tt,hh];
 ]];
 

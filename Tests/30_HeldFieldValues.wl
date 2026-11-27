@@ -29,8 +29,8 @@ Block[{xPlorer`Private`$insideManagedCalculation=True},ComponentValue[BN[{0,-ch}
 With[{head=bb,chart=ch},HeldComponentValue[head[{0,-chart}],8]];
 checks["Held repeated declared input repairs externally altered native source"]=ToValues[BN[{0,-ch}]]===8&&rec[bb]["Values"]==={8,2,3,4};
 rev=ShowBackground["N"]["DataRevision"];
-bad=With[{head=bb,chart=ch},HeldComponentValue[head[{0,-chart}],Null]];
-checks["Rejected incomplete dense edit leaves native source intact"]=FailureQ[bad]&&ToValues[BN[{0,-ch}]]===8&&ShowBackground["N"]["DataRevision"]===rev;
+bad=With[{head=bb,chart=ch},HeldComponentValue[head[{0,-chart}],head[{0,-chart}]+1]];
+checks["Rejected self-referential dense edit leaves native source intact"]=FailureQ[bad]&&ToValues[BN[{0,-ch}]]===8&&ShowBackground["N"]["DataRevision"]===rev;
 With[{head=aa,chart=ch},HeldComponentValue[head[{3,-chart}],Null]];
 checks["Held sparse component removal leaves symbolic slot"]=ToValues[AN[{3,-ch}]]===AN[{3,-ch}]&&rec[aa]["Values"]==={{0}->7,{1}->2,{2}->3};
 With[{head=aa,chart=ch},HeldComponentValue[head[{0,-chart}],Function[v,100]]];
