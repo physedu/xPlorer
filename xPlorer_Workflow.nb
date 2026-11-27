@@ -2,7 +2,7 @@
 Notebook[{
 Cell[TextData[{"xPlorer - From an abstract theory to physical spacetimes"}],"Title"],
 
-Cell[TextData[{"A massive scalar field on Minkowski, Schwarzschild and FLRW backgrounds | beta.13-dev.32"}],"Subtitle"],
+Cell[TextData[{"A massive scalar field on Minkowski, Schwarzschild and FLRW backgrounds | beta.13-dev.33"}],"Subtitle"],
 
 Cell["With xAct installed, start a fresh kernel. Choose just one of the two loading cells below, then evaluate the remaining input cells in order with Shift+Enter. Standalone recipes marked Alternative are for reference. xTensor defines the abstract theory; xCoba stores and transforms components; xPlorer manages isolated copies and transports registered expressions.","Text"],
 
@@ -720,6 +720,46 @@ Cell[BoxData["einstein00"],"Input",CellTags->"flrw_geometry_part_1"],
 
 Cell[BoxData["lagFLRW"],"Input",CellTags->"flrw_geometry_part_2"],
 
+Cell["Object labels across abstract and component calculations","Subsection"],
+
+Cell["Object labels distinguish backgrounds without changing a tensor, index, component value or stored calculation. BackgroundLabel controls the visual suffix; SymbolSuffix controls the names you type. Labels are off by default. Existing mathematical results can be displayed again without recomputing them.","Text"],
+
+Cell[BoxData["SetXPlorerPreferences[PartialStyle -> \"Fraction\", ShowObjectLabels -> True];"],"Input",CellTags->"labels_session"],
+
+Cell[BoxData["SetNotation[\"Schwarzschild\", BackgroundLabel -> \"S\"];"],"Input",CellTags->"labels_local"],
+
+Cell[BoxData["gSchw[-aSchw, -bSchw]"],"Input",CellTags->"labels_metric"],
+
+Cell[BoxData["CDSchw[-aSchw][phiSchw[]]"],"Input",CellTags->"labels_gradient"],
+
+Cell[BoxData["rSchw[]"],"Input",CellTags->"labels_coordinates"],
+
+Cell[BoxData["eqSchw == 0"],"Input",CellTags->"labels_eq"],
+
+Cell[BoxData["eqFLRW == 0"],"Input",CellTags->"labels_flrw"],
+
+Cell[BoxData["SetNotation[\"FLRW\", ShowObjectLabels -> False];"],"Input",CellTags->"labels_off_local"],
+
+Cell[BoxData["eqFLRW == 0"],"Input",CellTags->"labels_flrw_off"],
+
+Cell[BoxData["SetPresentation[\"Schwarzschild\", phi, ShowObjectLabels -> False];"],"Input",CellTags->"labels_one_object"],
+
+Cell[BoxData["CDSchw[-aSchw][phiSchw[]]"],"Input",CellTags->"labels_one_object_view"],
+
+Cell[BoxData["SetPresentation[\"Schwarzschild\", phi, ShowObjectLabels -> Automatic];"],"Input",CellTags->"labels_restore_object"],
+
+Cell[BoxData["eqSchw // PrettyExp[ShowObjectLabels -> False]"],"Input",CellTags->"labels_one_view"],
+
+Cell[BoxData["ExpressionText[eqSchw == 0, \"TeX\"]"],"Input",CellTags->"labels_tex"],
+
+Cell[BoxData["SetNotation[\"Schwarzschild\", BackgroundLabel -> Automatic]; SetNotation[\"FLRW\", ShowObjectLabels -> Automatic]; SetXPlorerPreferences[PartialStyle -> \"Fraction\"];"],"Input",CellTags->"labels_reset"],
+
+Cell["The label preferences can also be chosen when creating a background or defining a chart. The following reference calls are not evaluated.","Text"],
+
+Cell["CreateBackground[\"Schwarzschild\", SymbolSuffix -> \"Schw\", BackgroundLabel -> \"S\", ShowObjectLabels -> True]","Program",Evaluatable->False],
+
+Cell["DefineChart[\"Schwarzschild\", {t[],r[],theta[],varphi[]}, BackgroundLabel -> \"S\"]","Program",Evaluatable->False],
+
 Cell[TextData[{"Checking a solution"}],"Subsection"],
 
 Cell[TextData[{"Test a plane wave on Minkowski. Evaluate the scalar equation on the new profile, then use Wolfram\:2019s ",StyleBox["Simplify",FontFamily->"Courier",FontSize->14]," with the dispersion relation \:03c9\:00b2 = k\:00b2 + m\:00b2."}],"Text"],
@@ -1283,7 +1323,7 @@ Cell[BoxData[RowBox[{"ShowTheory","[","]"}]],"Input",CellTags->"lifecycle_empty_
 
 Cell["Existing backgrounds still have their captured theory. Restore the source registry from the saved association. This is not a reconstruction of undefined source tensors.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"With","[",RowBox[{RowBox[{"{",RowBox[{RowBox[{"snapshot","=","savedRegistry"}]}],"}"}],",",RowBox[{"RegisterTheory","[",RowBox[{"snapshot"}],"]"}]}],"]"}],";"}]],"Input",CellTags->"lifecycle_restore_registry"],
+Cell[BoxData["RegisterTheory[savedRegistry];"],"Input",CellTags->"lifecycle_restore_registry"],
 
 Cell[BoxData[RowBox[{"ShowTheory","[","]"}]],"Input",CellTags->"lifecycle_theory_restored"],
 
