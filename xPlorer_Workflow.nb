@@ -36,9 +36,9 @@ Cell["Continue only if this returns 1.0.0-beta.1. If an old internal 14.x paclet
 Cell[BoxData["If[$XPlorerVersion === \"1.0.0-beta.1\",\n  $XPlorerVersion,\n  Print[\"Wrong xPlorer version. Restart the kernel and check your installation.\"]; Abort[]\n]"],"Input",CellTags->"workflow_version"]
 },Open]],
 
-Cell["SetXPlorerPreferences sets session-wide display defaults. Here we enable short background labels on tensors and coordinates and fraction notation for partial derivatives. ShowObjectLabels -> False restores ordinary xAct appearance. Neither option changes the mathematical expression.","Text"],
+Cell["The default xAct notation is sufficient for the abstract derivation. SetXPlorerPreferences can set session-wide display defaults; here we select fraction notation for the component equations. We will enable object labels later, when the same coordinates occur in different charts.","Text"],
 
-Cell[BoxData["SetXPlorerPreferences[ShowObjectLabels -> True, PartialStyle -> \"Fraction\"];"],"Input",CellTags->"session_notation"],
+Cell[BoxData["SetXPlorerPreferences[PartialStyle -> \"Fraction\"];"],"Input",CellTags->"session_notation"],
 
 Cell[CellGroupData[{
 Cell["1. Abstract theory and registration","Section"],
@@ -67,7 +67,11 @@ Cell[BoxData["hessian = CD[-a][CD[-b][phi[]]];"],"Input",CellTags->"hessian"],
 
 Cell["RegisterTheory is the bridge from native xAct to xPlorer. Metric, CovD and Indices identify the source geometry; Field identifies tensor heads to copy and Parameter records shared constants. Sector groups related fields or parameters for inspection. Lagrangians and Expressions store named formulas, so a background can expose their suffixed aliases. Registration does not yet create a chart or evaluate components.","Text"],
 
-Cell[BoxData["RegisterTheory[\"Metric\", g];\nRegisterTheory[\"CovD\", CD];\nRegisterTheory[\"Indices\", {a,b,c,d,e,f,i,j}];"],"Input",CellTags->"register_geometry"],
+Cell[BoxData["RegisterTheory[\"Metric\", g];"],"Input",CellTags->"register_geometry"],
+
+Cell[BoxData["RegisterTheory[\"CovD\", CD];"],"Input",CellTags->"register_covd"],
+
+Cell[BoxData["RegisterTheory[\"Indices\", {a,b,c,d,e,f,i,j}];"],"Input",CellTags->"register_indices"],
 
 Cell[BoxData["RegisterTheory[\"Field\", phi, Sector -> \"Matter\"];"],"Input",CellTags->"register_field"],
 
@@ -99,35 +103,9 @@ Cell["ShowBackground[] lists the studies. The transported Klein-Gordon equations
 
 Cell[BoxData["ShowBackground[]"],"Input",CellTags->"open_models"],
 
-Cell[BoxData["Column[{PrettyExp[\"Minkowski\", kgM == 0, ShowBackgroundLabel -> True], PrettyExp[\"Schwarzschild\", kgSchw == 0, ShowBackgroundLabel -> True], PrettyExp[\"FLRW\", kgFLRW == 0, ShowBackgroundLabel -> True]}, Spacings -> 1]"],"Input",CellTags->"abstract_copies"],
+Cell["At this stage the three copies have the same abstract field equation, as expected. Their physical differences arise only when we assign each background its own metric and field profile.","Text"],
 
-Cell[CellGroupData[{
-Cell["Read and compare the transported equations","Subsection"],
-
-Cell["When comparing three otherwise identical abstract equations, the short M, S and F labels identify the owning tensors. For the Schwarzschild calculation we use prefix covariant derivatives; SetNotation sets the background default. PrettyExp can override it for one result, for example to compare with a paper using postfix notation. Normal recovers the original expression.","Text"],
-
-Cell[BoxData["SetNotation[\"Schwarzschild\", CovariantStyle -> \"Prefix\"];"],"Input",CellTags->"prefix"],
-
-Cell[BoxData["kgSchw == 0"],"Input",CellTags->"prefix_view"],
-
-Cell[BoxData["(kgSchw == 0) // PrettyExp[CovariantStyle -> \"Postfix\"]"],"Input",CellTags->"postfix_view"],
-
-Cell["When the entire equation belongs to a single background, a caption alone can be enough. ShowBackgroundLabel identifies the study, while ShowObjectLabels identifies individual tensor and coordinate occurrences. BackgroundLabel controls the short object marker, not the typed name.","Text"],
-
-Cell[BoxData["PrettyExp[\"Schwarzschild\", kgSchw == 0, ShowBackgroundLabel -> True, ShowObjectLabels -> False]"],"Input",CellTags->"caption"],
-
-Cell["In a long equation, repeated labels on the same field can become distracting. SetPresentation can hide only the scalar's object label while retaining the labels on the derivative and metric. The field name and mathematical expression are unchanged.","Text"],
-
-Cell[BoxData["SetPresentation[\"Schwarzschild\", phi, ShowObjectLabels -> False];"],"Input",CellTags->"rename_phi"],
-
-Cell[BoxData["PrettyExp[\"Schwarzschild\", kgSchw == 0, ShowBackgroundLabel -> True]"],"Input",CellTags->"rename_view"],
-
-Cell[BoxData["SetPresentation[\"Schwarzschild\", phi, ShowObjectLabels -> Automatic];"],"Input",CellTags->"reset_phi"],
-
-Cell[BoxData["SetNotation[\"Schwarzschild\", CovariantStyle -> Automatic];"],"Input",CellTags->"reset_prefix"],
-
-Cell["Restore the inherited settings before comparing the component equations. A local or one-object override can always be removed with Automatic.","Text"]
-},Closed]],
+Cell[BoxData["kgSchw == 0"],"Input",CellTags->"abstract_copies"],
 
 Cell["The copied heads are native xAct objects: CDSchw and phiSchw can be used directly. PortExpression transports a new source expression to a chosen background without registering it or changing the source. It is still abstract until components are requested.","Text"],
 
@@ -162,11 +140,13 @@ Cell[BoxData["eqM = kgM // ToComponents;"],"Input",CellTags->"eq_m"],
 
 Cell[BoxData["eqM == 0"],"Input",CellTags->"eq_m_view"],
 
-Cell["The general wave equation contains several second derivatives. Fraction notation is familiar, but Comma notation is much more compact for a long expression. Compare these two useful forms without recomputing components. Partial, MultiIndex and Native are also available in the API reference.","Text"],
+Cell["The wave equation contains four second derivatives. PrettyExp changes only its presentation: comma notation shortens this expression without recomputing the components. Normal recovers the underlying equation. Other styles are in API Examples.","Text"],
 
-Cell[BoxData["Column[{PrettyExp[\"Minkowski\", eqM == 0, PartialStyle -> \"Fraction\"], PrettyExp[\"Minkowski\", eqM == 0, PartialStyle -> \"Comma\"]}, Spacings -> 1]"],"Input",CellTags->"partial_compare"],
+Cell[BoxData["(eqM == 0) // PrettyExp[PartialStyle -> \"Comma\"]"],"Input",CellTags->"partial_compare"],
 
-Cell[BoxData["DefConstantSymbol[omega]; DefConstantSymbol[k];"],"Input",CellTags->"wave_params"],
+Cell[BoxData["DefConstantSymbol[omega];"],"Input",CellTags->"wave_params"],
+
+Cell[BoxData["DefConstantSymbol[k];"],"Input",CellTags->"wave_k"],
 
 Cell["Replace the general profile with a plane wave. Managed component inputs are updated automatically; the original abstract equation kgM does not need to be rebuilt.","Text"],
 
@@ -182,7 +162,9 @@ Cell["Schwarzschild: radial equation and curvature","Subsection"],
 
 Cell[BoxData["DefineChart[\"Schwarzschild\", {t[],r[],theta[],varphi[]}];"],"Input",CellTags->"chart_s"],
 
-Cell[BoxData["PrintAs[Evaluate[thetaSchw]] ^= \"\\[Theta]\";\nPrintAs[Evaluate[varphiSchw]] ^= \"\\[CurlyPhi]\";"],"Input",CellTags->"angles_s"],
+Cell[BoxData["PrintAs[Evaluate[thetaSchw]] ^= \"\\[Theta]\";"],"Input",CellTags->"angles_s"],
+
+Cell[BoxData["PrintAs[Evaluate[varphiSchw]] ^= \"\\[CurlyPhi]\";"],"Input",CellTags->"angle_phi_s"],
 
 Cell[BoxData["DefConstantSymbol[Mbh];"],"Input",CellTags->"bh"],
 
@@ -198,7 +180,7 @@ Cell[BoxData["ComponentValue[phiSchw[], u[rSchw[]]];"],"Input",CellTags->"profil
 
 Cell[BoxData["eqS = kgSchw // ToComponents;"],"Input",CellTags->"eq_s"],
 
-Cell[BoxData["PrettyExp[\"Schwarzschild\", eqS == 0, ShowBackgroundLabel -> True]"],"Input",CellTags->"eq_s_view"],
+Cell[BoxData["eqS == 0"],"Input",CellTags->"eq_s_view"],
 
 Cell["The radial equation depends only on r. Prime notation is shorter here than fractions: u' and u'' already identify the only derivative. Use PrettyExp for this one equation without changing the saved result.","Text"],
 
@@ -218,7 +200,9 @@ Cell["FLRW: homogeneous scalar and energy density","Subsection"],
 
 Cell[BoxData["DefineChart[\"FLRW\", {t[],x[],y[],z[]}];"],"Input",CellTags->"chart_f"],
 
-Cell[BoxData["DefScalarFunction[s]; DefScalarFunction[q];"],"Input",CellTags->"scale"],
+Cell[BoxData["DefScalarFunction[s];"],"Input",CellTags->"scale"],
+
+Cell[BoxData["DefScalarFunction[q];"],"Input",CellTags->"homogeneous_fn"],
 
 Cell[BoxData["MetricInBasis[gFLRW, DiagonalMatrix[{-1,s[tFLRW[]]^2,s[tFLRW[]]^2,s[tFLRW[]]^2}], Assumptions -> s[tFLRW[]]>0];"],"Input",CellTags->"metric_f"],
 
@@ -226,7 +210,7 @@ Cell[BoxData["ComponentValue[phiFLRW[], q[tFLRW[]]];"],"Input",CellTags->"profil
 
 Cell[BoxData["eqF = kgFLRW // ToComponents;"],"Input",CellTags->"eq_f"],
 
-Cell[BoxData["PrettyExp[\"FLRW\", eqF == 0, ShowBackgroundLabel -> True]"],"Input",CellTags->"eq_f_view"],
+Cell[BoxData["eqF == 0"],"Input",CellTags->"eq_f_view"],
 
 Cell["A rank-two expression evaluated with ToComponents returns its component matrix. MatrixForm is only for display; keep the raw array when you need to calculate with it.","Text"],
 
@@ -242,9 +226,9 @@ Cell["Components -> {{0,0}} requests only the time-time entry. The result is a l
 
 Cell[BoxData["rhoFLRW = First[stressFLRW // ToComponents[Components -> {{0,0}}]]"],"Input",CellTags->"rho"],
 
-Cell["Compare the three stored field equations in one column. The explicit background tags keep the captions and coordinate labels unambiguous even after the abstract tensors have disappeared.","Text"],
+Cell["The three component equations above are different because the geometry and field profiles are different. To keep a result identifiable when copying it into another part of the notebook, use ShowBackgroundLabel on the expression itself.","Text"],
 
-Cell[BoxData["Column[{PrettyExp[\"Minkowski\", eqM == 0, ShowBackgroundLabel -> True], PrettyExp[\"Schwarzschild\", eqS == 0, ShowBackgroundLabel -> True, PartialStyle -> \"Prime\"], PrettyExp[\"FLRW\", eqF == 0, ShowBackgroundLabel -> True]}, Spacings -> 1]"],"Input",CellTags->"component_compare"]
+Cell[BoxData["PrettyExp[\"Schwarzschild\", eqS == 0, ShowBackgroundLabel -> True, PartialStyle -> \"Prime\"]"],"Input",CellTags->"component_compare_s"]
 },Closed]]
 },Closed]],
 
@@ -258,7 +242,11 @@ Cell["Specialization rules are local physical assumptions, not Mathematica assig
 
 Cell[BoxData["AddRules[\"Schwarzschild\", {m -> 0}];"],"Input",CellTags->"individual_rules"],
 
-Cell[BoxData["Column[{PrettyExp[\"Schwarzschild\", kgSchw == 0, ShowBackgroundLabel -> True], PrettyExp[\"Schwarzschild\", ApplyRules[\"Schwarzschild\", kgSchw] == 0, ShowBackgroundLabel -> True], PrettyExp[\"Schwarzschild\", UseExpression[\"Schwarzschild\", \"Lagrangians\", \"Matter\"], ShowBackgroundLabel -> True]}, Spacings -> 1]"],"Input",CellTags->"formal_rule_compare"],
+Cell[BoxData["kgSchw == 0"],"Input",CellTags->"formal_rule_compare"],
+
+Cell[BoxData["ApplyRules[\"Schwarzschild\", kgSchw] == 0"],"Input",CellTags->"formal_rule_applied"],
+
+Cell[BoxData["UseExpression[\"Schwarzschild\", \"Lagrangians\", \"Matter\"]"],"Input",CellTags->"formal_lagrangian"],
 
 Cell[BoxData["ClearRules[\"Schwarzschild\"];"],"Input",CellTags->"clear_individual"],
 
@@ -310,9 +298,15 @@ Cell[BoxData["gM[-aM,-bM] // ToComponents[OutputChart -> \"Cylindrical\"] // Mat
 
 Cell[BoxData["phiM[] // ToComponents[OutputChart -> \"Cylindrical\"]"],"Input",CellTags->"profile_c"],
 
-Cell["The same field now has two coordinate representations. The M and C labels distinguish the Cartesian and cylindrical coordinates without long suffixes; neither the field nor its primary input has changed.","Text"],
+Cell["The Cartesian and cylindrical coordinate systems coexist on Minkowski. Turn on their object labels with SetNotation for this study; the short M and C markers are independent of typed names such as rCylindricalM. Evaluate the field in each chart separately. Ordinary output uses the resolved coordinate labels. Automatic removes a local override.","Text"],
 
-Cell[BoxData["Column[{phiM[] // ToComponents // PrettyExp, phiM[] // ToComponents[OutputChart -> \"Cylindrical\"] // PrettyExp}, Spacings -> 1]"],"Input",CellTags->"chart_comparison"],
+Cell[BoxData["SetNotation[\"Minkowski\", ShowObjectLabels -> True];"],"Input",CellTags->"chart_labels"],
+
+Cell[BoxData["phiM[] // ToComponents"],"Input",CellTags->"chart_comparison"],
+
+Cell[BoxData["phiM[] // ToComponents[OutputChart -> \"Cylindrical\"]"],"Input",CellTags->"chart_comparison_c"],
+
+Cell[BoxData["SetNotation[\"Minkowski\", ShowObjectLabels -> Automatic];"],"Input",CellTags->"chart_labels_reset"],
 
 Cell["FreeIndices explicitly fixes the tensor-axis order when it matters. OutputChart changes the output basis; it does not overwrite the primary metric or field assignments.","Text"],
 
@@ -363,7 +357,11 @@ Cell["Now supply the complete antisymmetric matrix. Select individual entries wi
 
 Cell[BoxData["AllComponentValues[FminkF[-aminkF,-bminkF], {{0,2,0,0},{-2,0,0,0},{0,0,0,0},{0,0,0,0}}];"],"Input",CellTags->"full_f"],
 
-Cell[BoxData["selectedF = FminkF[-aminkF,-bminkF] // ToComponents[Components -> {{0,1},{1,0}}];\nColumn[{Row[{\"F01 = \", selectedF[[1]]}], Row[{\"F10 = \", selectedF[[2]]}]}]"],"Input",CellTags->"selected_f"],
+Cell[BoxData["selectedF = FminkF[-aminkF,-bminkF] // ToComponents[Components -> {{0,1},{1,0}}];"],"Input",CellTags->"selected_f"],
+
+Cell[BoxData["selectedF[[1]]"],"Input",CellTags->"selected_f01"],
+
+Cell[BoxData["selectedF[[2]]"],"Input",CellTags->"selected_f10"],
 
 Cell[BoxData["FminkF[aminkF,bminkF] FminkF[-aminkF,-bminkF] // ToComponents"],"Input",CellTags->"invariant_f"]
 },Closed]],
