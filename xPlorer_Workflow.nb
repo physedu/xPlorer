@@ -144,17 +144,17 @@ Cell["The wave equation contains four second derivatives. PrettyExp changes only
 
 Cell[BoxData["(eqM == 0) // PrettyExp[PartialStyle -> \"Comma\"]"],"Input",CellTags->"partial_compare"],
 
-Cell[BoxData["DefConstantSymbol[omega];"],"Input",CellTags->"wave_params"],
+Cell[BoxData["DefConstantSymbol[w, PrintAs -> \"\\[Omega]\"];"],"Input",CellTags->"wave_params"],
 
 Cell[BoxData["DefConstantSymbol[k];"],"Input",CellTags->"wave_k"],
 
 Cell["Replace the general profile with a plane wave. Managed component inputs are updated automatically; the original abstract equation kgM does not need to be rebuilt.","Text"],
 
-Cell[BoxData["ComponentValue[phiM[], Cos[omega tM[] - k zM[]]];"],"Input",CellTags->"wave_profile"],
+Cell[BoxData["ComponentValue[phiM[], Cos[w tM[] - k zM[]]];"],"Input",CellTags->"wave_profile"],
 
 Cell[BoxData["waveResidual = kgM // ToComponents"],"Input",CellTags->"wave_residual"],
 
-Cell[BoxData["Simplify[waveResidual, omega^2 == k^2 + m^2]"],"Input",CellTags->"wave_solution"]
+Cell[BoxData["Simplify[waveResidual, w^2 == k^2 + m^2]"],"Input",CellTags->"wave_solution"]
 },Closed]],
 
 Cell[CellGroupData[{
