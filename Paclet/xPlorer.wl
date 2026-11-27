@@ -2476,7 +2476,7 @@ RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,c
  result=KeyValueMap[SetConnectionComponents[tag,#1,#2["Values"]/.rules,ReferenceConnection->#2["Reference"]]&,Lookup[recipe,"ConnectionComponents",<||>]];
  If[AnyTrue[result,FailureQ],Return[First@Select[result,FailureQ]]];
  put[tag,<|"FieldProfiles"->Map[Function[records,Association[(fieldRecordKey[#]->#)& /@ (Values[records]/.rules)]],Lookup[recipe,"FieldProfiles",<||>]],"RuleGroups"->(Lookup[recipe,"RuleGroups",<||>]/.rules),"SpecializationRules"->(Lookup[recipe,"SpecializationRules",{}]/.rules),"IndividualRules"->(individualRules[recipe]/.rules),
-   "ActiveRuleGroups"->Lookup[recipe,"ActiveRuleGroups",{}],"Notation"->Lookup[recipe,"Notation",<||>],"ObjectLabelOverrides"->KeyTake[Lookup[recipe,"ObjectLabelOverrides",<||>]/.rules,Keys[labelHeadRecords[$BG[tag]]]],"ChartNotation"->Lookup[recipe,"ChartNotation",<||>]|>];
+   "ActiveRuleGroups"->Lookup[recipe,"ActiveRuleGroups",{}],"Notation"->Lookup[recipe,"Notation",<||>],"ObjectLabelOverrides"->KeyTake[Association[Normal[Lookup[recipe,"ObjectLabelOverrides",<||>]]/.rules],Keys[labelHeadRecords[$BG[tag]]]],"ChartNotation"->Lookup[recipe,"ChartNotation",<||>]|>];
  updatePrintHook[];$BG[tag]
 ];
 
