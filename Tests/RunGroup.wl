@@ -24,7 +24,8 @@ Global`$XPlorerStandaloneGroups=<|
  "NativeSetState"->"32_NativeSetState.wl",
  "HeldGeometry"->"33_HeldGeometry.wl",
  "ChartLifecycle"->"34_ChartLifecycle.wl",
- "Consolidation"->"35_Consolidation.wl"|>;
+ "Consolidation"->"35_Consolidation.wl",
+ "ForeignInputIsolation"->"36_ForeignInputIsolation.wl"|>;
 Global`$XPlorerSelectedGroup=If[ValueQ[Global`$XPlorerTestGroup],Global`$XPlorerTestGroup,"Geometry"];
 If[KeyExistsQ[Global`$XPlorerStandaloneGroups,Global`$XPlorerSelectedGroup],
  Global`$XPlorerGroupReport=Block[{Print=(Null &),xAct`xPerm`$xpermQ=False,xAct`xCoba`$CVVerbose=False,Global`$B13GeometryTests=(Global`$XPlorerSelectedGroup==="RegistrationGeometry")},
