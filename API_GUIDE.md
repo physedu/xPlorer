@@ -1,6 +1,6 @@
-# Using xPlorer — beta.13-dev.31
+# Using xPlorer — beta.13-dev.32
 
-xPlorer_Workflow.nb is the principal worked guide, updated for dev.31. xPlorer_Consolidated.nb is retained as a supplementary integration-test notebook. Sections labeled with earlier versions are historical checkpoints; the dev.31 contract below takes precedence. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
+xPlorer_Workflow.nb is the principal worked guide, updated for the consolidated API (dev.31, corrected in dev.32). xPlorer_Consolidated.nb is retained as a supplementary integration-test notebook. Sections labeled with earlier versions are historical checkpoints; the dev.31 contract below takes precedence. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
 ## Responsibilities and defaults
 
