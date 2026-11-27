@@ -1,0 +1,143 @@
+{
+  "version": "14.0.0-beta.13-dev.26",
+  "testedCodeCommit": "80ff419e54a5fa71efdc736eb173d5f4118369c2",
+  "initialCandidate": "91bb5386459c2e2a2c447d95e9c6a16badeeaede",
+  "baselineProbeCommit": "0f618441d56e0065fc5912723ea5454829dabe1a",
+  "kernel": "15.0.1 Linux x86-64",
+  "xAct": "1.3.0",
+  "backend": "portable Wolfram Language permutations",
+  "groups": {
+    "HeldFieldValues": [
+      20,
+      20
+    ],
+    "SelectedFieldReads": [
+      24,
+      24
+    ],
+    "SparseInputs": [
+      26,
+      26
+    ],
+    "NativeRead": [
+      22,
+      22
+    ],
+    "FieldCache": [
+      23,
+      23
+    ],
+    "GeometryVariance": [
+      14,
+      14
+    ],
+    "SelectiveInvalidation": [
+      13,
+      13
+    ],
+    "MetricEdits": [
+      13,
+      13
+    ],
+    "Perturbations": [
+      48,
+      48
+    ],
+    "Geometry": [
+      49,
+      49
+    ],
+    "Lifecycle": [
+      64,
+      64
+    ],
+    "Reconstruction": [
+      20,
+      20
+    ],
+    "ProfilesAndCTensor": [
+      33,
+      33
+    ],
+    "NativeInterop": [
+      23,
+      23
+    ],
+    "GeometryRead": [
+      13,
+      13
+    ],
+    "NativeGeometry": [
+      12,
+      12
+    ],
+    "SecondaryChartNative": [
+      3,
+      3
+    ],
+    "ObjectsAndConnections": [
+      45,
+      45
+    ],
+    "FieldExtensions": [
+      16,
+      16
+    ],
+    "ManagedNativeSyntax": [
+      13,
+      13
+    ],
+    "Registration": [
+      56,
+      56
+    ],
+    "RegistrationGeometry": [
+      48,
+      48
+    ],
+    "TheoryInspection": [
+      25,
+      25
+    ],
+    "Display": [
+      55,
+      55
+    ],
+    "ComponentsAndRules": [
+      24,
+      24
+    ],
+    "MetricConnectionCurvature": [
+      6,
+      6
+    ]
+  },
+  "total": [
+    708,
+    708
+  ],
+  "workflow": {
+    "inputs": [
+      365,
+      365
+    ],
+    "math": [
+      84,
+      84
+    ],
+    "stages": [
+      33,
+      33
+    ],
+    "parse": 0,
+    "malformed": 0,
+    "warnings": 0,
+    "unexpectedFailures": 0,
+    "expectedFailureCells": [
+      "invalidated_result"
+    ],
+    "seconds": 18.557229
+  },
+  "initialCandidateIssue": "Lookup::invrl on initial ordinary scalar capture, corrected and rerun",
+  "limitations": "Literal owned primary-chart fields in Rule state only; held metric/geometry and Set-state synchronization, native group deletion, complete-to-sparse deletion remain open. Optional xTras, desktop rendering and archive installation not tested."
+}

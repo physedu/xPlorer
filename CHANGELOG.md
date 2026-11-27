@@ -146,6 +146,12 @@ Added a portable notebook, 75 regression checks, an MUnit report runner, and an 
 
 - Stage native covariant/contravariant metric-component edits and validate before replacing the managed metric. Preserve geometry and revisions on exact repeated metric assignments with matching native fingerprints. Skip component hooks on identically vanishing tensors.
 
+## 14.0.0-beta.13-dev.26 (development)
+
+- Capture literal rule-state HeldComponentValue reads and writes for owned primary-chart fields, preserving native HoldFirst and held value semantics.
+- Preserve exact captured values on replay and reconstruction; stage complete field edits and reject incomplete candidates safely.
+- 708/708 checks across 26 groups, including 20/20 held-field checks; workflow 365/365, 84/84, 33/33. See Tests/dev26-results.json. Set-state, held geometry and group deletion remain open.
+
 ## 14.0.0-beta.13-dev.25 (development)
 
 - Compute selected primary-chart field components by native metric separation and dummy contraction, for sparse and complete fields including LI orders; retain full native conversion for full requests.

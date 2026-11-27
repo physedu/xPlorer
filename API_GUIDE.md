@@ -1,4 +1,4 @@
-# Using xPlorer — beta.13-dev.25
+# Using xPlorer — beta.13-dev.26
 
 The principal worked guide is xPlorer_Workflow.nb. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
@@ -260,3 +260,18 @@ For example, after defining the chart and metric, `ComponentValue[A[{0,-chart}],
 
 A concrete primary-chart field-component query in another variance (native ToValues/ComponentValue, including complete or sparse input and distinct LI orders) separates only the changed indices with native SeparateMetric, substitutes the requested coordinate tuple, traces the resulting dummy indices with native TraceBasisDummy, resolves native rules, and stores the result through ComponentValue. No full target array is built for a single field query; symmetry-equivalent source groups reuse native ComponentValue. Individual canonical target fingerprints refer to the current native source, metric and target value, not a second tensor array. Repeated reads reuse matching stamps; metric/field edits and deleted or altered native target rules are detected. Full basis requests or complete coordinate-array requests still use ChangeComponents and the existing full-variance stamps. Direct primary-chart ToComponents selections also use this path; sparse full same-variance reads generate required native symmetry rules. No rank cutoff or new public API. The general compound ToComponents expansion and geometry/secondary-chart conversion paths are not optimized by this checkpoint. The actual work for a non-diagonal metric may still grow with the number of contracted indices; fingerprints have a cost, and no universal speedup or wall-clock benchmark is claimed.
 For example, `ToValues[T[{0,chart},{1,-chart},{2,-chart},{3,-chart}]]` requests just that component of a registered rank-four field. `ToComponents[tag,T[a,-b,-c,-d],Components->{{0,1,2,3}}]` can use the same path for a direct primary-chart field. A full `ToValues[ComponentArray[T[{a,chart},{-b,-chart},{-c,-chart},{-d,-chart}]]]` remains a complete request. Unassigned sparse source components remain symbolic, including in transformed expressions. A source change invalidates affected native derived groups, not independent backgrounds.
+
+
+## Held native field component input (dev.26)
+
+HeldComponentValue now integrates literal owned primary-chart field expressions in native Rule state (scalar, positive-rank, complete or sparse and distinct LI orders). Owned-head UpValues preserve the native HoldFirst attribute and DownValues; dispatch uses the actual native HeldComponentValue operation, not a substitution with evaluating ComponentValue. The guard checks held literal syntax and only accepts a field expression that evaluates identically. Use With to insert the actual owned head and basis into a held call; do not silently evaluate aliases or computed arguments. Any tensor with native Set-state ValIDs is deliberately outside this integration. Sparse replay uses Identity for CVSimplify because stored inputs are already actual native values; captured held scalar/complete records carry ExactNativeValues for replay and reconstruction. Complete-field component writes are staged before updating records, rejecting incomplete candidates without corrupting the source, and an exact repeat can restore an externally altered source. Native rule, list of rules and paired-list ComponentValue writes already dispatch correctly. Held metric/geometry writes and reads, derivatives, secondary charts, partial deletion of complete field inputs, DeleteTensorValues group deletion, and RuleToSet/SetToRule/WithSetValues synchronization remain open. No new public command.
+
+To inject the actual owned head and chart into a held call without evaluating the held component prematurely:
+
+```wl
+With[{head = BackgroundObject["N", "A"], chart = ChartOf["N"]},
+  HeldComponentValue[head[{0, -chart}], 7]
+]
+```
+
+A held query of the raised component can use the same literal-head pattern. With inserts the evaluated owned symbols before HoldFirst acts. In native Set state or unsupported held expressions, xPlorer intentionally leaves native behavior alone; it does not promise to capture those writes in a reconstruction recipe. Use the existing managed setters for controlled inputs in that case, after restoring Rule state.
