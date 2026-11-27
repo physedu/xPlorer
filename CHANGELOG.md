@@ -146,6 +146,12 @@ Added a portable notebook, 75 regression checks, an MUnit report runner, and an 
 
 - Stage native covariant/contravariant metric-component edits and validate before replacing the managed metric. Preserve geometry and revisions on exact repeated metric assignments with matching native fingerprints. Skip component hooks on identically vanishing tensors.
 
+## 14.0.0-beta.13-dev.30 (development)
+
+- Correct relative Christoffel ownership for all managed charts; preserve external blockers and native master/servant destruction.
+- Guard direct UndefChart/UndefBasis on managed chart symbols; chart-family deletion and recreation verified after native secondary geometry.
+- 792/792 checks across 30 groups; workflow 365/365, 84/84, 33/33. See Tests/dev30-results.json. Individual secondary deletion and native basis transform integration remain open.
+
 ## 14.0.0-beta.13-dev.29 (development)
 
 - Capture literal native held metric edits and geometry reads, preserving HoldFirst and native value semantics.

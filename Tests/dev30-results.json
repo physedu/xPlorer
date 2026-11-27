@@ -1,0 +1,159 @@
+{
+  "version": "14.0.0-beta.13-dev.30",
+  "testedCodeCommit": "55314d7a16775a42e6d7458324059004c29425ee",
+  "baseline": "e94f5d4d3795cd97b14244239cf8171b68d66a32",
+  "initialCandidate": "ac491d67a56981a0723fdeab16b04be76e42742e",
+  "kernel": "15.0.1 Linux x86-64",
+  "xAct": "1.3.0",
+  "backend": "portable Wolfram Language permutations",
+  "groups": {
+    "ChartLifecycle": [
+      13,
+      13
+    ],
+    "HeldGeometry": [
+      28,
+      28
+    ],
+    "NativeSetState": [
+      21,
+      21
+    ],
+    "FieldDeletion": [
+      22,
+      22
+    ],
+    "HeldFieldValues": [
+      20,
+      20
+    ],
+    "SelectedFieldReads": [
+      24,
+      24
+    ],
+    "SparseInputs": [
+      26,
+      26
+    ],
+    "NativeRead": [
+      22,
+      22
+    ],
+    "FieldCache": [
+      23,
+      23
+    ],
+    "GeometryVariance": [
+      14,
+      14
+    ],
+    "SelectiveInvalidation": [
+      13,
+      13
+    ],
+    "MetricEdits": [
+      13,
+      13
+    ],
+    "Perturbations": [
+      48,
+      48
+    ],
+    "Geometry": [
+      49,
+      49
+    ],
+    "Lifecycle": [
+      64,
+      64
+    ],
+    "Reconstruction": [
+      20,
+      20
+    ],
+    "ProfilesAndCTensor": [
+      33,
+      33
+    ],
+    "NativeInterop": [
+      23,
+      23
+    ],
+    "GeometryRead": [
+      13,
+      13
+    ],
+    "NativeGeometry": [
+      12,
+      12
+    ],
+    "SecondaryChartNative": [
+      3,
+      3
+    ],
+    "ObjectsAndConnections": [
+      45,
+      45
+    ],
+    "FieldExtensions": [
+      16,
+      16
+    ],
+    "ManagedNativeSyntax": [
+      13,
+      13
+    ],
+    "Registration": [
+      56,
+      56
+    ],
+    "RegistrationGeometry": [
+      48,
+      48
+    ],
+    "TheoryInspection": [
+      25,
+      25
+    ],
+    "Display": [
+      55,
+      55
+    ],
+    "ComponentsAndRules": [
+      24,
+      24
+    ],
+    "MetricConnectionCurvature": [
+      6,
+      6
+    ]
+  },
+  "total": [
+    792,
+    792
+  ],
+  "workflow": {
+    "inputs": [
+      365,
+      365
+    ],
+    "math": [
+      84,
+      84
+    ],
+    "stages": [
+      33,
+      33
+    ],
+    "parse": 0,
+    "malformed": 0,
+    "warnings": 0,
+    "unexpectedFailures": 0,
+    "expectedFailureCells": [
+      "invalidated_result"
+    ],
+    "seconds": 18.981523
+  },
+  "baselineReproduction": "native direct secondary chart deletion left stale record and PDOfBasis::unknown; native secondary Christoffel falsely blocked full deletion",
+  "limitations": "Managed chart family removal and full deletion only; direct UndefChart/UndefBasis on managed chart blocked. Individual secondary chart removal, native basis transformations and foreign basis lifecycle remain open. No desktop/xTras/archive install validation."
+}

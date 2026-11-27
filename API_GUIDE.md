@@ -1,4 +1,4 @@
-# Using xPlorer — beta.13-dev.29
+# Using xPlorer — beta.13-dev.30
 
 The principal worked guide is xPlorer_Workflow.nb. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
@@ -313,3 +313,13 @@ With[{head = gN, chart = ChartOf["N"]},
 ```
 
 Use the actual owned metric head (for example gN) if retrieving it through your own workflow. For curvature, use the actual native Ricci/Christoffel symbol; a Christoffel constructor can be a compound head and must not be silently evaluated by a held query. Literal owned primary-chart HeldComponentValue metric edits use the same staged validation and authoritative covariant matrix as ordinary native metric edits, with native held value semantics, CVSimplify bypass on held input, and native CVReplace behavior. Authoritative managed metric matrices are installed/restored exactly (ambient component CVSimplify is not reapplied); geometry calculation retains its configured simplification policy. A single conditional HeldComponentValue read DownValue parallels the existing native read integration, recognizing literal owned geometry heads and primary-chart component indices without changing HoldFirst, and allowing lazily created native geometry heads. Unrelated or compound held heads and nonliteral indices are left native. This is intentionally a scoped global read dispatch, not a second geometry engine; native HeldComponentValue's original rules remain. Tested Ricci and alternate variance, Ricci scalar, Christoffel actual native symbol (GiveSymbol), DMetric/DDMetric, inverse metric, Set-state blocking, external tensors and reconstruction. Preparation loop failures now return from Module explicitly (ordinary Return inside Do was swallowed), tested by injecting failures in all three routes. Derived geometry writes, nonliteral held input, arbitrary native Set-state writes, secondary-chart and independent connection lifecycle remain outside this checkpoint.
+
+
+## Chart family lifecycle (dev.30)
+
+```wl
+DeletionPlan["N", "Chart", Cascade -> True]
+DeleteBackgroundObject["N", "Chart", Cascade -> True]
+```
+
+This removes the primary and secondary chart family and resets chart-dependent inputs; it is not an individual secondary chart deletion. Use DeleteBackground for complete disposal. Recognize the coordinate partial derivatives of every registered managed chart (not just the primary) as owned derivative heads when classifying relative Christoffel tensors. Full background deletion now undefines only masterless owned relative tensors directly and leaves native Christoffel servants to their owning derivative destructor. Existing chart-family deletion via DeleteBackgroundObject[tag,"Chart",Cascade->True] works after native secondary geometry, retains the primary abstract connection and allows recreation. Actual external derivative dependencies remain blockers. Direct UndefChart/UndefBasis calls on registered chart symbols return an explicit ChartLifecycle failure instead of leaving registry, cached values and recipes dangling; internal managed destructors bypass the owned-head guard. A chart is also a native mapping, so UndefBasis is not its correct destructor. Partial managed object deletion preflights Set state and restores surviving metric inputs exactly, refreshing native metric fingerprints. Standalone removal of one secondary chart, native SetBasisChange/coordinate map integration, and native foreign bases remain open. No new public command.
