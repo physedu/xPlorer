@@ -1074,9 +1074,10 @@ ensureSelectedFieldComponent[b_,rec_,atom_] := Module[
 
 prepareManagedRead[expr_,list_] := Module[{owners=managedReadOwners[list],atoms,b,tag,rec,signs,r,requests=<||>,key,georequests=<||>,specs,sp,singleRequests={},selectedGroups={},group},
  atoms=DeleteDuplicates@Cases[expr,e:_[___]/;KeyExistsQ[owners,Head[e]],{0,Infinity}];
+ r=nativeSetGuard[Join[Head /@ atoms,Lookup[$BG[#],"Metric",None]& /@ DeleteDuplicates[Lookup[owners,Head /@ atoms,{}]]]];
+ If[FailureQ[r],Return[r]];
  Do[tag=owners[Head[atom]];b=$BG[tag];
   If[!KeyExistsQ[b,"MetricMatrix"],Continue[]];
-  r=nativeSetGuard[{Head[atom],b["Metric"]}];If[FailureQ[r],Return[r]];
   signs=If[List@@atom==={}, {},managedPrimaryIndices[b,atom,Function[i,BIndexQ[i]||CIndexQ[i]]]];
   If[signs===None,Continue[]];
   specs=Lookup[geometryReadSpecs[b],Head[atom],{}];
