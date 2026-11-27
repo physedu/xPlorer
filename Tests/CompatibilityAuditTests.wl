@@ -1,0 +1,57 @@
+(* Fresh kernel; no silent Print sink. Regression for confirmed audit defects. *)
+If[!MemberQ[$Packages,"xPlorer`"],Get[FileNameJoin[{DirectoryName[DirectoryName[$InputFileName]],"Paclet","xPlorer.wl"}]]];
+$DefInfoQ=False;$CVVerbose=False;
+DefManifold[M,4,{a,b,c,d,e,f,i,j}];DefMetric[-1,g[-a,-b],CD];DefMetricPerturbation[g,h,eps];
+DefTensor[A[-a],M];DefTensor[phi[],M];DefConstantSymbol[m];
+RegisterTheory["Metric",g];RegisterTheory["CovD",CD];RegisterTheory["Indices",{a,b,c,d,e,f,i,j}];RegisterTheory["Fields",{A,phi,h}];RegisterTheory["Parameter",m];
+CreateBackground["One",SymbolSuffix->"O",BackgroundLabel->"ONE",ShowObjectLabels->True];
+CreateBackground["Two",SymbolSuffix->"T",BackgroundLabel->"TWO",ShowObjectLabels->True];
+DefineChart["One",{t[],x[],y[],z[]}];DefineChart["Two",{t[],x[],y[],z[]}];
+ch=ChartOf["One"];co=ChartOf["Two"];
+MetricInBasis[gO,DiagonalMatrix[{-1,1,1,1}]];MetricInBasis[gT,DiagonalMatrix[{-1,1,1,1}]];
+ComponentValue[phiO[],2];ComponentValue[phiT[],7];
+AllComponentValues[AO[-aO],{1,2,3,4}];AllComponentValues[AT[-aT],{5,6,7,8}];
+checks=<||>;
+bb[ex_]:=With[{v=ex},MakeBoxes[v,StandardForm]];
+headlessFont=($FrontEnd===Null&&CurrentValue[FontSize]===$Failed);
+validBox[b_]:=FreeQ[If[headlessFont,b/.HoldPattern[FontSize->(3 $Failed)/4]:>(FontSize->12),b],$Failed|_Failure|_ErrorBox|_StringJoin|_Table]&&FreeQ[b,s_String/;StringContainsQ[s,"XPLabel"]];
+roundtrip[v_,expr_]:=SameQ[ToExpression[bb[v],StandardForm,HoldComplete],With[{e=expr},HoldComplete[e]]];
+labelPresent[b_,label_]:=AnyTrue[Cases[b,_String,Infinity],#===label||StringContainsQ[#,"("<>label<>")"]&];
+nativeBefore={PrintAs[xO],PrintAs[AO],SymbolOfCovD[CDO]};
+exprs=<|"coordinate and component"->xO[] AO[{1,-ch}],"coordinate and derivative"->tO[] xO[] CDO[{0,-ch}][AO[{1,-ch}]],"basis derivative"->tO[] xO[] PDOfBasis[ch][{0,-ch}][AO[{1,-ch}]]|>;
+(* The native options must be dynamically set around the actual formatting. *)
+Do[Block[{$CIndexForm=ci,$CovDFormat=native},
+ Do[KeyValueMap[Function[{k,e},Module[{v,bx},v=PrettyExp[e,CovariantStyle->style,ShowObjectLabels->True];bx=Check[bb[v],$Failed];
+ checks[k<>"/"<>ToString[ci]<>"/"<>native<>"/"<>style]=validBox[bx]&&labelPresent[bx,"ONE"]&&roundtrip[v,e]]],exprs],{style,{"Native","Prefix","Postfix"}}]],{ci,{False,True}},{native,{"Prefix","Postfix"}}];
+checks["named index TeX"]=Block[{$CIndexForm=True},Module[{tex=Check[ExpressionText[PrettyExp[exprs["coordinate and component"]],"TeX"],$Failed]},StringQ[tex]&&StringFreeQ[tex,"XPLabel"]]];
+checks["native metadata unchanged"]=nativeBefore==={PrintAs[xO],PrintAs[AO],SymbolOfCovD[CDO]};
+foreignQ[v_]:=MatchQ[v,Failure["ForeignBackground",_Association]];
+AddRules["Two",{m->0}];
+checks["source transport"]=SameQ[phi[]//PortExpression["Two"],phiT[]];
+checks["same owner"]=SameQ[phiO[]//PortExpression["One"],phiO[]];
+checks["foreign port"]=foreignQ[phiO[]//PortExpression["Two"]];
+checks["mixed port"]=foreignQ[PortExpression["Two",phiO[]+phiT[]]];
+checks["foreign index only"]=foreignQ[PortExpression["Two",IndexList[aO]]];
+checks["ownerless port"]=SameQ[PortExpression["Two",m],m];
+checks["components one"]=SameQ[phiO[]//ToComponents,2];
+checks["components two"]=SameQ[phiT[]//ToComponents,7];
+checks["source components"]=SameQ[ToComponents["Two",phi[]],7];
+checks["foreign components"]=foreignQ[ToComponents["Two",phiO[]]];
+checks["strict foreign components"]=foreignQ[ToComponents["Two",phiO[],StrictComponents->True]];
+checks["mixed components"]=foreignQ[ToComponents["Two",phiO[]+phiT[]]];
+checks["foreign perturbation"]=foreignQ[PerturbOn["Two",gO[-aO,-bO],1]];
+checks["foreign basis"]=foreignQ[ToBasisOf["Two",AO[-aO]]];
+checks["foreign values"]=foreignQ[ToValuesOf["Two",phiO[]]];
+checks["foreign rules"]=foreignQ[m phiO[]//ApplyRules["Two"]];
+checks["inferred rules"]=SameQ[m phiO[]//ApplyRules,m phiO[]];
+checks["explicit ownerless rules"]=SameQ[ApplyRules["Two",m],0];
+checks["source rule unchanged geometry"]=SameQ[ApplyRules["Two",m phi[]],0];
+checks["ambiguous inferred rules"]=FailureQ[(phiO[]+phiT[])//ApplyRules];
+checks["foreign rule add"]=foreignQ[AddRules["Two",{m->phiO[]}]];
+checks["foreign rule replace"]=foreignQ[ReplaceRules["Two",{m->phiO[]}]];
+checks["foreign rule group"]=foreignQ[SetRuleGroup["Two","bad",{m->phiO[]}]];
+checks["foreign saved result"]=foreignQ[SaveResult["Two","bad",phiO[]]];
+checks["rules unchanged"]=SameQ[ShowRules["Two"],{m->0}];
+checks["components unaffected"]=SameQ[{phiO[]//ToComponents,phiT[]//ToComponents},{2,7}];
+checks["mixed view valid"]=validBox[bb[PrettyExp[phiO[]+phiT[],ShowObjectLabels->True]]]&&labelPresent[bb[PrettyExp[phiO[]+phiT[],ShowObjectLabels->True]],"ONE"]&&labelPresent[bb[PrettyExp[phiO[]+phiT[],ShowObjectLabels->True]],"TWO"];
+<|"Total"->Length[checks],"Passed"->Count[Values[checks],True],"Failures"->Keys@Select[checks,!TrueQ[#]&],"HeadlessNativeFontSize"->headlessFont|>

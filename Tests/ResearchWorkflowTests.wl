@@ -10,6 +10,9 @@ renderTags={"kg_m_abstract","abstract_copies","rank_two_s","postfix_view","capti
 Block[{xAct`xPerm`$xpermQ=False,NotebookDirectory=Function[root]},
  Scan[Function[cell,Module[{id=First[cell],value,display},value=Catch[Check[ToExpression[Last[cell],StandardForm],AppendTo[warnings,id];$Failed],_,Function[{v,tag},AppendTo[warnings,id<>" threw"]; $Failed]];AssociateTo[outputs,id->value];If[MemberQ[renderTags,id],Catch[Check[display=If[ValueQ[$PrePrint],$PrePrint[value],value];AssociateTo[rendered,id->With[{v=display},MakeBoxes[v,StandardForm]]],AppendTo[warnings,id<>" render warning"];AssociateTo[rendered,id->$Failed]],_,Function[{v,tag},AppendTo[warnings,id<>" render threw"];AssociateTo[rendered,id->$Failed]]]]]],DeleteCases[inputs,{"load",_}]]];
 hasText[b_,str_]:=MemberQ[Cases[b,_String,Infinity],str];
+(* Native xTensor uses CurrentValue[FontSize] for indexed tensors. A headless kernel has no font size. Ignore only that exact native style rule, never other failed boxes. *)
+headlessFont=($FrontEnd===Null && CurrentValue[FontSize]===$Failed);
+validRender[b_]:=FreeQ[If[headlessFont,b/.HoldPattern[FontSize->(3 $Failed)/4]:>(FontSize->12),b],$Failed|_Failure|_ErrorBox|_StringJoin|_Table];
 checks=<|
  "version"->SameQ[$XPlorerVersion,"1.0.0-beta.1"],
  "registered Lagrangian"->SameQ[outputs["registry_formula"],L],
@@ -37,7 +40,7 @@ checks=<|
  "FLRW tensor wave"->TrueQ[Simplify[gwF-(Derivative[2,0][gam][tFLRW[],zFLRW[]]+3 Derivative[1][s][tFLRW[]]/s[tFLRW[]] Derivative[1,0][gam][tFLRW[],zFLRW[]]-Derivative[0,2][gam][tFLRW[],zFLRW[]]/s[tFLRW[]]^2)]==0],
  "quadratic wave energy"->TrueQ[Simplify[gwEnergy-Derivative[1,0][gam][tM[],zM[]]^2/(2 kap)]==0],
  "phase average"->TrueQ[Simplify[outputs["gw_average"]-amp^2 w^2/(4 kap)]==0],
- "native perturbation boxes"->AllTrue[Lookup[rendered,{"wave_abstract_m","wave_abstract_f"}],FreeQ[#,$Failed|_Failure|_notationAtom|_ErrorBox|_StringJoin|_Table]&],
+ "native perturbation boxes"->AllTrue[Lookup[rendered,{"wave_abstract_m","wave_abstract_f"}],validRender],
  "wave notation"->hasText[rendered["wave_pretty"],"FLRW"]&&SameQ[Normal[outputs["wave_pretty"]],dGF],
  "quadratic field equation"->TrueQ[Simplify[outputs["profile_equation"]-(4-m^2(xM[]^2+yM[]^2))]==0],
  "cylindrical scalar"->SameQ[outputs["profile_c"],rCylindricalM[]^2],
@@ -49,4 +52,4 @@ checks=<|
  "two-form norm"->TrueQ[Simplify[outputs["invariant_f"]-2(bf^2-ef^2)]==0],
  "three independent studies"->Length[BackgroundValue[]]===3
  |>;
-<|"Inputs"->Length[inputs],"Executed"->Length[outputs],"Warnings"->warnings,"UnexpectedFailures"->Keys@Select[outputs,!FreeQ[#,_Failure|$Failed|$Aborted]&],"Passed"->Count[Values[checks],True],"Total"->Length[checks],"FailedChecks"->Keys@Select[checks,!TrueQ[#]&]|>
+<|"HeadlessNativeFontSize"->headlessFont,"Inputs"->Length[inputs],"Executed"->Length[outputs],"Warnings"->warnings,"UnexpectedFailures"->Keys@Select[outputs,!FreeQ[#,_Failure|$Failed|$Aborted]&],"Passed"->Count[Values[checks],True],"Total"->Length[checks],"FailedChecks"->Keys@Select[checks,!TrueQ[#]&]|>

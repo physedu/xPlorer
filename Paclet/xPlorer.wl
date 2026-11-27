@@ -460,8 +460,10 @@ sourceIndexQ[s_Symbol, bundle_] := Module[{known = Flatten[IndicesOfVBundle[bund
   MemberQ[known, s] || (StringContainsQ[name, "$"] && AnyTrue[known, StringStartsQ[name, SymbolName[#] <> "$"] &] && AIndexQ[s, bundle])
 ];
 PortExpression[tag_String][expr_] := PortExpression[tag,expr];
-PortExpression[tag_String, expr_] := Module[{bg = background[tag], held, indices, extras, ir, output, leftovers},
+PortExpression[tag_String, expr_] := Module[{bg = background[tag], held, indices, extras, ir, output, leftovers, status},
   If[FailureQ[bg], Return[bg]];
+  If[FailureQ[expr],Return[expr]];
+  status=backgroundExpressionGuard[tag,expr];If[FailureQ[status],Return[status]];
   held = With[{ex = expr}, HoldComplete[ex]];
   indices = DeleteDuplicates@Cases[held, s_Symbol /; sourceIndexQ[s, bg["SourceBundle"]], Infinity, Heads -> True];
   extras = Complement[indices, bg["BaseIndices"]];
@@ -473,7 +475,8 @@ PortExpression[tag_String, expr_] := Module[{bg = background[tag], held, indices
   If[output === $Failed, failure["PortExpression", "The expression could not be transferred consistently."], output]
 ];
 
-AddRules[tag_String, rules_List] := Module[{bg = background[tag]}, If[FailureQ[bg], Return[bg]];
+AddRules[tag_String, rules_List] := Module[{bg = background[tag],status}, If[FailureQ[bg], Return[bg]];
+  status=backgroundExpressionGuard[tag,rules];If[FailureQ[status],Return[status]];
   If[!AllTrue[rules, MatchQ[#, _Rule | _RuleDelayed] &], Return[failure["Rules", "Supply a list of rules."]]];
   refreshRules[tag,<|"IndividualRules"->Join[individualRules[bg],rules]|>];$BG[tag]];
 ClearRules[tag_String] := ReplaceRules[tag,{}];
@@ -483,7 +486,12 @@ ApplyRules[expr:Except[_String]] := Module[{tag=notationOwner[expr]},
   If[!StringQ[tag],Return[failure["RulesBackground","Cannot infer a unique background. Use ApplyRules[tag, expr]."]]];
   ApplyRules[tag,expr]
 ];
-ApplyRules[tag_String, expr_] := Module[{b = background[tag]}, If[FailureQ[b], b, expr /. b["SpecializationRules"]]];
+ApplyRules[tag_String, expr_] := Module[{b=background[tag],status,result},
+  If[FailureQ[b],Return[b]];If[FailureQ[expr],Return[expr]];
+  status=backgroundExpressionGuard[tag,expr];If[FailureQ[status],Return[status]];
+  result=expr /. b["SpecializationRules"];
+  status=backgroundExpressionGuard[tag,result];If[FailureQ[status],status,result]
+];
 SetFlatRules[tag_String] := Module[{b = background[tag], heads, rules}, If[FailureQ[b], Return[b]];
   heads = Lookup[b, {"Riemann", "Ricci", "Einstein", "Weyl"}];
   rules = Join[With[{hh = #}, HoldPattern[hh[__]] :> 0] & /@ heads,
@@ -1652,7 +1660,11 @@ ToComponents[tag_String, input_, OptionsPattern[]] := Module[
 (* Only the previously unsupported unary native form is extended; explicit bases remain native. *)
 ToCTensor[expr_] /; StringQ[notationOwner[expr]] && FreeQ[expr,_CTensor] && !AtomQ[expr] :=
   ToComponents[expr,Output->"CTensor"];
-ToBasisOf[tag_String, expr_] := Module[{b = background[tag]}, If[FailureQ[b], Return[b]]; If[!KeyExistsQ[b,"Basis"],Return[failure["NoChart","Define the chart before converting to its basis."]]]; guard[TraceBasisDummy[ToBasis[b["Basis"]][expr]]]];
+ToBasisOf[tag_String, expr_] := Module[{b=background[tag],status},If[FailureQ[b],Return[b]];
+ status=backgroundExpressionGuard[tag,expr];If[FailureQ[status],Return[status]];
+ If[!KeyExistsQ[b,"Basis"],Return[failure["NoChart","Define the chart before converting to its basis."]]];
+ guard[TraceBasisDummy[ToBasis[b["Basis"]][expr]]]
+];
 ToValuesOf[tag_String, expr_] := Module[{ex = ToBasisOf[tag, expr]}, If[FailureQ[ex], ex, guard[ToValues[ex]]]];
 
 zeroCheck[expr_, ass_] := Module[{simp = Simplify[expr, Assumptions -> ass]},
@@ -1973,9 +1985,16 @@ hasGeneratedIndexQ[e_] := !FreeQ[e, i_Symbol /; StringContainsQ[SymbolName[i],"$
 automaticView[e_List] := automaticView /@ e;
 automaticView[Row[items_List, rest___]] := Row[automaticView /@ items, rest];
 automaticView[Grid[items_List, rest___]] := Grid[automaticView[items], rest];
-notationOwner[e_] := Module[{owners},
-  owners=Select[Keys[$BG],Function[t,!FreeQ[e,s_Symbol /; Context[s] === $BG[t]["Context"]]]];
-  If[Length[owners]===1,First[owners],None]
+(* Ownership is independent of formatting and includes heads, indices and held rules.
+   Shared constants and source-manifold symbols have no managed owner. *)
+expressionOwners[e_] := Module[{contexts},
+  contexts=DeleteDuplicates[Cases[With[{v=e},HoldComplete[v]],ss_Symbol:>Context[ss],Infinity,Heads->True]];
+  Select[Keys[$BG],MemberQ[contexts,$BG[#]["Context"]]&]
+];
+notationOwner[e_] := Module[{owners=expressionOwners[e]},If[Length[owners]===1,First[owners],None]];
+backgroundExpressionGuard[tag_,expr_] := Module[{owners=expressionOwners[expr],foreign},
+  foreign=DeleteCases[owners,tag];
+  If[foreign==={},Null,failure["ForeignBackground","The expression contains objects of another managed background. Use the original source expression to specialize independently.",<|"Target"->tag,"Owners"->owners,"ForeignOwners"->foreign|>]]
 ];
 notationSettings[tag_] := Join[$notationDefaults,$sessionNotation,
   If[StringQ[tag],Lookup[$BG[tag],"Notation",<||>],<||>]];
@@ -2055,15 +2074,33 @@ objectLabelPlan[e_,a_] := Module[{symbols,plan=<||>,b,settings,rec,chart,local,o
    ],KeyTake[labelHeadRecords[b],symbols]]
  ],$BG];plan
 ];
+(* Keep the native formatting metadata string-valued while xAct assembles
+   indices. Unique temporary text markers are expanded to real boxes only
+   after native MakeBoxes has completed. No native index/format hooks changed. *)
+labelTextMarker[box_] := Module[{key="XPLabel"<>StringReplace[CreateUUID[],"-"->""]},
+  AssociateTo[$labelTextBoxes,key->box];key
+];
+expandLabelText[str_String,labels_Association] := Module[{pos,parts={},last=1,key},
+  If[labels===<||>,Return[str]];
+  pos=StringPosition[str,Alternatives@@Keys[labels]];
+  If[pos==={},Return[str]];
+  Do[If[p[[1]]>last,AppendTo[parts,StringTake[str,{last,p[[1]]-1}]]];
+    key=StringTake[str,p];AppendTo[parts,labels[key]];last=p[[2]]+1,{p,pos}];
+  If[last<=StringLength[str],AppendTo[parts,StringDrop[str,last-1]]];
+  If[Length[parts]===1,First[parts],RowBox[parts]]
+];
 applyObjectLabel[h_,rec_] := Module[{label=rec["Label"],base,markers},
  If[CovDQ[h],markers=SymbolOfCovD[h];
-   (* Native xTensor postfix formatting uses DerSymbolLength and StringJoin. Its first marker must remain a string. *)
-   With[{hh=h,mm={First[markers]<>"("<>label<>")",labelBox[Last[markers],label,False]}},SymbolOfCovD[hh]^=mm],
-   base=PrintAs[h];With[{hh=h,bb=labelBox[base,label,rec["Coordinate"]]},PrintAs[hh]^=bb]]
+   With[{hh=h,mm={First[markers]<>"("<>label<>")",labelTextMarker[labelBox[Last[markers],label,False]]}},SymbolOfCovD[hh]^=mm],
+   base=PrintAs[h];With[{hh=h,bb=labelTextMarker[labelBox[base,label,rec["Coordinate"]]]},PrintAs[hh]^=bb]]
 ];
-labelledNotationBoxes[e_,a_] := Module[{plan=If[KeyExistsQ[a,"ResolvedObjectLabels"],a["ResolvedObjectLabels"],objectLabelPlan[e,a]]},
+labelledNotationBoxes[e_,a_] := Module[{plan=If[KeyExistsQ[a,"ResolvedObjectLabels"],a["ResolvedObjectLabels"],objectLabelPlan[e,a]],boxes,labels},
  If[plan===<||>,Return[notationBoxes[e,a]]];
- With[{heads=Keys[plan]},Internal`InheritedBlock[heads,KeyValueMap[applyObjectLabel,plan];notationBoxes[e,a]]]
+ Block[{$labelTextBoxes=<||>},
+  boxes=With[{heads=Keys[plan]},Internal`InheritedBlock[heads,KeyValueMap[applyObjectLabel,plan];notationBoxes[e,a]]];
+  labels=$labelTextBoxes;
+  Replace[boxes,str_String:>expandLabelText[str,labels],{0,Infinity}]
+ ]
 ];
 nativeBoxes[e_] := With[{ex=e},MakeBoxes[ex,StandardForm]];
 (* Build a pure Wolfram arithmetic skeleton from temporary scalar leaves. Do not mix
@@ -2451,7 +2488,8 @@ refreshRules[tag_,updates_Association] := Module[{old=$BG[tag],next,eff},
  put[tag,Join[updates,<|"SpecializationRules"->eff|>]];
  If[!SameQ[eff,old["SpecializationRules"]],invalidateResults[tag]];eff
 ];
-ReplaceRules[tag_String,rules_List] := Module[{b=background[tag]},If[FailureQ[b],Return[b]];
+ReplaceRules[tag_String,rules_List] := Module[{b=background[tag],status},If[FailureQ[b],Return[b]];
+ status=backgroundExpressionGuard[tag,rules];If[FailureQ[status],Return[status]];
  If[!AllTrue[rules,MatchQ[#,_Rule|_RuleDelayed]&],Return[failure["Rules","Supply a list of rules."]]];
  refreshRules[tag,<|"IndividualRules"->rules,"ActiveRuleGroups"->{}|>]
 ];
@@ -2465,7 +2503,8 @@ RemoveRules[tag_String,positions_List] := Module[{b=background[tag],groups,names
  manual=removeRulePositions[individualRules[b],Select[positions,#>offset&]-offset];
  refreshRules[tag,<|"RuleGroups"->groups,"IndividualRules"->manual|>]
 ];
-SetRuleGroup[tag_String,name_String,rules_List] := Module[{b=background[tag],a},If[FailureQ[b],Return[b]];
+SetRuleGroup[tag_String,name_String,rules_List] := Module[{b=background[tag],a,status},If[FailureQ[b],Return[b]];
+ status=backgroundExpressionGuard[tag,rules];If[FailureQ[status],Return[status]];
  If[StringTrim[name]==="" || !AllTrue[rules,MatchQ[#,_Rule|_RuleDelayed]&],Return[failure["Rules","Supply a nonempty group name and a list of rules."]]];
  a=Join[Lookup[b,"RuleGroups",<||>],<|name->rules|>];refreshRules[tag,<|"RuleGroups"->a|>];a
 ];
@@ -2494,7 +2533,8 @@ RemoveRuleGroup[tag_String,name_String] := Module[{b=background[tag],a,names},If
  names=DeleteCases[Lookup[b,"ActiveRuleGroups",{}],name];
  refreshRules[tag,<|"RuleGroups"->KeyDrop[a,name],"ActiveRuleGroups"->names|>];Null
 ];
-SaveResult[tag_String,key_String,value_] := Module[{b=background[tag]},If[FailureQ[b],Return[b]];
+SaveResult[tag_String,key_String,value_] := Module[{b=background[tag],status},If[FailureQ[b],Return[b]];
+ status=backgroundExpressionGuard[tag,value];If[FailureQ[status],Return[status]];
  put[tag,<|"SavedResults"->Join[Lookup[b,"SavedResults",<||>],<|key->value|>]|>];value
 ];
 ResultOf[tag_String,key_String] := Module[{b=background[tag]},If[FailureQ[b],b,
