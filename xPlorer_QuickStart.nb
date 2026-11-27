@@ -5,37 +5,23 @@ Cell["One abstract scalar theory, three independent spacetimes | beta.13-dev.36"
 
 Cell["A complete first calculation: one massive scalar theory on three independent geometries. After choosing a loading method, evaluate the remaining inputs in order. Continue with the full Workflow for advanced examples.","Text"],
 
-Cell[CellGroupData[{
-
-Cell["0. Start here - choose one loading method","Section"],
-
 Cell["Install xAct separately and start a fresh Mathematica kernel. Extract the complete distribution ZIP, rather than opening a notebook inside the archive. Choose A or B, never both. If you already have the matching paclet installed, A simply loads it.","Text"],
 
-Cell[CellGroupData[{
-
-Cell["A. Install and load the released paclet (recommended)","Subsection"],
+Cell["A. Install and load the released paclet (recommended)","Text",FontWeight->"Bold"],
 
 Cell["The release ZIP contains the matching .paclet beside these notebooks. This cell installs it if needed and then loads xPlorer. If the file is absent, obtain the release ZIP or use option B.","Text"],
 
-Cell[BoxData["archive = FileNameJoin[{NotebookDirectory[], \"xPlorer-14.0.0-beta.13-dev.36.paclet\"}];\nIf[!AnyTrue[PacletFind[\"xPlorer\"], #[\"Version\"] === \"14.0.0-beta.13-dev.36\" &],\n  If[!FileExistsQ[archive], Print[\"Matching paclet not found. Extract the release ZIP or use option B.\"]; Abort[]];\n  If[!MatchQ[PacletInstall[archive], _PacletObject], Abort[]]\n];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"]
+Cell[BoxData["archive = FileNameJoin[{NotebookDirectory[], \"xPlorer-14.0.0-beta.13-dev.36.paclet\"}];\nIf[!AnyTrue[PacletFind[\"xPlorer\"], #[\"Version\"] === \"14.0.0-beta.13-dev.36\" &],\n  If[!FileExistsQ[archive], Print[\"Matching paclet not found. Extract the release ZIP or use option B.\"]; Abort[]];\n  If[!MatchQ[PacletInstall[archive], _PacletObject], Abort[]]\n];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"],
 
-},Open]],
-
-Cell[CellGroupData[{
-
-Cell["B. Load the source without installation","Subsection"],
+Cell["B. Load the source without installation","Text",FontWeight->"Bold"],
 
 Cell["Use this alternative in the extracted ZIP or the development repository. It does not install a paclet.","Text"],
 
-Cell[BoxData["Get[FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]];"],"Input",CellTags->"load"]
-
-},Open]],
+Cell[BoxData["Get[FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]];"],"Input",CellTags->"load"],
 
 Cell["Confirm the version before continuing. If the wrong version is loaded, restart the kernel and check for conflicting older applications or paclets.","Text"],
 
-Cell[BoxData["If[$XPlorerVersion === \"14.0.0-beta.13-dev.36\", $XPlorerVersion, Print[\"Unexpected xPlorer version: \", $XPlorerVersion]; Abort[]]"],"Input",CellTags->"version"]
-
-},Open]],
+Cell[BoxData["If[$XPlorerVersion === \"14.0.0-beta.13-dev.36\", $XPlorerVersion, Print[\"Unexpected xPlorer version: \", $XPlorerVersion]; Abort[]]"],"Input",CellTags->"version"],
 
 Cell["Optional: reduce native informational printing, without suppressing errors. These are native xAct settings for this kernel.","Text"],
 

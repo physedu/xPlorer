@@ -4,45 +4,29 @@ Cell[TextData[{"xPlorer - From an abstract theory to physical spacetimes"}],"Tit
 
 Cell[TextData[{"A massive scalar field on Minkowski, Schwarzschild and FLRW backgrounds | beta.13-dev.36"}],"Subtitle"],
 
-Cell["Extended scientific reference. Start with Quick Start if you are new to xPlorer. The scientific sections and subsections are initially folded. Double-click a cell-group bracket on the right to open a section, then work through its contents in order. Later sections reuse earlier definitions. Choose one loading method; do not evaluate the entire notebook with both loading cells. Non-evaluatable reference snippets are marked separately.","Text"],
-
-Cell[CellGroupData[{
-
-Cell["0. Start here - choose one loading method","Section"],
+Cell["Extended scientific reference. Start with Quick Start if you are new to xPlorer. The scientific sections and subsections are initially folded. Double-click a cell-group bracket on the right to open a section, then work through its contents in order. Later sections reuse earlier definitions. Sections 1-8 form the main scientific route; sections 9-11 are reference and management, and section 12 is an optional affine-connection study. Choose one loading method; do not evaluate the entire notebook with both loading cells. Non-evaluatable reference snippets are marked separately.","Text"],
 
 Cell["Install xAct separately and start a fresh Mathematica kernel. Extract the complete distribution ZIP, rather than opening a notebook inside the archive. Choose A or B, never both. If you already have the matching paclet installed, A simply loads it.","Text"],
 
-Cell[CellGroupData[{
-
-Cell["A. Install and load the released paclet (recommended)","Subsection"],
+Cell["A. Install and load the released paclet (recommended)","Text",FontWeight->"Bold"],
 
 Cell["The release ZIP contains the matching .paclet beside these notebooks. This cell installs it if needed and then loads xPlorer. If the file is absent, obtain the release ZIP or use option B.","Text"],
 
-Cell[BoxData["archive = FileNameJoin[{NotebookDirectory[], \"xPlorer-14.0.0-beta.13-dev.36.paclet\"}];\nIf[!AnyTrue[PacletFind[\"xPlorer\"], #[\"Version\"] === \"14.0.0-beta.13-dev.36\" &],\n  If[!FileExistsQ[archive], Print[\"Matching paclet not found. Extract the release ZIP or use option B.\"]; Abort[]];\n  If[!MatchQ[PacletInstall[archive], _PacletObject], Abort[]]\n];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"]
+Cell[BoxData["archive = FileNameJoin[{NotebookDirectory[], \"xPlorer-14.0.0-beta.13-dev.36.paclet\"}];\nIf[!AnyTrue[PacletFind[\"xPlorer\"], #[\"Version\"] === \"14.0.0-beta.13-dev.36\" &],\n  If[!FileExistsQ[archive], Print[\"Matching paclet not found. Extract the release ZIP or use option B.\"]; Abort[]];\n  If[!MatchQ[PacletInstall[archive], _PacletObject], Abort[]]\n];\nNeeds[\"xPlorer`\"];"],"Input",CellTags->"load_installed"],
 
-},Open]],
-
-Cell[CellGroupData[{
-
-Cell["B. Load the source without installation","Subsection"],
+Cell["B. Load the source without installation","Text",FontWeight->"Bold"],
 
 Cell["Use this alternative in the extracted ZIP or the development repository. It does not install a paclet.","Text"],
 
-Cell[BoxData["Get[FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]];"],"Input",CellTags->"load"]
-
-},Open]],
+Cell[BoxData["Get[FileNameJoin[{NotebookDirectory[], \"Paclet\", \"xPlorer.wl\"}]];"],"Input",CellTags->"load"],
 
 Cell["Confirm the version before continuing. If the wrong version is loaded, restart the kernel and check for conflicting older applications or paclets.","Text"],
 
-Cell[BoxData["If[$XPlorerVersion === \"14.0.0-beta.13-dev.36\", $XPlorerVersion, Print[\"Unexpected xPlorer version: \", $XPlorerVersion]; Abort[]]"],"Input",CellTags->"workflow_version"]
-
-,
+Cell[BoxData["If[$XPlorerVersion === \"14.0.0-beta.13-dev.36\", $XPlorerVersion, Print[\"Unexpected xPlorer version: \", $XPlorerVersion]; Abort[]]"],"Input",CellTags->"workflow_version"],
 
 Cell["Optional presentation: show short background labels on mathematical objects, and use fraction notation for partial derivatives. These settings are purely visual. Turn ShowObjectLabels off to use ordinary xAct notation.","Text"],
 
-Cell[BoxData["SetXPlorerPreferences[ShowObjectLabels -> True, PartialStyle -> \"Fraction\"];"],"Input",CellTags->"session_notation"]
-
-},Open]],
+Cell[BoxData["SetXPlorerPreferences[ShowObjectLabels -> True, PartialStyle -> \"Fraction\"];"],"Input",CellTags->"session_notation"],
 
 Cell[CellGroupData[{
 Cell[TextData[{"1. Define and register a scalar theory"}],"Section"],
@@ -872,7 +856,201 @@ Cell[TextData[{"For the radial profile the angular component is 2r\:00b2 + m\:00
 },Closed]],
 
 Cell[CellGroupData[{
-Cell["7. Presentation and naming in detail","Section"],
+Cell[TextData[{"7. Vector and tensor fields"}],"Section"],
+
+Cell[CellGroupData[{
+Cell["Independent vector and tensor inputs","Subsection"],
+
+Cell[TextData[{"Define a covector A, a symmetric tensor S and a two-form F on the source manifold, then register them together. xPlorer obtains their slots and symmetries from the native definitions.\n\nThese three fields are independent in this example."}],"Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"DefTensor", "[", RowBox[{RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}], ",", "M"}], "]"}], ";"}]],"Input",CellTags->"extra_fields_step_1"],
+
+Cell[BoxData[RowBox[{RowBox[{"DefTensor", "[", RowBox[{RowBox[{"S", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "M", ",", RowBox[{"Symmetric", "[", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"extra_fields_step_2"],
+
+Cell[BoxData[RowBox[{RowBox[{"DefTensor", "[", RowBox[{RowBox[{"F", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "M", ",", RowBox[{"Antisymmetric", "[", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"extra_fields_step_3"],
+
+Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Fields\"", ",", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"A", ",", RowBox[{"Sector", "\[Rule]", "\"Vector\""}]}], "}"}], ",", "S", ",", RowBox[{"{", RowBox[{"F", ",", RowBox[{"Sector", "\[Rule]", "\"Vector\""}]}], "}"}]}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"extra_fields"],
+
+Cell[TextData[{"The uppercase S denotes the symmetric tensor. To register it on its own, use ",StyleBox["RegisterTheory[\"Field\", S]",FontFamily->"Courier",FontSize->14],"."}],"Text"],
+
+Cell[TextData[{"Create a new Minkowski study from the extended theory. Its descriptive tag is MinkowskiFields, but the typed suffix minkF is deliberately short: AminkF, gminkF and chartminkF. Compare the field keys with those in the original scalar-only background."}],"Text"],
+
+Cell[BoxData["CreateBackground[\"MinkowskiFields\", SymbolSuffix -> \"minkF\"];"],"Input",CellTags->"field_background_step_1"],
+
+Cell[BoxData["DefineChart[\"MinkowskiFields\", {t[], x[], y[], z[]}];"],"Input",CellTags->"field_background_step_2"],
+
+Cell[BoxData["MetricInBasis[gminkF, -chartminkF, DiagonalMatrix[{-1, 1, 1, 1}]];"],"Input",CellTags->"field_background"],
+
+Cell["Native geometry can be computed explicitly with the chart basis, or read lazily through native component readers. Here the Cartesian Ricci scalar vanishes.","Text"],
+
+Cell[BoxData["MetricCompute[gminkF, chartminkF, \"RicciScalar\"[]];"],"Input",CellTags->"dev31_native_metric_compute"],
+
+Cell[BoxData["ToComponents[RicciScalar[CDminkF][]]"],"Input",CellTags->"dev31_native_ricci"],
+
+Cell[BoxData["Keys[BackgroundValue[\"Minkowski\", \"Fields\"]]"],"Input",CellTags->"field_snapshots_part_1"],
+
+Cell[BoxData["Keys[BackgroundValue[\"MinkowskiFields\", \"Fields\"]]"],"Input",CellTags->"field_snapshots_part_2"],
+
+Cell[TextData[{"Assign the lower components of A in chart order (t,x,y,z) using ",StyleBox["AllComponentValues",FontFamily->"Courier",FontSize->14],". With abstract indices on an owned field, xPlorer infers the primary chart and remembers the supplied variance. The explicit primary-chart array syntax is also supported. Requesting the upper vector raises the index with the Minkowski metric only when needed. Native ToValues can then reuse the stored components."}],"Text"],
+
+Cell[BoxData["AllComponentValues[AminkF[{-aminkF, -chartminkF}], {1, 2, 3, 4}];"],"Input",CellTags->"vector_values_step_1"],
+
+Cell[BoxData[RowBox[{RowBox[{"Adown", "=", RowBox[{RowBox[{"AminkF", "[", RowBox[{"-", "aminkF"}], "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_2"],
+
+Cell[BoxData[RowBox[{RowBox[{"Aup", "=", RowBox[{RowBox[{"AminkF", "[", "aminkF", "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_3"],
+
+Cell[BoxData[RowBox[{RowBox[{"normA", "=", RowBox[{RowBox[{RowBox[{"AminkF", "[", "aminkF", "]"}], " ", RowBox[{"AminkF", "[", RowBox[{"-", "aminkF"}], "]"}]}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_4"],
+
+Cell[BoxData["Adown"],"Input",CellTags->"vector_values_part_1"],
+
+Cell[BoxData["Aup"],"Input",CellTags->"vector_values_part_2"],
+
+Cell[BoxData["normA"],"Input",CellTags->"vector_values_part_3"],
+
+Cell["ToCTensor returns a snapshot, not a live field. Managed primary-chart native inputs are captured and replayed; arbitrary external bases, secondary-chart assignments and raw native cache mutations are not automatically synchronized. Explicit native ToCTensor[expr, bases] still uses xCoba.","Text"],
+
+Cell[BoxData["ctA = AminkF[aminkF] // ToCTensor"],"Input",CellTags->"ctensor_output"],
+
+Cell[TextData[{"The contraction is \:22121 + 4 + 9 + 16 = 28. To retrieve the same covector with its abstract lower index, use ",StyleBox["PortExpression",FontFamily->"Courier",FontSize->14],"."}],"Text"],
+
+Cell[BoxData[RowBox[{"PortExpression", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}]}], "]"}]],"Input",CellTags->"formal_vector"],
+
+Cell["A complete component array is not required for every field. Supply an independent component of the antisymmetric tensor F using native ComponentValue. Native symmetry determines its opposite slot; unrelated, unassigned entries remain symbolic, not zero. The complete array in the next example replaces this sparse input.","Text"],
+
+Cell[BoxData["ComponentValue[FminkF[{1, -chartminkF}, {0, -chartminkF}], 3];"],"Input",CellTags->"dev31_sparse_input"],
+
+Cell[BoxData["ToValues[FminkF[{0, -chartminkF}, {1, -chartminkF}]]"],"Input",CellTags->"dev31_sparse_antisym"],
+
+Cell[BoxData["ToValues[FminkF[{0, -chartminkF}, {2, -chartminkF}]]"],"Input",CellTags->"dev31_sparse_unknown"],
+
+Cell[TextData[{"Assign matrices with the declared rank and symmetry. xPlorer checks both when it stores the components."}],"Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"Fmatrix", "=", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "2", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"-", "2"}], ",", "0", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}]}], "}"}]}], ";"}]],"Input",CellTags->"tensor_values_step_1"],
+
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"SminkF","[",RowBox[{RowBox[{"-","aminkF"}],",",RowBox[{"-","bminkF"}]}],"]"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"tensor_values_step_2"],
+
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"FminkF","[",RowBox[{RowBox[{"-","aminkF"}],",",RowBox[{"-","bminkF"}]}],"]"}], ",", "Fmatrix"}], "]"}], ";"}]],"Input",CellTags->"tensor_values_step_3"],
+
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"SminkF", "[", RowBox[{RowBox[{"-", "aminkF"}], ",", RowBox[{"-", "bminkF"}]}], "]"}], "//", "ToComponents"}],"//","MatrixForm"}]],"Input",CellTags->"tensor_values"],
+
+Cell[TextData[{StyleBox["FreeIndices",FontFamily->"Courier",FontSize->14]," fixes the order of the array axes. Reversing the free indices transposes the matrix. ",StyleBox["Components",FontFamily->"Courier",FontSize->14]," selects individual entries.\n\nIn the original order, F has entries 2 at (0,1) and \:22122 at (1,0)."}],"Text"],
+
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"FminkF", "[", RowBox[{RowBox[{"-", "aminkF"}], ",", RowBox[{"-", "bminkF"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "bminkF"}], ",", RowBox[{"-", "aminkF"}]}], "}"}]}]}], "]"}]}],"//","MatrixForm"}]],"Input",CellTags->"tensor_selection_part_1"],
+
+Cell[BoxData[RowBox[{RowBox[{"FminkF", "[", RowBox[{RowBox[{"-", "aminkF"}], ",", RowBox[{"-", "bminkF"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "1"}], "}"}], ",", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}], "}"}]}]}], "]"}]}]],"Input",CellTags->"tensor_selection_part_2"]
+},Closed]]
+},Closed]],
+
+Cell[CellGroupData[{
+Cell["8. Metric perturbations on an existing background","Section"],
+
+Cell["Consider a metric with g_xx = 1 + eps t^2, all other entries unchanged from Minkowski. Its first covariant metric variation has xx entry t^2; its second covariant variation vanishes. We will calculate the first variation and the second variation of the inverse metric.","Text"],
+
+Cell["DefMetricPerturbation is native xPert. It defines the perturbation tensor h and parameter eps. It does not truncate a series or calculate any particular order. Register h, then add its copy to the existing Minkowski background.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"DefMetricPerturbation", "[", RowBox[{"g", ",", "h", ",", "eps"}], "]"}], ";"}]],"Input",CellTags->"register_perturbation_step_1"],
+
+Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "h", ",", RowBox[{"Sector", "\[Rule]", "\"Perturbations\""}]}], "]"}], ";"}]],"Input",CellTags->"register_perturbation_step_2"],
+
+Cell[BoxData[RowBox[{"AddField","[",RowBox[{"\"Minkowski\"",",","h"}],"]"}]],"Input",CellTags->"register_perturbation"],
+
+Cell["The original Minkowski metric, chart, field profiles and geometry cache remain. Only this background now contains the new perturbation. AddField imports the registered field, not new registered equations.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"gM","[",RowBox[{RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],"//","ToComponents"}]],"Input",CellTags->"perturbation_preserved_metric"],
+
+Cell["PerturbOn selects a background-specific perturbation parameter, calls native xPert, contracts metrics and canonicalizes. Its default output is the nth abstract variation, not the complete Taylor series.","Text"],
+
+Cell[BoxData[RowBox[{"delta1Abstract","=",RowBox[{RowBox[{"gM","[",RowBox[{RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],"//",RowBox[{"PerturbOn","[",RowBox[{"1"}],"]"}]}]}]],"Input",CellTags->"abstract_perturbation"],
+
+Cell[BoxData[RowBox[{"delta2Abstract","=",RowBox[{RowBox[{"gM","[",RowBox[{"aM",",","bM"}],"]"}],"//",RowBox[{"PerturbOn","[",RowBox[{"2"}],"]"}]}]}]],"Input",CellTags->"abstract_inverse_second"],
+
+Cell["Assign components of hM with LI[1] and LI[2]. LI labels the order; the remaining two abstract indices select the variance. The assignment uses the primary chart, not an output chart. xCoba computes other index configurations as required.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues","[",RowBox[{RowBox[{"hM","[",RowBox[{RowBox[{"LI","[",RowBox[{"1"}],"]"}],",",RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],",",RowBox[{"DiagonalMatrix","[",RowBox[{RowBox[{"{",RowBox[{"0",",",SuperscriptBox[RowBox[{"tM","[","]"}],"2"],",","0",",","0"}],"}"}]}],"]"}]}],"]"}],";"}]],"Input",CellTags->"perturbation_profile_step_3"],
+
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues","[",RowBox[{RowBox[{"hM","[",RowBox[{RowBox[{"LI","[",RowBox[{"2"}],"]"}],",",RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],",",RowBox[{"ConstantArray","[",RowBox[{"0",",",RowBox[{"{",RowBox[{"4",",","4"}],"}"}]}],"]"}]}],"]"}],";"}]],"Input",CellTags->"perturbation_profile_step_4"],
+
+Cell[BoxData[RowBox[{RowBox[{"tP","=",RowBox[{"tM","[","]"}]}],";"}]],"Input",CellTags->"perturbation_profile"],
+
+Cell["Convert the abstract variations into components separately. The second inverse variation is not zero even though the second covariant metric variation vanishes.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"deltaG","=",RowBox[{"delta1Abstract","//","ToComponents"}]}],";"}]],"Input",CellTags->"perturbation_results_step_1"],
+
+Cell[BoxData[RowBox[{"deltaG","//","MatrixForm"}]],"Input",CellTags->"perturbation_results"],
+
+Cell[BoxData[RowBox[{RowBox[{"delta2G","=",RowBox[{"delta2Abstract","//","ToComponents"}]}],";"}]],"Input",CellTags->"perturbation_results_step_2"],
+
+Cell[BoxData[RowBox[{"delta2G","//","MatrixForm"}]],"Input",CellTags->"inverse_metric_second_variation"],
+
+Cell["A Taylor coefficient includes 1/n!, unlike the nth variation. The second Taylor coefficient therefore has xx entry t^4.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"taylor2","=",RowBox[{RowBox[{RowBox[{"gM","[",RowBox[{"aM",",","bM"}],"]"}],"//",RowBox[{"PerturbOn","[",RowBox[{"2",",",RowBox[{"PerturbationForm","\[Rule]","\"TaylorCoefficient\""}]}],"]"}]}],"//","ToComponents"}]}],";"}]],"Input",CellTags->"perturbation_results_step_3"],
+
+Cell[BoxData[RowBox[{"taylor2","//","MatrixForm"}]],"Input",CellTags->"inverse_metric_taylor_coefficient"],
+
+Cell["An additional chart can be selected at component evaluation without redefining h. In the existing cylindrical chart, the second inverse variation transforms as a rank-two contravariant tensor.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"delta2Abstract","//",RowBox[{"ToComponents","[",RowBox[{RowBox[{"OutputChart","\[Rule]","\"Cylindrical\""}]}],"]"}]}],"//","MatrixForm"}]],"Input",CellTags->"perturbation_cylindrical"],
+
+Cell["Alternatively PerturbOn can return components directly in the requested chart. This is equivalent to the two-step calculation above.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"gM","[",RowBox[{"aM",",","bM"}],"]"}],"//",RowBox[{"PerturbOn","[",RowBox[{"2",",",RowBox[{"Output","\[Rule]","\"Components\""}],",",RowBox[{"OutputChart","\[Rule]","\"Cylindrical\""}]}],"]"}]}],"//","MatrixForm"}]],"Input",CellTags->"perturbation_cylindrical_direct"]
+},Closed]],
+
+Cell[CellGroupData[{
+Cell[TextData[{"9. Update the model and reuse geometry"}],"Section"],
+
+Cell[TextData[{"To change a managed field or metric, assign the new input with the same commands. ",StyleBox["MetricCompute",FontFamily->"Courier",FontSize->14]," can infer the chart of an owned metric when passed a list of geometry target names. ",StyleBox["ToComponents",FontFamily->"Courier",FontSize->14]," already calculates the geometry it needs."}],"Text"],
+
+Cell[CellGroupData[{
+Cell["Reuse computed geometry","Subsection"],
+
+Cell[TextData[{"Request the Ricci and Einstein tensors twice. With the same metric and settings, the second call reports both as cached."}],"Text"],
+
+Cell[BoxData[RowBox[{"MetricCompute", "[", RowBox[{"gminkF", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_1"],
+
+Cell[BoxData[RowBox[{"MetricCompute", "[", RowBox[{"gminkF", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_2"]
+},Closed]],
+
+Cell[CellGroupData[{
+Cell["Optional: detect stale notebook results","Subsection"],
+
+Cell["A normal Wolfram variable such as normA does not update when you edit the metric. SaveResult is an optional in-memory registry of derived values, not a file save or automatic recomputation. ResultOf retrieves the value only until a managed mathematical change invalidates it. The next steps compare the ordinary variable and the managed result.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"SaveResult", "[", RowBox[{"\"MinkowskiFields\"", ",", "\"VectorNorm\"", ",", "normA"}], "]"}], ";"}]],"Input",CellTags->"save_result_step_1"],
+
+Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"MinkowskiFields\"", ",", "A", ",", RowBox[{"PrintAs", "\[Rule]", "\"V\""}]}], "]"}], ";"}]],"Input",CellTags->"save_result_step_2"],
+
+Cell[BoxData[RowBox[{"ResultOf", "[", RowBox[{"\"MinkowskiFields\"", ",", "\"VectorNorm\""}], "]"}]],"Input",CellTags->"save_result"],
+
+Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"MinkowskiFields\"", ",", "A", ",", RowBox[{"PrintAs", "\[Rule]", "Automatic"}]}], "]"}], ";"}]],"Input",CellTags->"reset_vector_label"],
+
+Cell[TextData[{"Change the metric\:2019s time-time entry to \:22124. The covector still has lower time component 1, so raising its index now gives \:22121/4.\n\nChanging the metric also invalidates its cached curvature."}],"Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gminkF", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "4"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"change_metric_step_1"],
+
+Cell[BoxData[RowBox[{RowBox[{"AminkF", "[", "aminkF", "]"}], "//", "ToComponents"}]],"Input",CellTags->"change_metric"],
+
+Cell[TextData[{"The next lookup reports True for FailureQ because the saved norm was computed with the old metric. The ordinary variable still stores 28; the new norm is 115/4. Recalculate and save it explicitly if useful."}],"Text"],
+
+Cell[BoxData["FailureQ[ResultOf[\"MinkowskiFields\", \"VectorNorm\"]]"],"Input",CellTags->"invalidated_result"],
+
+Cell[BoxData["{normA, AminkF[aminkF] AminkF[-aminkF] // ToComponents}"],"Input",CellTags->"stale_comparison"],
+
+Cell[BoxData["SaveResult[\"MinkowskiFields\", \"VectorNorm\", AminkF[aminkF] AminkF[-aminkF] // ToComponents]"],"Input",CellTags->"save_new_result"],
+
+Cell[BoxData["ResultOf[\"MinkowskiFields\", \"VectorNorm\"]"],"Input",CellTags->"new_result"],
+
+Cell[TextData[{"Restore the Minkowski metric."}],"Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gminkF", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"restore_metric"],
+
+Cell["The vector study has been restored to its original metric. The scalar backgrounds and their perturbations have not changed.","Text"]
+},Closed]]
+},Closed]],
+
+Cell[CellGroupData[{
+Cell["10. Advanced presentation and naming","Section"],
 
 Cell[CellGroupData[{
 Cell[TextData[{"Choose a lookup key, a symbol name and a printed label"}],"Subsection"],
@@ -1026,282 +1204,6 @@ Cell[BoxData["SetXPlorerPreferences[ShowObjectLabels -> True, PartialStyle -> \"
 },Closed]],
 
 Cell[CellGroupData[{
-Cell[TextData[{"8. Extend the theory with vectors, tensors and a connection"}],"Section"],
-
-Cell[CellGroupData[{
-Cell["Independent vector and tensor inputs","Subsection"],
-
-Cell[TextData[{"Define a covector A, a symmetric tensor S and a two-form F on the source manifold, then register them together. xPlorer obtains their slots and symmetries from the native definitions.\n\nThese three fields are independent in this example."}],"Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"DefTensor", "[", RowBox[{RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}], ",", "M"}], "]"}], ";"}]],"Input",CellTags->"extra_fields_step_1"],
-
-Cell[BoxData[RowBox[{RowBox[{"DefTensor", "[", RowBox[{RowBox[{"S", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "M", ",", RowBox[{"Symmetric", "[", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"extra_fields_step_2"],
-
-Cell[BoxData[RowBox[{RowBox[{"DefTensor", "[", RowBox[{RowBox[{"F", "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "]"}], ",", "M", ",", RowBox[{"Antisymmetric", "[", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"extra_fields_step_3"],
-
-Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Fields\"", ",", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"A", ",", RowBox[{"Sector", "\[Rule]", "\"Vector\""}]}], "}"}], ",", "S", ",", RowBox[{"{", RowBox[{"F", ",", RowBox[{"Sector", "\[Rule]", "\"Vector\""}]}], "}"}]}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"extra_fields"],
-
-Cell[TextData[{"The uppercase S denotes the symmetric tensor. To register it on its own, use ",StyleBox["RegisterTheory[\"Field\", S]",FontFamily->"Courier",FontSize->14],"."}],"Text"],
-
-Cell[TextData[{"Create a new Minkowski study from the extended theory. Its descriptive tag is MinkowskiFields, but the typed suffix minkF is deliberately short: AminkF, gminkF and chartminkF. Compare the field keys with those in the original scalar-only background."}],"Text"],
-
-Cell[BoxData["CreateBackground[\"MinkowskiFields\", SymbolSuffix -> \"minkF\"];"],"Input",CellTags->"field_background_step_1"],
-
-Cell[BoxData["DefineChart[\"MinkowskiFields\", {t[], x[], y[], z[]}];"],"Input",CellTags->"field_background_step_2"],
-
-Cell[BoxData["MetricInBasis[gminkF, -chartminkF, DiagonalMatrix[{-1, 1, 1, 1}]];"],"Input",CellTags->"field_background"],
-
-Cell["Native geometry can be computed explicitly with the chart basis, or read lazily through native component readers. Here the Cartesian Ricci scalar vanishes.","Text"],
-
-Cell[BoxData["MetricCompute[gminkF, chartminkF, \"RicciScalar\"[]];"],"Input",CellTags->"dev31_native_metric_compute"],
-
-Cell[BoxData["ToComponents[RicciScalar[CDminkF][]]"],"Input",CellTags->"dev31_native_ricci"],
-
-Cell[BoxData["Keys[BackgroundValue[\"Minkowski\", \"Fields\"]]"],"Input",CellTags->"field_snapshots_part_1"],
-
-Cell[BoxData["Keys[BackgroundValue[\"MinkowskiFields\", \"Fields\"]]"],"Input",CellTags->"field_snapshots_part_2"],
-
-Cell[TextData[{"Assign the lower components of A in chart order (t,x,y,z) using ",StyleBox["AllComponentValues",FontFamily->"Courier",FontSize->14],". With abstract indices on an owned field, xPlorer infers the primary chart and remembers the supplied variance. The explicit primary-chart array syntax is also supported. Requesting the upper vector raises the index with the Minkowski metric only when needed. Native ToValues can then reuse the stored components."}],"Text"],
-
-Cell[BoxData["AllComponentValues[AminkF[{-aminkF, -chartminkF}], {1, 2, 3, 4}];"],"Input",CellTags->"vector_values_step_1"],
-
-Cell[BoxData[RowBox[{RowBox[{"Adown", "=", RowBox[{RowBox[{"AminkF", "[", RowBox[{"-", "aminkF"}], "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_2"],
-
-Cell[BoxData[RowBox[{RowBox[{"Aup", "=", RowBox[{RowBox[{"AminkF", "[", "aminkF", "]"}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_3"],
-
-Cell[BoxData[RowBox[{RowBox[{"normA", "=", RowBox[{RowBox[{RowBox[{"AminkF", "[", "aminkF", "]"}], " ", RowBox[{"AminkF", "[", RowBox[{"-", "aminkF"}], "]"}]}], "//", "ToComponents"}]}], ";"}]],"Input",CellTags->"vector_values_step_4"],
-
-Cell[BoxData["Adown"],"Input",CellTags->"vector_values_part_1"],
-
-Cell[BoxData["Aup"],"Input",CellTags->"vector_values_part_2"],
-
-Cell[BoxData["normA"],"Input",CellTags->"vector_values_part_3"],
-
-Cell["ToCTensor returns a snapshot, not a live field. Managed primary-chart native inputs are captured and replayed; arbitrary external bases, secondary-chart assignments and raw native cache mutations are not automatically synchronized. Explicit native ToCTensor[expr, bases] still uses xCoba.","Text"],
-
-Cell[BoxData["ctA = AminkF[aminkF] // ToCTensor"],"Input",CellTags->"ctensor_output"],
-
-Cell[TextData[{"The contraction is \:22121 + 4 + 9 + 16 = 28. To retrieve the same covector with its abstract lower index, use ",StyleBox["PortExpression",FontFamily->"Courier",FontSize->14],"."}],"Text"],
-
-Cell[BoxData[RowBox[{"PortExpression", "[", RowBox[{"\"MinkowskiFields\"", ",", RowBox[{"A", "[", RowBox[{"-", "a"}], "]"}]}], "]"}]],"Input",CellTags->"formal_vector"],
-
-Cell["A complete component array is not required for every field. Supply an independent component of the antisymmetric tensor F using native ComponentValue. Native symmetry determines its opposite slot; unrelated, unassigned entries remain symbolic, not zero. The complete array in the next example replaces this sparse input.","Text"],
-
-Cell[BoxData["ComponentValue[FminkF[{1, -chartminkF}, {0, -chartminkF}], 3];"],"Input",CellTags->"dev31_sparse_input"],
-
-Cell[BoxData["ToValues[FminkF[{0, -chartminkF}, {1, -chartminkF}]]"],"Input",CellTags->"dev31_sparse_antisym"],
-
-Cell[BoxData["ToValues[FminkF[{0, -chartminkF}, {2, -chartminkF}]]"],"Input",CellTags->"dev31_sparse_unknown"],
-
-Cell[TextData[{"Assign matrices with the declared rank and symmetry. xPlorer checks both when it stores the components."}],"Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"Fmatrix", "=", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "2", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{RowBox[{"-", "2"}], ",", "0", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}], ",", RowBox[{"{", RowBox[{"0", ",", "0", ",", "0", ",", "0"}], "}"}]}], "}"}]}], ";"}]],"Input",CellTags->"tensor_values_step_1"],
-
-Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"SminkF","[",RowBox[{RowBox[{"-","aminkF"}],",",RowBox[{"-","bminkF"}]}],"]"}], ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"tensor_values_step_2"],
-
-Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"FminkF","[",RowBox[{RowBox[{"-","aminkF"}],",",RowBox[{"-","bminkF"}]}],"]"}], ",", "Fmatrix"}], "]"}], ";"}]],"Input",CellTags->"tensor_values_step_3"],
-
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"SminkF", "[", RowBox[{RowBox[{"-", "aminkF"}], ",", RowBox[{"-", "bminkF"}]}], "]"}], "//", "ToComponents"}],"//","MatrixForm"}]],"Input",CellTags->"tensor_values"],
-
-Cell[TextData[{StyleBox["FreeIndices",FontFamily->"Courier",FontSize->14]," fixes the order of the array axes. Reversing the free indices transposes the matrix. ",StyleBox["Components",FontFamily->"Courier",FontSize->14]," selects individual entries.\n\nIn the original order, F has entries 2 at (0,1) and \:22122 at (1,0)."}],"Text"],
-
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"FminkF", "[", RowBox[{RowBox[{"-", "aminkF"}], ",", RowBox[{"-", "bminkF"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "bminkF"}], ",", RowBox[{"-", "aminkF"}]}], "}"}]}]}], "]"}]}],"//","MatrixForm"}]],"Input",CellTags->"tensor_selection_part_1"],
-
-Cell[BoxData[RowBox[{RowBox[{"FminkF", "[", RowBox[{RowBox[{"-", "aminkF"}], ",", RowBox[{"-", "bminkF"}]}], "]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"{", RowBox[{"0", ",", "1"}], "}"}], ",", RowBox[{"{", RowBox[{"1", ",", "0"}], "}"}]}], "}"}]}]}], "]"}]}]],"Input",CellTags->"tensor_selection_part_2"]
-},Closed]],
-
-Cell[CellGroupData[{
-Cell[TextData[{"An independent covariant derivative"}],"Subsection"],
-
-Cell[TextData[{"Define an independent covariant derivative DA on the source manifold using the source index a. ",StyleBox["Torsion -> True",FontFamily->"Courier",FontSize->14]," allows torsion.\n\nRegister DA as a connection so that ",StyleBox["CreateBackground",FontFamily->"Courier",FontSize->14]," copies it to the new study."}],"Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"DefCovD", "[", RowBox[{RowBox[{"DA", "[", RowBox[{"-", "a"}], "]"}], ",", RowBox[{"{", "}"}], ",", RowBox[{"SymbolOfCovD", "\[Rule]", RowBox[{"{", RowBox[{"\"|\"", ",", "\"D\""}], "}"}]}], ",", RowBox[{"Torsion", "\[Rule]", "True"}]}], "]"}], ";"}]],"Input",CellTags->"register_affine_step_1"],
-
-Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Connection\"", ",", "\"Affine\"", ",", "DA"}], "]"}], ";"}]],"Input",CellTags->"register_affine_step_2"],
-
-Cell[BoxData["CreateBackground[\"AffineStudy\", SymbolSuffix -> \"Aff\"];"],"Input",CellTags->"register_affine_step_3"],
-
-Cell[BoxData[RowBox[{"ConnectionsOf", "[", "\"AffineStudy\"", "]"}]],"Input",CellTags->"register_affine"],
-
-Cell[TextData[{"The default connection is the metric\:2019s Levi-Civita derivative, keyed by ",StyleBox["\"Primary\"",FontFamily->"Courier",FontSize->14],". Use the copied native derivative AffineAff directly and obtain its curvature through xAct Riemann[AffineAff]. ConnectionOf is useful only when selecting a derivative by its registered key programmatically.\n\nIts curvature family also has a Ricci tensor. A Ricci scalar of this independent connection requires an explicit contraction metric; the metric-curvature getter is not defined for DA."}],"Text"],
-
-Cell[BoxData["CovDOfMetric[gAff]"],"Input",CellTags->"formal_affine_step_1"],
-
-Cell[BoxData["AffineAff[-aAff][phiAff[]]"],"Input",CellTags->"formal_affine_part_1"],
-
-Cell[BoxData["Riemann[AffineAff][-aAff,-bAff,-cAff,dAff]"],"Input",CellTags->"formal_affine_part_2"],
-
-Cell[BoxData["BackgroundObject[\"AffineStudy\", \"Riemann\", \"Affine\"]"],"Input",CellTags->"dev31_connection_lookup"],
-
-Cell[TextData[{"Supply the independent connection coefficients in the order {upper output, lower derivative, lower input}. The assignment below sets a single coefficient, \:0393 with upper index t and lower indices (x,t), equal to t, in the Cartesian chart.\n\nYou can also supply the difference from the metric connection using ",StyleBox["ReferenceConnection -> \"Primary\"",FontFamily->"Courier",FontSize->14],"."}],"Text"],
-
-Cell[BoxData["DefineChart[\"AffineStudy\", {t[], x[], y[], z[]}];"],"Input",CellTags->"affine_coordinates_step_1"],
-
-Cell[BoxData["MetricInBasis[gAff, -chartAff, DiagonalMatrix[{-1, 1, 1, 1}]];"],"Input",CellTags->"affine_coordinates_step_2"],
-
-Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"AAff","[",RowBox[{RowBox[{"-","aAff"}]}],"]"}], ",", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates_step_3"],
-
-Cell[BoxData["tA = tAff[];"],"Input",CellTags->"affine_coordinates_step_4"],
-
-Cell[BoxData[RowBox[{RowBox[{"gammaDA", "=", RowBox[{"ConstantArray", "[", RowBox[{"0", ",", RowBox[{"{", RowBox[{"4", ",", "4", ",", "4"}], "}"}]}], "]"}]}], ";"}]],"Input",CellTags->"affine_coordinates_step_5"],
-
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"gammaDA", "\[LeftDoubleBracket]", RowBox[{"1", ",", "2", ",", "1"}], "\[RightDoubleBracket]"}], "=", RowBox[{"tAff","[","]"}]}], ";"}]],"Input",CellTags->"affine_coordinates_step_6"],
-
-Cell[BoxData[RowBox[{RowBox[{"SetConnectionComponents", "[", RowBox[{"\"AffineStudy\"", ",", "\"Affine\"", ",", "gammaDA"}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates"],
-
-Cell[TextData[{"For this constant covector, the coefficient contributes \:2212t to the x derivative of its time component. Compute the derivative matrix and one curvature component.\n\nThe latter\:2019s sign follows xAct\:2019s ",StyleBox["$RiemannSign",FontFamily->"Courier",FontSize->14]," convention."}],"Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"gradA", "=", RowBox[{"ToComponents", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{RowBox[{"DA", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"A", "[", RowBox[{"-", "b"}], "]"}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}]}], ",", RowBox[{"StrictComponents", "\[Rule]", "True"}]}], "]"}]}], ";"}]],"Input",CellTags->"affine_results_step_1"],
-
-Cell[BoxData[RowBox[{RowBox[{"riemannDA", "=", RowBox[{"First", "[", RowBox[{"ToComponents", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{RowBox[{"Riemann", "[", "DA", "]"}], "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}], ",", RowBox[{"-", "c"}], ",", "d"}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}], ",", RowBox[{"-", "c"}], ",", "d"}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"0", ",", "1", ",", "0", ",", "0"}], "}"}], "}"}]}], ",", RowBox[{"StrictComponents", "\[Rule]", "True"}]}], "]"}], "]"}]}], ";"}]],"Input",CellTags->"affine_results_step_2"],
-
-Cell[BoxData[RowBox[{"gradA","//","MatrixForm"}]],"Input",CellTags->"affine_results"],
-
-Cell[BoxData["riemannDA"],"Input",CellTags->"affine_curvature_component"],
-
-Cell[TextData[{"Compare the same (x,t) entry using CD and DA. The Levi-Civita derivative gives zero for these Cartesian data. ",StyleBox["CheckConnection",FontFamily->"Courier",FontSize->14]," reports the torsion and metric-compatibility residuals for DA."}],"Text"],
-
-Cell["Levi-Civita connection (CD):","Text"],
-
-Cell[BoxData["CDAff[-aAff][AAff[-bAff]] // ToComponents[FreeIndices -> {-aAff,-bAff}, Components -> {{1,0}}] // First"],"Input",CellTags->"compare_affine_component_part_1"],
-
-Cell["Independent connection (DA):","Text"],
-
-Cell[BoxData["AffineAff[-aAff][AAff[-bAff]] // ToComponents[FreeIndices -> {-aAff,-bAff}, Components -> {{1,0}}] // First"],"Input",CellTags->"compare_affine_component_part_2"],
-
-Cell[BoxData[RowBox[{"CheckConnection", "[", RowBox[{"\"AffineStudy\"", ",", "\"Affine\""}], "]"}]],"Input",CellTags->"affine_checks"],
-
-Cell[TextData[{StyleBox["Christoffel[AffineAff, CDAff]",FontFamily->"Courier",FontSize->14]," is the native difference tensor for the two connections. ConnectionDifference is a lookup-based convenience wrapper. Use ",StyleBox["AddConnection",FontFamily->"Courier",FontSize->14]," when the target background already exists."}],"Text"],
-
-Cell[BoxData["diffDA = Christoffel[AffineAff,CDAff][aAff,-bAff,-cAff];"],"Input",CellTags->"affine_difference_step_1"],
-
-Cell[BoxData["diffDA"],"Input",CellTags->"affine_difference"],
-
-Cell[TextData[{"Inspect the manifolds of DA and its copy. In a formula the derivative head selects the connection. ",StyleBox["MetricCompute",FontFamily->"Courier",FontSize->14]," calculates the geometry of the metric connection."}],"Text"],
-
-Cell[BoxData[RowBox[{"ManifoldOfCovD", "[", "DA", "]"}]],"Input",CellTags->"compare_derivatives_part_1"],
-
-Cell[BoxData["ManifoldOfCovD[AffineAff]"],"Input",CellTags->"compare_derivatives_part_2"],
-
-Cell[BoxData["ConnectionDifference[\"AffineStudy\", \"Affine\", \"Primary\"] === diffDA"],"Input",CellTags->"compare_derivatives_part_3"],
-
-Cell[TextData[{"Unregister DA to omit it from future backgrounds. Its source definition and the existing affine study remain available."}],"Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"UnregisterTheory", "[", "\"Connections\"", "]"}], ";"}]],"Input",CellTags->"unregister_affine"],
-
-Cell[TextData[{"Use ",StyleBox["StrictComponents -> True",FontFamily->"Courier",FontSize->14]," when every requested component must be explicit. An unresolved component then returns a Failure."}],"Tip"]
-},Closed]]
-},Closed]],
-
-Cell[CellGroupData[{
-Cell[TextData[{"9. Update the model and reuse geometry"}],"Section"],
-
-Cell[TextData[{"To change a managed field or metric, assign the new input with the same commands. ",StyleBox["MetricCompute",FontFamily->"Courier",FontSize->14]," can infer the chart of an owned metric when passed a list of geometry target names. ",StyleBox["ToComponents",FontFamily->"Courier",FontSize->14]," already calculates the geometry it needs."}],"Text"],
-
-Cell[CellGroupData[{
-Cell["Reuse computed geometry","Subsection"],
-
-Cell[TextData[{"Request the Ricci and Einstein tensors twice. With the same metric and settings, the second call reports both as cached."}],"Text"],
-
-Cell[BoxData[RowBox[{"MetricCompute", "[", RowBox[{"gminkF", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_1"],
-
-Cell[BoxData[RowBox[{"MetricCompute", "[", RowBox[{"gminkF", ",", RowBox[{"{", RowBox[{"\"Ricci\"", ",", "\"Einstein\""}], "}"}]}], "]"}]],"Input",CellTags->"geometry_reuse_part_2"]
-},Closed]],
-
-Cell[CellGroupData[{
-Cell["Optional: detect stale notebook results","Subsection"],
-
-Cell["A normal Wolfram variable such as normA does not update when you edit the metric. SaveResult is an optional in-memory registry of derived values, not a file save or automatic recomputation. ResultOf retrieves the value only until a managed mathematical change invalidates it. The next steps compare the ordinary variable and the managed result.","Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"SaveResult", "[", RowBox[{"\"MinkowskiFields\"", ",", "\"VectorNorm\"", ",", "normA"}], "]"}], ";"}]],"Input",CellTags->"save_result_step_1"],
-
-Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"MinkowskiFields\"", ",", "A", ",", RowBox[{"PrintAs", "\[Rule]", "\"V\""}]}], "]"}], ";"}]],"Input",CellTags->"save_result_step_2"],
-
-Cell[BoxData[RowBox[{"ResultOf", "[", RowBox[{"\"MinkowskiFields\"", ",", "\"VectorNorm\""}], "]"}]],"Input",CellTags->"save_result"],
-
-Cell[BoxData[RowBox[{RowBox[{"SetPresentation", "[", RowBox[{"\"MinkowskiFields\"", ",", "A", ",", RowBox[{"PrintAs", "\[Rule]", "Automatic"}]}], "]"}], ";"}]],"Input",CellTags->"reset_vector_label"],
-
-Cell[TextData[{"Change the metric\:2019s time-time entry to \:22124. The covector still has lower time component 1, so raising its index now gives \:22121/4.\n\nChanging the metric also invalidates its cached curvature."}],"Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gminkF", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "4"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"change_metric_step_1"],
-
-Cell[BoxData[RowBox[{RowBox[{"AminkF", "[", "aminkF", "]"}], "//", "ToComponents"}]],"Input",CellTags->"change_metric"],
-
-Cell[TextData[{"The next lookup reports True for FailureQ because the saved norm was computed with the old metric. The ordinary variable still stores 28; the new norm is 115/4. Recalculate and save it explicitly if useful."}],"Text"],
-
-Cell[BoxData["FailureQ[ResultOf[\"MinkowskiFields\", \"VectorNorm\"]]"],"Input",CellTags->"invalidated_result"],
-
-Cell[BoxData["{normA, AminkF[aminkF] AminkF[-aminkF] // ToComponents}"],"Input",CellTags->"stale_comparison"],
-
-Cell[BoxData["SaveResult[\"MinkowskiFields\", \"VectorNorm\", AminkF[aminkF] AminkF[-aminkF] // ToComponents]"],"Input",CellTags->"save_new_result"],
-
-Cell[BoxData["ResultOf[\"MinkowskiFields\", \"VectorNorm\"]"],"Input",CellTags->"new_result"],
-
-Cell[TextData[{"Restore the Minkowski metric."}],"Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"MetricInBasis", "[", RowBox[{"gminkF", ",", RowBox[{"DiagonalMatrix", "[", RowBox[{"{", RowBox[{RowBox[{"-", "1"}], ",", "1", ",", "1", ",", "1"}], "}"}], "]"}]}], "]"}], ";"}]],"Input",CellTags->"restore_metric"],
-
-Cell["The vector study has been restored to its original metric. Next, return to the independent scalar Minkowski background to vary its metric.","Text"]
-},Closed]]
-},Closed]],
-
-Cell[CellGroupData[{
-Cell["10. Metric perturbations on an existing background","Section"],
-
-Cell["Consider a metric with g_xx = 1 + eps t^2, all other entries unchanged from Minkowski. Its first covariant metric variation has xx entry t^2; its second covariant variation vanishes. We will calculate the first variation and the second variation of the inverse metric.","Text"],
-
-Cell["DefMetricPerturbation is native xPert. It defines the perturbation tensor h and parameter eps. It does not truncate a series or calculate any particular order. Register h, then add its copy to the existing Minkowski background.","Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"DefMetricPerturbation", "[", RowBox[{"g", ",", "h", ",", "eps"}], "]"}], ";"}]],"Input",CellTags->"register_perturbation_step_1"],
-
-Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Field\"", ",", "h", ",", RowBox[{"Sector", "\[Rule]", "\"Perturbations\""}]}], "]"}], ";"}]],"Input",CellTags->"register_perturbation_step_2"],
-
-Cell[BoxData[RowBox[{"AddField","[",RowBox[{"\"Minkowski\"",",","h"}],"]"}]],"Input",CellTags->"register_perturbation"],
-
-Cell["The original Minkowski metric, chart, field profiles and geometry cache remain. Only this background now contains the new perturbation. AddField imports the registered field, not new registered equations.","Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"gM","[",RowBox[{RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],"//","ToComponents"}]],"Input",CellTags->"perturbation_preserved_metric"],
-
-Cell["PerturbOn selects a background-specific perturbation parameter, calls native xPert, contracts metrics and canonicalizes. Its default output is the nth abstract variation, not the complete Taylor series.","Text"],
-
-Cell[BoxData[RowBox[{"delta1Abstract","=",RowBox[{RowBox[{"gM","[",RowBox[{RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],"//",RowBox[{"PerturbOn","[",RowBox[{"1"}],"]"}]}]}]],"Input",CellTags->"abstract_perturbation"],
-
-Cell[BoxData[RowBox[{"delta2Abstract","=",RowBox[{RowBox[{"gM","[",RowBox[{"aM",",","bM"}],"]"}],"//",RowBox[{"PerturbOn","[",RowBox[{"2"}],"]"}]}]}]],"Input",CellTags->"abstract_inverse_second"],
-
-Cell["Assign components of hM with LI[1] and LI[2]. LI labels the order; the remaining two abstract indices select the variance. The assignment uses the primary chart, not an output chart. xCoba computes other index configurations as required.","Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"AllComponentValues","[",RowBox[{RowBox[{"hM","[",RowBox[{RowBox[{"LI","[",RowBox[{"1"}],"]"}],",",RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],",",RowBox[{"DiagonalMatrix","[",RowBox[{RowBox[{"{",RowBox[{"0",",",SuperscriptBox[RowBox[{"tM","[","]"}],"2"],",","0",",","0"}],"}"}]}],"]"}]}],"]"}],";"}]],"Input",CellTags->"perturbation_profile_step_3"],
-
-Cell[BoxData[RowBox[{RowBox[{"AllComponentValues","[",RowBox[{RowBox[{"hM","[",RowBox[{RowBox[{"LI","[",RowBox[{"2"}],"]"}],",",RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}],",",RowBox[{"ConstantArray","[",RowBox[{"0",",",RowBox[{"{",RowBox[{"4",",","4"}],"}"}]}],"]"}]}],"]"}],";"}]],"Input",CellTags->"perturbation_profile_step_4"],
-
-Cell[BoxData[RowBox[{RowBox[{"tP","=",RowBox[{"tM","[","]"}]}],";"}]],"Input",CellTags->"perturbation_profile"],
-
-Cell["Convert the abstract variations into components separately. The second inverse variation is not zero even though the second covariant metric variation vanishes.","Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"deltaG","=",RowBox[{"delta1Abstract","//","ToComponents"}]}],";"}]],"Input",CellTags->"perturbation_results_step_1"],
-
-Cell[BoxData[RowBox[{"deltaG","//","MatrixForm"}]],"Input",CellTags->"perturbation_results"],
-
-Cell[BoxData[RowBox[{RowBox[{"delta2G","=",RowBox[{"delta2Abstract","//","ToComponents"}]}],";"}]],"Input",CellTags->"perturbation_results_step_2"],
-
-Cell[BoxData[RowBox[{"delta2G","//","MatrixForm"}]],"Input",CellTags->"inverse_metric_second_variation"],
-
-Cell["A Taylor coefficient includes 1/n!, unlike the nth variation. The second Taylor coefficient therefore has xx entry t^4.","Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"taylor2","=",RowBox[{RowBox[{RowBox[{"gM","[",RowBox[{"aM",",","bM"}],"]"}],"//",RowBox[{"PerturbOn","[",RowBox[{"2",",",RowBox[{"PerturbationForm","\[Rule]","\"TaylorCoefficient\""}]}],"]"}]}],"//","ToComponents"}]}],";"}]],"Input",CellTags->"perturbation_results_step_3"],
-
-Cell[BoxData[RowBox[{"taylor2","//","MatrixForm"}]],"Input",CellTags->"inverse_metric_taylor_coefficient"],
-
-Cell["An additional chart can be selected at component evaluation without redefining h. In the existing cylindrical chart, the second inverse variation transforms as a rank-two contravariant tensor.","Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"delta2Abstract","//",RowBox[{"ToComponents","[",RowBox[{RowBox[{"OutputChart","\[Rule]","\"Cylindrical\""}]}],"]"}]}],"//","MatrixForm"}]],"Input",CellTags->"perturbation_cylindrical"],
-
-Cell["Alternatively PerturbOn can return components directly in the requested chart. This is equivalent to the two-step calculation above.","Text"],
-
-Cell[BoxData[RowBox[{RowBox[{RowBox[{"gM","[",RowBox[{"aM",",","bM"}],"]"}],"//",RowBox[{"PerturbOn","[",RowBox[{"2",",",RowBox[{"Output","\[Rule]","\"Components\""}],",",RowBox[{"OutputChart","\[Rule]","\"Cylindrical\""}]}],"]"}]}],"//","MatrixForm"}]],"Input",CellTags->"perturbation_cylindrical_direct"]
-},Closed]],
-
-Cell[CellGroupData[{
 Cell["11. Manage, delete and recover a study","Section"],
 
 Cell["Work with MinkowskiFields, the existing vector and tensor study. The goal is to distinguish reversible changes to values from removal of actual xAct definitions. The original scalar backgrounds are left untouched.","Text"],
@@ -1309,7 +1211,7 @@ Cell["Work with MinkowskiFields, the existing vector and tensor study. The goal 
 Cell[CellGroupData[{
 Cell["11.1. Clear derived values without changing the model","Subsubsection"],
 
-Cell["The preceding example restored the standard Minkowski metric. The covector A has lower components (1, 2, 3, 4), so its raised time component is -1.","Text"],
+Cell["Section 9 restored the standard Minkowski metric. The covector A has lower components (1, 2, 3, 4), so its raised time component is -1.","Text"],
 
 Cell[BoxData["BackgroundValue[\"MinkowskiFields\", \"MetricMatrix\"] // MatrixForm"],"Input",CellTags->"lifecycle_initial_metric"],
 
@@ -1470,21 +1372,7 @@ Cell["For dependent fields, Cascade -> True authorizes deletion of tracked depen
 },Closed]],
 
 Cell[CellGroupData[{
-Cell["11.9. Remove a connection or a chart","Subsubsection"],
-
-Cell["The independent connection in AffineStudy can be deleted without deleting its manifold. Preview the actual dependency order first. The primary metric connection is different: it belongs to its metric and cannot be removed independently.","Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"affinePlan","=",RowBox[{"DeletionPlan","[",RowBox[{"\"AffineStudy\"",",","\"Affine\"",",",RowBox[{"Cascade","\[Rule]","True"}]}],"]"}]}],";"}]],"Input",CellTags->"lifecycle_affine_plan"],
-
-Cell[BoxData[RowBox[{"affinePlan","[","\"CanDelete\"","]"}]],"Input",CellTags->"lifecycle_affine_plan_allowed"],
-
-Cell[BoxData[RowBox[{RowBox[{"DeleteBackgroundObject","[",RowBox[{"\"AffineStudy\"",",","\"Affine\"",",",RowBox[{"Cascade","\[Rule]","True"}]}],"]"}],";"}]],"Input",CellTags->"lifecycle_affine_remove"],
-
-Cell[BoxData[RowBox[{"ConnectionsOf","[",RowBox[{"\"AffineStudy\""}],"]"}]],"Input",CellTags->"lifecycle_affine_connections"],
-
-Cell["The independent connection is no longer present; the Levi-Civita connection is retained. Close this study when it is no longer needed.","Text"],
-
-Cell[BoxData[RowBox[{RowBox[{"DeleteBackground", "[", "\"AffineStudy\"", "]"}], ";"}]],"Input",CellTags->"close_affine_study"],
+Cell["11.9. Preview removal of a chart or metric","Subsubsection"],
 
 Cell["Deleting a chart family removes primary and secondary charts, coordinate aliases, managed basis changes, metric component assignment and managed field/connection inputs. Direct UndefChart or UndefBasis is blocked for managed charts; individual secondary-chart deletion and primary promotion are not supported. Save a recipe first.","Text"],
 
@@ -1526,7 +1414,119 @@ Cell["ClearBackgrounds[]","Program",Evaluatable->False],
 
 Cell["ClearTheory[]","Program",Evaluatable->False],
 
-Cell["These final two commands are deliberately not evaluated by the tutorial. The scalar backgrounds and the restored vector study remain available for further work. The initial scalar definitions in section 1 can be reused in a separate notebook.","Text"]
+Cell["These two commands are deliberately not evaluated by the tutorial. The scalar backgrounds and the restored vector study remain available for further work. The optional affine example follows. The initial scalar definitions in section 1 can be reused in a separate notebook.","Text"]
+},Closed]]
+},Closed]],
+
+Cell[CellGroupData[{
+Cell["12. Independent affine connections (optional)","Section"],
+
+Cell[CellGroupData[{
+Cell["Define and calculate with an independent connection","Subsection"],
+
+Cell["This optional example uses the vector field A defined in section 7. Save the current registry and omit the metric perturbation from this separate study; the original perturbation remains defined in the scalar Minkowski background.","Text"],
+
+Cell[BoxData["affineRegistry = TheorySnapshot[];"],"Input",CellTags->"affine_registry_snapshot"],
+
+Cell[BoxData["UnregisterTheory[\"Fields\", \"h\"];"],"Input",CellTags->"affine_registry_without_perturbation"],
+
+Cell[TextData[{"Define an independent covariant derivative DA on the source manifold using the source index a. ",StyleBox["Torsion -> True",FontFamily->"Courier",FontSize->14]," allows torsion.\n\nRegister DA as a connection so that ",StyleBox["CreateBackground",FontFamily->"Courier",FontSize->14]," copies it to the new study."}],"Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"DefCovD", "[", RowBox[{RowBox[{"DA", "[", RowBox[{"-", "a"}], "]"}], ",", RowBox[{"{", "}"}], ",", RowBox[{"SymbolOfCovD", "\[Rule]", RowBox[{"{", RowBox[{"\"|\"", ",", "\"D\""}], "}"}]}], ",", RowBox[{"Torsion", "\[Rule]", "True"}]}], "]"}], ";"}]],"Input",CellTags->"register_affine_step_1"],
+
+Cell[BoxData[RowBox[{RowBox[{"RegisterTheory", "[", RowBox[{"\"Connection\"", ",", "\"Affine\"", ",", "DA"}], "]"}], ";"}]],"Input",CellTags->"register_affine_step_2"],
+
+Cell[BoxData["CreateBackground[\"AffineStudy\", SymbolSuffix -> \"Aff\"];"],"Input",CellTags->"register_affine_step_3"],
+
+Cell[BoxData[RowBox[{"ConnectionsOf", "[", "\"AffineStudy\"", "]"}]],"Input",CellTags->"register_affine"],
+
+Cell[TextData[{"The default connection is the metric\:2019s Levi-Civita derivative, keyed by ",StyleBox["\"Primary\"",FontFamily->"Courier",FontSize->14],". Use the copied native derivative AffineAff directly and obtain its curvature through xAct Riemann[AffineAff]. ConnectionOf is useful only when selecting a derivative by its registered key programmatically.\n\nIts curvature family also has a Ricci tensor. A Ricci scalar of this independent connection requires an explicit contraction metric; the metric-curvature getter is not defined for DA."}],"Text"],
+
+Cell[BoxData["CovDOfMetric[gAff]"],"Input",CellTags->"formal_affine_step_1"],
+
+Cell[BoxData["AffineAff[-aAff][phiAff[]]"],"Input",CellTags->"formal_affine_part_1"],
+
+Cell[BoxData["Riemann[AffineAff][-aAff,-bAff,-cAff,dAff]"],"Input",CellTags->"formal_affine_part_2"],
+
+Cell[BoxData["BackgroundObject[\"AffineStudy\", \"Riemann\", \"Affine\"]"],"Input",CellTags->"dev31_connection_lookup"],
+
+Cell[TextData[{"Supply the independent connection coefficients in the order {upper output, lower derivative, lower input}. The assignment below sets a single coefficient, \:0393 with upper index t and lower indices (x,t), equal to t, in the Cartesian chart.\n\nYou can also supply the difference from the metric connection using ",StyleBox["ReferenceConnection -> \"Primary\"",FontFamily->"Courier",FontSize->14],"."}],"Text"],
+
+Cell[BoxData["DefineChart[\"AffineStudy\", {t[], x[], y[], z[]}];"],"Input",CellTags->"affine_coordinates_step_1"],
+
+Cell[BoxData["MetricInBasis[gAff, -chartAff, DiagonalMatrix[{-1, 1, 1, 1}]];"],"Input",CellTags->"affine_coordinates_step_2"],
+
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"AAff","[",RowBox[{RowBox[{"-","aAff"}]}],"]"}], ",", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates_step_3"],
+
+Cell[BoxData["tA = tAff[];"],"Input",CellTags->"affine_coordinates_step_4"],
+
+Cell[BoxData[RowBox[{RowBox[{"gammaDA", "=", RowBox[{"ConstantArray", "[", RowBox[{"0", ",", RowBox[{"{", RowBox[{"4", ",", "4", ",", "4"}], "}"}]}], "]"}]}], ";"}]],"Input",CellTags->"affine_coordinates_step_5"],
+
+Cell[BoxData[RowBox[{RowBox[{RowBox[{"gammaDA", "\[LeftDoubleBracket]", RowBox[{"1", ",", "2", ",", "1"}], "\[RightDoubleBracket]"}], "=", RowBox[{"tAff","[","]"}]}], ";"}]],"Input",CellTags->"affine_coordinates_step_6"],
+
+Cell[BoxData[RowBox[{RowBox[{"SetConnectionComponents", "[", RowBox[{"\"AffineStudy\"", ",", "\"Affine\"", ",", "gammaDA"}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates"],
+
+Cell[TextData[{"For this constant covector, the coefficient contributes \:2212t to the x derivative of its time component. Compute the derivative matrix and one curvature component.\n\nThe latter\:2019s sign follows xAct\:2019s ",StyleBox["$RiemannSign",FontFamily->"Courier",FontSize->14]," convention."}],"Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"gradA", "=", RowBox[{"ToComponents", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{RowBox[{"DA", "[", RowBox[{"-", "a"}], "]"}], "[", RowBox[{"A", "[", RowBox[{"-", "b"}], "]"}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}]}], "}"}]}], ",", RowBox[{"StrictComponents", "\[Rule]", "True"}]}], "]"}]}], ";"}]],"Input",CellTags->"affine_results_step_1"],
+
+Cell[BoxData[RowBox[{RowBox[{"riemannDA", "=", RowBox[{"First", "[", RowBox[{"ToComponents", "[", RowBox[{"\"AffineStudy\"", ",", RowBox[{RowBox[{"Riemann", "[", "DA", "]"}], "[", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}], ",", RowBox[{"-", "c"}], ",", "d"}], "]"}], ",", RowBox[{"FreeIndices", "\[Rule]", RowBox[{"{", RowBox[{RowBox[{"-", "a"}], ",", RowBox[{"-", "b"}], ",", RowBox[{"-", "c"}], ",", "d"}], "}"}]}], ",", RowBox[{"Components", "\[Rule]", RowBox[{"{", RowBox[{"{", RowBox[{"0", ",", "1", ",", "0", ",", "0"}], "}"}], "}"}]}], ",", RowBox[{"StrictComponents", "\[Rule]", "True"}]}], "]"}], "]"}]}], ";"}]],"Input",CellTags->"affine_results_step_2"],
+
+Cell[BoxData[RowBox[{"gradA","//","MatrixForm"}]],"Input",CellTags->"affine_results"],
+
+Cell[BoxData["riemannDA"],"Input",CellTags->"affine_curvature_component"],
+
+Cell[TextData[{"Compare the same (x,t) entry using CD and DA. The Levi-Civita derivative gives zero for these Cartesian data. ",StyleBox["CheckConnection",FontFamily->"Courier",FontSize->14]," reports the torsion and metric-compatibility residuals for DA."}],"Text"],
+
+Cell["Levi-Civita connection (CD):","Text"],
+
+Cell[BoxData["CDAff[-aAff][AAff[-bAff]] // ToComponents[FreeIndices -> {-aAff,-bAff}, Components -> {{1,0}}] // First"],"Input",CellTags->"compare_affine_component_part_1"],
+
+Cell["Independent connection (DA):","Text"],
+
+Cell[BoxData["AffineAff[-aAff][AAff[-bAff]] // ToComponents[FreeIndices -> {-aAff,-bAff}, Components -> {{1,0}}] // First"],"Input",CellTags->"compare_affine_component_part_2"],
+
+Cell[BoxData[RowBox[{"CheckConnection", "[", RowBox[{"\"AffineStudy\"", ",", "\"Affine\""}], "]"}]],"Input",CellTags->"affine_checks"],
+
+Cell[TextData[{StyleBox["Christoffel[AffineAff, CDAff]",FontFamily->"Courier",FontSize->14]," is the native difference tensor for the two connections. ConnectionDifference is a lookup-based convenience wrapper. Use ",StyleBox["AddConnection",FontFamily->"Courier",FontSize->14]," when the target background already exists."}],"Text"],
+
+Cell[BoxData["diffDA = Christoffel[AffineAff,CDAff][aAff,-bAff,-cAff];"],"Input",CellTags->"affine_difference_step_1"],
+
+Cell[BoxData["diffDA"],"Input",CellTags->"affine_difference"],
+
+Cell[TextData[{"Inspect the manifolds of DA and its copy. In a formula the derivative head selects the connection. ",StyleBox["MetricCompute",FontFamily->"Courier",FontSize->14]," calculates the geometry of the metric connection."}],"Text"],
+
+Cell[BoxData[RowBox[{"ManifoldOfCovD", "[", "DA", "]"}]],"Input",CellTags->"compare_derivatives_part_1"],
+
+Cell[BoxData["ManifoldOfCovD[AffineAff]"],"Input",CellTags->"compare_derivatives_part_2"],
+
+Cell[BoxData["ConnectionDifference[\"AffineStudy\", \"Affine\", \"Primary\"] === diffDA"],"Input",CellTags->"compare_derivatives_part_3"],
+
+Cell[TextData[{"Restore the source registry, including its metric perturbation. The native source derivative DA and the existing affine study remain available."}],"Text"],
+
+Cell[BoxData["ClearTheory[]; RegisterTheory[affineRegistry];"],"Input",CellTags->"unregister_affine"],
+
+Cell[TextData[{"Use ",StyleBox["StrictComponents -> True",FontFamily->"Courier",FontSize->14]," when every requested component must be explicit. An unresolved component then returns a Failure."}],"Tip"]
+},Closed]],
+
+Cell[CellGroupData[{
+Cell["Remove an independent connection and close the study","Subsection"],
+
+Cell["The independent connection in AffineStudy can be deleted without deleting its manifold. Preview the actual dependency order first. The primary metric connection is different: it belongs to its metric and cannot be removed independently.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"affinePlan","=",RowBox[{"DeletionPlan","[",RowBox[{"\"AffineStudy\"",",","\"Affine\"",",",RowBox[{"Cascade","\[Rule]","True"}]}],"]"}]}],";"}]],"Input",CellTags->"lifecycle_affine_plan"],
+
+Cell[BoxData[RowBox[{"affinePlan","[","\"CanDelete\"","]"}]],"Input",CellTags->"lifecycle_affine_plan_allowed"],
+
+Cell[BoxData[RowBox[{RowBox[{"DeleteBackgroundObject","[",RowBox[{"\"AffineStudy\"",",","\"Affine\"",",",RowBox[{"Cascade","\[Rule]","True"}]}],"]"}],";"}]],"Input",CellTags->"lifecycle_affine_remove"],
+
+Cell[BoxData[RowBox[{"ConnectionsOf","[",RowBox[{"\"AffineStudy\""}],"]"}]],"Input",CellTags->"lifecycle_affine_connections"],
+
+Cell["The independent connection is no longer present; the Levi-Civita connection is retained. Close this study when it is no longer needed.","Text"],
+
+Cell[BoxData[RowBox[{RowBox[{"DeleteBackground", "[", "\"AffineStudy\"", "]"}], ";"}]],"Input",CellTags->"close_affine_study"],
+
+Cell["This deliberately undefines the copied affine objects. Their names may become blue in earlier input cells after evaluation. This is normal Mathematica syntax highlighting; the source derivative and other backgrounds remain defined.","Text"]
 },Closed]]
 },Closed]]
 },PageWidth->WindowWidth,WindowTitle->"xPlorer - Theory and backgrounds",StyleDefinitions->Notebook[{
