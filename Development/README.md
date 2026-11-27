@@ -4,6 +4,8 @@ Internal design, planning, recovery and release-preparation records for xPlorer.
 
 ## Documents
 
+- [WORKFLOW_STYLE.md](WORKFLOW_STYLE.md) — binding editorial and pedagogical rules for the public notebooks.
+
 - [API_AUDIT.md](API_AUDIT.md)
 - [API_REDUNDANCY_AUDIT.md](API_REDUNDANCY_AUDIT.md)
 - [BETA13_CONSOLIDATION.md](BETA13_CONSOLIDATION.md)
