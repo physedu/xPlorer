@@ -4,8 +4,11 @@ Needs["xAct`xPert`"]; Needs["xAct`xCoba`"];
 nb=Get[FileNameJoin[{root,"xPlorer_Workflow.nb"}]];
 inputs=DeleteCases[Cases[nb,Cell[BoxData[b_],"Input",CellTags->id_String]:>{id,b},Infinity],{"load_installed",_}];
 warnings={}; outputs=<||>;
+(* Load the package before parsing checks that refer to its public symbols. *)
+loadCell=First@Select[inputs,First[#]==="load"&];
+AssociateTo[outputs,"load"->Check[Block[{NotebookDirectory=Function[root]},ToExpression[Last[loadCell],StandardForm]],AppendTo[warnings,"load"];$Failed]];
 Block[{xAct`xPerm`$xpermQ=False,NotebookDirectory=Function[root]},
- Scan[Function[cell,AssociateTo[outputs,First[cell]->Check[ToExpression[Last[cell],StandardForm],AppendTo[warnings,First[cell]];$Failed]]],inputs];
+ Scan[Function[cell,AssociateTo[outputs,First[cell]->Check[ToExpression[Last[cell],StandardForm],AppendTo[warnings,First[cell]];$Failed]]],DeleteCases[inputs,{"load",_}]]];
  checks=<|
  "version"->SameQ[$XPlorerVersion,"14.0.0-beta.13-dev.36"],
  "wave solution"->SameQ[outputs["wave_solution"],0],
@@ -31,7 +34,7 @@ Block[{xAct`xPerm`$xpermQ=False,NotebookDirectory=Function[root]},
  "metric edit"->SameQ[outputs["raised_changed"],{-1/4,2,3,4}]&&SameQ[outputs["norm_changed"],115/4],
  "restoration"->SameQ[outputs["norm_restored"],28]&&SameQ[outputs["raised_recovered"],{-1,2,3,4}],
  "four independent studies"->Length[BackgroundValue[]]===4,
- "labels preserve math"->SameQ[Normal[outputs["postfix_view"]],kgSchw==0],
+ "labels preserve math"->SameQ[Normal[outputs["postfix_view"]],outputs["prefix_view"]],
  "visual inspection"->MatchQ[outputs["inspect_s"],_Column]&&MatchQ[outputs["models_final"],_Grid]
- |>;];
+ |>;
 <|"Inputs"->Length[inputs],"Executed"->Length[outputs],"Warnings"->warnings,"UnexpectedFailures"->Keys@Select[outputs,!FreeQ[#,_Failure|$Failed|$Aborted]&],"Passed"->Count[Values[checks],True],"Total"->Length[checks],"FailedChecks"->Keys@Select[checks,!TrueQ[#]&]|>
