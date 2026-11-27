@@ -1984,7 +1984,8 @@ objectLabelPlan[e_,a_] := Module[{symbols,plan=<||>,b,settings,rec,chart,local,o
     head=h;rec=rr;chart=rec["Chart"];
     show=Join[settings,Lookup[Lookup[b,"ChartNotation",<||>],chart,<||>],If[KeyExistsQ[overrides,head],<|"ShowObjectLabels"->overrides[head]|>,<||>],local];
     label=Lookup[show,"BackgroundLabel",Automatic];
-    If[label===Automatic,label=If[StringQ[chart]&&chart=!="Primary",b["SymbolSuffix"]<>":"<>chart,b["SymbolSuffix"]]];
+    If[label===Automatic,label=b["SymbolSuffix"]];
+    If[StringQ[chart]&&chart=!="Primary"&&!KeyExistsQ[local,"BackgroundLabel"]&&!KeyExistsQ[Lookup[Lookup[b,"ChartNotation",<||>],chart,<||>],"BackgroundLabel"],label=label<>":"<>chart];
     If[TrueQ[show["ShowObjectLabels"]],plan[head]=<|"Label"->label,"Coordinate"->rec["Coordinate"]|>]
    ],KeyTake[labelHeadRecords[b],symbols]]
  ],$BG];plan
