@@ -8,7 +8,7 @@ Global`$XPlorerWorkflowReport=Module[
  (* Reassemble comparison groups only inside the test runner; the notebook shows separate outputs. *)
  partCounts=<|"naming_result"->4,"naming_index_aliases"->2,"inspect_registration"->2,"scalar_alias"->2,"inspect_short_names"->4,"automatic_formulas"->5,"formal_equations"->3,"riemann_tensor"->3,"custom_presentation"->3,"reset_presentation"->3,"session_prefix"->2,"local_postfix"->2,"pretty_gradient"->2,"restore_local"->2,"schwarzschild_curvature"->2,"flrw_geometry"->2,"cylindrical_connection"->2,"two_hessian_charts"->2,"trace_both"->2,"field_snapshots"->2,"vector_values"->3,"tensor_selection"->2,"formal_affine"->2,"compare_derivatives"->3,"geometry_reuse"->2,"delete_background"->2,"flat_rules"->2,"compare_affine_component"->2|>;
  initiallyAbsent=!MemberQ[$Packages,"xPlorer`"];
- notebook=Get[FileNameJoin[{directory,"xPlorer_Workflow.nb"}]];
+ notebook=Get[FileNameJoin[{directory,"xPlorer_API_Examples.nb"}]];
  (* The two startup cells are alternatives. Test the direct-source path here. *)
  inputs=DeleteCases[Cases[notebook,Cell[BoxData[b_],"Input",CellTags->id_String]:>{id,b},Infinity],{"load_installed",_}];
  Block[{Print=(Null&)},Needs["xAct`xPert`"];Needs["xAct`xCoba`"]];

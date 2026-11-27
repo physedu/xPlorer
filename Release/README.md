@@ -1,16 +1,30 @@
 # xPlorer - Beta tester guide
 
-xPlorer lets you reuse one abstract xAct theory on independent geometric backgrounds, then calculate its components using xCoba. It is a research tool built on xTensor, xCoba and xPert, not a replacement for them.
+xPlorer is a Wolfram Language research package for theoretical physics and general relativity, built on xAct. It addresses a practical problem: after deriving tensor equations on an abstract manifold, how can the same theory be studied on different metrics, coordinate charts and field configurations without redefining all the tensors or restarting the Mathematica kernel?
+
+With xPlorer, register the abstract theory once, create independent backgrounds, and assign concrete metric and field components. The same equations can then be transported and evaluated on Minkowski, Schwarzschild, FLRW or other user-defined geometries in the same session. Each study has its own native xAct objects and managed component inputs.
+
+xPlorer is not a new tensor algebra engine. It uses xTensor, xCoba and xPert for the mathematics and provides the management layer connecting abstract derivations to concrete calculations. Native xAct operations remain available on the copied objects.
+
+### What can you do with xPlorer?
+
+- Reuse registered tensors, Lagrangians and equations on independent spacetimes.
+- Calculate components of tensor equations, curvature and new observables using xCoba.
+- Explore physical limits, change scalar/vector/tensor profiles, and evaluate in registered secondary coordinate charts.
+- Compute metric perturbations using xPert, including inverse metric variations and their components.
+- Modify or reconstruct a model without restarting the kernel; inspect declared inputs and customize mathematical notation.
+
+The intended audience is researchers and students already using Mathematica and xAct, particularly those comparing geometric backgrounds or specializing abstract field equations. This is experimental research software; feedback and reproducible bug reports are welcome.
 
 **Version:** 14.0.0-beta.13-dev.36 (beta candidate). Install xAct separately: https://www.xact.es/. Mathematica 13.0+ is the declared minimum; the current automated validation uses Wolfram Language 15.0.1 and xAct 1.3.0. Earlier kernel versions have not all been tested.
 
 ## Start here
 
 1. Extract the distribution ZIP. Keep the two notebooks beside the Paclet directory.
-2. Open **xPlorer_QuickStart.nb** in a fresh Mathematica kernel.
+2. Open **xPlorer_Workflow.nb** in a fresh Mathematica kernel.
 3. Choose A to install and load the supplied paclet, or B to load the source directly, not both. Evaluate the remaining inputs in order.
-4. The quick start derives the massive scalar equation and evaluates it on Minkowski, Schwarzschild and FLRW, including curvature and a plane-wave check.
-5. For the extended API and more advanced examples, open **xPlorer_Workflow.nb** in a fresh kernel.
+4. The seven-section research tutorial derives the massive scalar equation, evaluates it on Minkowski, Schwarzschild and FLRW, and continues through rules, profiles, secondary charts, vector/tensor fields, metric perturbations and reconstruction.
+5. For the extended API and more advanced examples, open **xPlorer_API_Examples.nb** in a fresh kernel. The advanced notebook has folded sections with shared prerequisites; it is not necessary to run it for a first study.
 
 ## Installation options
 
@@ -64,7 +78,7 @@ SetNotation["Schwarzschild", ShowObjectLabels -> False];
 SetNotation["Schwarzschild", ShowObjectLabels -> Automatic];
 ```
 
-The printed label never renames a symbol. It can be changed per background, chart, owned object or single PrettyExp view. Labels are off by default; the Quick Start enables them as a demonstration.
+The printed label never renames a symbol. It can be changed per background, chart, owned object or single PrettyExp view. Labels are off by default; the notebooks enable them as a demonstration.
 
 ## Current scope and limitations
 
