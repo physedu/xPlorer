@@ -1,6 +1,6 @@
-# xPlorer - First public beta (draft)
+# xPlorer - Beta 14 - first public beta (draft)
 
-**Candidate:** 14.0.0-beta.13-dev.36
+**Candidate:** 14.0.0-beta.14
 
 xPlorer connects abstract xAct calculations with concrete geometric studies. Define and register your theory once, then explore different spacetimes, metric and field configurations, coordinate charts and physical limits in the same Mathematica kernel. The underlying tensor algebra remains xAct's.
 
@@ -22,4 +22,4 @@ The supported managed scope is tangent-bundle tensors, perturbations, named inde
 
 Please report reproducible issues at https://github.com/physedu/xPlorer/issues. Include Mathematica, xAct and xPlorer versions, OS, smallest input and expected versus actual output.
 
-**Maintainer gate:** this text is a draft, not an announcement of publication. Before posting it, verify the actual dev.36 paclet against source, test installation/uninstallation and both notebooks in Desktop, verify the curated ZIP, and update the tested-platform and asset statements to reflect observed results. Publish as a GitHub pre-release only after approval.
+**Maintainer gate:** this text is a draft, not an announcement of publication. Before posting it, verify the actual beta.14 paclet against source, test installation/uninstallation and both notebooks in Desktop, verify the curated ZIP, and update the tested-platform and asset statements to reflect observed results. Publish as a GitHub pre-release only after approval.
