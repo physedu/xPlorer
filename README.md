@@ -2,7 +2,7 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-**Development candidate: 14.0.0-beta.13-dev.35.** The public beta release has not yet been published.
+**Development candidate: 14.0.0-beta.13-dev.36.** The public beta release has not yet been published.
 
 xPlorer is a Wolfram Language research package that reuses an abstract xAct theory on independent geometric backgrounds, transports equations and calculates components. It connects xTensor, xCoba and xPert rather than replacing their mathematics.
 
@@ -13,7 +13,7 @@ xPlorer is a Wolfram Language research package that reuses an abstract xAct theo
 | [xPlorer_QuickStart.nb](xPlorer_QuickStart.nb) | First scientific calculation: massive scalar theory, Minkowski, Schwarzschild and FLRW. |
 | [xPlorer_Workflow.nb](xPlorer_Workflow.nb) | Full scientific reference: registration, abstract formulas, notation, specialization, charts, vector/tensor fields, affine connections, perturbations and lifecycle. |
 
-Install [xAct](https://www.xact.es/) separately. Use a fresh Mathematica kernel for either notebook. Keep the notebook beside the Paclet directory. Choose exactly one startup cell: source loading or an already installed paclet.
+Install [xAct](https://www.xact.es/) separately. Use a fresh Mathematica kernel for either notebook. Keep the notebook beside the Paclet directory. Choose exactly one startup cell: A installs the matching released paclet if needed and loads it with Needs; B loads the source directly using Get. The distribution ZIP places the versioned paclet beside both notebooks.
 
 ```wl
 Get[FileNameJoin[{NotebookDirectory[], "Paclet", "xPlorer.wl"}]];

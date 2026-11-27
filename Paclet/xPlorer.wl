@@ -76,7 +76,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.35";
+$XPlorerVersion = "14.0.0-beta.13-dev.36";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. ShowObjectLabels -> True or False overrides visibility for one owned head; Automatic restores inheritance. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -1828,12 +1828,13 @@ bgViewSection[tag_,b_,section_] := Module[{a,rows,inds,metric,coords},
  "Lagrangians"|"Expressions",a=b13Collection[b["Theory"],section];b13Table[{"Key","Alias","Registered source formula"},KeyValueMap[{#1,#2["AliasBase"]<>b["SymbolSuffix"],#2["Value"]}&,a]],
  _,failure["BackgroundSection","Choose Summary, Geometry, Fields, Connections, Charts, Rules, Profiles, Results, Presentation, Lagrangians or Expressions."]
  ]];
-bgViewHeading[s_] := Style[s,Bold,13,FontFamily->"Helvetica"];
+(* Inherit foreground and background from the notebook stylesheet in both themes. *)
+bgViewHeading[s_] := Style[s,Bold,15,FontFamily->"Helvetica"];
 bgViewSummary[tag_,b_] := Module[{sections,header,summary},
- header={Style[tag,Bold,16,FontFamily->"Helvetica"],Style[Lookup[b["Theory"],"Title","Registered theory"],FontFamily->"Helvetica",12]};
+ header={Style[tag,Bold,19,FontFamily->"Helvetica"],Style[Lookup[b["Theory"],"Title","Registered theory"],FontFamily->"Helvetica",12]};
  summary=b13KeyTable[<|"Symbol suffix"->b["SymbolSuffix"],"Registered lagrangians"->bgViewNames[Keys[b13Collection[b["Theory"],"Lagrangians"]]],"Registered expressions"->bgViewNames[Keys[b13Collection[b["Theory"],"Expressions"]]],"Stored profiles"->bgViewNames[Keys[Lookup[b,"FieldProfiles",<||>]]],"Saved results"->bgViewNames[Keys[Lookup[b,"SavedResults",<||>]]]|>];
  sections={"Geometry","Charts","Fields","Connections","Rules"};
- Column[Join[header,(Column[{bgViewHeading[#],bgViewSection[tag,b,#]},Alignment->Left,Spacings->0.25]& /@ sections),{Column[{bgViewHeading["Registered formulas and stored work"],summary},Alignment->Left,Spacings->0.25]}],Alignment->Left,Spacings->0.75]];
+ Column[Join[header,(Column[{bgViewHeading[#],bgViewSection[tag,b,#]},Alignment->Left,Spacings->0.45]& /@ sections),{Column[{bgViewHeading["Registered formulas and stored work"],summary},Alignment->Left,Spacings->0.45]}],Alignment->Left,Spacings->1.15]];
 ShowBackground[] := b13Table[{"Background","Suffix","Fields","Charts","Metric components"},
  KeyValueMap[{#1,#2["SymbolSuffix"],bgViewNames[Keys[Lookup[#2,"Field",<||>]]],If[KeyExistsQ[#2,"Chart"],1+Length[Lookup[#2,"AdditionalCharts",<||>]],0],If[KeyExistsQ[#2,"MetricMatrix"],"Assigned","Not assigned"]}&,$BG]];
 ShowBackground[tag_String] := ShowBackground[tag,"Summary"];
@@ -1855,8 +1856,8 @@ b13SectorLabel[a_] := Replace[Lookup[a,"Sector",None],None->"-"];
 b13TableCell[x_String] := Style[x,FontFamily->"Helvetica"];
 b13TableCell[x_] := x;
 b13Table[headers_,rows_] := Grid[
- Prepend[Map[b13TableCell,If[rows==={}, {Join[{"(none)"},ConstantArray["",Length[headers]-1]]},rows],{2}],Style[#,Bold,FontFamily->"Helvetica"]& /@ headers],
- Alignment->{Left,Top},Spacings->{1.25,0.35},BaseStyle->{FontSize->12},Dividers->{None,{False,True}}];
+ Prepend[Map[b13TableCell,If[rows==={}, {Join[{"(none)"},ConstantArray["",Length[headers]-1]]},rows],{2}],Style[#,Bold,11,FontFamily->"Helvetica"]& /@ headers],
+ Alignment->{Left,Top},Spacings->{1.5,0.65},BaseStyle->{FontSize->12},Dividers->{None,{False,True}}];
 b13SectorKeys[keys_List] := Column[Row[Riffle[Style[#,FontFamily->"Helvetica"]& /@ #,", "]]& /@ (TakeList[keys,Append[ConstantArray[3,Quotient[Length[keys],3]],Mod[Length[keys],3]]]/.{}->Nothing),Alignment->Left,Spacings->0.15];
 b13SectorRows[t_] := Flatten[Table[Module[{groups,rows},
  groups=Select[AssociationMap[Select[b13Collection[t,#],Lookup[#,"Sector",None]===sector&]&,{"Fields","Parameters","Lagrangians","Expressions"}],Length[#]>0&];
@@ -1885,13 +1886,13 @@ b13TheoryView[t_,section_,detail_] := Module[{a},
  _,failure["TheoryKey","Unknown theory display section.",<|"Key"->section|>]
  ]];
 ShowTheory[] := Module[{t=$Theory,header,sections,extra},
- header=Join[{Style[Lookup[t,"Title","Registered theory"],Bold,16,FontFamily->"Helvetica"]},
+ header=Join[{Style[Lookup[t,"Title","Registered theory"],Bold,19,FontFamily->"Helvetica"]},
   If[KeyExistsQ[t,"Description"],{Lookup[t,"Description"]},{}],
   (Column[{Style[#,Bold],t[#]},Spacings->0.5]& /@ Select[{"Assumptions","Conditions"},KeyExistsQ[t,#]&])];
  sections=Select[b13Sections,Switch[#,"Geometry",Length[b13Geometry[t]]>0,"Sectors",b13Sectors[t]=!={},"Connections",Length[Lookup[t,"Connections",<||>]]>0,_,Length[b13Collection[t,#]]>0]&];
  extra=KeyDrop[b13Metadata[t],{"Title","Description","Assumptions","Conditions"}];
- Column[Join[header,(Column[{Style[#,Bold,13,FontFamily->"Helvetica"],b13TheoryView[t,#,False]},Alignment->Left,Spacings->0.25]& /@ sections),
-  If[extra===<||>,{},{Column[{Style["Additional information",Bold,13,FontFamily->"Helvetica"],b13KeyTable[extra]}]}]],Alignment->Left,Spacings->0.75]
+ Column[Join[header,(Column[{bgViewHeading[#],b13TheoryView[t,#,False]},Alignment->Left,Spacings->0.45]& /@ sections),
+  If[extra===<||>,{},{Column[{bgViewHeading["Additional information"],b13KeyTable[extra]}]}]],Alignment->Left,Spacings->1.15]
 ];
 ShowTheory[section_String] := b13TheoryView[$Theory,section,True];
 
