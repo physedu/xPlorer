@@ -415,7 +415,7 @@ Cell[BoxData["PrintAs[Evaluate[thetaSchw]] ^= \"\\[Theta]\"; PrintAs[Evaluate[va
 
 Cell[BoxData["DefineChart[\"FLRW\", {t[], x[], y[], z[]}];"],"Input",CellTags->"charts"],
 
-Cell["The suffixed aliases are scalar heads, so write xM[] rather than xM. CoordinatesOf returns the actual heads; Through[CoordinatesOf[tag][]] retrieves the corresponding coordinate expressions without changing the aliases.","Text"],
+Cell["The suffixed aliases are scalar heads, so write xM[] rather than xM. Native ScalarsOfChart[chartM] returns the actual coordinate scalar expressions. CoordinatesOf is only a managed lookup when the chart is known by its background tag.","Text"],
 
 Cell[BoxData["{tM[], xM[], yM[], zM[]}"],"Input",CellTags->"coordinate_aliases_step_1"],
 
@@ -447,9 +447,9 @@ Cell["The complete native xCoba object retains the component array and its basis
 
 Cell[BoxData["metricCTensor"],"Input",CellTags->"native_metric_object"],
 
-Cell["MetricMatrixOf is a direct getter for the declared covariant matrix in the primary chart.","Text"],
+Cell["BackgroundValue retrieves the declared covariant matrix in the primary chart, without a new calculation.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"MetricMatrixOf","[",RowBox[{"\"Minkowski\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"declared_metric_matrix"],
+Cell[BoxData["BackgroundValue[\"Minkowski\", \"MetricMatrix\"] // MatrixForm"],"Input",CellTags->"declared_metric_matrix"],
 
 
 Cell[TextData[{"Alternative \:2014 two native xCoba setups"}],"Subsubsection"],
@@ -751,7 +751,7 @@ Cell[BoxData[RowBox[{RowBox[{"phiM","[","]"}], "//", "ToComponents"}]],"Input",C
 
 Cell[BoxData[RowBox[{"boxPhiM", "//", "ToComponents"}]],"Input",CellTags->"profile_wave_box_after"],
 
-Cell[BoxData[RowBox[{"ComputeGeometry","[",RowBox[{"\"Minkowski\"",",",RowBox[{"{",RowBox[{"\"Metric\""}],"}"}]}],"]"}]],"Input",CellTags->"profile_cached_geometry"],
+Cell[BoxData["MetricCompute[gM, {\"Metric\"}]"],"Input",CellTags->"profile_cached_geometry"],
 
 Cell[TextData[{"One Minkowski metric, two coordinate charts"}],"Subsection"],
 
@@ -763,7 +763,7 @@ Cell[BoxData["PrintAs[Evaluate[thetaCylindricalM]] ^= \"\\[Theta]\";"],"Input",C
 
 Cell[BoxData["{tCylindricalM[], rCylindricalM[], thetaCylindricalM[], zCylindricalM[]}"],"Input",CellTags->"second_chart"],
 
-Cell["The short label C was chosen when defining the cylindrical chart. Hide its object labels temporarily, then restore inherited visibility without removing the short label. Neither operation changes coordinates or basis transformations.","Text"],
+Cell["The short label C was chosen when defining the cylindrical chart. Native PrintAs changes the printed angular symbol to Greek; Evaluate resolves the owned head behind the alias. Hide its object labels temporarily, then restore inherited visibility without removing the short label. Neither operation changes coordinates or basis transformations.","Text"],
 
 Cell[BoxData["SetNotation[\"Minkowski\", \"Cylindrical\", ShowObjectLabels -> False];"],"Input",CellTags->"labels_chart_set"],
 
@@ -777,11 +777,11 @@ Cell[BoxData["nativeCylCovector = ToCTensor[CTensor[{0, 1, 0, 0}, {-chartM}], {-
 
 Cell["This is the Cartesian dx covector in cylindrical slots: (0, cos(theta), -r sin(theta), 0). Do not directly overwrite a managed chart pair with SetBasisChange.","Text"],
 
-Cell[TextData[{"MetricMatrixOf returns the originally assigned matrix in the primary Cartesian chart. Use // ToComponents[OutputChart -> \"Cylindrical\"] to evaluate the same metric in cylindrical coordinates.\n\nThe angular entry is r\:00b2."}],"Text"],
+Cell[TextData[{"BackgroundValue retrieves the originally assigned matrix in the primary Cartesian chart. Use // ToComponents[OutputChart -> \"Cylindrical\"] to evaluate the same metric in cylindrical coordinates.\n\nThe angular entry is r\:00b2."}],"Text"],
 
 Cell[BoxData[RowBox[{RowBox[{"gCyl","=",RowBox[{RowBox[{"gM","[",RowBox[{RowBox[{"-","aM"}],",",RowBox[{"-","bM"}]}],"]"}], "//", RowBox[{"ToComponents", "[", RowBox[{RowBox[{"OutputChart","\[Rule]","\"Cylindrical\""}]}], "]"}]}]}], ";"}]],"Input",CellTags->"two_metric_charts_step_1"],
 
-Cell[BoxData[RowBox[{RowBox[{"MetricMatrixOf","[",RowBox[{"\"Minkowski\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"two_metric_charts"],
+Cell[BoxData["BackgroundValue[\"Minkowski\", \"MetricMatrix\"] // MatrixForm"],"Input",CellTags->"two_metric_charts"],
 
 Cell[BoxData[RowBox[{"gCyl","//","MatrixForm"}]],"Input",CellTags->"cylindrical_matrix_display"],
 
@@ -1067,7 +1067,7 @@ Cell[BoxData[RowBox[{"ConnectionsOf", "[", "\"AffineStudy\"", "]"}]],"Input",Cel
 
 Cell[TextData[{"The default connection is the metric\:2019s Levi-Civita derivative, keyed by ",StyleBox["\"Primary\"",FontFamily->"Courier",FontSize->14],". Use the copied native derivative AffineAff directly and obtain its curvature through xAct Riemann[AffineAff]. ConnectionOf is useful only when selecting a derivative by its registered key programmatically.\n\nIts curvature family also has a Ricci tensor. A native Ricci scalar requires an associated metric, and requesting one for DA returns a Failure."}],"Text"],
 
-Cell[BoxData["{aDA,bDA,cDA,dDA} = {aAff,bAff,cAff,dAff};"],"Input",CellTags->"formal_affine_step_1"],
+Cell[BoxData["CovDOfMetric[gAff]"],"Input",CellTags->"formal_affine_step_1"],
 
 Cell[BoxData["AffineAff[-aAff][phiAff[]]"],"Input",CellTags->"formal_affine_part_1"],
 
@@ -1081,7 +1081,7 @@ Cell[BoxData["DefineChart[\"AffineStudy\", {t[], x[], y[], z[]}];"],"Input",Cell
 
 Cell[BoxData["MetricInBasis[gAff, -chartAff, DiagonalMatrix[{-1, 1, 1, 1}]];"],"Input",CellTags->"affine_coordinates_step_2"],
 
-Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"AAff","[",RowBox[{RowBox[{"-","aDA"}]}],"]"}], ",", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates_step_3"],
+Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"AAff","[",RowBox[{RowBox[{"-","aAff"}]}],"]"}], ",", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates_step_3"],
 
 Cell[BoxData["tA = tAff[];"],"Input",CellTags->"affine_coordinates_step_4"],
 
@@ -1247,7 +1247,7 @@ Cell["11.1. Clear derived values without changing the model","Subsubsection"],
 
 Cell["The preceding example restored the standard Minkowski metric. The covector A has lower components (1, 2, 3, 4), so its raised time component is -1.","Text"],
 
-Cell[BoxData[RowBox[{RowBox[{"MetricMatrixOf","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"lifecycle_initial_metric"],
+Cell[BoxData["BackgroundValue[\"MinkowskiFields\", \"MetricMatrix\"] // MatrixForm"],"Input",CellTags->"lifecycle_initial_metric"],
 
 Cell[BoxData[RowBox[{RowBox[{"AminkF","[",RowBox[{"aminkF"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_initial_vector"],
 
@@ -1349,7 +1349,7 @@ Cell["RecreateBackground uses the saved recipe to define new owned objects under
 
 Cell[BoxData[RowBox[{RowBox[{"RecreateBackground","[",RowBox[{"\"MinkowskiFields\"",",","recipe"}],"]"}],";"}]],"Input",CellTags->"lifecycle_rebuild"],
 
-Cell[BoxData[RowBox[{RowBox[{"MetricMatrixOf","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"//","MatrixForm"}]],"Input",CellTags->"lifecycle_restored_metric"],
+Cell[BoxData["BackgroundValue[\"MinkowskiFields\", \"MetricMatrix\"] // MatrixForm"],"Input",CellTags->"lifecycle_restored_metric"],
 
 Cell[BoxData[RowBox[{RowBox[{"AminkF","[",RowBox[{"aminkF"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"recreate_background"],
 
