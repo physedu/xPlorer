@@ -2,7 +2,7 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-**Development candidate: 14.0.0-beta.13-dev.34.** The public beta release has not yet been published.
+**Development candidate: 14.0.0-beta.13-dev.35.** The public beta release has not yet been published.
 
 xPlorer is a Wolfram Language research package that reuses an abstract xAct theory on independent geometric backgrounds, transports equations and calculates components. It connects xTensor, xCoba and xPert rather than replacing their mathematics.
 
@@ -40,6 +40,16 @@ kgSchw // ToComponents
 ```
 
 Here the source metric, derivative, field and equation must already be defined with xAct; matrix and u must be supplied by the user. The Quick Start contains all these definitions. Owned fields and charts can use native xCoba assignments, with managed primary-chart capture and native basis transformations. Unknown components stay unknown. Named rules and profiles allow exploration without recreating the geometry.
+
+## Inspect your models
+
+```wl
+ShowBackground[]
+ShowBackground["Schwarzschild"]
+ShowBackground["Schwarzschild", "Fields"]
+```
+
+The first call lists the studies in the current kernel; the others show the declared geometry, actual managed input values or a selected section. No new geometry is computed. Use BackgroundValue["Schwarzschild", "MetricMatrix"] for programmatic data access, or BackgroundObject for native xAct heads. In dev.35, use BackgroundValue instead of the former raw ShowBackground association.
 
 ## Optional presentation
 
