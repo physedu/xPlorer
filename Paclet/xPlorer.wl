@@ -940,7 +940,7 @@ captureManagedScalar[tag_,expr_,input_,operation_:ComponentValue] := Block[{$ins
   key=fieldRecordKey[rec];old=Lookup[b["FieldComponents"],key,Missing[]];
   If[actual===expr,rec=Missing[]];
   If[AssociationQ[old]&&AssociationQ[rec]&&KeyDrop[old,"ExactNativeValues"]===rec,Return[r]];
-  If[AssociationQ[rec]&&(operation===HeldComponentValue||TrueQ[Lookup[old,"ExactNativeValues",False]]),rec=Append[rec,"ExactNativeValues"->True]];
+  If[AssociationQ[rec]&&(operation===HeldComponentValue||(AssociationQ[old]&&TrueQ[Lookup[old,"ExactNativeValues",False]])),rec=Append[rec,"ExactNativeValues"->True]];
   If[old===rec,Return[r]];
   ids=Select[TensorValIDs[head],Length[List@@#]>2&];
   status=guard[Scan[DeleteTensorValues,ids]];
@@ -1199,8 +1199,8 @@ captureManagedComponent[tag_,expr_,value_,operation_:ComponentValue] := Block[{$
   r=First[stage];arr=Last[stage];
   If[!FreeQ[arr,head],Return[failure["IncompleteField","The native edit left an incomplete source array."]]];
   updated=Join[record,<|"Values"->arr|>];
-  If[updated===record,Return[r]];
-  If[operation===HeldComponentValue,updated=Append[updated,"ExactNativeValues"->True]];
+  If[updated===record&&nativeInputCurrentQ[b,record],Return[r]];
+  If[operation===HeldComponentValue&&updated=!=record,updated=Append[updated,"ExactNativeValues"->True]];
   result=applyFieldRecords[tag,Append[b["FieldComponents"],fieldRecordKey[updated]->updated],{head}];
   If[FailureQ[result],result,r]
  ]];

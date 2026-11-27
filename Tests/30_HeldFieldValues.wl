@@ -25,6 +25,10 @@ AllComponentValues[BN[-aN],{1,2,3,4}];Block[{$CVSimplify=Function[v,v+100]},With
 checks["Held complete field records exact actual values"]=rec[bb]["Values"]==={8,2,3,4}&&ToValues[BN[{0,-ch}]]===8&&TrueQ[rec[bb]["ExactNativeValues"]];
 rev=ShowBackground["N"]["DataRevision"];With[{head=bb,chart=ch},HeldComponentValue[head[{0,-chart}],8]];
 checks["Identical held complete edit is a no-op"]=ShowBackground["N"]["DataRevision"]===rev;
+Block[{xPlorer`Private`$insideManagedCalculation=True},ComponentValue[BN[{0,-ch}],77]];
+With[{head=bb,chart=ch},HeldComponentValue[head[{0,-chart}],8]];
+checks["Held repeated declared input repairs externally altered native source"]=ToValues[BN[{0,-ch}]]===8&&rec[bb]["Values"]==={8,2,3,4};
+rev=ShowBackground["N"]["DataRevision"];
 bad=With[{head=bb,chart=ch},HeldComponentValue[head[{0,-chart}],Null]];
 checks["Rejected incomplete dense edit leaves native source intact"]=FailureQ[bad]&&ToValues[BN[{0,-ch}]]===8&&ShowBackground["N"]["DataRevision"]===rev;
 With[{head=aa,chart=ch},HeldComponentValue[head[{3,-chart}],Null]];
