@@ -16,7 +16,7 @@ xPlorer is not a new tensor algebra engine. It uses xTensor, xCoba and xPert for
 
 The intended audience is researchers and students already using Mathematica and xAct, particularly those comparing geometric backgrounds or specializing abstract field equations. This is experimental research software; feedback and reproducible bug reports are welcome.
 
-**Version:** 14.0.0-beta.13-dev.36 (beta candidate). Install xAct separately: https://www.xact.es/. Mathematica 13.0+ is the declared minimum; the current automated validation uses Wolfram Language 15.0.1 and xAct 1.3.0. Earlier kernel versions have not all been tested.
+**Version:** 14.0.0-beta.14 (beta candidate). Install xAct separately: https://www.xact.es/. Mathematica 13.0+ is the declared minimum; the current automated validation uses Wolfram Language 15.0.1 and xAct 1.3.0. Earlier kernel versions have not all been tested.
 
 ## Start here
 
@@ -46,7 +46,7 @@ Needs["xPlorer`"];
 $XPlorerVersion
 ```
 
-The version should be "14.0.0-beta.13-dev.36". Do not load a second copy of xPlorer in the same kernel; remove or move conflicting older traditional installations out of the Applications path before using a paclet. To uninstall, inspect PacletFind["xPlorer"] and use PacletUninstall on the specific installed PacletObject. Restart before testing a different version.
+The version should be "14.0.0-beta.14". Do not load a second copy of xPlorer in the same kernel; remove or move conflicting older traditional installations out of the Applications path before using a paclet. To uninstall, inspect PacletFind["xPlorer"] and use PacletUninstall on the specific installed PacletObject. Restart before testing a different version.
 
 ### B. Load the source without installation
 
