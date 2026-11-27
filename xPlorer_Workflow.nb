@@ -102,9 +102,9 @@ Cell[BoxData["ShowBackground[]"],"Input",CellTags->"open_models"],
 Cell[BoxData["Column[{PrettyExp[\"Minkowski\", kgM == 0, ShowBackgroundLabel -> True], PrettyExp[\"Schwarzschild\", kgSchw == 0, ShowBackgroundLabel -> True], PrettyExp[\"FLRW\", kgFLRW == 0, ShowBackgroundLabel -> True]}, Spacings -> 1]"],"Input",CellTags->"abstract_copies"],
 
 Cell[CellGroupData[{
-Cell["Choose the appearance of an equation","Subsection"],
+Cell["Read and compare the transported equations","Subsection"],
 
-Cell["SetNotation changes the default display for one background; PrettyExp changes only the displayed expression. Use it as expr // PrettyExp[options] or PrettyExp[tag, expr, options] when the owner is ambiguous. Normal recovers the original expression. CovariantStyle controls prefix or postfix derivative notation; Automatic removes a local override.","Text"],
+Cell["When comparing three otherwise identical abstract equations, the short M, S and F labels identify the owning tensors. For the Schwarzschild calculation we use prefix covariant derivatives; SetNotation sets the background default. PrettyExp can override it for one result, for example to compare with a paper using postfix notation. Normal recovers the original expression.","Text"],
 
 Cell[BoxData["SetNotation[\"Schwarzschild\", CovariantStyle -> \"Prefix\"];"],"Input",CellTags->"prefix"],
 
@@ -112,27 +112,21 @@ Cell[BoxData["kgSchw == 0"],"Input",CellTags->"prefix_view"],
 
 Cell[BoxData["(kgSchw == 0) // PrettyExp[CovariantStyle -> \"Postfix\"]"],"Input",CellTags->"postfix_view"],
 
-Cell["ShowBackgroundLabel adds a heading to the whole result, whereas ShowObjectLabels marks individual owned tensors and coordinates. BackgroundLabel is the short marker chosen at creation; it is not the tag or typed suffix.","Text"],
+Cell["When the entire equation belongs to a single background, a caption alone can be enough. ShowBackgroundLabel identifies the study, while ShowObjectLabels identifies individual tensor and coordinate occurrences. BackgroundLabel controls the short object marker, not the typed name.","Text"],
 
 Cell[BoxData["PrettyExp[\"Schwarzschild\", kgSchw == 0, ShowBackgroundLabel -> True, ShowObjectLabels -> False]"],"Input",CellTags->"caption"],
 
-Cell[BoxData["SetNotation[\"FLRW\", ShowObjectLabels -> False];"],"Input",CellTags->"hide_local"],
+Cell["In a long equation, repeated labels on the same field can become distracting. SetPresentation can hide only the scalar's object label while retaining the labels on the derivative and metric. The field name and mathematical expression are unchanged.","Text"],
 
-Cell[BoxData["kgFLRW == 0"],"Input",CellTags->"hide_local_view"],
+Cell[BoxData["SetPresentation[\"Schwarzschild\", phi, ShowObjectLabels -> False];"],"Input",CellTags->"rename_phi"],
 
-Cell[BoxData["SetNotation[\"FLRW\", ShowObjectLabels -> Automatic];"],"Input",CellTags->"restore_local"],
+Cell[BoxData["PrettyExp[\"Schwarzschild\", kgSchw == 0, ShowBackgroundLabel -> True]"],"Input",CellTags->"rename_view"],
 
-Cell["SetPresentation changes a particular object's PrintAs or label visibility, without renaming its typed symbol. Here phiSchw is displayed as psi only in Schwarzschild.","Text"],
-
-Cell[BoxData["SetPresentation[\"Schwarzschild\", phi, PrintAs -> \"\\[Psi]\"];"],"Input",CellTags->"rename_phi"],
-
-Cell[BoxData["kgSchw == 0"],"Input",CellTags->"rename_view"],
-
-Cell[BoxData["SetPresentation[\"Schwarzschild\", phi, PrintAs -> Automatic];"],"Input",CellTags->"reset_phi"],
+Cell[BoxData["SetPresentation[\"Schwarzschild\", phi, ShowObjectLabels -> Automatic];"],"Input",CellTags->"reset_phi"],
 
 Cell[BoxData["SetNotation[\"Schwarzschild\", CovariantStyle -> Automatic];"],"Input",CellTags->"reset_prefix"],
 
-Cell["For a single expression, PrettyExp can override both kinds of labels; for an entire study, use SetNotation. Session defaults remain available when a local setting is Automatic.","Text"]
+Cell["Restore the inherited settings before comparing the component equations. A local or one-object override can always be removed with Automatic.","Text"]
 },Closed]],
 
 Cell["The copied heads are native xAct objects: CDSchw and phiSchw can be used directly. PortExpression transports a new source expression to a chosen background without registering it or changing the source. It is still abstract until components are requested.","Text"],
@@ -168,9 +162,9 @@ Cell[BoxData["eqM = kgM // ToComponents;"],"Input",CellTags->"eq_m"],
 
 Cell[BoxData["eqM == 0"],"Input",CellTags->"eq_m_view"],
 
-Cell["PrettyExp can also format partial derivatives after component evaluation: Fraction, Comma, Partial, MultiIndex and Native are available. The next comparison uses the same equation, not three different calculations.","Text"],
+Cell["The general wave equation contains several second derivatives. Fraction notation is familiar, but Comma notation is much more compact for a long expression. Compare these two useful forms without recomputing components. Partial, MultiIndex and Native are also available in the API reference.","Text"],
 
-Cell[BoxData["Column[{PrettyExp[\"Minkowski\", eqM == 0, PartialStyle -> \"Fraction\"], PrettyExp[\"Minkowski\", eqM == 0, PartialStyle -> \"Comma\"], PrettyExp[\"Minkowski\", eqM == 0, PartialStyle -> \"Native\"]}, Spacings -> 1]"],"Input",CellTags->"partial_compare"],
+Cell[BoxData["Column[{PrettyExp[\"Minkowski\", eqM == 0, PartialStyle -> \"Fraction\"], PrettyExp[\"Minkowski\", eqM == 0, PartialStyle -> \"Comma\"]}, Spacings -> 1]"],"Input",CellTags->"partial_compare"],
 
 Cell[BoxData["DefConstantSymbol[omega]; DefConstantSymbol[k];"],"Input",CellTags->"wave_params"],
 
@@ -206,9 +200,9 @@ Cell[BoxData["eqS = kgSchw // ToComponents;"],"Input",CellTags->"eq_s"],
 
 Cell[BoxData["PrettyExp[\"Schwarzschild\", eqS == 0, ShowBackgroundLabel -> True]"],"Input",CellTags->"eq_s_view"],
 
-Cell["For a single-argument function, PartialStyle -> \"Prime\" displays ordinary derivatives as primes. PrettyExp is useful for a paper-ready view while retaining the underlying equation.","Text"],
+Cell["The radial equation depends only on r. Prime notation is shorter here than fractions: u' and u'' already identify the only derivative. Use PrettyExp for this one equation without changing the saved result.","Text"],
 
-Cell[BoxData["(eqS == 0) // PrettyExp[PartialStyle -> \"Prime\"]"],"Input",CellTags->"prime"],
+Cell[BoxData["PrettyExp[\"Schwarzschild\", eqS == 0, PartialStyle -> \"Prime\"]"],"Input",CellTags->"prime"],
 
 Cell[BoxData["RicciScalar[CDSchw][] // ToComponents"],"Input",CellTags->"ricci_s"],
 
@@ -315,6 +309,10 @@ Cell[BoxData["PrintAs[Evaluate[thetaCylindricalM]] ^= \"\\[Theta]\";"],"Input",C
 Cell[BoxData["gM[-aM,-bM] // ToComponents[OutputChart -> \"Cylindrical\"] // MatrixForm"],"Input",CellTags->"metric_c"],
 
 Cell[BoxData["phiM[] // ToComponents[OutputChart -> \"Cylindrical\"]"],"Input",CellTags->"profile_c"],
+
+Cell["The same field now has two coordinate representations. The M and C labels distinguish the Cartesian and cylindrical coordinates without long suffixes; neither the field nor its primary input has changed.","Text"],
+
+Cell[BoxData["Column[{phiM[] // ToComponents // PrettyExp, phiM[] // ToComponents[OutputChart -> \"Cylindrical\"] // PrettyExp}, Spacings -> 1]"],"Input",CellTags->"chart_comparison"],
 
 Cell["FreeIndices explicitly fixes the tensor-axis order when it matters. OutputChart changes the output basis; it does not overwrite the primary metric or field assignments.","Text"],
 
