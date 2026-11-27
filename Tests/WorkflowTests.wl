@@ -39,8 +39,8 @@ Global`$XPlorerWorkflowReport=Module[
    "naming_setup",stages["Greek index labels on naming example"]=With[{ii=xPlorer`BackgroundIndices["NamingExample",2]},SameQ[Map[Function[ix,With[{s=ix},xAct`xTensor`PrintAs[s]]],ii],{"\[Mu]","\[Nu]"}]],
    "naming_index_aliases",stages["Latin aliases preserve Greek indices"]=SameQ[value,Rest[Global`$XPlorerWorkflowOutputs["naming_result"]][[{2,3}]]],
    "custom_presentation",stages["Multiple labels applied together"]=SameQ[KeyTake[xPlorer`PresentationOf["Schwarzschild"]["Effective"],{"phi","Metric","CovD"}],<|"phi"->"\[Psi]","Metric"->"q","CovD"->{"|","D"}|>],
-   "named_profiles",profileRuns=xPlorer`ShowBackground["Minkowski"]["GeometryRuns"],
-   "profile_cached_geometry",stages["Profile switching retains geometry run count"]=SameQ[xPlorer`ShowBackground["Minkowski"]["GeometryRuns"],profileRuns],
+   "named_profiles",profileRuns=xPlorer`BackgroundValue["Minkowski"]["GeometryRuns"],
+   "profile_cached_geometry",stages["Profile switching retains geometry run count"]=SameQ[xPlorer`BackgroundValue["Minkowski"]["GeometryRuns"],profileRuns],
    "eab_postfix",stages["Rank two notation preserves expression"]=SameQ[Normal[value],Global`EabSchw]&&SameQ[styleOf[value,"CovariantStyle"],"Postfix"];
     stages["Eab display has no internal context labels"]=With[{v=value},StringFreeQ[ToString[MakeBoxes[v,StandardForm]//.InterpretationBox[display_,___]:>display,InputForm],"Backgrounds`"]],
    "partial_comma",stages["All five multivariate partial styles preserve equation"]=AllTrue[{"partial_view","partial_multiindex","partial_fraction","partial_partial","partial_comma"},SameQ[Normal[Global`$XPlorerWorkflowOutputs[#]],Global`$XPlorerWorkflowOutputs["minkowski_equation"]]&],

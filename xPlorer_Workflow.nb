@@ -2,7 +2,7 @@
 Notebook[{
 Cell[TextData[{"xPlorer - From an abstract theory to physical spacetimes"}],"Title"],
 
-Cell[TextData[{"A massive scalar field on Minkowski, Schwarzschild and FLRW backgrounds | beta.13-dev.34"}],"Subtitle"],
+Cell[TextData[{"A massive scalar field on Minkowski, Schwarzschild and FLRW backgrounds | beta.13-dev.35"}],"Subtitle"],
 
 Cell["This is the extended scientific reference. If you are new to xPlorer, start with xPlorer_QuickStart.nb instead. With xAct installed, start a fresh kernel. Choose just one of the two loading cells below, then evaluate the remaining input cells in order with Shift+Enter. Standalone recipes marked Alternative are for reference. xTensor defines the abstract theory; xCoba stores and transforms components; xPlorer manages isolated copies and transports registered expressions.","Text"],
 
@@ -201,7 +201,7 @@ Cell[BoxData["phi1"],"Input",CellTags->"scalar_alias_part_1"],
 
 Cell[BoxData[RowBox[{"phi1", "[", "]"}]],"Input",CellTags->"scalar_alias_part_2"],
 
-Cell[TextData[{"If you know the background tag but want to look up a head or index, use these accessors. If a notebook name is occupied, xPlorer keeps its existing definition and lists it under ",StyleBox["\"UnavailableObjectAliases\"",FontFamily->"Courier",FontSize->14]," in ",StyleBox["ShowBackground",FontFamily->"Courier",FontSize->14],"."}],"Text"],
+Cell[TextData[{"If you know the background tag but want to look up a head or index, use these accessors. If a notebook name is occupied, xPlorer keeps its existing definition and lists it under ",StyleBox["\"UnavailableObjectAliases\"",FontFamily->"Courier",FontSize->14]," in ",StyleBox["BackgroundValue",FontFamily->"Courier",FontSize->14],"."}],"Text"],
 
 Cell[BoxData[RowBox[{"BackgroundObject", "[", RowBox[{"\"Schwarzschild\"", ",", "\"Metric\""}], "]"}]],"Input",CellTags->"inspect_short_names_part_1"],
 
@@ -225,9 +225,11 @@ Cell[BoxData[RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", "
 
 Cell[TextData[{"Inspect the entries in the Schwarzschild background."}],"Text"],
 
-Cell[BoxData["ShowBackground[\"Schwarzschild\", \"Geometry\"]"],"Input",CellTags->"inspect_background"],
+Cell["Inspect the studies already open in this kernel. At this stage the abstract geometry exists, but no metric or field components have been assigned. ShowBackground is a read-only scientific view; BackgroundValue retrieves the data for programming.","Text"],
 
-Cell[BoxData["ShowBackground[\"Schwarzschild\", \"Summary\"]"],"Input",CellTags->"dev31_background_summary"],
+Cell[BoxData["ShowBackground[]"],"Input",CellTags->"inspect_background"],
+
+Cell[BoxData["ShowBackground[\"Schwarzschild\"]"],"Input",CellTags->"dev31_background_summary"],
 
 Cell[TextData[{"The geometry, fields and indices have their own entries. The ",StyleBox["\"Theory\"",FontFamily->"Courier",FontSize->14]," entry records the theory as it stood at creation.\n\nFields registered later appear in subsequent backgrounds."}],"Text"],
 
@@ -661,6 +663,14 @@ Cell[BoxData["rhoFLRW = First[stressFLRW // ToComponents[Components -> {{0,0}}]]
 
 Cell[BoxData["PrettyExp[\"FLRW\", rhoFLRW, ShowBackgroundLabel -> True]"],"Input",CellTags->"stress_density_view"],
 
+Cell["The same inspection now shows the actual assigned Schwarzschild metric, chart, radial profile and stored assumptions, without evaluating another field equation or curvature tensor.","Text"],
+
+Cell[BoxData["ShowBackground[\"Schwarzschild\"]"],"Input",CellTags->"background_filled"],
+
+Cell[BoxData["ShowBackground[\"FLRW\", \"Fields\"]"],"Input",CellTags->"background_fields"],
+
+Cell[BoxData["BackgroundValue[\"Schwarzschild\", \"MetricMatrix\"] // MatrixForm"],"Input",CellTags->"background_metric_value"],
+
 Cell[TextData[{"Checking a solution"}],"Subsection"],
 
 Cell[TextData[{"Test a plane wave on Minkowski. Evaluate the scalar equation on the new profile, then use Wolfram\:2019s ",StyleBox["Simplify",FontFamily->"Courier",FontSize->14]," with the dispersion relation \:03c9\:00b2 = k\:00b2 + m\:00b2."}],"Text"],
@@ -965,9 +975,9 @@ Cell[BoxData["MetricCompute[gminkF, chartminkF, \"RicciScalar\"[]];"],"Input",Ce
 
 Cell[BoxData["ToComponents[RicciScalar[CDminkF][]]"],"Input",CellTags->"dev31_native_ricci"],
 
-Cell[BoxData["Keys[ShowBackground[\"Minkowski\", \"Fields\"]]"],"Input",CellTags->"field_snapshots_part_1"],
+Cell[BoxData["Keys[BackgroundValue[\"Minkowski\", \"Fields\"]]"],"Input",CellTags->"field_snapshots_part_1"],
 
-Cell[BoxData["Keys[ShowBackground[\"MinkowskiFields\", \"Fields\"]]"],"Input",CellTags->"field_snapshots_part_2"],
+Cell[BoxData["Keys[BackgroundValue[\"MinkowskiFields\", \"Fields\"]]"],"Input",CellTags->"field_snapshots_part_2"],
 
 Cell[TextData[{"Assign the lower components of A in chart order (t,x,y,z) using ",StyleBox["AllComponentValues",FontFamily->"Courier",FontSize->14],". With abstract indices on an owned field, xPlorer infers the primary chart and remembers the supplied variance. The explicit primary-chart array syntax is also supported. Requesting the upper vector raises the index with the Minkowski metric only when needed. Native ToValues can then reuse the stored components."}],"Text"],
 
@@ -1346,9 +1356,9 @@ Cell[BoxData[RowBox[{RowBox[{"DeleteBackgroundObject", "[", RowBox[{"\"Minkowski
 
 Cell["The field key S is gone from this background, but the source tensor S and other independent copies remain.","Text"],
 
-Cell[BoxData[RowBox[{"KeyExistsQ", "[", RowBox[{RowBox[{RowBox[{"ShowBackground", "[", "\"MinkowskiFields\"", "]"}], "[", "\"Field\"", "]"}], ",", "\"S\""}], "]"}]],"Input",CellTags->"delete_single_field"],
+Cell[BoxData[RowBox[{"KeyExistsQ", "[", RowBox[{RowBox[{RowBox[{"BackgroundValue", "[", "\"MinkowskiFields\"", "]"}], "[", "\"Field\"", "]"}], ",", "\"S\""}], "]"}]],"Input",CellTags->"delete_single_field"],
 
-Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{RowBox[{"ShowBackground","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"[","\"Field\"","]"}]}],"]"}]],"Input",CellTags->"lifecycle_remaining_fields"],
+Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{RowBox[{"BackgroundValue","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"[","\"Field\"","]"}]}],"]"}]],"Input",CellTags->"lifecycle_remaining_fields"],
 
 Cell[BoxData[RowBox[{RowBox[{"AminkF","[",RowBox[{"aminkF"}],"]"}],"//","ToComponents"}]],"Input",CellTags->"lifecycle_vector_preserved"],
 

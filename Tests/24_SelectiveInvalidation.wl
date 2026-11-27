@@ -6,9 +6,9 @@ MetricInBasis[gN,{-1,1,1,1}];AllComponentValues[AN[-aN],{1,2,3,4}];ComponentValu
 AllComponentValues[hN[LI[1],-aN,-bN],DiagonalMatrix[{1,2,3,4}]];
 AllComponentValues[hN[LI[2],-aN,-bN],DiagonalMatrix[{5,6,7,8}]];
 v=ToComponents["N",A[a]];hv=ToComponents["N",h[LI[2],a,-b]];
-bb=ShowBackground["N"];stamps=bb["NativeInputStamps"];idsA=TensorValIDs[AN];allRules=TensorValues[AN];rev=bb["DataRevision"];
+bb=BackgroundValue["N"];stamps=bb["NativeInputStamps"];idsA=TensorValIDs[AN];allRules=TensorValues[AN];rev=bb["DataRevision"];
 repeat=AllComponentValues[AN[-aN],{1,2,3,4}];
-checks=<|"Repeat complete assignment unchanged"->(AssociationQ[repeat]&&ShowBackground["N"]["DataRevision"]===rev&&TensorValues[AN]===allRules&&TensorValIDs[AN]===idsA),
+checks=<|"Repeat complete assignment unchanged"->(AssociationQ[repeat]&&BackgroundValue["N"]["DataRevision"]===rev&&TensorValues[AN]===allRules&&TensorValIDs[AN]===idsA),
 "Scalar stamp recorded"->(IntegerQ[stamps["phiN:None"]]),"Input stamps stored"->(Length[stamps]===4&&AllTrue[Values[stamps],IntegerQ])|>;
 sourceA=TensorValues[AN,{{-ch}}];sourceH=TensorValues[hN,{{LI[1],-ch,-ch}}];sourceH2=TensorValues[hN,{{LI[2],-ch,-ch}}];sourcePhi=TensorValues[phiN,{{}}];
 (* Count actual storeField calls in a dynamically localized test definition. *)

@@ -16,7 +16,7 @@ assert["native-chart-not-managed",FailureQ[ChartOf["Native"]],True];
 assert["external-chart-protected",DeletionPlan["Native"]["CanDelete"],False];
 
 makeBackground["Mixed",{"t","x","y","z"},DiagonalMatrix[{-1,1,1,1}],ComputeOnSet->None];
-assert["compute-none",ShowBackground["Mixed"]["ComputedGeometry"],{}];
+assert["compute-none",BackgroundValue["Mixed"]["ComputedGeometry"],{}];
 SetFieldComponents["Mixed",A,{1,2,3,4}];
 nativePrimary=ChartOf["Mixed"];
 nativeVB=VBundleOfMetric[BackgroundObject["Mixed","Metric"]];

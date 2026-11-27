@@ -2,7 +2,7 @@
    This does not publish to GitHub. Load from the repository root or Tools. *)
 With[{root=DirectoryName[DirectoryName[$InputFileName]]},
  PrepareXPlorerRelease[archive_String] := Module[
-  {source=FileNameJoin[{root,"Paclet"}],version="14.0.0-beta.13-dev.34",required,files,temp,copy,extract,meta,packRoot,mismatch,build,stage,zip,asset,archiveResult,result},
+  {source=FileNameJoin[{root,"Paclet"}],version="14.0.0-beta.13-dev.35",required,files,temp,copy,extract,meta,packRoot,mismatch,build,stage,zip,asset,archiveResult,result},
   required={"PacletInfo.wl","xPlorer.wl","Kernel/init.m","Kernel/init.wl","LICENSE","CITATION.cff"};
   files={"xPlorer_QuickStart.nb","xPlorer_Workflow.nb","LICENSE","CITATION.cff","Release/README.md"};
   If[FileType[archive]=!=File||ToLowerCase[FileExtension[archive]]=!="paclet",Return[Failure["ReleaseArchive",<|"MessageTemplate"->"Choose an existing local .paclet file."|>]]];

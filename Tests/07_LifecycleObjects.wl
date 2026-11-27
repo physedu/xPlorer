@@ -27,7 +27,7 @@ metricName=ToString[BackgroundObject["MetricCase","Metric"],InputForm];
 assert["metric-plan-protected",DeletionPlan["MetricCase","Metric"]["CanDelete"],False];
 assert["metric-delete-retains-manifold",AssociationQ[DeleteBackgroundObject["MetricCase","Metric",Cascade->True]],True];
 assert["metric-really-undefined",ToExpression[metricName,InputForm,MetricQ],False];
-assert["metric-state",ShowBackground["MetricCase"]["GeometryState"],"AbstractWithoutMetric"];
+assert["metric-state",BackgroundValue["MetricCase"]["GeometryState"],"AbstractWithoutMetric"];
 assert["metric-no-components",FailureQ[ToComponents["MetricCase",A[-a]]],True];
 assert["metric-rest-delete",DeleteBackground["MetricCase"],Null];
 CreateBackground["ExternalRelative"];DefineChart["ExternalRelative",{"t","x","y","z"}];

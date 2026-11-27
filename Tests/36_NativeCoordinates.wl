@@ -25,7 +25,7 @@ assert["native-explicit-basis-change",ToCTensor[CTensor[{1,2,3,4},{-chartNA}],{-
 assert["native-unary-ctensor",gNA[-aNA,-bNA]//ToCTensor,ToComponents["NativeA",g[-a,-b],Output->"CTensor"]];
 assert["native-explicit-ctensor",FixedPoint[ToValues,ToCTensor[gNA,{-chartNA,-chartNA}],12],CTensor[MetricMatrixOf["NativeA"],{-chartNA,-chartNA}]];
 assert["foreign-ctensor-unchanged",Head[ToCTensor[A[-a]]],ToCTensor];
-assert["background-inspection",ShowBackground["NativeA","Summary"]["Charts"],{"Primary","Scaled"}];
+assert["background-inspection",BackgroundValue["NativeA","Summary"]["Charts"],{"Primary","Scaled"}];
 assert["background-connection-lookup",BackgroundObject["NativeA","Ricci","Primary"],Ricci[CDNA]];
 assert["secondary-metric",ToComponents["NativeA",g[-a,-b],OutputChart->"Scaled"],DiagonalMatrix[{-1,4,Exp[4 uScaledNA[]],1}]];
 recipeNative=ReconstructionData["NativeA"];

@@ -11,9 +11,9 @@ DeleteTensorValues[AN,{{ch}}];checks["Deleted derived group recreated"]=ToValues
 MetricInBasis[gN,{-2,1,1,1}];checks["Metric update retains native edited input"]=ToValues[AN[{0,ch}]]===-7/2;
 checks["Native selector respected"]=ToValues[AN[{0,ch}],{AO}]===AN[{0,ch}];
 nativeReturn=AllComponentValues[AN[{-aN,-ch}],{8,9,10,11}];checks["Explicit native complete assignment captured"]=ToComponents["N",A[a]]==={-4,9,10,11};
-ChangeComponents[AN[{aN,ch}],AN[{-aN,-ch}]];checks["Native transformation not captured as source"]=First[Select[Values[ShowBackground["N"]["FieldComponents"]],#["Head"]===AN&]]["IndexPositions"]==={-1};
+ChangeComponents[AN[{aN,ch}],AN[{-aN,-ch}]];checks["Native transformation not captured as source"]=First[Select[Values[BackgroundValue["N"]["FieldComponents"]],#["Head"]===AN&]]["IndexPositions"]==={-1};
 recipe=ReconstructionData["N"];RecreateBackground["Copy",recipe];checks["Explicit native input reconstructs"]=ToComponents["Copy",A[a]]==={-4,9,10,11};
-DeleteTensorValues[AN];checks["Full native deletion clears managed source"]=!AnyTrue[Values[ShowBackground["N"]["FieldComponents"]],#["Head"]===AN&]&&ToValues[AN[{0,ch}]]===AN[{0,ch}];
+DeleteTensorValues[AN];checks["Full native deletion clears managed source"]=!AnyTrue[Values[BackgroundValue["N"]["FieldComponents"]],#["Head"]===AN&]&&ToValues[AN[{0,ch}]]===AN[{0,ch}];
 ClearComputedValues["N"];checks["Deleted source not resurrected"]=ToValues[AN[{0,ch}]]===AN[{0,ch}];
 nativeMetric=MetricInBasis[gN,-ch,{-4,1,1,1},Inverse->True];checks["Explicit covariant metric captured"]=MatrixQ[nativeMetric,MatchQ[#,_Rule]&]&&MetricMatrixOf["N"]===DiagonalMatrix[{-4,1,1,1}];
 AllComponentValues[AN[-aN],{8,9,10,11}];checks["Native read after explicit metric"]=ToValues[AN[{0,ch}]]===-2;

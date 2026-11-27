@@ -1,4 +1,4 @@
-# Using xPlorer — beta.13-dev.34
+# Using xPlorer — beta.13-dev.35
 
 xPlorer_Workflow.nb is the principal worked guide, updated for the consolidated API (dev.31, corrected in dev.32). xPlorer_Consolidated.nb is retained as a supplementary integration-test notebook. Sections labeled with earlier versions are historical checkpoints; the dev.31 contract below takes precedence. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
@@ -377,3 +377,19 @@ The snapshot symbol is evaluated only in the single-argument registration form. 
 
 
 In dev.34, explicit PrettyExp views capture resolved object-label settings at creation. Re-evaluating the original mathematical expression uses current preferences; a previously saved display view retains its visibility and label choices. ShowTheory uses compact, top-aligned tables and lists sector collections in separate rows. SaveResult is optional in-memory storage with invalidation on mathematical edits; it is not file persistence or automatic recalculation.
+
+
+## Scientific background inspection (dev.35)
+
+```wl
+ShowBackground[]                              (* open studies *)
+ShowBackground["Schwarzschild"]               (* scientific summary *)
+ShowBackground["Schwarzschild", "Fields"]     (* assigned primary-chart inputs *)
+ShowBackground["Schwarzschild", "Geometry"]
+BackgroundValue["Schwarzschild", "MetricMatrix"]
+BackgroundValue["Schwarzschild", "Fields", "phi"]
+```
+
+ShowBackground is now a display interface, analogous to ShowTheory, rather than a raw association. It presents compact left/top-aligned grids of declared geometry, actual stored metric and field inputs, charts, connections, effective rules and stored work. It distinguishes missing assignments from sparse inputs; it never replaces unknown components with zero. Large arrays and long sparse assignments are summarized; retrieve the complete stored record through BackgroundValue. Formula detail sections list the registered source expressions and their copied alias names (not recalculated or automatically specialized component equations). The metric determinant sign is not a full signature specification. Tracked computed geometry is recorded metadata, not a fresh native-cache validation. The view does not compute new tensors or components and does not change model data or saved results. Native edits outside the managed capture scope are not discovered by inspection.
+
+**Migration from dev.34:** replace raw accesses such as `ShowBackground[tag]["Field"]` with `BackgroundValue[tag]["Field"]`. BackgroundValue[tag,section] retains the previous structured section API and additionally accepts raw record keys. BackgroundValue[] returns all records. BackgroundObject remains the accessor for actual xAct symbols; ReconstructionData remains the input recipe. ShowBackgroundLabel is unrelated: it is a formatting option for an expression caption. See Tests/BackgroundInspectionTests.wl for read-only inspection and box-format checks.
