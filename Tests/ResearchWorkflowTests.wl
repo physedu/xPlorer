@@ -8,7 +8,7 @@ loadCell=First@Select[inputs,First[#]==="load"&];
 AssociateTo[outputs,"load"->Check[Block[{NotebookDirectory=Function[root]},ToExpression[Last[loadCell],StandardForm]],AppendTo[warnings,"load"];$Failed]];
 renderTags={"kg_m_abstract","abstract_copies","rank_two_s","postfix_view","caption","rename_view","eq_m_view","partial_compare","eq_s_view","prime","profile_c","density_caption","wave_abstract_f","wave_pretty"};
 Block[{xAct`xPerm`$xpermQ=False,NotebookDirectory=Function[root]},
- Scan[Function[cell,Module[{id=First[cell],value,display},value=Check[ToExpression[Last[cell],StandardForm],AppendTo[warnings,id];$Failed];AssociateTo[outputs,id->value];If[MemberQ[renderTags,id],display=If[ValueQ[$PrePrint],$PrePrint[value],value];AssociateTo[rendered,id->With[{v=display},MakeBoxes[v,StandardForm]]]]]],DeleteCases[inputs,{"load",_}]]];
+ Scan[Function[cell,Module[{id=First[cell],value,display},value=Catch[Check[ToExpression[Last[cell],StandardForm],AppendTo[warnings,id];$Failed],_,Function[{v,tag},AppendTo[warnings,id<>" threw"]; $Failed]];AssociateTo[outputs,id->value];If[MemberQ[renderTags,id],Catch[display=If[ValueQ[$PrePrint],$PrePrint[value],value];AssociateTo[rendered,id->With[{v=display},MakeBoxes[v,StandardForm]]],_,Function[{v,tag},AppendTo[warnings,id<>" render threw"];AssociateTo[rendered,id->$Failed]]]]]],DeleteCases[inputs,{"load",_}]]];
 hasText[b_,str_]:=MemberQ[Cases[b,_String,Infinity],str];
 checks=<|
  "version"->SameQ[$XPlorerVersion,"1.0.0-beta.1"],

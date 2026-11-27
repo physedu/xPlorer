@@ -406,9 +406,9 @@ Cell[BoxData["dGM = Einstein[CDM][aM,-bM] // PerturbOn[1]"],"Input",CellTags->"w
 
 Cell[BoxData["dGF = Einstein[CDFLRW][aFLRW,-bFLRW] // PerturbOn[1]"],"Input",CellTags->"wave_abstract_f"],
 
-Cell[TextData[{"The expressions have identical abstract structure but use independent metrics, perturbations and derivatives. For this longer expression, a postfix view with one background caption can be easier to read."}],"Text"],
+Cell[TextData[{"The expressions have identical abstract structure but use independent metrics, perturbations and derivatives. For this longer expression, use one background caption instead of repeated object labels."}],"Text"],
 
-Cell[BoxData["PrettyExp[\"FLRW\", dGF, CovariantStyle -> \"Postfix\", ShowObjectLabels -> False, ShowBackgroundLabel -> True]"],"Input",CellTags->"wave_pretty"],
+Cell[BoxData["PrettyExp[\"FLRW\", dGF, CovariantStyle -> \"Native\", ShowObjectLabels -> False, ShowBackgroundLabel -> True]"],"Input",CellTags->"wave_pretty"],
 
 Cell[TextData[{"Assign the tensor profile. ",StyleBox["LI[1]",FontFamily->"Courier",FontSize->14]," labels the first variation, not a component index. The primary metric matrices from section 3 are unchanged."}],"Text"],
 
