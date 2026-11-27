@@ -12,7 +12,7 @@ Block[{xAct`xPerm`$xpermQ=False,NotebookDirectory=Function[root]},
 hasText[b_,str_]:=MemberQ[Cases[b,_String,Infinity],str];
 (* Native xTensor uses CurrentValue[FontSize] for indexed tensors. A headless kernel has no font size. Ignore only that exact native style rule, never other failed boxes. *)
 headlessFont=(CurrentValue[FontSize]===$Failed);
-validRender[b_]:=FreeQ[If[headlessFont,b/.HoldPattern[FontSize->(3 $Failed)/4]:>(FontSize->12),b],$Failed|_Failure|_ErrorBox|_StringJoin|_Table];
+validRender[b_]:=FreeQ[If[headlessFont,With[{bad=System`FontSize->(3 $Failed/4)},b/.HoldPattern[bad]->(System`FontSize->12)],b],$Failed|_Failure|_ErrorBox|_StringJoin|_Table];
 checks=<|
  "version"->SameQ[$XPlorerVersion,"1.0.0-beta.1"],
  "registered Lagrangian"->SameQ[outputs["registry_formula"],L],

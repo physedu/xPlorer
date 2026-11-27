@@ -14,7 +14,7 @@ AllComponentValues[AO[-aO],{1,2,3,4}];AllComponentValues[AT[-aT],{5,6,7,8}];
 checks=<||>;
 bb[ex_]:=With[{v=ex},MakeBoxes[v,StandardForm]];
 headlessFont=(CurrentValue[FontSize]===$Failed);
-validBox[b_]:=FreeQ[If[headlessFont,b/.HoldPattern[FontSize->(3 $Failed)/4]:>(FontSize->12),b],$Failed|_Failure|_ErrorBox|_StringJoin|_Table]&&FreeQ[b,s_String/;StringContainsQ[s,"XPLabel"]];
+validBox[b_]:=FreeQ[If[headlessFont,With[{bad=System`FontSize->(3 $Failed/4)},b/.HoldPattern[bad]->(System`FontSize->12)],b],$Failed|_Failure|_ErrorBox|_StringJoin|_Table]&&FreeQ[b,s_String/;StringContainsQ[s,"XPLabel"]];
 roundtrip[v_,expr_]:=SameQ[ToExpression[bb[v],StandardForm,HoldComplete],With[{e=expr},HoldComplete[e]]];
 labelPresent[b_,label_]:=AnyTrue[Cases[b,_String,Infinity],#===label||StringContainsQ[#,"("<>label<>")"]&];
 nativeBefore={PrintAs[xO],PrintAs[AO],SymbolOfCovD[CDO]};
