@@ -102,7 +102,7 @@ Module[{o=Global`$XPlorerWorkflowOutputs,sector},
  "Early view without label" -> With[{v=o["early_plain_view"]},FreeQ[MakeBoxes[v,StandardForm]//.InterpretationBox[d_,___]:>d,"S"]],
  "Component equation label and caption" -> With[{v=o["labels_eq"]},!FreeQ[MakeBoxes[v,StandardForm]//.InterpretationBox[d_,___]:>d,"S"] && !FreeQ[MakeBoxes[v,StandardForm]//.InterpretationBox[d_,___]:>d,"Schwarzschild"]],
  "FLRW label toggle" -> With[{v=o["labels_flrw"],w=o["labels_flrw_off"]},!FreeQ[MakeBoxes[v,StandardForm]//.InterpretationBox[d_,___]:>d,"F"] && FreeQ[MakeBoxes[w,StandardForm]//.InterpretationBox[d_,___]:>d,"F"]],
- "Short aliases" -> SameQ[SymbolName[BackgroundObject["MinkowskiFields","A"]],"AMf"],
+ "Short aliases" -> SameQ[SymbolName[BackgroundObject["MinkowskiFields","A"]],"AminkF"],
  "Scalar stress-energy density" -> TrueQ[Simplify[rhoFLRW-(q'[tFLRW[]]^2+m^2 q[tFLRW[]]^2)/2]==0],
  "PrintAs reset" -> SameQ[With[{hh=BackgroundObject["Schwarzschild","phi"]},PrintAs[hh]],PrintAs[phi]]
  |>
