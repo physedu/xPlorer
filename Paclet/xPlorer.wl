@@ -44,7 +44,7 @@ BasisOf::usage = "BasisOf[tag] returns the basis symbol stored for the backgroun
 SetCMetricSystem::usage = "SetCMetricSystem[tag, mat, opts] assigns the matrix mat as components of the already existing background metric in the coordinated chart/basis of tag using xCoba MetricInBasis, then computes the objects selected by ComputeOnSet (metric and inverse by default).";
 MetricMatrixOf::usage = "MetricMatrixOf[tag] returns the matrix used in SetCMetricSystem for the background tag.";
 ShowTheory::usage = "ShowTheory[] displays a compact theory overview. ShowTheory[section] displays details for Geometry, Fields, Parameters, Lagrangians, Expressions, Connections, Sectors, Assumptions, Conditions or Metadata. Optional Title and Description appear at the top. Use TheorySnapshot[] for restorable data.";
-TheorySnapshot::usage = "TheorySnapshot[] returns the raw restorable theory association. Restore with With[{snapshot = saved}, RegisterTheory[snapshot]] after ClearTheory[]. Source xAct definitions must remain alive.";
+TheorySnapshot::usage = "TheorySnapshot[] returns the raw restorable theory association. Restore with RegisterTheory[saved] after ClearTheory[]. Source xAct definitions must remain alive.";
 TheoryValue::usage = "TheoryValue[section] returns a logical collection; TheoryValue[section,key] returns one registered item.";
 
 $BG::usage = "$BG stores the backgrounds created by the package.";
@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.32";
+$XPlorerVersion = "14.0.0-beta.13-dev.33";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -86,7 +86,9 @@ BackgroundObject::usage = "BackgroundObject[tag, key] returns a field, connectio
 SetNotation::usage = "SetNotation[tag, option -> value, ...] sets background display defaults; no mathematical data changes.";
 PartialStyle::usage = "PartialStyle chooses Native, MultiIndex, Fraction, Partial, Comma or Prime (one argument) for notebook output and explicit views.";
 CovariantStyle::usage = "CovariantStyle chooses Native, Prefix, or Postfix in PrettyExp.";
-ShowBackgroundLabel::usage = "ShowBackgroundLabel adds a background label to an expression view.";
+ShowBackgroundLabel::usage = "ShowBackgroundLabel adds a caption to an expression view.";
+ShowObjectLabels::usage = "ShowObjectLabels -> True displays the background label on owned tensors, derivatives and coordinates without changing their identity.";
+BackgroundLabel::usage = "BackgroundLabel -> a string chooses the visual label independently of SymbolSuffix. Automatic uses the suffix; chart-specific labels may be set with DefineChart.";
 
 ClearComputedValues::usage = "ClearComputedValues[tag] clears derived geometry and restores declared metric/field inputs.";
 ClearFieldComponents::usage = "ClearFieldComponents[tag, fieldOrKey] clears assigned and derived values of one field, retaining its definition.";
@@ -169,6 +171,7 @@ TheorySector[sector_String] := AssociationMap[
   {"Fields","Parameters","Lagrangians","Expressions"}];
 (* Raw snapshots are used by reconstruction; not an alternate positional API. *)
 RegisterTheory[assoc_Association] := ($Theory=Join[$Theory,assoc]; $Theory);
+RegisterTheory[snapshot_Symbol] := Module[{value=snapshot},If[AssociationQ[value],RegisterTheory[Evaluate[value]],failure["Registration","Supply a saved theory association."]]];
 RegisterTheory["Metric",value_] := ($Theory["Metric"]=value;$Theory);
 RegisterTheory["CovD",value_] := ($Theory["CovD"]=value;$Theory);
 RegisterTheory["Indices",value_List] := ($Theory["Indices"]=value;$Theory);
@@ -329,10 +332,10 @@ makeOwnedField[key_, spec_, ctx_, suffix_, srcg_, srcm_, m_, g_, base_, inds_, l
       "PrintAs" -> print, "Rank" -> rank, "IndexPositions" -> signs|>
   ];
 
-Options[CreateBackground] = {Indices -> Automatic, MetricSignature -> Automatic, Presentation -> <||>, SymbolSuffix -> Automatic, PrintAs -> Automatic};
+Options[CreateBackground] = {Indices -> Automatic, MetricSignature -> Automatic, Presentation -> <||>, SymbolSuffix -> Automatic, PrintAs -> Automatic, ShowObjectLabels->Automatic, BackgroundLabel->Automatic, ShowBackgroundLabel->Automatic};
 CreateBackground[tag_String, OptionsPattern[]] := Module[
   {theory = $Theory, srcg, srccd, srcm, dim, base, display, inds, ctx, m, g, cd, sig,
-   specs, fields = <||>, oldgeo, geo, rules, result, parameter, make, owned, labels, defaults, suffix, perturbHead = None},
+   specs, fields = <||>, oldgeo, geo, rules, result, parameter, make, owned, labels, defaults, suffix, notation, perturbHead = None},
   If[KeyExistsQ[$BG, tag],
     If[!KeyExistsQ[$BG[tag],"AliasContext"],installBackgroundObjectAliases[tag,$Context]];
     Return[$BG[tag]]];
@@ -353,6 +356,8 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
   sig = Replace[OptionValue[MetricSignature], Automatic :> SignDetOfMetric[srcg]];
   If[!MemberQ[{-1, 1}, sig] && !(MatchQ[sig, {_Integer, _Integer, 0}] && Min[sig] >= 0 && Total[sig] === dim),
     Return[failure["Signature", "Use determinant sign -1 or +1, or signature counts {positive,negative,0} matching the dimension."]]];
+  notation=Select[<|"ShowObjectLabels"->OptionValue[ShowObjectLabels],"BackgroundLabel"->OptionValue[BackgroundLabel],"ShowBackgroundLabel"->OptionValue[ShowBackgroundLabel]|>,#=!=Automatic&];
+  If[!validNotation[notation],Return[failure["Notation","Supply a Boolean label setting and a nonempty label string."]]];
   ctx = "xPlorer`Backgrounds`B" <> ToString[++$BackgroundCounter] <> "`";
   suffix = Replace[OptionValue[SymbolSuffix], Automatic :> safeName[tag]];
   If[!StringQ[suffix] || suffix === "" || safeName[suffix] =!= suffix,
@@ -405,7 +410,7 @@ CreateBackground[tag_String, OptionsPattern[]] := Module[
   rules = Join[{srcg -> g, srccd -> cd}, Thread[Values[oldgeo] -> Values[geo]],
     (# ["OldHead"] -> # ["NewHead"] & /@ Values[fields]),
     (Dagger[#["OldHead"]] -> Dagger[#["NewHead"]] & /@ Select[Values[fields],xTensorQ[#["OldHead"]] && DaggerQ[#["OldHead"]]&])];
-  $BG[tag] = Join[<|"Tag" -> tag, "SymbolSuffix" -> suffix, "Context" -> ctx, "PresentationDefaults" -> defaults, "PresentationOverrides" -> labels, "Theory" -> theory, "Dimension" -> dim,
+  $BG[tag] = Join[<|"Tag" -> tag, "SymbolSuffix" -> suffix, "Context" -> ctx, "PresentationDefaults" -> defaults, "PresentationOverrides" -> labels, "Notation"->notation, "Theory" -> theory, "Dimension" -> dim,
     "SourceManifold" -> srcm, "SourceBundle" -> VBundleOfMetric[srcg], "Manifold" -> m,
     "Metric" -> g, "CovD" -> cd, "Signature" -> sig, "Indices" -> inds, "BaseIndices" -> base,
     "DisplayIndices" -> display, "Field" -> fields, "HeadRules" -> rules,
@@ -576,7 +581,10 @@ installChartAliases[tag_,chart_,coords_,labels_,base_] := Module[{b=$BG[tag],hea
  If[failed=!=None,releaseAliases[entries];Return[failure["CoordinateAlias","Choose coordinate names whose suffixed symbols are unused.",<|"Alias"->failed|>]]];
  put[tag,<|"ObjectAliases"->Join[Lookup[b,"ObjectAliases",<||>],entries]|>];Null
 ];
-DefineChart[tag_String, declarations_List] := Module[{b = background[tag], chart, coords, result,names=coordinateLabels[declarations],nativeQ=AllTrue[declarations,coordinateDeclarationQ]},
+Options[DefineChart]={ShowObjectLabels->Automatic,BackgroundLabel->Automatic};
+chartNotationOptions[opts_] := Select[Association[(SymbolName[First[#]]->Last[#])& /@ opts],#=!=Automatic&];
+DefineChart[tag_String, declarations_List,opts:OptionsPattern[]] := Module[{b = background[tag], chart, coords, result,names=coordinateLabels[declarations],nativeQ=AllTrue[declarations,coordinateDeclarationQ],notation=chartNotationOptions[{opts}]},
+  If[!validNotation[notation],Return[failure["Notation","Invalid chart notation options."]]];
   If[FailureQ[b], Return[b]];
   If[Length[names] =!= b["Dimension"] || !VectorQ[names, StringQ] || !DuplicateFreeQ[names],
     Return[failure["Coordinates", "Supply distinct coordinate labels matching the dimension."]]];
@@ -593,12 +601,13 @@ DefineChart[tag_String, declarations_List] := Module[{b = background[tag], chart
   If[nativeQ,result=installChartAliases[tag,chart,coords,names,b["SymbolSuffix"]];
     If[FailureQ[result],guard[UndefChart[chart]];Return[result]]];
   installManagedChartSyntax[tag,chart];
-  put[tag, <|"Chart" -> chart, "Basis" -> chart, "Coordinates" -> coords, "CoordinateLabels" -> names,"NativeCoordinateSyntax"->nativeQ|>]
+  put[tag, <|"Chart" -> chart, "Basis" -> chart, "Coordinates" -> coords, "CoordinateLabels" -> names,"NativeCoordinateSyntax"->nativeQ,"ChartNotation"->Join[Lookup[b,"ChartNotation",<||>],<|"Primary"->notation|>]|>]
 ];
 (* Secondary coordinate charts are native xCoba charts on the owned manifold.
    Maps give the primary coordinates as functions of the target coordinates. *)
-DefineChart[tag_String,name_String,declarations_List,map_Function] := Module[
-  {b=background[tag],charts,coords,values,chart,jac,det,n,created,record,labels=coordinateLabels[declarations],nativeQ=AllTrue[declarations,coordinateDeclarationQ],base,visitors,nativeObjects,newAliases},
+DefineChart[tag_String,name_String,declarations_List,map_Function,opts:OptionsPattern[]] := Module[
+  {b=background[tag],charts,coords,values,chart,jac,det,n,created,record,labels=coordinateLabels[declarations],nativeQ=AllTrue[declarations,coordinateDeclarationQ],base,visitors,nativeObjects,newAliases,notation=chartNotationOptions[{opts}]},
+  If[!validNotation[notation],Return[failure["Notation","Invalid chart notation options."]]];
   If[FailureQ[b],Return[b]];
   If[!KeyExistsQ[b,"Chart"],Return[failure["NoChart","Define the primary chart first."]]];
   charts=Lookup[b,"AdditionalCharts",<||>]; n=b["Dimension"];
@@ -631,7 +640,7 @@ DefineChart[tag_String,name_String,declarations_List,map_Function] := Module[
   record=<|"Chart"->chart,"Coordinates"->coords,"Labels"->labels,"Map"->map,
     "Values"->values,"Jacobian"->jac,"NativeCoordinateSyntax"->nativeQ,"NativeBasisObjects"->nativeObjects|>;
   installManagedChartSyntax[tag,chart];
-  put[tag,<|"AdditionalCharts"->Append[charts,name->record]|>]; chart
+  put[tag,<|"AdditionalCharts"->Append[charts,name->record],"ChartNotation"->Join[Lookup[b,"ChartNotation",<||>],<|name->notation|>]|>]; chart
 ];
 managedChartAliasNames[b_] := Join[
  If[TrueQ[Lookup[b,"NativeCoordinateSyntax",False]],(#<>b["SymbolSuffix"]& /@ Prepend[b["CoordinateLabels"],"chart"]),{}],
@@ -1889,10 +1898,10 @@ SetPresentation[tag_String, assoc_Association] := Module[{b = background[tag], u
 ];
 PresentationOf[tag_String] := Module[{b = background[tag]}, If[FailureQ[b], b,
   <|"Defaults" -> b["PresentationDefaults"], "Overrides" -> b["PresentationOverrides"],
-    "Effective" -> Join[b["PresentationDefaults"], b["PresentationOverrides"]]|>]];
+    "Effective" -> Join[b["PresentationDefaults"], b["PresentationOverrides"]],"Notation"->notationSettings[tag],"ObjectLabelOverrides"->Lookup[b,"ObjectLabelOverrides",<||>],"ChartNotation"->Lookup[b,"ChartNotation",<||>]|>]];
 
 (* Expression views are interpreted boxes, never replacements in the calculation. *)
-$notationDefaults = <|"PartialStyle" -> "Native", "CovariantStyle" -> "Native", "ShowBackgroundLabel" -> False|>;
+$notationDefaults = <|"PartialStyle" -> "Native", "CovariantStyle" -> "Native", "ShowBackgroundLabel" -> False, "ShowObjectLabels"->False, "BackgroundLabel"->Automatic|>;
 If[!AssociationQ[$sessionNotation],$sessionNotation=<||>];
 (* PrePrint runs only when a notebook output is rendered. Keep assignments and Out raw. *)
 hasGeneratedIndexQ[e_] := !FreeQ[e, i_Symbol /; StringContainsQ[SymbolName[i],"$"] && AIndexQ[i]];
@@ -1907,10 +1916,11 @@ notationOwner[e_] := Module[{owners},
 notationSettings[tag_] := Join[$notationDefaults,$sessionNotation,
   If[StringQ[tag],Lookup[$BG[tag],"Notation",<||>],<||>]];
 automaticView[e_] := Module[{tag,style},
-  If[!FreeQ[e,_expressionView] || !MatchQ[e,_Plus|_Times|_Power|_Equal|_Scalar|_?xTensorQ[___]|_?CovDQ[_][_]|Derivative[__][_][__]],Return[e]];
-  If[!FreeQ[e,Derivative|_?CovDQ],
-    tag=notationOwner[e];style=notationSettings[tag];
-    If[style =!= $notationDefaults,Return[expressionView[e,style,tag]]]];
+  If[!FreeQ[e,_expressionView] || MatchQ[e,_Association|_Failure|_String|_Rule|_RuleDelayed],Return[e]];
+  tag=notationOwner[e];style=notationSettings[tag];
+  If[objectLabelPlan[e,style]=!=<||>,Return[expressionView[e,style,tag]]];
+  If[!MatchQ[e,_Plus|_Times|_Power|_Equal|_Scalar|_?xTensorQ[___]|_?CovDQ[_][_]|Derivative[__][_][__]],Return[e]];
+  If[(!FreeQ[e,Derivative|_?CovDQ] || TrueQ[style["ShowBackgroundLabel"]]) && style=!=$notationDefaults,Return[expressionView[e,style,tag]]];
   If[hasGeneratedIndexQ[e],expressionView[e,$notationDefaults,None],e]
 ];
 notebookPrint[e_] := If[$previousPrint === ScreenDollarIndices,
@@ -1924,20 +1934,20 @@ updatePrintHook[] := If[$PrePrint =!= notebookPrint,
 validNotation[a_] := AssociationQ[a] && Complement[Keys[a], Keys[$notationDefaults]] === {} &&
   MemberQ[{"Native","MultiIndex","Fraction","Partial","Comma","Prime"}, Lookup[a,"PartialStyle","Native"]] &&
   MemberQ[{"Native","Prefix","Postfix"}, Lookup[a,"CovariantStyle","Native"]] &&
-  MemberQ[{True,False}, Lookup[a,"ShowBackgroundLabel",False]];
+  MemberQ[{True,False}, Lookup[a,"ShowBackgroundLabel",False]] && MemberQ[{True,False},Lookup[a,"ShowObjectLabels",False]] && validBackgroundLabelQ[Lookup[a,"BackgroundLabel",Automatic]];
 SetNotation[tag_String, a_Association] := Module[{b=background[tag],overrides}, If[FailureQ[b],Return[b]];
   overrides=Select[Join[Lookup[b,"Notation",<||>],a],#=!=Automatic&];
   If[Complement[Keys[a],Keys[$notationDefaults]]=!={} || !validNotation[overrides],Return[failure["Notation","Unknown notation setting."]]];
   put[tag,<|"Notation" -> overrides|>]; updatePrintHook[]; $BG[tag]["Notation"]];
-Options[PrettyExp] = {PartialStyle -> Automatic, CovariantStyle -> Automatic, ShowBackgroundLabel -> Automatic};
+Options[PrettyExp] = {PartialStyle -> Automatic, CovariantStyle -> Automatic, ShowBackgroundLabel -> Automatic,ShowObjectLabels->Automatic,BackgroundLabel->Automatic};
 prettyView[tag_, input_, opts:OptionsPattern[PrettyExp]] := Module[{b,a,local,expr=input},
   If[MatchQ[expr,_expressionView],expr=Normal[expr]];
   If[StringQ[tag],b=background[tag];If[FailureQ[b],Return[b]]];
   If[Complement[First /@ Flatten[{opts}],First /@ Options[PrettyExp]]=!={},Return[failure["Notation","Unknown notation option."]]];
-  local=Select[<|"PartialStyle"->OptionValue[PartialStyle],"CovariantStyle"->OptionValue[CovariantStyle],"ShowBackgroundLabel"->OptionValue[ShowBackgroundLabel]|>,# =!= Automatic &];
+  local=Select[<|"PartialStyle"->OptionValue[PartialStyle],"CovariantStyle"->OptionValue[CovariantStyle],"ShowBackgroundLabel"->OptionValue[ShowBackgroundLabel],"ShowObjectLabels"->OptionValue[ShowObjectLabels],"BackgroundLabel"->OptionValue[BackgroundLabel]|>,# =!= Automatic &];
   a=Join[notationSettings[tag],local];
   If[!validNotation[a],Return[failure["Notation","Unknown notation setting."]]];
-  expressionView[expr,a,tag]
+  expressionView[expr,Join[a,<|"ObjectLabelCall"->KeyTake[local,{"ShowObjectLabels","BackgroundLabel"}]|>],tag]
 ];
 PrettyExp[tag_String, expr:Except[_Rule|_RuleDelayed], opts:OptionsPattern[]] := prettyView[tag,expr,opts];
 PrettyExp[tag_String][expr_] := prettyView[tag,expr];
@@ -1945,12 +1955,48 @@ PrettyExp[opts:(_Rule|_RuleDelayed)..][expr_] := prettyView[notationOwner[expr],
 PrettyExp[expr:Except[_String|_Rule|_RuleDelayed], opts:OptionsPattern[]] := prettyView[notationOwner[expr],expr,opts];
 expressionView /: Normal[expressionView[e_,_,_]] := e;
 expressionView /: MakeBoxes[expressionView[e_,a_,tag_], StandardForm] :=
-  With[{body=notationBoxes[If[hasGeneratedIndexQ[e],ScreenDollarIndices[e],e],a]},
+  With[{body=labelledNotationBoxes[If[hasGeneratedIndexQ[e],ScreenDollarIndices[e],e],a]},
     If[StringQ[tag] && TrueQ[a["ShowBackgroundLabel"]],
       InterpretationBox[RowBox[{StyleBox[tag,FontWeight->Bold],": ",body}],e],
       InterpretationBox[body,e]]
   ];
 expressionView /: MakeBoxes[expressionView[e_,a_,tag_], TraditionalForm] := MakeBoxes[expressionView[e,a,tag],StandardForm];
+(* Display only: temporarily localize the native xAct formatting definitions of
+   managed heads actually present in the expression. No global MakeBoxes or Print
+   definitions, no changes to tensor identity, values or cache stamps. *)
+validBackgroundLabelQ[x_] := x===Automatic || (StringQ[x] && StringLength[x]>0);
+labelBox[base_,label_,coordinate_] := If[TrueQ[coordinate],SubscriptBox[base,label],SuperscriptBox[base,RowBox[{"(",label,")"}]]];
+labelHeadRecords[b_] := Module[{coords,chartHeads,chartRecords,baseHeads},
+ chartRecords=Join[If[KeyExistsQ[b,"Chart"],<|"Primary"-><|"Chart"->b["Chart"],"Coordinates"->b["Coordinates"]|>|>,<||>],Lookup[b,"AdditionalCharts",<||>]];
+ coords=Association@Flatten@KeyValueMap[Function[{key,rec},(#->key)& /@ rec["Coordinates"]],chartRecords];
+ chartHeads=Association@Flatten@KeyValueMap[Function[{key,rec},(#->key)& /@ Select[Join[{rec["Chart"]},VisitorsOf[rec["Chart"]]],(xTensorQ[#]||CovDQ[#])&]],chartRecords];
+ baseHeads=DeleteDuplicates@Select[Join[Values@recipeObjects[b],Lookup[Values[b["Field"]],"NewHead",{}],Lookup[b,"RelativeHeads",{}],Keys[coords],Keys[chartHeads]],MatchQ[#,_Symbol]&&(xTensorQ[#]||CovDQ[#])&];
+ AssociationMap[Function[h,<|"Coordinate"->KeyExistsQ[coords,h],"Chart"->Lookup[coords,h,Lookup[chartHeads,h,None]]|>],baseHeads]
+];
+objectLabelPlan[e_,a_] := Module[{symbols,plan=<||>,b,settings,rec,chart,local,overrides,show,label,head},
+ If[!TrueQ[Lookup[a,"ShowObjectLabels",False]] && !AnyTrue[Values[$BG],Function[bg,TrueQ[Lookup[Lookup[bg,"Notation",<||>],"ShowObjectLabels",False]]||MemberQ[Values[Lookup[bg,"ObjectLabelOverrides",<||>]],True]||AnyTrue[Values[Lookup[bg,"ChartNotation",<||>]],TrueQ[Lookup[#,"ShowObjectLabels",False]]&]]],Return[plan]];
+ symbols=DeleteDuplicates@Cases[e,_Symbol,{0,Infinity},Heads->True];
+ local=Lookup[a,"ObjectLabelCall",<||>];
+ KeyValueMap[Function[{tag,bg},
+   b=bg;settings=notationSettings[tag];overrides=Lookup[b,"ObjectLabelOverrides",<||>];
+   KeyValueMap[Function[{h,rr},
+    head=h;rec=rr;chart=rec["Chart"];
+    show=Join[settings,Lookup[Lookup[b,"ChartNotation",<||>],chart,<||>],If[KeyExistsQ[overrides,head],<|"ShowObjectLabels"->overrides[head]|>,<||>],local];
+    label=Lookup[show,"BackgroundLabel",Automatic];
+    If[label===Automatic,label=If[StringQ[chart]&&chart=!="Primary",b["SymbolSuffix"]<>":"<>chart,b["SymbolSuffix"]]];
+    If[TrueQ[show["ShowObjectLabels"]],plan[head]=<|"Label"->label,"Coordinate"->rec["Coordinate"]|>]
+   ],KeyTake[labelHeadRecords[b],symbols]]
+ ],$BG];plan
+];
+applyObjectLabel[h_,rec_] := Module[{label=rec["Label"],base,markers},
+ If[CovDQ[h],markers=SymbolOfCovD[h];
+   With[{hh=h,mm={RowBox[{First[markers],RowBox[{"(",label,")"}]}],labelBox[Last[markers],label,False]}},SymbolOfCovD[hh]^=mm],
+   base=PrintAs[h];With[{hh=h,bb=labelBox[base,label,rec["Coordinate"]]},PrintAs[hh]^=bb]]
+];
+labelledNotationBoxes[e_,a_] := Module[{plan=objectLabelPlan[e,a]},
+ If[plan===<||>,Return[notationBoxes[e,a]]];
+ With[{heads=Keys[plan]},Internal`InheritedBlock[heads,KeyValueMap[applyObjectLabel,plan];notationBoxes[e,a]]]
+];
 nativeBoxes[e_] := With[{ex=e},MakeBoxes[ex,StandardForm]];
 notationAtom /: MakeBoxes[notationAtom[b_, original_], StandardForm] := b;
 notationAtom /: MakeBoxes[notationAtom[b_, original_], TraditionalForm] := b;
@@ -1971,7 +2017,7 @@ presentationTeX[e_,tag_:Automatic] := Module[{expr=e,owner,a,boxes,tex},
   If[MatchQ[expr,_expressionView],a=expr[[2]];expr=Normal[expr],
     owner=If[tag===Automatic,notationOwner[expr],tag];a=notationSettings[owner]];
   If[hasGeneratedIndexQ[expr],expr=ScreenDollarIndices[expr]];
-  boxes=notationBoxes[expr,Join[a,<|"ShowBackgroundLabel"->False|>]];
+  boxes=labelledNotationBoxes[expr,Join[a,<|"ShowBackgroundLabel"->False|>]];
   tex=With[{b=boxes},Check[ToString[TeXForm[RawBoxes[b]]],$Failed]];
   If[StringQ[tex],StringReplace[tex,"=="->"="],failure["TeXExport","Mathematica could not convert the presentation boxes to TeX."]]
 ];
@@ -2386,7 +2432,7 @@ recipeObjects[b_] := Join[managedObjects[b],KeyTake[b,{"Christoffel","Torsion","
 ReconstructionData[tag_String] := Module[{b=background[tag],inputs,r},If[FailureQ[b],Return[b]];
  r=backgroundNativeSetGuard[b];If[FailureQ[r],Return[r]];
  inputs=Association@KeyValueMap[Function[{key,fs},key -> (KeyDrop[#,"Head"]& /@ Select[Values[b["FieldComponents"]],#["Head"]===fs["NewHead"]&])],b["Field"]];
- Join[KeyTake[b,{"Theory","Signature","SymbolSuffix","DisplayIndices","CoordinateLabels","Coordinates","NativeCoordinateSyntax","MetricMatrix","Assumptions","SpecializationRules","IndividualRules","RuleGroups","ActiveRuleGroups","PresentationOverrides","Notation","ConnectionComponents","FieldProfiles"}],
+ Join[KeyTake[b,{"Theory","Signature","SymbolSuffix","DisplayIndices","CoordinateLabels","Coordinates","NativeCoordinateSyntax","MetricMatrix","Assumptions","SpecializationRules","IndividualRules","RuleGroups","ActiveRuleGroups","PresentationOverrides","Notation","ObjectLabelOverrides","ChartNotation","ConnectionComponents","FieldProfiles"}],
  <|"RecipeVersion"->1,"OriginalTag"->tag,"ChartMaps"->Map[KeyTake[#,{"Labels","Map","Chart","Coordinates","NativeCoordinateSyntax"}]&,Lookup[b,"AdditionalCharts",<||>]],"Objects"->recipeObjects[b],"Indices"->b["Indices"],"FieldInputs"->inputs,
   "RelativeHeads"->relativeHeads[b]|>]
 ];
@@ -2426,7 +2472,7 @@ RecreateBackground[tag_String,recipe_Association] := Module[{b,r,old,new,rules,c
  result=KeyValueMap[SetConnectionComponents[tag,#1,#2["Values"]/.rules,ReferenceConnection->#2["Reference"]]&,Lookup[recipe,"ConnectionComponents",<||>]];
  If[AnyTrue[result,FailureQ],Return[First@Select[result,FailureQ]]];
  put[tag,<|"FieldProfiles"->Map[Function[records,Association[(fieldRecordKey[#]->#)& /@ (Values[records]/.rules)]],Lookup[recipe,"FieldProfiles",<||>]],"RuleGroups"->(Lookup[recipe,"RuleGroups",<||>]/.rules),"SpecializationRules"->(Lookup[recipe,"SpecializationRules",{}]/.rules),"IndividualRules"->(individualRules[recipe]/.rules),
-   "ActiveRuleGroups"->Lookup[recipe,"ActiveRuleGroups",{}],"Notation"->Lookup[recipe,"Notation",<||>]|>];
+   "ActiveRuleGroups"->Lookup[recipe,"ActiveRuleGroups",{}],"Notation"->Lookup[recipe,"Notation",<||>],"ObjectLabelOverrides"->(Lookup[recipe,"ObjectLabelOverrides",<||>]/.rules),"ChartNotation"->Lookup[recipe,"ChartNotation",<||>]|>];
  updatePrintHook[];$BG[tag]
 ];
 
@@ -2443,16 +2489,23 @@ connectionKey[b_Association,selector_] := Module[{keys},
 RegisterTheory["Connection",source_Symbol,opts___Rule] := With[{key=SymbolName[source],head=source},RegisterTheory["Connection",key,head,opts]];
 AddConnection[tag_String,source_Symbol,opts:OptionsPattern[]] := AddConnection[tag,SymbolName[source],source,opts];
 SetPresentation[tag_String,rules__Rule] := SetPresentation[tag,Association[{rules}]];
-Options[SetPresentation]={PrintAs->Automatic};
-SetPresentation[tag_String,object:(_Symbol|_String),opts:OptionsPattern[]] := Module[{b=background[tag],key,objects,candidates,heads},
+Options[SetPresentation]={PrintAs->Automatic,ShowObjectLabels->Automatic};
+SetPresentation[tag_String,object:(_Symbol|_String),opts:OptionsPattern[]] := Module[{b=background[tag],key,objects,candidates,heads,target,overrides,setting=OptionValue[ShowObjectLabels],given=First /@ {opts},result},
  If[FailureQ[b],Return[b]];
- If[Complement[First /@ Flatten[{opts}],{PrintAs}]=!={},Return[failure["PresentationOptions","Use PrintAs for the object label."]]];
+ If[Complement[given,{PrintAs,ShowObjectLabels}]=!={} || !MemberQ[{Automatic,True,False},setting],Return[failure["PresentationOptions","Use PrintAs and Boolean ShowObjectLabels (or Automatic)."]]];
  If[StringQ[object],key=object,
   objects=Join[AssociationThread[Keys[b["Field"]],Lookup[Values[b["Field"]],"NewHead"]],KeyTake[b,Keys[b["PresentationDefaults"]]]];
   heads=DeleteDuplicates@Join[{object},Last /@ Select[b["HeadRules"],First[#]===object&]];
   candidates=Keys@Select[objects,MemberQ[heads,#]&];
   If[Length[candidates]=!=1,Return[failure["PresentationObject","Select a registered source field/geometry symbol or its owned copy."]]];
   key=First[candidates]
+ ];
+ If[MemberQ[given,ShowObjectLabels],
+  target=BackgroundObject[tag,key];If[FailureQ[target]||!KeyExistsQ[labelHeadRecords[b],target],Return[failure["PresentationObject","Select an owned tensor or covariant derivative."]]];
+  overrides=Lookup[b,"ObjectLabelOverrides",<||>];
+  If[setting===Automatic,overrides=KeyDrop[overrides,target],overrides[target]=setting];
+  If[MemberQ[given,PrintAs],result=SetPresentation[tag,Association[key->OptionValue[PrintAs]]];If[FailureQ[result],Return[result]]];
+  put[tag,<|"ObjectLabelOverrides"->overrides|>];Return[PresentationOf[tag]]
  ];
  SetPresentation[tag,Association[key->OptionValue[PrintAs]]]
 ];
