@@ -16,7 +16,7 @@ ix=First[BackgroundIndices["N"]];With[{i=ix},DefCovD[outsideD[-i],{}]];ii=Backgr
 rel=Christoffel[outsideD,pd][ii[[1]],-ii[[2]],-ii[[3]]];ext=Head[If[Head[rel]===Times,-rel,rel]];
 checks["External secondary relative head remains a blocker"]=MemberQ[xPlorer`Private`externalRelativeHeads[ShowBackground["N"]],ext]&&FailureQ[DeleteBackground["N"]]&&ChartQ[sec];
 UndefCovD[outsideD];
-checks["Full deletion succeeds after native secondary geometry"]=DeleteBackground["N"]===Null&&MissingQ[Lookup[xPlorer`Private`$BG,"N",Missing[]]];
+checks["Full deletion succeeds after native secondary geometry"]=DeleteBackground["N"]===Null&&FailureQ[ShowBackground["N"]];
 checks["Other background charts and metric remain"]=ChartQ[co]&&ToComponents["O",g[-a,-b]]===DiagonalMatrix[{-1,1,1,1}];
 makeCase["P"];cp=ChartOf["P"];sp=ChartOf["P","Cyl"];mp=ToComponents["P",g[-a,-b],OutputChart->"Cyl"];MetricInBasis[gP,-sp,mp];MetricCompute[gP,sp,All];
 pl=DeletionPlan["P","Chart",Cascade->True];checks["Chart-family deletion plan has no false external blocker"]=AssociationQ[pl]&&TrueQ[pl["CanDelete"]];
