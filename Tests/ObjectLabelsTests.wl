@@ -1,7 +1,6 @@
 (* Run in a fresh kernel with xAct installed, leaving native Print unchanged. *)
 If[!MemberQ[$Packages,"xPlorer`"],Get[FileNameJoin[{DirectoryName[DirectoryName[$InputFileName]],"Paclet","xPlorer.wl"}]]];
 Block[{xAct`xPerm`$xpermQ=False,xAct`xTensor`$DefInfoQ=False,xAct`xCoba`$CVVerbose=False},
- Begin["ObjectLabelTests`"];
  DefManifold[M,4,{a,b,c,d,e,f,i,j}]; DefMetric[-1,g[-a,-b],CD]; DefTensor[phi[],M]; DefTensor[A[-a],M]; DefConstantSymbol[m];
  RegisterTheory["Metric",g]; RegisterTheory["CovD",CD]; RegisterTheory["Indices",{a,b,c,d,e,f,i,j}]; RegisterTheory["Fields",{phi,A}]; RegisterTheory["Parameter",m];
  snap=TheorySnapshot[]; ClearTheory[]; RegisterTheory[snap];
@@ -54,5 +53,5 @@ Block[{xAct`xPerm`$xpermQ=False,xAct`xTensor`$DefInfoQ=False,xAct`xCoba`$CVVerbo
  checks["reconstruction"]=label[auto[phiO[]],"ONE"]&&!label[auto[xO[]],"ONE"]&&label[auto[uScaledO[]],"ONE:Scaled"];
  checks["registration rejects label option"]=FailureQ[RegisterTheory["Field",phi,ShowObjectLabels->True]];
  result=<|"Version"->$XPlorerVersion,"Passed"->Count[Values[checks],True],"Total"->Length[checks],"Failures"->Keys@Select[checks,!TrueQ[#]&],"Examples"-><|"Scalar"->display[auto[phiO[]]],"Coordinate"->display[auto[uScaledO[]]],"Derivative"->display[PrettyExp[CDO[-aO][phiO[]],CovariantStyle->"Prefix"]]|>|>;
- End[]; result
+ result
 ]
