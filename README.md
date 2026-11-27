@@ -10,13 +10,13 @@ xPlorer keeps the existing native registration API and background snapshots. Dev
 
 ## Start here
 
-Start with [xPlorer_Consolidated.nb](xPlorer_Consolidated.nb) for the focused native workflow. For the extended tutorial, keep [xPlorer_Workflow.nb](xPlorer_Workflow.nb) beside the [Paclet](Paclet/) directory, install xAct, start a fresh Mathematica kernel and evaluate the notebook in order. Choose one of its two startup cells. For source use:
+Start with [xPlorer_Workflow.nb](xPlorer_Workflow.nb), the principal scientific tutorial, updated to the consolidated dev.31 API. Keep it beside the [Paclet](Paclet/) directory, install xAct, start a fresh Mathematica kernel and evaluate the notebook in order. [xPlorer_Consolidated.nb](xPlorer_Consolidated.nb) is a supplementary integration-test notebook, not a second principal guide. Choose one of its two startup cells. For source use:
 
 ```wl
 Get[FileNameJoin[{NotebookDirectory[], "Paclet", "xPlorer.wl"}]];
 ```
 
-The principal notebook develops a scalar theory on Minkowski, Schwarzschild and FLRW, then introduces vectors, tensors, an independent affine connection, perturbations and cleanup. It contains 366 executable input cells, including two alternative startup cells (choose only one), with explanatory prose beside the calculations. The stylesheet inherits light/dark theme colors. ScalarTheory.wl is an optional reusable source recipe; it is not required to run the notebook.
+The principal notebook develops a scalar theory on Minkowski, Schwarzschild and FLRW, then introduces vectors, tensors, an independent affine connection, perturbations and cleanup. It contains 381 executable input cells, including two alternative startup cells (choose only one), with explanatory prose beside the calculations. The stylesheet inherits light/dark theme colors. The updated notebook was executed end to end using both Get and Needs from a development paclet directory (380/380 inputs, 94/94 mathematical checks and 33/33 stages each). ScalarTheory.wl is an optional reusable source recipe; it is not required to run the notebook.
 
 ## Features
 
@@ -68,7 +68,7 @@ build = Get[FileNameJoin[{NotebookDirectory[], "Tools", "BuildPaclet.wl"}]];
 If[MatchQ[build, _Success], PacletInstall[build["PacletArchive"]]]
 ```
 
-The builder calls the native `CreatePacletArchive[source, out]` directly on the prepared `Paclet/` directory, with `build/` as the output directory. This avoids PacletBuild's redundant staging copies, which failed on the author's Windows kernel. The corrected archive path still needs Desktop verification. For future releases, distribute the verified archive as a GitHub Release asset so users do not need to build it themselves. No beta.13 release has been published. The remote kernel has a Java restriction on producing a real archive; Desktop verification remains necessary. Do not keep both a conflicting traditional installation and a paclet active.
+The builder calls the native `CreatePacletArchive[source, out]` directly on the prepared `Paclet/` directory, with `build/` as the output directory. This avoids PacletBuild's redundant staging copies, which failed on the author's Windows kernel. The author reports successful Desktop archive construction; the actual archive has not yet been inspected, installed or uninstalled as part of this verification. For future releases, distribute the verified archive as a GitHub Release asset so users do not need to build it themselves. No beta.13 release has been published. The remote kernel has a Java restriction on producing a real archive; Desktop verification remains necessary. Do not keep both a conflicting traditional installation and a paclet active.
 
 ### Inspect the registered theory
 
