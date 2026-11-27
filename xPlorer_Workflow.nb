@@ -184,11 +184,11 @@ Cell[TextData[{"When all terms belong to one background, a caption can replace r
 
 Cell[BoxData["PrettyExp[\"Schwarzschild\", EabSchw, ShowBackgroundLabel -> True, ShowObjectLabels -> False, CovariantStyle -> \"Postfix\"]"],"Input",CellTags->"caption"],
 
-Cell[TextData[{"Suppose we want to use psi for the field, q for the metric and D for the derivative, as in another notation convention.\n\n",StyleBox["SetPresentation",FontFamily->"Courier",FontSize->14]," changes these printed names throughout Schwarzschild, without changing its typed symbols or mathematical identities. The result is visible in the full expression."}],"Text"],
+Cell[TextData[{"Suppose we want to use psi for the field, q for the metric and D for the derivative, as in another notation convention.\n\n",StyleBox["SetPresentation",FontFamily->"Courier",FontSize->14]," changes these printed names throughout Schwarzschild, without changing its typed symbols or mathematical identities. Evaluate the ordinary expression again: its output already uses the new names, without a PrettyExp wrapper."}],"Text"],
 
 Cell[BoxData["SetPresentation[\"Schwarzschild\", \"phi\" -> \"\\[Psi]\", \"Metric\" -> \"q\", \"CovD\" -> {\"|\", \"D\"}];"],"Input",CellTags->"rename_objects"],
 
-Cell[BoxData["EabSchw // PrettyExp[CovariantStyle -> \"Prefix\"]"],"Input",CellTags->"rename_view"],
+Cell[BoxData["EabSchw"],"Input",CellTags->"rename_view"],
 
 Cell[TextData[{"Use ",StyleBox["Automatic",FontFamily->"Courier",FontSize->14]," to restore the inherited printed names. The other backgrounds are unaffected."}],"Text"],
 
