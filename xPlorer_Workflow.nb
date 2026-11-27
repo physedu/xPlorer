@@ -185,7 +185,7 @@ Cell["Recognize the same equation on different geometries","Subsection"],
 
 Cell["The typed suffix (Schw) is independent of the mathematical label (S). The full equations below are distinct xAct expressions, not merely copies of one displayed formula. A caption identifies the whole expression; object labels identify the tensors and derivatives inside it. The optional explicit view guarantees the requested display even for an expression with no owned symbols.","Text"],
 
-Cell[BoxData["{scalarEqM == 0, scalarEqSchw == 0, scalarEqFLRW == 0} // PrettyExp"],"Input",CellTags->"early_labels_compare"],
+Cell[BoxData["{PrettyExp[scalarEqM == 0], PrettyExp[scalarEqSchw == 0], PrettyExp[scalarEqFLRW == 0]}"],"Input",CellTags->"early_labels_compare"],
 
 Cell[BoxData["PrettyExp[\"Schwarzschild\", scalarEqSchw == 0, ShowBackgroundLabel -> True, ShowObjectLabels -> False]"],"Input",CellTags->"early_caption"],
 
@@ -225,7 +225,7 @@ Cell[BoxData[RowBox[{"BackgroundExpression", "[", RowBox[{"\"Schwarzschild\"", "
 
 Cell[TextData[{"Inspect the entries in the Schwarzschild background."}],"Text"],
 
-Cell[BoxData[RowBox[{"Keys", "[", RowBox[{"ShowBackground", "[", "\"Schwarzschild\"", "]"}], "]"}]],"Input",CellTags->"inspect_background"],
+Cell[BoxData["ShowBackground[\"Schwarzschild\", \"Geometry\"]"],"Input",CellTags->"inspect_background"],
 
 Cell[BoxData["ShowBackground[\"Schwarzschild\", \"Summary\"]"],"Input",CellTags->"dev31_background_summary"],
 
@@ -609,19 +609,19 @@ Cell[BoxData["einstein00"],"Input",CellTags->"flrw_geometry_part_1"],
 
 Cell[BoxData["lagFLRW"],"Input",CellTags->"flrw_geometry_part_2"],
 
-Cell["Object labels across abstract and component calculations","Subsection"],
+Cell["Presentation applied to physical results","Subsection"],
 
-Cell["Compare the complete radial and cosmological equations, not only individual symbols. Object labels identify each owned coordinate or tensor. ShowBackgroundLabel adds a heading to the whole result; BackgroundLabel selects the short object label. Labels are off by default in the package, enabled at the start of this tutorial. Existing results need not be recalculated.","Text"],
+Cell["Compare the complete metric matrix, radial gradient, cosmological Lagrangian and both field equations, not only individual symbols. Object labels identify each owned coordinate or tensor. ShowBackgroundLabel adds a heading to the whole result; BackgroundLabel selects the short object label. Labels are off by default in the package, enabled at the start of this tutorial. Existing results need not be recalculated.","Text"],
 
 Cell[BoxData["SetXPlorerPreferences[PartialStyle -> \"Fraction\", ShowObjectLabels -> True];"],"Input",CellTags->"labels_session"],
 
 Cell[BoxData["SetNotation[\"Schwarzschild\", BackgroundLabel -> \"S\"];"],"Input",CellTags->"labels_local"],
 
-Cell[BoxData["gSchw[-aSchw, -bSchw]"],"Input",CellTags->"labels_metric"],
+Cell[BoxData["gSchw[-aSchw, -bSchw] // ToComponents // MatrixForm"],"Input",CellTags->"labels_metric"],
 
-Cell[BoxData["CDSchw[-aSchw][phiSchw[]]"],"Input",CellTags->"labels_gradient"],
+Cell[BoxData["gradientSchw // ToComponents"],"Input",CellTags->"labels_gradient"],
 
-Cell[BoxData["rSchw[]"],"Input",CellTags->"labels_coordinates"],
+Cell[BoxData["lagrangianFLRW // ToComponents"],"Input",CellTags->"labels_coordinates"],
 
 Cell[BoxData["PrettyExp[\"Schwarzschild\", eqSchw == 0, ShowBackgroundLabel -> True, ShowObjectLabels -> True]"],"Input",CellTags->"labels_eq"],
 
@@ -947,9 +947,9 @@ Cell[BoxData["MetricCompute[gMF, chartMF, \"RicciScalar\"[]];"],"Input",CellTags
 
 Cell[BoxData["ToComponents[RicciScalar[CDMF][]]"],"Input",CellTags->"dev31_native_ricci"],
 
-Cell[BoxData[RowBox[{"Keys", "[", RowBox[{RowBox[{"ShowBackground", "[", "\"Minkowski\"", "]"}], "[", "\"Field\"", "]"}], "]"}]],"Input",CellTags->"field_snapshots_part_1"],
+Cell[BoxData["Keys[ShowBackground[\"Minkowski\", \"Fields\"]]"],"Input",CellTags->"field_snapshots_part_1"],
 
-Cell[BoxData[RowBox[{"Keys", "[", RowBox[{RowBox[{"ShowBackground", "[", "\"MinkowskiFields\"", "]"}], "[", "\"Field\"", "]"}], "]"}]],"Input",CellTags->"field_snapshots_part_2"],
+Cell[BoxData["Keys[ShowBackground[\"MinkowskiFields\", \"Fields\"]]"],"Input",CellTags->"field_snapshots_part_2"],
 
 Cell[TextData[{"Assign the lower components of A in chart order (t,x,y,z) using ",StyleBox["AllComponentValues",FontFamily->"Courier",FontSize->14],". With abstract indices on an owned field, xPlorer infers the primary chart and remembers the supplied variance. The explicit primary-chart array syntax is also supported. Requesting the upper vector raises the index with the Minkowski metric only when needed. Native ToValues can then reuse the stored components."}],"Text"],
 
@@ -1215,11 +1215,11 @@ Cell[BoxData[RowBox[{RowBox[{"RegisterProfile","[",RowBox[{"\"MinkowskiFields\""
 
 Cell[BoxData[RowBox[{RowBox[{"ClearFieldComponents","[",RowBox[{"\"MinkowskiFields\"",",","\"A\""}],"]"}],";"}]],"Input",CellTags->"clear_vector_input_step_1"],
 
-Cell["A is still defined; only its assigned components have been removed. The native Deleted values messages are informational, not errors. Inspect the remaining managed input records, then recover the stored profile.","Text"],
+Cell["A is still defined; only its assigned components have been removed. The native Deleted values messages are informational, not errors. Inspect the actual vector components (they are now unresolved, not zero), then recover the stored profile.","Text"],
 
 Cell[BoxData[RowBox[{"BackgroundObject","[",RowBox[{"\"MinkowskiFields\"",",","\"A\""}],"]"}]],"Input",CellTags->"lifecycle_field_defined"],
 
-Cell[BoxData[RowBox[{"Keys","[",RowBox[{RowBox[{RowBox[{"ShowBackground","[",RowBox[{"\"MinkowskiFields\""}],"]"}],"[","\"FieldComponents\"","]"}]}],"]"}]],"Input",CellTags->"lifecycle_inputs_cleared"],
+Cell[BoxData["AMF[-aMF] // ToComponents[StrictComponents -> False]"],"Input",CellTags->"lifecycle_inputs_cleared"],
 
 Cell[BoxData[RowBox[{RowBox[{"ActivateProfile","[",RowBox[{"\"MinkowskiFields\"",",","\"OriginalFields\""}],"]"}],";"}]],"Input",CellTags->"lifecycle_activate_profile"],
 
