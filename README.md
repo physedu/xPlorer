@@ -2,11 +2,11 @@
 
 [![License: GPL-3.0-or-later](https://img.shields.io/badge/License-GPL--3.0--or--later-blue.svg)](LICENSE)
 
-> **Development candidate: 14.0.0-beta.13-dev.31.** Selective consolidation of registration dev.30 and native-integration dev.16. This branch is not a public release. See [BETA13_CONSOLIDATION.md](BETA13_CONSOLIDATION.md) for scope and validation.
+> **Development candidate: 14.0.0-beta.13-dev.32.** Selective consolidation of registration dev.30 and native-integration dev.16. This branch is not a public release. See [BETA13_CONSOLIDATION.md](BETA13_CONSOLIDATION.md) for scope and validation.
 
 xPlorer is a Wolfram Language package for reusing an abstract xAct theory on independent metric backgrounds, inspecting formal tensors and calculating components without rebuilding the theory each time.
 
-xPlorer keeps the existing native registration API and background snapshots. Dev.31 retains dev.30's managed component engine and integrates native coordinate declarations, registered basis transformations, unary ToCTensor, independent rules and structured background inspection.
+xPlorer keeps the existing native registration API and background snapshots. Dev.32 fixes native Print recursion in dev.31 without changing the mathematical API. Dev.31 retains dev.30's managed component engine and integrates native coordinate declarations, registered basis transformations, unary ToCTensor, independent rules and structured background inspection.
 
 ## Start here
 
@@ -101,7 +101,7 @@ If you use xPlorer in your research, please cite the version used. GitHub's **Ci
   author  = {Sanz-Romero, Eduardo},
   title   = {xPlorer},
   year    = {2026},
-  version = {14.0.0-beta.13-dev.31},
+  version = {14.0.0-beta.13-dev.32},
   url     = {https://github.com/physedu/xPlorer}
 }
 ```

@@ -20,7 +20,7 @@ Global`$XPlorerWorkflowReport=Module[
   If[parsed===$Failed,AppendTo[parseFailures,id]];
   If[MatchQ[parsed,HoldComplete[_Times]]&&!FreeQ[parsed,_CompoundExpression],AppendTo[compoundFailures,id]];
   {seconds,value}=AbsoluteTiming[Check[
-    Block[{NotebookDirectory=Function[directory],Print=(Null&)},ToExpression[b,StandardForm]],
+    Block[{NotebookDirectory=Function[directory]},If[TrueQ[Global`$XPlorerWorkflowSilent],Block[{Print=(Null&)},ToExpression[b,StandardForm]],ToExpression[b,StandardForm]]],
     AppendTo[warnings,id];$Failed]];
   AssociateTo[Global`$XPlorerWorkflowOutputs,id->value];
   AppendTo[timings,<|"Cell"->id,"Seconds"->seconds|>];
