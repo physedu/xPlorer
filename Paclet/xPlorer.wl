@@ -292,6 +292,12 @@ If[!IntegerQ[$BackgroundCounter], $BackgroundCounter = 0];
 put[tag_, assoc_Association] := ($BG[tag] = Join[$BG[tag], assoc]);
 coordinateValues[bg_] := Through[bg["Coordinates"][]];
 profile[value_, bg_] := If[Head[value] === Function, value @@ coordinateValues[bg], value];
+profileForBackground[tag_String,value_,bg_Association] := Module[{status,result},
+  status=backgroundExpressionGuard[tag,value];If[FailureQ[status],Return[status]];
+  result=profile[value,bg];
+  status=backgroundExpressionGuard[tag,result];If[FailureQ[status],Return[status]];
+  result
+];
 allGeometry[cd_, g_] := <|"Christoffel" -> GiveSymbol[Christoffel, cd], "Riemann" -> Riemann[cd],
   "Ricci" -> Ricci[cd], "RicciScalar" -> RicciScalar[cd], "Einstein" -> Einstein[cd],
   "Weyl" -> Weyl[cd], "TFRicci" -> TFRicci[cd], "Kretschmann" -> Kretschmann[cd],
@@ -621,10 +627,11 @@ DefineChart[tag_String, declarations_List,opts:OptionsPattern[]] := Module[{b = 
 (* Secondary coordinate charts are native xCoba charts on the owned manifold.
    Maps give the primary coordinates as functions of the target coordinates. *)
 DefineChart[tag_String,name_String,declarations_List,map_Function,opts:OptionsPattern[]] := Module[
-  {b=background[tag],charts,coords,values,chart,jac,det,n,created,record,labels=coordinateLabels[declarations],nativeQ=AllTrue[declarations,coordinateDeclarationQ],base,visitors,nativeObjects,newAliases,notation=chartNotationOptions[{opts}]},
+  {b=background[tag],charts,coords,values,chart,jac,det,n,created,record,labels=coordinateLabels[declarations],nativeQ=AllTrue[declarations,coordinateDeclarationQ],base,visitors,nativeObjects,newAliases,status,notation=chartNotationOptions[{opts}]},
   If[!validNotation[notation],Return[failure["Notation","Invalid chart notation options."]]];
   If[FailureQ[b],Return[b]];
   If[!KeyExistsQ[b,"Chart"],Return[failure["NoChart","Define the primary chart first."]]];
+  status=backgroundExpressionGuard[tag,map];If[FailureQ[status],Return[status]];
   charts=Lookup[b,"AdditionalCharts",<||>]; n=b["Dimension"];
   If[name==="Primary" || KeyExistsQ[charts,name],Return[failure["ChartExists","Choose an unused chart name."]]];
   If[Length[labels]=!=n || !VectorQ[labels,StringQ] || !DuplicateFreeQ[labels],
@@ -637,6 +644,8 @@ DefineChart[tag_String,name_String,declarations_List,map_Function,opts:OptionsPa
   If[created===$Failed || !ChartQ[chart],Return[failure["Chart","xCoba could not define this chart."]]];
   MapThread[Function[{sym,label},With[{ss=sym,ll=label},PrintAs[ss]^=ll]],{coords,labels}];
   values=guard[map@@Through[coords[]]];
+  If[values===$Failed,UndefChart[chart];Return[failure["ChartMap","The coordinate map could not be evaluated."]]];
+  status=backgroundExpressionGuard[tag,values];If[FailureQ[status],UndefChart[chart];Return[status]];
   If[!VectorQ[values] || Length[values]=!=n,UndefChart[chart];Return[failure["ChartMap","Return one primary coordinate per dimension."]]];
   jac=Outer[D,values,Through[coords[]]];det=Simplify[Det[jac]];
   If[TrueQ[det==0],UndefChart[chart];Return[failure["ChartMap","The chart Jacobian is identically singular."]]];
@@ -956,16 +965,18 @@ replayFields[tag_, selection_:All] := Module[{b = $BG[tag], records, heads, resu
 ];
 Options[SetFieldComponents] = {IndexPositions -> Automatic, PerturbationOrderLabel -> 1, Assumptions -> Automatic};
 fieldComponentRecord[tag_String, field_Symbol, input_, OptionsPattern[SetFieldComponents]] := Module[
-  {b = background[tag], fs, vals, signs, order, ass, tensor, expected, actual},
+  {b = background[tag], fs, vals, signs, order, ass, tensor, expected, actual,status},
   If[FailureQ[b], Return[b]];
   If[!KeyExistsQ[b, "Basis"], Return[failure["NoChart", "Define the chart before assigning field components."]]];
   fs = fieldSpec[b, field]; If[FailureQ[fs], Return[fs]];
-  vals = profile[input, b]; signs = Replace[OptionValue[IndexPositions], Automatic :> fs["IndexPositions"]];
+  vals = profileForBackground[tag,input,b];If[FailureQ[vals],Return[vals]];
+   signs = Replace[OptionValue[IndexPositions], Automatic :> fs["IndexPositions"]];
   If[Length[signs] =!= fs["Rank"] || !VectorQ[signs, MemberQ[{-1, 1}, #] &], Return[failure["IndexPositions", "Specify one +1 or -1 per tensor slot."]]];
   If[If[fs["Rank"] === 0, ListQ[vals], Dimensions[vals] =!= ConstantArray[b["Dimension"], fs["Rank"]]], Return[failure["FieldDimensions", "The component array does not match the field rank and dimension."]]];
   order = If[fs["Type"] === "MetricPert", OptionValue[PerturbationOrderLabel], None];
   If[order =!= None && (!IntegerQ[order] || order < 1), Return[failure["PerturbationOrder", "Perturbation components need a positive LI order."]]];
   ass = Replace[OptionValue[Assumptions], Automatic :> Lookup[b, "Assumptions", True]];
+  status=backgroundExpressionGuard[tag,ass];If[FailureQ[status],Return[status]];
   (* Canonicalize the supplied array against the tensor's declared slot symmetries before storing anything. *)
   tensor = fs["NewHead"] @@ Join[If[order === None, {}, {LI[order]}], MapThread[{#1 #2, #2 b["Basis"]} &, {indicesFor[b, fs["Rank"]], signs}]];
   expected = If[fs["Rank"] === 0, tensor, guard[ToCanonical[ComponentArray[tensor]]]];
