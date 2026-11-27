@@ -146,6 +146,12 @@ Added a portable notebook, 75 regression checks, an MUnit report runner, and an 
 
 - Stage native covariant/contravariant metric-component edits and validate before replacing the managed metric. Preserve geometry and revisions on exact repeated metric assignments with matching native fingerprints. Skip component hooks on identically vanishing tensors.
 
+## 14.0.0-beta.13-dev.28 (development)
+
+- Correct native Set-state detection and reject unsafe managed operations before mutation; explicit Rule restoration required.
+- Preserve tested native read-only RuleToSet/SetToRule and WithSetValues round trips without global overrides.
+- 751/751 checks across 28 groups; workflow 365/365, 84/84, 33/33. See Tests/dev28-results.json. Set-state writes remain unsupported.
+
 ## 14.0.0-beta.13-dev.27 (development)
 
 - Capture deletion of exact native authoritative primary-chart field groups in Rule state; derived groups remain native and independently recalculable.

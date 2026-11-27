@@ -1,4 +1,4 @@
-# Using xPlorer — beta.13-dev.27
+# Using xPlorer — beta.13-dev.28
 
 The principal worked guide is xPlorer_Workflow.nb. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
@@ -290,3 +290,15 @@ DeleteTensorValues[A, {{-ch}}]
 ```
 
 Use the actual native ValID from TensorValIDs when a symmetry group or LI order needs exact selection. Removing a derived group does not remove the authoritative field record. Profiles are explicit snapshots and can intentionally restore previously saved inputs. Reassign earlier mixed-variance sparse inputs from their original expressions if affected by the previous tuple-order bug.
+
+
+## Native Set-state and read-only evaluation (dev.28)
+
+```wl
+RuleToSet[A]
+(* Evaluate already stored components directly; no managed mutations. *)
+SetToRule[A]
+(* Resume managed component calculation and input editing. *)
+```
+
+Native read-only RuleToSet/SetToRule round trips and WithSetValues arithmetic remain native and preserve the original Rule-state source stamp and managed revision in the tested case. Correct the previous unqualified StateOfValID reference: xCoba 1.3.0 implements this as xAct`xCoba`Private`StateOfValID, not xPlorer`Private`StateOfValID. A native HeldComponentValue write on an evaluative Set component was observed to emit TensorValues::invalid (numeric argument). Do not pretend Set-state writes are normal Rule-state inputs. Return Failure["NativeSetState",...] with native ValIDs for literal owned held field accesses and managed operations that require Rule-state source data; reject before replay, metric replacement, geometry computation, field deletion, recipe export or component calculation. Native direct evaluation and read-only transitions are unchanged; no global overrides of RuleToSet, SetToRule or WithSetValues. Background-wide calculations are conservatively guarded, field setters guard affected dependencies, and another background remains independent. Explicit SetToRule is required before managed mutations. Direct Set assignments, arbitrary held/nonliteral calls, arbitrary native mutations inside WithSetValues and their synchronization remain unsupported. This is a safe boundary, not full Set-state interoperability.
