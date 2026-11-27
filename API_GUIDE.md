@@ -1,4 +1,4 @@
-# Using xPlorer — beta.13-dev.35
+# Using xPlorer — beta.13-dev.36
 
 xPlorer_Workflow.nb is the principal worked guide, updated for the consolidated API (dev.31, corrected in dev.32). xPlorer_Consolidated.nb is retained as a supplementary integration-test notebook. Sections labeled with earlier versions are historical checkpoints; the dev.31 contract below takes precedence. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
@@ -63,9 +63,9 @@ Name selects the key and default symbol base; SymbolBase can override the latter
 DefCovD[DD[-a], {}, Torsion -> True, SymbolOfCovD -> {"|","D"}];
 RegisterTheory["Connection", "Affine", DD];
 CreateBackground["Study"];
-ConnectionOf["Study"]
-ConnectionOf["Study", "Affine"]
-RiemannOf["Study", "Affine"]
+CovDOfMetric[gStudy]
+AffineStudy[-aStudy][phiStudy[]]
+Riemann[AffineStudy][-aStudy,-bStudy,-cStudy,dStudy]
 ```
 
 The empty second argument to DefCovD adds no extra bundles; xAct infers the source tangent bundle from a. Primary is the registered metric's Levi-Civita connection. AddConnection can copy a source connection onto an existing background. A source connection has one representation per background, preventing ambiguous transport. ConnectionDifference[tag, key1, key2] returns the native tensor with background indices. Nonmetric connections have no native RicciScalar/Einstein/Weyl getters; requesting these returns Failure.
@@ -393,3 +393,8 @@ BackgroundValue["Schwarzschild", "Fields", "phi"]
 ShowBackground is now a display interface, analogous to ShowTheory, rather than a raw association. It presents compact left/top-aligned grids of declared geometry, actual stored metric and field inputs, charts, connections, effective rules and stored work. It distinguishes missing assignments from sparse inputs; it never replaces unknown components with zero. Large arrays and long sparse assignments are summarized; retrieve the complete stored record through BackgroundValue. Formula detail sections list the registered source expressions and their copied alias names (not recalculated or automatically specialized component equations). The metric determinant sign is not a full signature specification. Tracked computed geometry is recorded metadata, not a fresh native-cache validation. The view does not compute new tensors or components and does not change model data or saved results. Native edits outside the managed capture scope are not discovered by inspection.
 
 **Migration from dev.34:** replace raw accesses such as `ShowBackground[tag]["Field"]` with `BackgroundValue[tag]["Field"]`. BackgroundValue[tag,section] retains the previous structured section API and additionally accepts raw record keys. BackgroundValue[] returns all records. BackgroundObject remains the accessor for actual xAct symbols; ReconstructionData remains the input recipe. ShowBackgroundLabel is unrelated: it is a formatting option for an expression caption. See Tests/BackgroundInspectionTests.wl for read-only inspection and box-format checks.
+
+
+## Native-first notebook and release onboarding (dev.36)
+
+Prefer known native heads: CDSchw or CovDOfMetric[gSchw], Riemann[CDSchw], Ricci[CDSchw], Christoffel[AffineAff,CDAff] and ScalarsOfChart[chartSchw]. ConnectionOf, RiemannOf and ConnectionDifference are optional managed key lookups, not separate tensor engines; keep them for programmatic code, not as the primary route in examples. ConnectionMatrixOf and SetConnectionComponents remain useful managed operations for assigned independent coefficients and chart transformations. MetricCompute is preferred for geometry computation, and BackgroundValue provides the recorded matrix without recalculation. Short chart labels can be selected at DefineChart time, and visibility reset independently. Native PrintAs on the resolved coordinate head allows Greek display without renaming the typed alias. Both public notebooks offer A (install/load the matching versioned archive beside the notebook) and B (source Get); the actual release archive is built separately. Inspection styling inherits the theme foreground/background and uses separate title, section and column-header typography.
