@@ -938,7 +938,7 @@ Cell[BoxData["MetricInBasis[gAffineStudy, -chartAffineStudy, DiagonalMatrix[{-1,
 
 Cell[BoxData[RowBox[{RowBox[{"AllComponentValues", "[", RowBox[{RowBox[{"AAffineStudy","[",RowBox[{RowBox[{"-","aDA"}]}],"]"}], ",", RowBox[{"{", RowBox[{"1", ",", "2", ",", "3", ",", "4"}], "}"}]}], "]"}], ";"}]],"Input",CellTags->"affine_coordinates_step_3"],
 
-Cell[BoxData["{tAffineStudy[], xAffineStudy[], yAffineStudy[], zAffineStudy[]}"],"Input",CellTags->"affine_coordinates_step_4"],
+Cell[BoxData["tA = tAffineStudy[];"],"Input",CellTags->"affine_coordinates_step_4"],
 
 Cell[BoxData[RowBox[{RowBox[{"gammaDA", "=", RowBox[{"ConstantArray", "[", RowBox[{"0", ",", RowBox[{"{", RowBox[{"4", ",", "4", ",", "4"}], "}"}]}], "]"}]}], ";"}]],"Input",CellTags->"affine_coordinates_step_5"],
 
