@@ -9,6 +9,16 @@ checks["Repeated held curvature read reuses native computation"]=r===r2&&ShowBac
 checks["Held scalar geometry read"]=Last[With[{head=rs},HeldComponentValue[head[]]]]===-2;
 checks["Held geometry alternate variance"]=Simplify[Last[With[{head=ri,chart=ch},HeldComponentValue[head[{0,chart},{0,chart}]]]]-Exp[-2x]]===0;
 checks["Unrequested geometry and other background untouched"]=TensorValIDs[we]==={}&&TensorValIDs[ei]==={}&&TensorValIDs[ro]==={};
+gamma=Christoffel[ConnectionOf["N"],PDOfBasis[ch]];
+gr=With[{head=gamma,chart=ch},HeldComponentValue[head[{0,chart},{0,-chart},{1,-chart}]]];
+checks["Held Christoffel read uses native geometry"]=MatchQ[gr,_Rule]&&Last[gr]===1;
+data=xPlorer`Private`geometryNativeData[ShowBackground["N"]];
+dm=xPlorer`Private`nativeGeometrySpecHead["DMetric"[-1,-1,-1],data];
+ddm=xPlorer`Private`nativeGeometrySpecHead["DDMetric"[-1,-1,-1,-1],data];
+checks["Held derivative geometry read"]=Last[With[{head=dm,chart=ch},HeldComponentValue[head[{0,-chart},{0,-chart},{1,-chart}]]]]===-2 Exp[2x];
+DeleteTensorValues[ddm];
+checks["Held second derivative geometry rebuilds native group"]=Last[With[{head=ddm,chart=ch},HeldComponentValue[head[{0,-chart},{0,-chart},{1,-chart},{1,-chart}]]]]===-4 Exp[2x];
+
 a0=ToValues[AN[{0,ch}]];source=TensorValues[AN,{{-ch}}];rev=ShowBackground["N"]["MetricRevision"];
 r=Block[{$CVSimplify=Function[v,v+100]},With[{head=gN,chart=ch},HeldComponentValue[head[{0,-chart},{0,-chart}],-4 Exp[2x]]]];
 checks["Held metric write bypasses ambient CVSimplify"]=MatchQ[r,_Rule]&&Last[r]===-4 Exp[2x]&&MetricMatrixOf["N"]===DiagonalMatrix[{-4 Exp[2x],1,1,1}]&&ToValues[gN[{0,-ch},{0,-ch}]]===-4 Exp[2x];
@@ -46,6 +56,14 @@ f3=Internal`InheritedBlock[{xPlorer`Private`ensureSelectedFieldComponent},
  xPlorer`Private`ensureSelectedFieldComponent[b_,rec_,atom_]:=mock;
  ToValues[AN[{0,ch}]]];
 checks["Selected field preparation failure propagates"]=f3===mock;
+
+gid=SelectFirst[TensorValIDs[gN],MemberQ[Last[List@@#],{-ch,-ch}]&];RuleToSet[gid];
+checks["Held literal metric Set accesses blocked"]=MatchQ[With[{head=gN,chart=ch},HeldComponentValue[head[{0,-chart},{0,-chart}]]],Failure["NativeSetState",_Association]]&&MatchQ[With[{head=gN,chart=ch},HeldComponentValue[head[{0,-chart},{0,-chart}],-10 Exp[2x]]],Failure["NativeSetState",_Association]]&&xAct`xCoba`Private`StateOfValID[gid]===Set;
+SetToRule[gid];
+checks["Held metric access resumes after SetToRule"]=Last[With[{head=gN,chart=ch},HeldComponentValue[head[{0,-chart},{0,-chart}]]]]===-8 Exp[2x];
+DefChart[originalChart,MN,Range[0,3],{u0[],u1[],u2[],u3[]}];
+rrNative=HeldComponentValue[A[{0,-originalChart}],17];rrNativeRead=HeldComponentValue[A[{0,-originalChart}]];
+checks["External native held operations untouched"]=MatchQ[rrNative,_Rule]&&rrNativeRead===rrNative&&Last[rrNativeRead]===17;
 checks["Held native attribute retained"]=MemberQ[Attributes[HeldComponentValue],HoldFirst]&&MemberQ[Attributes[HeldComponentValue],Protected];
 checks["Cleanup"]=And@@(SameQ[DeleteBackground[#],Null]& /@ {"Copy","N","O"});
 <|"Total"->Length[checks],"Passed"->Count[Values[checks],True],"Failures"->Keys@Select[checks,#=!=True&]|>
