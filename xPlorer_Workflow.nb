@@ -1065,7 +1065,7 @@ Cell[BoxData["CreateBackground[\"AffineStudy\", SymbolSuffix -> \"Aff\"];"],"Inp
 
 Cell[BoxData[RowBox[{"ConnectionsOf", "[", "\"AffineStudy\"", "]"}]],"Input",CellTags->"register_affine"],
 
-Cell[TextData[{"The default connection is the metric\:2019s Levi-Civita derivative, keyed by ",StyleBox["\"Primary\"",FontFamily->"Courier",FontSize->14],". Use the copied native derivative AffineAff directly and obtain its curvature through xAct Riemann[AffineAff]. ConnectionOf is useful only when selecting a derivative by its registered key programmatically.\n\nIts curvature family also has a Ricci tensor. A native Ricci scalar requires an associated metric, and requesting one for DA returns a Failure."}],"Text"],
+Cell[TextData[{"The default connection is the metric\:2019s Levi-Civita derivative, keyed by ",StyleBox["\"Primary\"",FontFamily->"Courier",FontSize->14],". Use the copied native derivative AffineAff directly and obtain its curvature through xAct Riemann[AffineAff]. ConnectionOf is useful only when selecting a derivative by its registered key programmatically.\n\nIts curvature family also has a Ricci tensor. A Ricci scalar of this independent connection requires an explicit contraction metric; the metric-curvature getter is not defined for DA."}],"Text"],
 
 Cell[BoxData["CovDOfMetric[gAff]"],"Input",CellTags->"formal_affine_step_1"],
 
@@ -1119,7 +1119,7 @@ Cell[BoxData["diffDA = Christoffel[AffineAff,CDAff][aAff,-bAff,-cAff];"],"Input"
 
 Cell[BoxData["diffDA"],"Input",CellTags->"affine_difference"],
 
-Cell[TextData[{"Inspect the manifolds of DA and its copy. In a formula the derivative head selects the connection. ",StyleBox["ComputeGeometry",FontFamily->"Courier",FontSize->14]," calculates the geometry of the metric connection."}],"Text"],
+Cell[TextData[{"Inspect the manifolds of DA and its copy. In a formula the derivative head selects the connection. ",StyleBox["MetricCompute",FontFamily->"Courier",FontSize->14]," calculates the geometry of the metric connection."}],"Text"],
 
 Cell[BoxData[RowBox[{"ManifoldOfCovD", "[", "DA", "]"}]],"Input",CellTags->"compare_derivatives_part_1"],
 
