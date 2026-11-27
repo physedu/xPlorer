@@ -16,11 +16,11 @@ xPlorer is not a new tensor algebra engine. It uses xTensor, xCoba and xPert for
 
 The intended audience is researchers and students already using Mathematica and xAct, particularly those comparing geometric backgrounds or specializing abstract field equations. This is experimental research software; feedback and reproducible bug reports are welcome.
 
-**Version:** 14.0.0-beta.13-dev.36 (beta candidate). Install xAct separately: https://www.xact.es/. Mathematica 13.0+ is the declared minimum; the current automated validation uses Wolfram Language 15.0.1 and xAct 1.3.0. Earlier kernel versions have not all been tested.
+**Version:** 1.0.0-beta.1 (beta candidate). Install xAct separately: https://www.xact.es/. Mathematica 13.0+ is the declared minimum; the current automated validation uses Wolfram Language 15.0.1 and xAct 1.3.0. Earlier kernel versions have not all been tested.
 
 ## Start here
 
-1. Extract the distribution ZIP. Keep the two notebooks beside the Paclet directory.
+1. Extract the distribution ZIP. Keep the two notebooks beside xPlorer.wl and the versioned paclet.
 2. Open **xPlorer_Workflow.nb** in a fresh Mathematica kernel.
 3. Choose A to install and load the supplied paclet, or B to load the source directly, not both. Evaluate the remaining inputs in order.
 4. The seven-section research tutorial derives the massive scalar equation, evaluates it on Minkowski, Schwarzschild and FLRW, and continues through rules, profiles, secondary charts, vector/tensor fields, metric perturbations and reconstruction.
@@ -28,7 +28,7 @@ The intended audience is researchers and students already using Mathematica and 
 
 ## Installation options
 
-Download the curated distribution ZIP from GitHub Releases (not GitHub's automatic source-code ZIP). Extract the complete folder. The versioned .paclet must sit beside both notebooks; the source stays in Paclet/xPlorer.wl. Option A in either notebook installs the matching archive when it is not already installed, then calls Needs. Option B uses Get without installation. If an older package is found, the version check stops the tutorial. Restart the kernel before changing loading methods.
+Download the curated distribution ZIP from GitHub Releases (not GitHub's automatic source-code ZIP). Extract the complete folder. The versioned .paclet must sit beside both notebooks; the plain source xPlorer.wl sits beside them. Option A in either notebook installs the matching archive when it is not already installed, then calls Needs. Option B uses Get without installation. If an older package is found, the version check stops the tutorial. Restart the kernel before changing loading methods.
 
 ### A. Install and load the supplied paclet (recommended)
 
@@ -46,14 +46,14 @@ Needs["xPlorer`"];
 $XPlorerVersion
 ```
 
-The version should be "14.0.0-beta.13-dev.36". Do not load a second copy of xPlorer in the same kernel; remove or move conflicting older traditional installations out of the Applications path before using a paclet. To uninstall, inspect PacletFind["xPlorer"] and use PacletUninstall on the specific installed PacletObject. Restart before testing a different version.
+The version should be "1.0.0-beta.1". Do not load a second copy of xPlorer in the same kernel; remove or move conflicting older traditional installations out of the Applications path before using a paclet. To uninstall, inspect PacletFind["xPlorer"] and use PacletUninstall on the specific installed PacletObject. Restart before testing a different version. Internal testers must uninstall the previous 14.0.0-beta.* paclets before using public beta 1, since Mathematica may prefer the numerically higher version.
 
 ### B. Load the source without installation
 
 The B cell in either notebook uses:
 
 ```wl
-Get[FileNameJoin[{NotebookDirectory[], "Paclet", "xPlorer.wl"}]];
+Get[FileNameJoin[{NotebookDirectory[], "xPlorer.wl"}]];
 ```
 
 Check $XPlorerVersion in the next cell.
@@ -66,7 +66,7 @@ ShowBackground["Schwarzschild"]
 ShowBackground["Schwarzschild", "Fields"]
 ```
 
-The first call lists the studies in the current kernel; the others show the declared geometry, actual managed input values or a selected section. No new geometry is computed. Use BackgroundValue["Schwarzschild", "MetricMatrix"] for programmatic data access, or BackgroundObject for native xAct heads. In dev.35, use BackgroundValue instead of the former raw ShowBackground association.
+The first call lists the studies in the current kernel; the others show the declared geometry, actual managed input values or a selected section. No new geometry is computed. Use BackgroundValue["Schwarzschild", "MetricMatrix"] for programmatic data access, or BackgroundObject for native xAct heads. 
 
 ## Presentation
 
