@@ -5,6 +5,7 @@ Internal design, planning, recovery and release-preparation records for xPlorer.
 ## Documents
 
 - [COMPATIBILITY_AUDIT.md](COMPATIBILITY_AUDIT.md) — reproducible compatibility findings, fixes and remaining research scope.
+- [COMPATIBILITY_AUDIT_EXTENDED.md](COMPATIBILITY_AUDIT_EXTENDED.md) — four confirmed mathematical-correctness findings, independent reproductions, native integration risks and the approved P0–P2 remediation plan; publication gate pending.
 
 - [WORKFLOW_STYLE.md](WORKFLOW_STYLE.md) — binding editorial and pedagogical rules for the public notebooks.
 
