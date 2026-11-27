@@ -109,6 +109,8 @@ Module[{o=Global`$XPlorerWorkflowOutputs,sector},
  "Native affine difference matches managed lookup" -> TrueQ[o["compare_derivatives"][[3]]],
  "Native curvature head" -> SameQ[o["inspect_short_names"][[2]],Riemann[CDSchw]],
  "Short cylindrical label retained" -> SameQ[BackgroundValue["Minkowski","Presentation"]["ChartNotation"]["Cylindrical"]["BackgroundLabel"],"C"],
+ "Native metric derivative" -> SameQ[SymbolName[o["formal_affine_step_1"]],"CDAff"],
+ "Cylindrical matrix uses compact Greek labels" -> With[{v=xPlorer`Private`notebookPrint[o["perturbation_cylindrical"]]},With[{bb=MakeBoxes[v,StandardForm]//.InterpretationBox[d_,___]:>d},!FreeQ[bb,SubscriptBox["\[Theta]","C"]] && FreeQ[bb,"M:Cylindrical"]]],
  "PrintAs reset" -> SameQ[With[{hh=BackgroundObject["Schwarzschild","phi"]},PrintAs[hh]],PrintAs[phi]]
  |>
 ]
