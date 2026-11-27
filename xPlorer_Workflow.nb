@@ -4,7 +4,7 @@ Cell[TextData[{"xPlorer - From an abstract theory to physical spacetimes"}],"Tit
 
 Cell[TextData[{"A massive scalar field on Minkowski, Schwarzschild and FLRW backgrounds | beta.13-dev.33"}],"Subtitle"],
 
-Cell["With xAct installed, start a fresh kernel. Choose just one of the two loading cells below, then evaluate the remaining input cells in order with Shift+Enter. Standalone recipes marked Alternative are for reference. xTensor defines the abstract theory; xCoba stores and transforms components; xPlorer manages isolated copies and transports registered expressions.","Text"],
+Cell["This is the extended scientific reference. If you are new to xPlorer, start with xPlorer_QuickStart.nb instead. With xAct installed, start a fresh kernel. Choose just one of the two loading cells below, then evaluate the remaining input cells in order with Shift+Enter. Standalone recipes marked Alternative are for reference. xTensor defines the abstract theory; xCoba stores and transforms components; xPlorer manages isolated copies and transports registered expressions.","Text"],
 
 Cell["Option A: Load the source directly (keep this notebook beside the Paclet directory).","Text"],
 
@@ -22,6 +22,8 @@ Cell[BoxData[RowBox[{RowBox[{"SetXPlorerPreferences", "[", RowBox[{"PartialStyle
 
 Cell[CellGroupData[{
 Cell[TextData[{"1. Define and register a scalar theory"}],"Section"],
+
+Cell["The full Workflow retains native xAct informational printing for inspection. If you prefer a quieter notebook, set $DefInfoQ = False; $CVVerbose = False; in a separate input after loading xAct. These options reduce native informational printing, not errors.","Text"],
 
 Cell[TextData[{"Define a four-dimensional Lorentzian manifold, its metric g and a real scalar field of mass m with xTensor. CD is the Levi-Civita derivative of g."}],"Text"],
 
@@ -819,6 +821,14 @@ Cell[TextData[{"Add cylindrical coordinates to the existing Minkowski background
 Cell[BoxData["DefineChart[\"Minkowski\", \"Cylindrical\", {t[], r[], theta[], z[]}, Function[{tt, rr, th, zz}, {tt, rr Cos[th], rr Sin[th], zz}]];"],"Input",CellTags->"second_chart_step_1"],
 
 Cell[BoxData["{tCylindricalM[], rCylindricalM[], thetaCylindricalM[], zCylindricalM[]}"],"Input",CellTags->"second_chart"],
+
+Cell["Optional chart-specific notation: display the cylindrical coordinates with a short C label, without changing the Cartesian chart or its basis transformation. Automatic removes a local override.","Text"],
+
+Cell[BoxData["SetNotation[\"Minkowski\", \"Cylindrical\", ShowObjectLabels -> True, BackgroundLabel -> \"C\"];"],"Input",CellTags->"labels_chart_set"],
+
+Cell[BoxData["{rCylindricalM[], thetaCylindricalM[]}"],"Input",CellTags->"labels_chart_view"],
+
+Cell[BoxData["SetNotation[\"Minkowski\", \"Cylindrical\", ShowObjectLabels -> Automatic, BackgroundLabel -> Automatic];"],"Input",CellTags->"labels_chart_reset"],
 
 Cell["The registered map also installs native xCoba basis transformations. A pure component tensor can therefore change its slots with explicit ToCTensor. For coordinate-dependent components, ToComponents with OutputChart additionally substitutes the scalar coordinate map.","Text"],
 
