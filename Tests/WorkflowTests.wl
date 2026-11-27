@@ -49,7 +49,7 @@ Global`$XPlorerWorkflowReport=Module[
    "inferred_eab",stages["Inferred Eab agrees with explicit components"]=SameQ[First[value],xPlorer`ToComponents["Schwarzschild",Global`EabSchw]];
     stages["Inferred CTensor options"]=With[{v=xPlorer`ToComponents[Global`EabSchw,xPlorer`Output->"CTensor"]},MatchQ[v,_xAct`xCoba`CTensor]&&SameQ[Part[v,1],First[value]]];
     stages["Ambiguous and abstract inputs require tag"]=And[FailureQ[xPlorer`ToComponents[Global`Eab]],FailureQ[xPlorer`ToComponents[{Global`phiM[],Global`phiSchw[]}]],FailureQ[xPlorer`ToComponents[1]]],
-   "custom_postfix_marker",stages["Custom postfix marker is rendered"]=With[{v=value},!FreeQ[MakeBoxes[v,StandardForm],"|"]],
+   "custom_postfix_marker",stages["Custom postfix marker is rendered"]=With[{v=value},AnyTrue[Cases[MakeBoxes[v,StandardForm],_String,Infinity],#==="|"||StringStartsQ[#,"|("]&]],
    "session_prefix",stages["Session prefix applies to both backgrounds"]=SameQ[printedStyle[#,"CovariantStyle"]& /@ value,{"Prefix","Prefix"}],
    "local_postfix",stages["Background notation overrides only its own output"]=SameQ[printedStyle[#,"CovariantStyle"]& /@ value,{"Prefix","Postfix"}]&&TrueQ[printedStyle[Last[value],"ShowBackgroundLabel"]],
    "pretty_default",stages["Postfix PrettyExp inherits background settings"]=SameQ[styleOf[value,"CovariantStyle"],"Postfix"]&&TrueQ[styleOf[value,"ShowBackgroundLabel"]],

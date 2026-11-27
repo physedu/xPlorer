@@ -2084,7 +2084,7 @@ applyObjectLabel[h_,rec_] := Module[{label=rec["Label"],base,markers},
    base=PrintAs[h];With[{hh=h,bb=labelBox[base,label,False]},PrintAs[hh]^=bb]]
 ];
 coordinateLabelRule[box_,coords_] := Module[{head=Head[box[[2]]],part,replacement},
- part=labelBox[box[[1]],coords[head]["Label"],True];
+ part=Replace[box[[1]],{StyleBox[base_,opts___]:>With[{v=labelBox[base,coords[head]["Label"],True]},StyleBox[v,opts]],other_:>labelBox[other,coords[head]["Label"],True]}];
  replacement=With[{p=part},ReplacePart[box,1->p]];
  Rule[box,replacement]
 ];
