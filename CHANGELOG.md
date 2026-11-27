@@ -146,6 +146,12 @@ Added a portable notebook, 75 regression checks, an MUnit report runner, and an 
 
 - Stage native covariant/contravariant metric-component edits and validate before replacing the managed metric. Preserve geometry and revisions on exact repeated metric assignments with matching native fingerprints. Skip component hooks on identically vanishing tensors.
 
+## 14.0.0-beta.13-dev.29 (development)
+
+- Capture literal native held metric edits and geometry reads, preserving HoldFirst and native value semantics.
+- Install and restore authoritative metric matrices exactly; propagate native preparation failures from all three loops.
+- 779/779 checks across 29 groups; workflow 365/365, 84/84, 33/33. See Tests/dev29-results.json. Set-state writes and nonliteral held inputs remain unsupported.
+
 ## 14.0.0-beta.13-dev.28 (development)
 
 - Correct native Set-state detection and reject unsafe managed operations before mutation; explicit Rule restoration required.

@@ -1,4 +1,4 @@
-# Using xPlorer — beta.13-dev.28
+# Using xPlorer — beta.13-dev.29
 
 The principal worked guide is xPlorer_Workflow.nb. Start a fresh Mathematica kernel with xAct installed; keep the notebook beside Paclet/ and evaluate its ordinary Get cell. ScalarTheory.wl is an optional source recipe, not a dependency of the notebook.
 
@@ -302,3 +302,14 @@ SetToRule[A]
 ```
 
 Native read-only RuleToSet/SetToRule round trips and WithSetValues arithmetic remain native and preserve the original Rule-state source stamp and managed revision in the tested case. Correct the previous unqualified StateOfValID reference: xCoba 1.3.0 implements this as xAct`xCoba`Private`StateOfValID, not xPlorer`Private`StateOfValID. A native HeldComponentValue write on an evaluative Set component was observed to emit TensorValues::invalid (numeric argument). Do not pretend Set-state writes are normal Rule-state inputs. Return Failure["NativeSetState",...] with native ValIDs for literal owned held field accesses and managed operations that require Rule-state source data; reject before replay, metric replacement, geometry computation, field deletion, recipe export or component calculation. Native direct evaluation and read-only transitions are unchanged; no global overrides of RuleToSet, SetToRule or WithSetValues. Background-wide calculations are conservatively guarded, field setters guard affected dependencies, and another background remains independent. Explicit SetToRule is required before managed mutations. Direct Set assignments, arbitrary held/nonliteral calls, arbitrary native mutations inside WithSetValues and their synchronization remain unsupported. This is a safe boundary, not full Set-state interoperability.
+
+
+## Held native metric edits and geometry reads (dev.29)
+
+```wl
+With[{head = gN, chart = ChartOf["N"]},
+  HeldComponentValue[head[{0, -chart}, {0, -chart}], -4]
+]
+```
+
+Use the actual owned metric head (for example gN) if retrieving it through your own workflow. For curvature, use the actual native Ricci/Christoffel symbol; a Christoffel constructor can be a compound head and must not be silently evaluated by a held query. Literal owned primary-chart HeldComponentValue metric edits use the same staged validation and authoritative covariant matrix as ordinary native metric edits, with native held value semantics, CVSimplify bypass on held input, and native CVReplace behavior. Authoritative managed metric matrices are installed/restored exactly (ambient component CVSimplify is not reapplied); geometry calculation retains its configured simplification policy. A single conditional HeldComponentValue read DownValue parallels the existing native read integration, recognizing literal owned geometry heads and primary-chart component indices without changing HoldFirst, and allowing lazily created native geometry heads. Unrelated or compound held heads and nonliteral indices are left native. This is intentionally a scoped global read dispatch, not a second geometry engine; native HeldComponentValue's original rules remain. Tested Ricci and alternate variance, Ricci scalar, Christoffel actual native symbol (GiveSymbol), DMetric/DDMetric, inverse metric, Set-state blocking, external tensors and reconstruction. Preparation loop failures now return from Module explicitly (ordinary Return inside Do was swallowed), tested by injecting failures in all three routes. Derived geometry writes, nonliteral held input, arbitrary native Set-state writes, secondary-chart and independent connection lifecycle remain outside this checkpoint.
