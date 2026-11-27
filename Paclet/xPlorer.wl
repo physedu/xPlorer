@@ -75,7 +75,7 @@ StrictComponents::usage = "StrictComponents -> True returns Failure when tensor 
 ForceCompute::usage = "ForceCompute -> True forces a fresh geometry calculation.";
 AboutXPlorer::usage = "AboutXPlorer[] displays the package description, version, authorship and license.";
 $XPlorerVersion::usage = "$XPlorerVersion is the xPlorer package version.";
-$XPlorerVersion = "14.0.0-beta.13-dev.28";
+$XPlorerVersion = "14.0.0-beta.13-dev.29";
 
 Presentation::usage = "Presentation -> <|key -> label|> overrides inherited labels when creating a background. Keys include Metric, CovD, curvature names and registered field keys.";
 SetPresentation::usage = "SetPresentation[tag, fieldOrGeometry, PrintAs -> label] changes one label. SetPresentation[tag, key1 -> label1, key2 -> label2] changes several owned object labels at once; the association form is also accepted. Automatic restores the inherited default for a key.";
@@ -680,6 +680,10 @@ refreshNativeMetricState[tag_,before_] := Module[{b=$BG[tag],known,after},
  Null
 ];
 
+(* A managed matrix is the authoritative mathematical input. Do not
+   reapply an ambient component simplifier while installing or replaying it. *)
+storeManagedMetric[b_,mat_] := guard[Block[{$CVSimplify=Identity,$insideManagedCalculation=True},
+ MetricInBasis[b["Metric"],-b["Basis"],mat]]];
 Options[SetCMetricSystem] = {ComputeOnSet -> {"Metric"}, Assumptions -> True, CVSimplify -> Together, Verbose -> False};
 SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background[tag], mat, det, result, ass = OptionValue[Assumptions], sym},
   If[FailureQ[b], Return[b]];
@@ -698,7 +702,7 @@ SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background
   If[TrueQ[det == 0], Return[failure["DegenerateMetric", "The metric is identically degenerate."]]];
   If[signatureStatus[mat, b["Signature"], ass] === "Failed", Return[failure["MetricSignature", "The matrix signature conflicts with the declared background metric."]]];
   clearGeometry[tag];
-  result = guard[MetricInBasis[b["Metric"], -b["Basis"], mat]];
+  result = storeManagedMetric[b,mat];
   If[result === $Failed, Return[failure["MetricAssignment", "xCoba could not assign the metric."]]];
   put[tag, <|"MetricMatrix" -> mat, "MetricRevision" -> b["MetricRevision"] + 1,
     "Assumptions" -> ass|>];
@@ -782,7 +786,7 @@ ComputeGeometry[tag_String, targets_: {"Metric"}, OptionsPattern[]] := Module[
   ass = Replace[OptionValue[Assumptions], Automatic :> Lookup[b, "Assumptions", True]];
   policy = {fun, ass};
   If[TrueQ[OptionValue[ForceCompute]] || (KeyExistsQ[b, "GeometryPolicy"] && b["GeometryPolicy"] =!= policy),
-    clearGeometry[tag];result=guard[MetricInBasis[b["Metric"], -b["Basis"], b["MetricMatrix"]]];
+    clearGeometry[tag];result=storeManagedMetric[b,b["MetricMatrix"]];
     If[result===$Failed,Return[failure["MetricAssignment","Could not restore the metric before recomputation."]]];
     recordNativeMetricState[tag];
     result=replayFields[tag];If[FailureQ[result],Return[result]];
@@ -1110,16 +1114,16 @@ prepareManagedRead[expr_,list_] := Module[{owners=managedReadOwners[list],atoms,
  ,{group,GatherBy[singleRequests,{#[[1]],fieldRecordKey[#[[2]]],#[[4]]}&]}];
  singleRequests=Flatten[selectedGroups,1];
  Do[b=$BG[tag];r=captureNativeMetricCompute[tag,b["Chart"],georequests[tag],CVSimplify->managedReadPolicy[b]];
-  If[FailureQ[r],Return[r]],{tag,Keys[georequests]}];
+  If[FailureQ[r],Return[r,Module]],{tag,Keys[georequests]}];
  Do[b=$BG[req[[1]]];
   If[!MemberQ[b["ComputedGeometry"],"Metric"]||!nativeGeometryGroupPresentQ[b,"Metric"],
-   r=ComputeGeometry[req[[1]],{"Metric"},CVSimplify->managedReadPolicy[b]];If[FailureQ[r],Return[r]]];
-  r=ensureFieldConfiguration[$BG[req[[1]]],req[[2]],req[[3]]];If[FailureQ[r],Return[r]]
+   r=ComputeGeometry[req[[1]],{"Metric"},CVSimplify->managedReadPolicy[b]];If[FailureQ[r],Return[r,Module]]];
+  r=ensureFieldConfiguration[$BG[req[[1]]],req[[2]],req[[3]]];If[FailureQ[r],Return[r,Module]]
  ,{req,Values[requests]}];
  Do[b=$BG[req[[1]]];
   If[!MemberQ[b["ComputedGeometry"],"Metric"]||!nativeGeometryGroupPresentQ[b,"Metric"],
-   r=ComputeGeometry[req[[1]],{"Metric"},CVSimplify->managedReadPolicy[b]];If[FailureQ[r],Return[r]]];
-  r=ensureSelectedFieldComponent[$BG[req[[1]]],req[[2]],req[[3]]];If[FailureQ[r],Return[r]]
+   r=ComputeGeometry[req[[1]],{"Metric"},CVSimplify->managedReadPolicy[b]];If[FailureQ[r],Return[r,Module]]];
+  r=ensureSelectedFieldComponent[$BG[req[[1]]],req[[2]],req[[3]]];If[FailureQ[r],Return[r,Module]]
  ,{req,singleRequests}];
  Null
 ];
@@ -1132,13 +1136,27 @@ managedSingleRead[e_,operation_] := Block[{$insideManagedCalculation=True},
 (* Conditional native read rules retain the original native dispatch. The
    ToValues list signature covers compound expressions; the two one-argument
    query signatures cover component rules and full native rule groups. *)
+(* Held geometry reads cannot evaluate their arguments to find the owner.
+   Only literal known geometry heads and primary-chart component indices
+   are intercepted, including heads created lazily by MetricCompute. *)
+heldGeometryOwner[head_] := SelectFirst[Values[$BG],KeyExistsQ[geometryReadSpecs[#],head]&,None];
+SetAttributes[managedHeldGeometryReadQ,HoldAllComplete];
+managedHeldGeometryReadQ[head_,e_] := Module[{b},
+ If[TrueQ[$insideManagedCalculation]||TrueQ[$insideNativePrintGuard]||
+  !SameQ[HoldComplete[head],With[{h=head},HoldComplete[h]]],Return[False]];
+ b=heldGeometryOwner[head];If[!AssociationQ[b],Return[False]];
+ With[{tt=b["Tag"]},heldManagedSyntaxQ[tt,e]&&(nativeSetActiveQ[head]||heldManagedLiteralQ[tt,e])]
+];
+managedHeldGeometryRead[head_,e_] := Module[{r=nativeSetGuard[{head}]},
+ If[FailureQ[r],r,managedSingleRead[e,HeldComponentValue]]];
 installManagedReadSyntax[] := If[!TrueQ[$managedReadSyntaxInstalled],
- Unprotect[ToValues,ComponentValue,AllComponentValues];
+ Unprotect[ToValues,ComponentValue,AllComponentValues,HeldComponentValue];
  ToValues[expr_,list_List,f_:Identity] /; (!TrueQ[$insideManagedCalculation] && !TrueQ[$insideNativePrintGuard] && managedReadHeads[list]=!={}) :=
   managedNativeRead[expr,list,f];
  ComponentValue[e_] /; managedSingleReadQ[e] := managedSingleRead[e,ComponentValue];
  AllComponentValues[e:h_?xTensorQ[___]] /; managedSingleReadQ[e] := managedSingleRead[e,AllComponentValues];
- Protect[ToValues,ComponentValue,AllComponentValues];$managedReadSyntaxInstalled=True
+ HeldComponentValue[e:h_Symbol[___]] /; managedHeldGeometryReadQ[h,e] := managedHeldGeometryRead[h,e];
+ Protect[ToValues,ComponentValue,AllComponentValues,HeldComponentValue];$managedReadSyntaxInstalled=True
 ];
 
 (* Native writes to a complete recorded primary-chart configuration.
@@ -1302,7 +1320,7 @@ managedMetricComponentQ[tag_,expr_] := Module[{b=Lookup[$BG,tag,<||>],signs},
  signs=managedPrimaryIndices[b,expr,CIndexQ];
  MemberQ[{{-1,-1},{1,1}},signs]
 ];
-captureManagedMetricComponent[tag_,expr_,input_] := Block[{$insideManagedCalculation=True},
+captureManagedMetricComponent[tag_,expr_,input_,operation_:ComponentValue] := Block[{$insideManagedCalculation=True},
  Module[{b=$BG[tag],metric,signs,basis,stage,r,mat},
   r=backgroundNativeSetGuard[b];If[FailureQ[r],Return[r]];
   metric=b["Metric"];signs=managedPrimaryIndices[b,expr,CIndexQ];basis=First[signs] b["Basis"];
@@ -1314,19 +1332,22 @@ captureManagedMetricComponent[tag_,expr_,input_] := Block[{$insideManagedCalcula
   (* Stage the native write on a localized metric symbol. Failed validation
      leaves the original metric rules and geometry untouched. *)
   stage=guard[With[{hh=metric},Internal`InheritedBlock[{hh},
-   r=ComponentValue[expr,input];
+   r=nativeFieldWrite[operation,expr,input];
    {r,ToValues[ComponentArray[hh,{basis,basis}],hh]}
   ]]];
   If[stage===$Failed||!MatchQ[stage,{_Rule,_List}],Return[failure["MetricInput","The native component assignment could not be staged."]]];
   mat=Last[stage];
   If[!FreeQ[mat,metric],Return[failure["MetricInput","The staged metric is incomplete."]]];
-  r=captureManagedMetricArray[tag,basis,mat,CVSimplify->managedReadPolicy[b]];
+  r=Block[{$CVSimplify=If[operation===HeldComponentValue,Identity,$CVSimplify]},
+   captureManagedMetricArray[tag,basis,mat,CVSimplify->managedReadPolicy[b]]];
   If[FailureQ[r],r,First[stage]]
  ]];
 
 installManagedMetricSyntax[tag_,metric_Symbol] := With[{hh=metric,tt=tag},
  hh /: MetricInBasis[hh,input:(_List|_Function),opts___Rule] := managedMetricInput[tt,input,opts];
  hh /: ComponentValue[e:hh[___],value_] /; managedMetricComponentQ[tt,e] := captureManagedMetricComponent[tt,e,value];
+ hh /: HeldComponentValue[e:hh[___],value_] /; (heldManagedLiteralQ[tt,e]&&managedMetricComponentQ[tt,e]) := captureManagedMetricComponent[tt,e,value,HeldComponentValue];
+ hh /: HeldComponentValue[e:hh[___],value_] /; (heldManagedSyntaxQ[tt,e]&&nativeSetActiveQ[hh]) := nativeSetGuard[{hh}];
  hh /: MetricInBasis[hh,basis_,input_List,opts___Rule] /; managedPrimaryMetricArrayQ[tt,basis,input,{opts}] := captureManagedMetricArray[tt,basis,input,opts];
  hh /: MetricCompute[hh,targets:(_String|_List|All),opts___Rule] := managedNativeGeometry[tt,targets,opts];
  hh /: MetricCompute[hh,ch_,what_,opts___Rule] /; managedNativeMetricComputeQ[tt,ch,{opts}] := captureNativeMetricCompute[tt,ch,what,opts];
@@ -1903,7 +1924,7 @@ notationBoxes[e_,a_] := Module[{orders,args,fn,n,terms,den,body,mark,ix,h=Head[e
 ClearComputedValues[tag_String] := Module[{b=background[tag],r},If[FailureQ[b],Return[b]];
   r=backgroundNativeSetGuard[b];If[FailureQ[r],Return[r]];
   clearGeometry[tag];
-  If[KeyExistsQ[b,"MetricMatrix"],r=guard[MetricInBasis[b["Metric"],-b["Basis"],b["MetricMatrix"]]];If[r===$Failed,Return[failure["ClearValues","Metric values could not be restored."]]];recordNativeMetricState[tag]];
+  If[KeyExistsQ[b,"MetricMatrix"],r=storeManagedMetric[b,b["MetricMatrix"]];If[r===$Failed,Return[failure["ClearValues","Metric values could not be restored."]]];recordNativeMetricState[tag]];
   invalidateResults[tag];
   r=replayFields[tag];If[FailureQ[r],Return[r]];
   r=replayConnections[tag];If[FailureQ[r],Return[r]];Null
