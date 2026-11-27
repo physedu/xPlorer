@@ -1669,7 +1669,7 @@ ownedObjects[b_] := Module[{roots, relative},
 disposeObjects[b_] := Module[{fields, parameter = b["PerturbationParameter"]},
   fields = Reverse[Lookup[Values[b["Field"]], "NewHead", {}]];
   Scan[If[xTensorQ[#], DeleteTensorValues[#]; UndefTensor[#]] &, fields];
-  Scan[If[xTensorQ[#],DeleteTensorValues[#];UndefTensor[#]]&,relativeHeads[b]];
+  Scan[If[xTensorQ[#]&&MasterOf[#]===Null,DeleteTensorValues[#];UndefTensor[#]]&,relativeHeads[b]];
   Scan[If[CovDQ[#] && #=!=Lookup[b,"CovD",None],UndefCovD[#]]&,Reverse@connectionHeads[b]];
   If[MetricQ[b["Metric"]], UndefMetric[b["Metric"]]];
   If[KeyExistsQ[b, "Chart"] && ChartQ[b["Chart"]], UndefChart[b["Chart"]]];
