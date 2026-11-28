@@ -33,6 +33,11 @@ foreignSet=SetFieldComponents["Two",phia,phiaO[]];
 check["SetFieldComponents rejects foreign field",MatchQ[foreignSet,Failure["ForeignBackground",_Association]],True];
 check["Rejected field assignment preserves target",ToComponents["Two",phiaT[]],7];
 check["Rejected field assignment preserves source",ToComponents["One",phiaO[]],2];
+foreignAssumptions=SetFieldComponents["Two",phia,8,Assumptions->(psiaO[]>0)];
+check["SetFieldComponents rejects foreign assumptions",MatchQ[foreignAssumptions,Failure["ForeignBackground",_Association]],True];
+foreignSparse=SetFieldComponents["Two",Va,SparseArray[{2->psiaO[]},{4}],IndexPositions->{-1}];
+check["SetFieldComponents inspects sparse array values",MatchQ[foreignSparse,Failure["ForeignBackground",_Association]],True];
+check["Rejected sparse field is not registered",!AnyTrue[Values[BackgroundValue["Two"]["FieldComponents"]],#["Head"]===VaT&],True];
 
 foreignProfile=RegisterProfile["Two","Foreign",phia,phiaO[]];
 check["RegisterProfile rejects foreign field",MatchQ[foreignProfile,Failure["ForeignBackground",_Association]],True];
@@ -55,6 +60,8 @@ check["Managed complete array rejects foreign scalar",MatchQ[foreignArray,Failur
 foreignMetric=SetCMetricSystem["Two",DiagonalMatrix[{-1,1+xxO[]^2,1,1}],ComputeOnSet->None];
 check["SetCMetricSystem rejects foreign coordinate",MatchQ[foreignMetric,Failure["ForeignBackground",_Association]],True];
 check["Rejected metric preserves target",MetricMatrixOf["Two"],DiagonalMatrix[{-1,1,1,1}]];
+foreignMetricAssumptions=SetCMetricSystem["Two",DiagonalMatrix[{-1,1,1,1}],Assumptions->(psiaO[]>0),ComputeOnSet->None];
+check["SetCMetricSystem rejects foreign assumptions",MatchQ[foreignMetricAssumptions,Failure["ForeignBackground",_Association]],True];
 foreignMetricFunction=SetCMetricSystem["Two",Function[{tt,xx,yy,zz},DiagonalMatrix[{-1,1+xxO[]^2,1,1}]],ComputeOnSet->None];
 check["Metric profile rejects foreign function body",MatchQ[foreignMetricFunction,Failure["ForeignBackground",_Association]],True];
 foreignMetricNative=MetricInBasis[ggT,DiagonalMatrix[{-1,1+xxO[]^2,1,1}]];
@@ -62,6 +69,8 @@ check["Native managed MetricInBasis rejects foreign coordinate",MatchQ[foreignMe
 
 foreignConnection=SetConnectionComponents["Two","Affine",ReplacePart[ConstantArray[0,{4,4,4}],{2,1,3}->xxO[]]];
 check["SetConnectionComponents rejects foreign coordinate",MatchQ[foreignConnection,Failure["ForeignBackground",_Association]],True];
+foreignConnectionAssumptions=SetConnectionComponents["Two","Affine",ConstantArray[0,{4,4,4}],Assumptions->(psiaO[]>0)];
+check["SetConnectionComponents rejects foreign assumptions",MatchQ[foreignConnectionAssumptions,Failure["ForeignBackground",_Association]],True];
 check["Rejected connection is not stored",FailureQ[ConnectionMatrixOf["Two","Affine"]],True];
 
 foreignChart=DefineChart["Two","Foreign",{"T","u","v","w"},Function[{t1,u1,v1,w1},{t1,u1+xxO[],v1,w1}]];
