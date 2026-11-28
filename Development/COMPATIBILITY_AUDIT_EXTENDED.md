@@ -339,3 +339,62 @@ Recommended decisions still to settle explicitly: reject unresolved field metric
 - [xAct distribution](https://xact.es/download/xAct_1.3.0.zip), [xTensor](https://xact.es/xTensor/), [xCoba](https://xact.es/xCoba/), [xPert](https://xact.es/xPert/), [xTras](https://xact.es/xTras/), [xPand source](https://github.com/xAct-contrib/xPand/blob/master/xPand.m), [xAct forum](https://groups.google.com/g/xAct).
 - Wolfram Language: [HoldFirst](https://reference.wolfram.com/language/ref/HoldFirst.html), [MakeBoxes](https://reference.wolfram.com/language/ref/MakeBoxes.html), [$Assumptions](https://reference.wolfram.com/language/ref/$Assumptions.html).
 - Previous audit and resolution history: [COMPATIBILITY_AUDIT.md](COMPATIBILITY_AUDIT.md). This extended record is the current remediation reference, not a replacement for earlier regression evidence.
+
+
+---
+
+## 16. Implementation progress — Phase 1 (2026-11-27)
+
+**Status: implemented on `develop`; focused regression coverage passes.** This section records work performed after the original audit. It does not mark the overall P0 release gate as complete: geometry/connection consistency (Phase 2) and cache policy (Phase 3) remain open.
+
+### 16.1. Changes in `Paclet/xPlorer.wl`
+
+- Added `profileForBackground`, which checks ownership both before and after evaluating a coordinate-dependent profile. Applied it to field, metric and connection inputs.
+- Added owner checks to field-record application and profile snapshots, including profile activation/replay.
+- Guarded managed scalar writes through `ComponentValue` and `HeldComponentValue`, partial component writes, and complete component arrays. The native scalar capture path checks the staged value and restores the previous value if a foreign dependency appears after evaluation; restoration failure is reported separately.
+- Guarded metric arrays, metric component staging, metric assumptions, connection arrays and connection assumptions before committing state.
+- Guarded primary and secondary chart maps before chart creation and after evaluating their coordinate values. A failed secondary chart is removed.
+- Guarded reconstruction export and import. A reconstruction recipe may refer to its declared original owner, but not to a second active background. Remapped profiles and rule groups are checked before being stored.
+- Extended `expressionOwners` to inspect explicit values inside `SparseArray` objects, which are otherwise opaque to ordinary structural traversal.
+- Added `theoryExpressionGuard` to prevent active-background objects from entering the global source theory through metric, covariant derivative, index, assumption/condition, field, parameter, formula, connection, presentation or association-snapshot registration. `CreateBackground` also validates the complete source theory before creating a new background.
+- Extended held managed syntax recognition to include zero-slot scalar tensor expressions, so held scalar writes can be routed through the managed guard. The native held semantics remain intact.
+
+The guard is deliberately provenance-based: an explicitly evaluated numeric value can be transferred as a snapshot. A live expression referring to another active background is rejected. This avoids claiming that a numeric snapshot still carries recoverable provenance after evaluation.
+
+### 16.2. New regression group
+
+Added [`Tests/36_ForeignInputIsolation.wl`](../Tests/36_ForeignInputIsolation.wl) and registered `ForeignInputIsolation` in [`Tests/RunGroup.wl`](../Tests/RunGroup.wl).
+
+The group covers cross-owner field values, profile bodies and snapshots, native scalar/held/partial/array writes, sparse arrays, assumptions, metric matrices and metric native input, independent-connection inputs, secondary chart maps, theory registration, reconstruction recipes, and preservation of valid same-owner operation and numeric snapshots.
+
+<badge color="success">39/39 passed</badge>
+
+The test group ran in a fresh Wolfram Language 15.0.1 kernel with xAct 1.3.0 and the portable xPerm backend.
+
+### 16.3. Existing focused regression groups
+
+After the source-theory guards were added, the following existing standalone groups were rerun against the updated `develop` source:
+
+| Group | Passed |
+| --- | ---: |
+| ManagedNativeSyntax | 13/13 |
+| HeldFieldValues | 20/20 |
+| SparseInputs | 26/26 |
+| SelectedFieldReads | 24/24 |
+| ProfilesAndCTensor | 33/33 |
+| SecondaryChartNative | 3/3 |
+| Consolidation | 30/30 |
+| FieldCache | 23/23 |
+| NativeRead | 22/22 |
+| SelectiveInvalidation | 13/13 |
+| MetricEdits | 13/13 |
+| NativeSetState | 21/21 |
+| **Total existing focused checks** | **241/241** |
+
+Together with the new isolation group, this is **280/280 focused checks passed**. Each group was executed in an independent kernel using the exact test file and the matching runner from the audited development revision.
+
+A full `Tests/RunTests.wl` invocation was attempted but did not complete in the remote evaluator: it returned `Hold[Throw[Null]]` while loading the shared Fixture, before a full-suite summary was produced. It is not counted as a pass. The focused group results above are the completed regression evidence; a clean full-suite run remains a validation task.
+
+### 16.4. Next implementation step
+
+Proceed with Phase 2: revalidate every connection whose compatibility or curvature declaration depends on a proposed metric/reference-connection change, before committing that change. A rejected edit must preserve the previous metric, connection records, native component values, revisions and caches. Do not silently rewrite the abstract connection declarations. Add explicit regressions for metric compatibility, flatness, and rollback after a failed validation.
