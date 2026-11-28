@@ -1,4 +1,6 @@
-# Extended xAct compatibility audit and approved remediation plan
+# Extended xAct compatibility audit and historical remediation plan
+
+**Scope update (2026-11-28):** the maintainer-approved [ACTIVE_BETA_PLAN.md](ACTIVE_BETA_PLAN.md) supersedes this audit's implementation sequence and remaining-work requirements. The findings, reproductions and completed fixes below remain historical evidence. Unsupported advanced operations may be documented with alternative workflows; exhaustive support is not a release requirement. The two still-open demonstrated defects (B and C) have priority.
 
 Date: 2026-11-27. Version: **1.0.0-beta.1**, development branch. Audited revision: [dcf7d929426b6368a3e633da5e563811d82b80b8](https://github.com/physedu/xPlorer/commit/dcf7d929426b6368a3e633da5e563811d82b80b8), verified identical to develop at the start of the investigation. Package blob: b58fe4c58072468c26b27114022cd1af543defa1. This document supplements, rather than replaces, [COMPATIBILITY_AUDIT.md](COMPATIBILITY_AUDIT.md). The maintainer approved the proposed remediation plan on 2026-11-27. Individual design choices below are recommendations, not new public API contracts. This is a research record; no fixes or new executable repository tests are included in this documentation commit.
 
