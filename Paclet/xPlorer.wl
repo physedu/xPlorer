@@ -803,7 +803,7 @@ refreshNativeMetricState[tag_,before_] := Module[{b=$BG[tag],known,after},
 storeManagedMetric[b_,mat_] := guard[Block[{$CVSimplify=Identity,$insideManagedCalculation=True},
  MetricInBasis[b["Metric"],-b["Basis"],mat]]];
 Options[SetCMetricSystem] = {ComputeOnSet -> {"Metric"}, Assumptions -> True, CVSimplify -> Together, Verbose -> False};
-SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background[tag], mat, det, result, ass = OptionValue[Assumptions], sym},
+SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background[tag], mat, det, result, ass = OptionValue[Assumptions], sym,connectionCheck},
   If[FailureQ[b], Return[b]];
   If[!KeyExistsQ[b, "Chart"], Return[failure["NoChart", "Define the chart before assigning a metric."]]];
   result=backgroundNativeSetGuard[b];If[FailureQ[result],Return[result]];
@@ -819,6 +819,8 @@ SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background
   det = Simplify[Det[mat], Assumptions -> ass];
   If[TrueQ[det == 0], Return[failure["DegenerateMetric", "The metric is identically degenerate."]]];
   If[signatureStatus[mat, b["Signature"], ass] === "Failed", Return[failure["MetricSignature", "The matrix signature conflicts with the declared background metric."]]];
+  connectionCheck=preflightConnectionMetricChange[tag,mat,ass];
+  If[FailureQ[connectionCheck],Return[connectionCheck]];
   clearGeometry[tag];
   result = storeManagedMetric[b,mat];
   If[result === $Failed, Return[failure["MetricAssignment", "xCoba could not assign the metric."]]];
@@ -2448,7 +2450,56 @@ primaryGamma[tag_] := Module[{b=$BG[tag],ii,rr},
  rr=ComputeGeometry[tag,{"Christoffel"}];If[FailureQ[rr],Return[rr]];
  ii=indicesFor[b,3];resolveValues[ComponentArray[Christoffel[b["CovD"],PDOfBasis[b["Chart"]]][{ii[[1]],b["Basis"]},{-ii[[2]],-b["Basis"]},{-ii[[3]],-b["Basis"]}]]]
 ];
-connectionGamma[tag_,rec_] := If[rec["Reference"]==="Coordinates",rec["Values"],rec["Values"]+primaryGamma[tag]];
+primaryGammaFromMetric[b_,mat_,ass_] := Module[{n=b["Dimension"],coords=coordinateValues[b],inv,gamma},
+  inv=guard[Inverse[mat]];
+  If[inv===$Failed,Return[failure["ConnectionPreflight","The proposed metric inverse could not be evaluated."]]];
+  gamma=guard[Table[
+    1/2 Sum[inv[[mu,sigma]](
+      D[mat[[sigma,rho]],coords[[nu]]] +
+      D[mat[[sigma,nu]],coords[[rho]]] -
+      D[mat[[nu,rho]],coords[[sigma]]]),{sigma,n}],
+    {mu,n},{nu,n},{rho,n}]];
+  If[gamma===$Failed,Return[failure["ConnectionPreflight","The proposed primary connection could not be evaluated."]]];
+  guard[Simplify[gamma,Assumptions->ass]]
+];
+connectionGamma[tag_,rec_,primary_:Automatic] := If[rec["Reference"]==="Coordinates",rec["Values"],
+  rec["Values"]+If[primary===Automatic,primaryGamma[tag],primary]];
+preflightConnectionMetricChange[tag_,mat_,ass_] := Module[
+  {b=$BG[tag],records=Lookup[$BG[tag],"ConnectionComponents",<||>],primary=Automatic,n,coords,key,rec,cc,gamma,res,check},
+  If[records===<||>,Return[Null]];
+  n=b["Dimension"];coords=coordinateValues[b];
+  If[AnyTrue[Values[records],#["Reference"]==="Primary"&],
+    primary=primaryGammaFromMetric[b,mat,ass];If[FailureQ[primary],Return[primary]]];
+  Do[
+    rec=records[key];cc=ConnectionOf[tag,key];If[FailureQ[cc],Return[cc]];
+    gamma=connectionGamma[tag,rec,primary];
+    If[!TorsionQ[cc],
+      check=arrayZeroCheck[gamma-Transpose[gamma,{1,3,2}],ass];
+      If[check["Status"]=!="Passed",Return[failure["ConnectionTorsion",
+        "The proposed metric would violate the declared zero torsion of connection "<>key<>".",
+        <|"Connection"->key,"Status"->check["Status"],"Residual"->check["Residual"]|>]]]
+    ];
+    If[MetricOfCovD[cc]=!=Null,
+      res=Table[D[mat[[i,j]],coords[[k]]]-
+        Sum[gamma[[l,k,i]]mat[[l,j]]+gamma[[l,k,j]]mat[[i,l]],{l,n}],
+        {k,n},{i,n},{j,n}];
+      check=arrayZeroCheck[res,ass];
+      If[check["Status"]=!="Passed",Return[failure["ConnectionMetricCompatibility",
+        "The proposed metric is incompatible with the stored coefficients of connection "<>key<>".",
+        <|"Connection"->key,"Status"->check["Status"],"Residual"->check["Residual"]|>]]]
+    ];
+    If[!CurvatureQ[cc],
+      res=Table[D[gamma[[d,j,c]],coords[[i]]]-D[gamma[[d,i,c]],coords[[j]]]+
+        Sum[gamma[[d,i,l]]gamma[[l,j,c]]-gamma[[d,j,l]]gamma[[l,i,c]],{l,n}],
+        {i,n},{j,n},{c,n},{d,n}];
+      check=arrayZeroCheck[res,ass];
+      If[check["Status"]=!="Passed",Return[failure["ConnectionCurvature",
+        "The proposed metric would violate the declared flatness of connection "<>key<>".",
+        <|"Connection"->key,"Status"->check["Status"],"Residual"->check["Residual"]|>]]]
+    ],
+    {key,Keys[records]}];
+  Null
+];
 storeConnection[tag_,key_,rec_] := Module[{b=$BG[tag],cc=ConnectionOf[tag,key],ii,tensor,vals,r},
  vals=connectionGamma[tag,rec];If[FailureQ[vals],Return[vals]];
  ii=indicesFor[b,3];tensor=Christoffel[cc,PDOfBasis[b["Chart"]]][{ii[[1]],b["Basis"]},{-ii[[2]],-b["Basis"]},{-ii[[3]],-b["Basis"]}];
