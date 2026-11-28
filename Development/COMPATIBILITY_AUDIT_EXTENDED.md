@@ -436,3 +436,7 @@ Runtime: Wolfram Language 15.0.1, Linux x86-64, xAct 1.3.0, xCoba 0.8.6, xPerm 1
 - Phase 2 remains open until these checks and rollback/replay failure paths are covered.
 
 Next: complete the flatness and multi-connection tests, then proceed to Phase 3 (assumption-aware cache policy) only after the remaining P0 geometry checks are closed.
+
+## 18. Active-plan Phase 2 resolution — 2026-11-28
+
+The two remaining demonstrated findings B and C have been addressed on develop within the managed input/primary-chart scope. See [PHASE2_VALIDATION.md](PHASE2_VALIDATION.md) for precise policy, tests, new native inverse-assignment reproduction and limitations. The active roadmap supersedes the earlier requirement to develop exhaustive connection-edit rollback. No general dynamic metric-field support or global xAct state synchronization is added.
