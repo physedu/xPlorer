@@ -53,6 +53,8 @@ The printed label never renames a symbol. It can be changed per background, char
 - Native abstract and primary-chart component workflows, scalar/vector/tensor fields, perturbations and independent affine connections within the documented scope.
 - Additional charts and registered basis changes; not arbitrary external basis synchronization or primary chart promotion.
 - Arbitrary direct native cache edits, general spinors and bundles beyond the supported tangent-bundle scope are not supported. xAct itself may support additional operations.
+- Supply metric components as explicit expressions of the coordinates and parameters. Evaluate tensor profiles first if needed; metric inputs are not live links to tensor component rules.
+- Specify the intended Assumptions domain for managed geometry; ambient session assumptions do not silently specialize cached geometry. Native RuleToSet and SetToRule are available, but restore Rule state before managed calculations or mutations.
 - Unknown components are not assumed to be zero. xPlorer does not solve boundary-value problems automatically.
 - If a displayed expression no longer contains any owned symbols (for example a pure number), its origin cannot be inferred. Use a background caption explicitly if needed.
 
