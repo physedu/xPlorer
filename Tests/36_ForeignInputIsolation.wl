@@ -24,6 +24,13 @@ SetFieldComponents["One",phia,2];
 SetFieldComponents["Two",phia,7];
 recipe=ReconstructionData["One"];
 
+
+
+checks=<||>;
+SetAttributes[check,HoldRest];
+check[id_,actual_,expected_]:=Module[{x=actual,y=expected},
+  checks[id]=<|"Passed"->SameQ[x,y],"Actual"->ToString[x,InputForm],"Expected"->ToString[y,InputForm]|>];
+
 foreignTheoryMetric=RegisterTheory["Metric",ggO];
 check["RegisterTheory rejects a managed metric",MatchQ[foreignTheoryMetric,Failure["ForeignBackground",_Association]],True];
 foreignTheoryAssumptions=RegisterTheory["Assumptions",psiaO[]>0];
@@ -39,11 +46,6 @@ check["RegisterTheory rejects a contaminated snapshot",MatchQ[foreignTheorySnaps
 check["Rejected theory registrations preserve source metric",TheorySnapshot[]["Metric"],gg];
 thirdBackground=CreateBackground["Three",SymbolSuffix->"R"];
 check["CreateBackground remains usable after rejected registrations",AssociationQ[thirdBackground],True];
-
-checks=<||>;
-SetAttributes[check,HoldRest];
-check[id_,actual_,expected_]:=Module[{x=actual,y=expected},
-  checks[id]=<|"Passed"->SameQ[x,y],"Actual"->ToString[x,InputForm],"Expected"->ToString[y,InputForm]|>];
 
 foreignSet=SetFieldComponents["Two",phia,phiaO[]];
 check["SetFieldComponents rejects foreign field",MatchQ[foreignSet,Failure["ForeignBackground",_Association]],True];
