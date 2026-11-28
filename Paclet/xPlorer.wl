@@ -194,7 +194,8 @@ RegisterTheory[key:("Assumptions"|"Conditions"),value_] := Module[{candidate=Joi
  $Theory=candidate;$Theory
 ];
 b13NativeField[h_Symbol,opts_Association] := Module[
- {g=Lookup[$Theory,"Metric",None],bundle,m,slots,rank,type,key,base,label,sector,pert,idx},
+ {g=Lookup[$Theory,"Metric",None],bundle,m,slots,rank,type,key,base,label,sector,pert,idx,status},
+ status=theoryExpressionGuard[h];If[FailureQ[status],Return[status]];
  If[!TrueQ[xTensorQ[h]] || TrueQ[MetricQ[h]],
   Return[failure["FieldSource","Define a nonmetric tensor with xAct before registration."]]];
  If[!TrueQ[MetricQ[g]],Return[failure["FieldGeometry","Register the source metric first."]]];
@@ -226,14 +227,16 @@ b13NativeField[h_Symbol,opts_Association] := Module[
    "Symmetry"->SymmetryGroupOfTensor[h],"SymbolBase"->base,"PrintAs"->label,"Sector"->sector|>
 ];
 b13NativeField[_,_] := failure["FieldSource","Expected an existing xAct tensor symbol."];
-b13Parameter[h_Symbol,opts_Association] := Module[{key=Lookup[opts,Name,SymbolName[h]],sector=Lookup[opts,Sector,None]},
+b13Parameter[h_Symbol,opts_Association] := Module[{key=Lookup[opts,Name,SymbolName[h]],sector=Lookup[opts,Sector,None],status},
+ status=theoryExpressionGuard[h];If[FailureQ[status],Return[status]];
  If[!TrueQ[ConstantSymbolQ[h]] || !b13NameQ[key] || !b13SectorQ[sector],
   Return[failure["Parameter","Expected an unassigned native constant symbol and valid metadata."]]];
  key -> <|"Value"->h,"Sector"->sector|>
 ];
 b13Parameter[_,_] := failure["Parameter","Parameters are shared native xAct constant symbols."];
 b13Formula[section_,key_String,held_HoldComplete,opts_Association] := Module[
- {named,base,value,sector=Lookup[opts,Sector,None]},
+ {named,base,value,sector=Lookup[opts,Sector,None],status},
+ status=theoryExpressionGuard[held];If[FailureQ[status],Return[status]];
  named=Replace[held,{HoldComplete[s_Symbol]:>SymbolName[Unevaluated[s]],_:>None}];
  If[named=!=None && KeyExistsQ[opts,Head],
   Return[failure["FormulaHead","A named source supplies its own alias base."]]];
@@ -241,6 +244,7 @@ b13Formula[section_,key_String,held_HoldComplete,opts_Association] := Module[
  If[key==="" || !b13NameQ[base] || !b13SectorQ[sector],
   Return[failure["FormulaOptions","Supply a nonempty key and a valid Head for an anonymous formula."]]];
  value=ReleaseHold[held];
+ status=theoryExpressionGuard[value];If[FailureQ[status],Return[status]];
  If[Head[value]===Symbol && !TrueQ[ConstantSymbolQ[value]] && !MemberQ[{True,False},value],
   Return[failure["FormulaValue","Assign the named source formula before registration."]]];
  If[section==="Lagrangians" &&
