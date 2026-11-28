@@ -49,9 +49,9 @@ Keep changes localized. Preserve native mathematics, no new public API unless ne
 
 ### Phase 4 — Public beta preparation
 
-- [ ] Freeze the corrected scientific scope. Document supported workflows and intentional limits in the public README/API guide without burdening the introductory tutorial with internal implementation details.
-- [ ] Follow WORKFLOW_STYLE.md: native syntax, English prose, one operation per input cell, useful physical expressions, optional presentation, separate installation notebook.
-- [ ] Build and verify a matching real paclet and curated distribution (current layout includes the three notebooks). The previous archive already passed remote installation/uninstallation; do not reuse it for changed source. Review Desktop rendering, copy/paste and actual installation as applicable.
+- [x] Freeze the corrected scientific scope at source blob 90cef340400e8fbcac7fb5b6a3d3514f97db8daa. Document the metric input and assumption policy and Rule/Set boundary in README, API_GUIDE and tester-facing Release/README. No new public functions.
+- [x] Preserve WORKFLOW_STYLE.md and the validated scientific notebooks unchanged; native syntax, English prose, separate installation notebook. Desktop visual acceptance remains pending.
+- [ ] Build and verify a matching real paclet and curated distribution (current layout includes the three notebooks). The previous archive already passed remote installation/uninstallation; do not reuse it for changed source. Review Desktop rendering, copy/paste and actual installation as applicable. Remote native archive build attempted at 56de8d9: Java SecurityException, Failure["PacletArchive",...]. Build in Desktop; see RELEASE_CHECKLIST.md.
 - [ ] Keep main as the clean public tree; project only reviewed public files from develop. Publication remains subject to maintainer approval. See RELEASE_CHECKLIST.md and current public VALIDATION.md.
 
 ### Phase 5 — Researcher feedback
