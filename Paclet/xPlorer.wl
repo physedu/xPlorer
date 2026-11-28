@@ -2465,40 +2465,53 @@ primaryGammaFromMetric[b_,mat_,ass_] := Module[{n=b["Dimension"],coords=coordina
 connectionGamma[tag_,rec_,primary_:Automatic] := If[rec["Reference"]==="Coordinates",rec["Values"],
   rec["Values"]+If[primary===Automatic,primaryGamma[tag],primary]];
 preflightConnectionMetricChange[tag_,mat_,ass_] := Module[
-  {b=$BG[tag],records=Lookup[$BG[tag],"ConnectionComponents",<||>],primary=Automatic,n,coords,key,rec,cc,gamma,res,check},
+  {b=$BG[tag],records=Lookup[$BG[tag],"ConnectionComponents",<||>],primary=Automatic,n,coords,key,rec,cc,gamma,res,check,outcome},
   If[records===<||>,Return[Null]];
   n=b["Dimension"];coords=coordinateValues[b];
   If[AnyTrue[Values[records],#["Reference"]==="Primary"&],
     primary=primaryGammaFromMetric[b,mat,ass];If[FailureQ[primary],Return[primary]]];
-  Do[
-    rec=records[key];cc=ConnectionOf[tag,key];If[FailureQ[cc],Return[cc]];
-    gamma=connectionGamma[tag,rec,primary];
-    If[!TorsionQ[cc],
-      check=arrayZeroCheck[gamma-Transpose[gamma,{1,3,2}],ass];
-      If[check["Status"]=!="Passed",Return[failure["ConnectionTorsion",
-        "The proposed metric would violate the declared zero torsion of connection "<>key<>".",
-        <|"Connection"->key,"Status"->check["Status"],"Residual"->check["Residual"]|>]]]
-    ];
-    If[MetricOfCovD[cc]=!=Null,
-      res=Table[D[mat[[i,j]],coords[[k]]]-
-        Sum[gamma[[l,k,i]]mat[[l,j]]+gamma[[l,k,j]]mat[[i,l]],{l,n}],
-        {k,n},{i,n},{j,n}];
-      check=arrayZeroCheck[res,ass];
-      If[check["Status"]=!="Passed",Return[failure["ConnectionMetricCompatibility",
-        "The proposed metric is incompatible with the stored coefficients of connection "<>key<>".",
-        <|"Connection"->key,"Status"->check["Status"],"Residual"->check["Residual"]|>]]]
-    ];
-    If[!CurvatureQ[cc],
-      res=Table[D[gamma[[d,j,c]],coords[[i]]]-D[gamma[[d,i,c]],coords[[j]]]+
-        Sum[gamma[[d,i,l]]gamma[[l,j,c]]-gamma[[d,j,l]]gamma[[l,i,c]],{l,n}],
-        {i,n},{j,n},{c,n},{d,n}];
-      check=arrayZeroCheck[res,ass];
-      If[check["Status"]=!="Passed",Return[failure["ConnectionCurvature",
-        "The proposed metric would violate the declared flatness of connection "<>key<>".",
-        <|"Connection"->key,"Status"->check["Status"],"Residual"->check["Residual"]|>]]]
-    ],
-    {key,Keys[records]}];
-  Null
+  (* Return inside Do exits the iterator, not this surrounding Module.
+     Throw/Catch makes every failed preflight abort the whole validation. *)
+  outcome=Catch[
+    Do[
+      rec=records[key];cc=ConnectionOf[tag,key];
+      If[FailureQ[cc],Throw[cc,"ConnectionMetricPreflight"]];
+      gamma=connectionGamma[tag,rec,primary];
+      If[!TorsionQ[cc],
+        check=arrayZeroCheck[gamma-Transpose[gamma,{1,3,2}],ass];
+        If[check["Status"]=!="Passed",
+          Throw[failure["ConnectionTorsion",
+            "The proposed metric would violate the declared zero torsion of connection "<>key<>".",
+            <|"Connection"->key,"Status"->check["Status"],"Residual"->check["Residual"]|>],
+            "ConnectionMetricPreflight"]]
+      ];
+      If[MetricOfCovD[cc]=!=Null,
+        res=Table[D[mat[[i,j]],coords[[k]]]-
+          Sum[gamma[[l,k,i]]mat[[l,j]]+gamma[[l,k,j]]mat[[i,l]],{l,n}],
+          {k,n},{i,n},{j,n}];
+        check=arrayZeroCheck[res,ass];
+        If[check["Status"]=!="Passed",
+          Throw[failure["ConnectionMetricCompatibility",
+            "The proposed metric is incompatible with the stored coefficients of connection "<>key<>".",
+            <|"Connection"->key,"Status"->check["Status"],"Residual"->check["Residual"]|>],
+            "ConnectionMetricPreflight"]]
+      ];
+      If[!CurvatureQ[cc],
+        res=Table[D[gamma[[d,j,c]],coords[[i]]]-D[gamma[[d,i,c]],coords[[j]]]+
+          Sum[gamma[[d,i,l]]gamma[[l,j,c]]-gamma[[d,j,l]]gamma[[l,i,c]],{l,n}],
+          {i,n},{j,n},{c,n},{d,n}];
+        check=arrayZeroCheck[res,ass];
+        If[check["Status"]=!="Passed",
+          Throw[failure["ConnectionCurvature",
+            "The proposed metric would violate the declared flatness of connection "<>key<>".",
+            <|"Connection"->key,"Status"->check["Status"],"Residual"->check["Residual"]|>],
+            "ConnectionMetricPreflight"]]
+      ],
+      {key,Keys[records]}];
+    Null,
+    "ConnectionMetricPreflight"
+  ];
+  If[FailureQ[outcome],outcome,Null]
 ];
 storeConnection[tag_,key_,rec_] := Module[{b=$BG[tag],cc=ConnectionOf[tag,key],ii,tensor,vals,r},
  vals=connectionGamma[tag,rec];If[FailureQ[vals],Return[vals]];
