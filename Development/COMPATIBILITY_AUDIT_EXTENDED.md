@@ -398,3 +398,39 @@ A full `Tests/RunTests.wl` invocation was attempted but did not complete in the 
 ### 16.4. Next implementation step
 
 Proceed with Phase 2: revalidate every connection whose compatibility or curvature declaration depends on a proposed metric/reference-connection change, before committing that change. A rejected edit must preserve the previous metric, connection records, native component values, revisions and caches. Do not silently rewrite the abstract connection declarations. Add explicit regressions for metric compatibility, flatness, and rollback after a failed validation.
+
+
+---
+
+## 17. Implementation progress — Phase 2 connection preflight (2026-11-28)
+
+**Status: first confirmed metric-compatibility path repaired; focused regression passes.** This does not yet complete all of Phase 2. Flatness-specific preflight, every independent-connection input mode, all rollback failure modes, and wider existing regression groups remain to be tested.
+
+### 17.1. Defect in the initial preflight implementation
+
+The existing `preflightConnectionMetricChange` iterated over stored connections using `Do`, but used `Return[failure[...]]` from inside the iterator and then ended the surrounding Module with an unconditional `Null`. In the actual Wolfram kernel this did not propagate the incompatibility failure to `SetCMetricSystem`; the proposed metric was accepted. This was reproduced on the previous develop revision with the metric `DiagonalMatrix[{-1,4,1,1}]` and an independently stored metric-compatible connection. The subsequent `CheckConnection` returned `"Failed"`.
+
+### 17.2. Source correction
+
+Commit [ee2f372](https://github.com/physedu/xPlorer/commit/ee2f372646e06b0a8bde7fb8909ce24bc7ea4bdb) changes the loop's failure propagation to a tagged `Catch`/`Throw` path. Any failed connection lookup, torsion check, metric-compatibility check or flatness check now exits the whole preflight and returns its `Failure` to `SetCMetricSystem`. The preflight remains before `clearGeometry` and before native metric assignment. No abstract connection declaration is rewritten.
+
+### 17.3. New regression
+
+Added [`Tests/37_ConnectionMetricPreflight.wl`](../Tests/37_ConnectionMetricPreflight.wl) and registered `ConnectionMetricPreflight` in [`Tests/RunGroup.wl`](../Tests/RunGroup.wl). Commit [686af5b](https://github.com/physedu/xPlorer/commit/686af5b01f7add0564a28da5b9945cd9b1f71d1f).
+
+The fresh-kernel test creates a metric-compatible independent connection with nonzero coefficients, proposes an incompatible metric, and checks that the operation returns `Failure["ConnectionMetricCompatibility",...]`. It verifies that the managed metric, connection coefficients, metric revision, native metric fingerprints, and connection input record all remain unchanged, and that the connection remains compatible after rejection. It also checks the identical-metric no-op.
+
+<badge color="success">10/10 passed</badge>
+
+Runtime: Wolfram Language 15.0.1, Linux x86-64, xAct 1.3.0, xCoba 0.8.6, xPerm 1.2.4 portable backend. Test executed via the repository's `RunGroup["ConnectionMetricPreflight"]` runner in a fresh kernel after downloading the exact source at commit 686af5b.
+
+### 17.4. Scope and remaining work
+
+- The test demonstrates atomic rejection for a metric-compatibility violation. It does not certify every possible native xCoba side effect or failure during later geometry computation.
+- The flatness branch (`CurvatureQ[cc] === False`) is present in the preflight but still needs an independent regression using a declared-flat connection and a proposed update that makes its stored coefficients curved.
+- Test a connection whose coefficients are relative to `"Coordinates"` as well as `"Primary"`, and multiple named connections where a later failure must reject the entire metric edit.
+- Test valid metric edits that preserve compatibility, torsion and flatness.
+- The broader focused groups `MetricEdits`, `ObjectsAndConnections` and `MetricConnectionCurvature` did not yield usable pass summaries in this remote run (`$Failed` or zero tests due to the shared test harness/context); they are **not counted as passes or regressions**. Rerun with the normal project test harness before declaring compatibility.
+- Phase 2 remains open until these checks and rollback/replay failure paths are covered.
+
+Next: complete the flatness and multi-connection tests, then proceed to Phase 3 (assumption-aware cache policy) only after the remaining P0 geometry checks are closed.
