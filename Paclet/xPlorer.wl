@@ -802,6 +802,14 @@ refreshNativeMetricState[tag_,before_] := Module[{b=$BG[tag],known,after},
    reapply an ambient component simplifier while installing or replaying it. *)
 storeManagedMetric[b_,mat_] := guard[Block[{$CVSimplify=Identity,$insideManagedCalculation=True},
  MetricInBasis[b["Metric"],-b["Basis"],mat]]];
+(* Metric components must be coordinate expressions, not implicit links to
+   xTensor component rules: xCoba differentiates the installed expressions. *)
+metricCoordinateInputGuard[b_,mat_] := Module[{heads},
+ heads=DeleteDuplicates@Cases[mat,s_Symbol /; xTensorQ[s]&&!MemberQ[b["Coordinates"],s],{0,Infinity},Heads->True];
+ If[heads==={},Null,failure["UnresolvedMetricTensor",
+  "Supply metric components as explicit coordinate expressions. Evaluate the tensor profile first (for example with ToComponents), rather than inserting a tensor head into the metric.",
+  <|"TensorHeads"->heads|>]]
+];
 Options[SetCMetricSystem] = {ComputeOnSet -> {"Metric"}, Assumptions -> True, CVSimplify -> Together, Verbose -> False};
 SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background[tag], mat, det, result, ass = OptionValue[Assumptions], sym,connectionCheck},
   If[FailureQ[b], Return[b]];
@@ -809,6 +817,7 @@ SetCMetricSystem[tag_String, input_, OptionsPattern[]] := Module[{b = background
   result=backgroundNativeSetGuard[b];If[FailureQ[result],Return[result]];
   ass = profileForBackground[tag,ass,b];If[FailureQ[ass],Return[ass]];
   mat = profileForBackground[tag,input,b];If[FailureQ[mat],Return[mat]];
+  result=metricCoordinateInputGuard[b,mat];If[FailureQ[result],Return[result]];
   If[SameQ[Lookup[b,"MetricMatrix",Missing[]],mat]&&SameQ[Lookup[b,"Assumptions",Missing[]],ass]&&nativeMetricCurrentQ[b],
    If[OptionValue[ComputeOnSet]=!=None,
     result=ComputeGeometry[tag,OptionValue[ComputeOnSet],CVSimplify->OptionValue[CVSimplify],Assumptions->ass,Verbose->OptionValue[Verbose]];
