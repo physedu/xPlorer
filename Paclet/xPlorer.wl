@@ -2019,8 +2019,10 @@ automaticView[Row[items_List, rest___]] := Row[automaticView /@ items, rest];
 automaticView[Grid[items_List, rest___]] := Grid[automaticView[items], rest];
 (* Ownership is independent of formatting and includes heads, indices and held rules.
    Shared constants and source-manifold symbols have no managed owner. *)
-expressionOwners[e_] := Module[{contexts},
-  contexts=DeleteDuplicates[Cases[With[{v=e},HoldComplete[v]],ss_Symbol:>Context[ss],Infinity,Heads->True]];
+expressionOwners[e_] := Module[{contexts,scan},
+  (* SparseArray is opaque to ordinary structural traversal; inspect its explicit values too. *)
+  scan=Replace[e,s_SparseArray:>Normal[s],{0,Infinity}];
+  contexts=DeleteDuplicates[Cases[With[{v=scan},HoldComplete[v]],ss_Symbol:>Context[ss],Infinity,Heads->True]];
   Select[Keys[$BG],MemberQ[contexts,$BG[#]["Context"]]&]
 ];
 notationOwner[e_] := Module[{owners=expressionOwners[e]},If[Length[owners]===1,First[owners],None]];
