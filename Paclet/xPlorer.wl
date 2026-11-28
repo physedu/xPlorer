@@ -928,7 +928,7 @@ ComputeGeometry[tag_String, targets_: {"Metric"}, OptionsPattern[]] := Module[
     (* Establish the requested policy before replay: relative connections
        may request the primary Christoffel cache during restoration. *)
     put[tag,<|"GeometryPolicy"->policy|>];
-    result=Block[{$Assumptions=ass},replayFields[tag]];If[FailureQ[result],Return[result]];
+    result=Block[{$Assumptions=Lookup[b,"Assumptions",True]},invalidateMetricFieldValues[tag]];If[FailureQ[result],Return[result]];
     result=Block[{$Assumptions=ass},replayConnections[tag]];If[FailureQ[result],Return[result]];b = $BG[tag]];
   refreshGeometryCoverage[tag]; b = $BG[tag];
   todo = Complement[wanted, b["ComputedGeometry"]];
@@ -1445,11 +1445,12 @@ managedPrimaryMetricArrayQ[tag_,basis_,input_,opts_List] := Module[{b=Lookup[$BG
  MemberQ[{{b["Dimension"]},{b["Dimension"],b["Dimension"]}},Dimensions[input]] &&
  TrueQ[$CVReplace] && Complement[First/@opts,First/@Options[MetricInBasis]]==={}
 ];
-captureManagedMetricArray[tag_,basis_,input_,opts___Rule] := Block[{$insideManagedCalculation=True},
+captureManagedMetricArray[tag_,basis_,input_,opts___Rule] := Block[{$insideManagedCalculation=True,$Assumptions=Lookup[$BG[tag],"Assumptions",True]},
  Module[{b=$BG[tag],mat,lower,r,fun,inv,metric,other,known,requested,status},
   status=backgroundExpressionGuard[tag,input];If[FailureQ[status],Return[status]];
   metric=b["Metric"];mat=If[VectorQ[input],DiagonalMatrix[input],input];
   status=backgroundExpressionGuard[tag,mat];If[FailureQ[status],Return[status]];
+  status=metricCoordinateInputGuard[b,mat];If[FailureQ[status],Return[status]];
   fun=CVSimplify/.Join[{opts},Options[MetricInBasis]];
   inv=Inverse/.Join[{opts},Options[MetricInBasis]];
   lower=If[basis===-b["Basis"],mat,guard[fun[Inverse[mat]]]];
@@ -1462,9 +1463,9 @@ captureManagedMetricArray[tag_,basis_,input_,opts___Rule] := Block[{$insideManag
   If[basis===b["Basis"]||TrueQ[inv],
    known=guard[ToValues[ComponentArray[metric,{basis,basis}],metric]];
    other=If[TrueQ[inv],guard[ToValues[ComponentArray[metric,{-basis,-basis}],metric]],None];
-   requested=If[TrueQ[inv],guard[fun[Inverse[mat]]],None];
+   requested=If[TrueQ[inv],guard[Block[{$Assumptions=geometryAssumptions[$BG[tag]]},fun[Inverse[mat]]]],None];
    If[known=!=mat||other=!=requested,
-    r=guard[MetricInBasis[metric,basis,mat,Inverse->inv,CVSimplify->fun]];
+    r=guard[Block[{$Assumptions=geometryAssumptions[$BG[tag]]},MetricInBasis[metric,basis,mat,Inverse->inv,CVSimplify->fun]]];
     If[r===$Failed,Return[failure["MetricAssignment","The native metric inverse assignment failed."]]];
     recordNativeMetricState[tag];Return[r]]];
   recordNativeMetricState[tag];
@@ -1475,9 +1476,10 @@ managedMetricComponentQ[tag_,expr_] := Module[{b=Lookup[$BG,tag,<||>],signs},
  signs=managedPrimaryIndices[b,expr,CIndexQ];
  MemberQ[{{-1,-1},{1,1}},signs]
 ];
-captureManagedMetricComponent[tag_,expr_,input_,operation_:ComponentValue] := Block[{$insideManagedCalculation=True},
+captureManagedMetricComponent[tag_,expr_,input_,operation_:ComponentValue] := Block[{$insideManagedCalculation=True,$Assumptions=Lookup[$BG[tag],"Assumptions",True]},
  Module[{b=$BG[tag],metric,signs,basis,stage,r,mat,status},
   status=backgroundExpressionGuard[tag,input];If[FailureQ[status],Return[status]];
+  status=metricCoordinateInputGuard[b,input];If[FailureQ[status],Return[status]];
   r=backgroundNativeSetGuard[b];If[FailureQ[r],Return[r]];
   metric=b["Metric"];signs=managedPrimaryIndices[b,expr,CIndexQ];basis=First[signs] b["Basis"];
   If[!nativeGeometryRulePresentQ["Metric"[-1,-1],geometryNativeData[b]],
