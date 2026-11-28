@@ -4,8 +4,10 @@ Internal design, planning, recovery and release-preparation records for xPlorer.
 
 ## Documents
 
+**Current roadmap:** [ACTIVE_BETA_PLAN.md](ACTIVE_BETA_PLAN.md) — maintainer-approved finite plan for beta 1 (2026-11-28). Follow this plan before the historical development sequences and audit recommendations.
+
 - [COMPATIBILITY_AUDIT.md](COMPATIBILITY_AUDIT.md) — reproducible compatibility findings, fixes and remaining research scope.
-- [COMPATIBILITY_AUDIT_EXTENDED.md](COMPATIBILITY_AUDIT_EXTENDED.md) — four confirmed mathematical-correctness findings, independent reproductions, native integration risks and the approved P0–P2 remediation plan; publication gate pending.
+- [COMPATIBILITY_AUDIT_EXTENDED.md](COMPATIBILITY_AUDIT_EXTENDED.md) — four confirmed mathematical-correctness findings, independent reproductions, native integration risks and historical P0–P2 recommendations; implementation priorities are superseded by ACTIVE_BETA_PLAN.md.
 
 - [WORKFLOW_STYLE.md](WORKFLOW_STYLE.md) — binding editorial and pedagogical rules for the public notebooks.
 
@@ -29,7 +31,7 @@ Internal design, planning, recovery and release-preparation records for xPlorer.
 
 The maintainer selected exactly two active branches: `main` (clean public-facing source tree) and `develop` (complete development tree and internal records). PR #14 has been merged into main at [7160eb0](https://github.com/physedu/xPlorer/commit/7160eb0a943ce7fe432adae650e0634d3b2d8ecf). This is the unreleased 1.0.0-beta.1 candidate, not an announcement of publication. No new development work should occur on temporary or historical branches. For future releases, project the public source tree into main, keeping this Development archive and historical-only material on develop. Do not blindly merge the complete development tree into main.
 
-Fresh notebook validation of the clean candidate [d67e5b8](https://github.com/physedu/xPlorer/commit/d67e5b8f09d99ccd457f3237569e992de57ad9aa) passed 131/131 and 419/419 cells, 26/26 and 109/109 checks, and 33/33 advanced stages. See [public validation](https://github.com/physedu/xPlorer/blob/7160eb0a943ce7fe432adae650e0634d3b2d8ecf/VALIDATION.md). The startup banner was observed with the correct version and GitHub URL. The remote native archive builder failed due to a Java security restriction; actual paclet installation, Desktop acceptance and publication remain pending. The main integration was advanced before that gate to establish the two active branches; the publication gate is unchanged.
+Fresh notebook validation of the clean candidate [d67e5b8](https://github.com/physedu/xPlorer/commit/d67e5b8f09d99ccd457f3237569e992de57ad9aa) passed 131/131 and 419/419 cells, 26/26 and 109/109 checks, and 33/33 advanced stages. See [public validation](https://github.com/physedu/xPlorer/blob/7160eb0a943ce7fe432adae650e0634d3b2d8ecf/VALIDATION.md). The startup banner was observed with the correct version and GitHub URL. The remote native archive builder initially failed due to a Java security restriction. Subsequent actual archive installation/uninstallation and distribution verification for the earlier public candidate passed, as recorded in [current public validation](https://github.com/physedu/xPlorer/blob/main/VALIDATION.md). A matching archive for the corrected development source, Desktop acceptance and publication remain pending.
 
 ## Retired branch references
 
