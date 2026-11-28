@@ -9,6 +9,8 @@ Internal design, planning, recovery and release-preparation records for xPlorer.
 - [COMPATIBILITY_AUDIT.md](COMPATIBILITY_AUDIT.md) — reproducible compatibility findings, fixes and remaining research scope.
 - [COMPATIBILITY_AUDIT_EXTENDED.md](COMPATIBILITY_AUDIT_EXTENDED.md) — four confirmed mathematical-correctness findings, independent reproductions, native integration risks and historical P0–P2 recommendations; implementation priorities are superseded by ACTIVE_BETA_PLAN.md.
 
+- [PHASE2_VALIDATION.md](PHASE2_VALIDATION.md) — corrected mathematical defects and exact regression/scientific validation evidence.
+
 - [RULE_SET_RESEARCH.md](RULE_SET_RESEARCH.md) — independent native Rule/Set interoperability investigation, tested prototype and prepared-array timings; optional Phase 3 experiment.
 
 - [WORKFLOW_STYLE.md](WORKFLOW_STYLE.md) — binding editorial and pedagogical rules for the public notebooks.
