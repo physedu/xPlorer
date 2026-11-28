@@ -889,10 +889,16 @@ managedNativeMetricComputeQ[tag_,ch_,opts_List] := Module[{b=Lookup[$BG,tag,<||>
  !TrueQ[$insideManagedCalculation]&&!TrueQ[$insideNativePrintGuard]&&
  KeyExistsQ[b,"MetricMatrix"]&&ch===b["Chart"]&&Complement[First/@opts,First/@Options[MetricCompute]]==={}
 ];
-captureNativeMetricCompute[tag_,ch_,what_,opts___Rule] := Block[{$insideManagedCalculation=True},
+(* Cached native computations must not inherit ambient $Assumptions.
+   A managed geometry policy records the explicit assumptions; otherwise
+   use the background's declared domain. Native calls may choose their own
+   simplifier but share this assumption domain with the managed cache. *)
+geometryAssumptions[b_] := Last[Lookup[b,"GeometryPolicy",{Together,Lookup[b,"Assumptions",True]}]];
+captureNativeMetricCompute[tag_,ch_,what_,opts___Rule] := Block[{$insideManagedCalculation=True,$Assumptions=geometryAssumptions[$BG[tag]]},
  Module[{b=$BG[tag],result,deps,covered,old,new,seconds,before},
   result=backgroundNativeSetGuard[b];If[FailureQ[result],Return[result]];
   old=refreshGeometryCoverage[tag];
+  If[!KeyExistsQ[b,"GeometryPolicy"],put[tag,<|"GeometryPolicy"->{Together,$Assumptions}|>]];
   repairMissingGeometryCache[b];before=nativeMetricState[b];
   {seconds,result}=AbsoluteTiming[guard[MetricCompute[b["Metric"],Zero,ch,what,opts]]];
   If[result===$Failed,Return[failure["GeometryComputation","xCoba could not compute the requested native geometry."]]];
@@ -913,20 +919,24 @@ ComputeGeometry[tag_String, targets_: {"Metric"}, OptionsPattern[]] := Module[
   wanted = If[targets === All, Keys[$geometryTargets], Flatten[{targets}]];
   If[!VectorQ[wanted, StringQ] || !SubsetQ[Keys[$geometryTargets], wanted], Return[failure["GeometryTargets", "Unknown geometry target.", <|"Allowed" -> Keys[$geometryTargets]|>]]];
   ass = Replace[OptionValue[Assumptions], Automatic :> Lookup[b, "Assumptions", True]];
+  ass=profileForBackground[tag,ass,b];If[FailureQ[ass],Return[ass]];
   policy = {fun, ass};
   If[TrueQ[OptionValue[ForceCompute]] || (KeyExistsQ[b, "GeometryPolicy"] && b["GeometryPolicy"] =!= policy),
     clearGeometry[tag];result=storeManagedMetric[b,b["MetricMatrix"]];
     If[result===$Failed,Return[failure["MetricAssignment","Could not restore the metric before recomputation."]]];
     recordNativeMetricState[tag];
-    result=replayFields[tag];If[FailureQ[result],Return[result]];
-    result=replayConnections[tag];If[FailureQ[result],Return[result]];b = $BG[tag]];
+    (* Establish the requested policy before replay: relative connections
+       may request the primary Christoffel cache during restoration. *)
+    put[tag,<|"GeometryPolicy"->policy|>];
+    result=Block[{$Assumptions=ass},replayFields[tag]];If[FailureQ[result],Return[result]];
+    result=Block[{$Assumptions=ass},replayConnections[tag]];If[FailureQ[result],Return[result]];b = $BG[tag]];
   refreshGeometryCoverage[tag]; b = $BG[tag];
   todo = Complement[wanted, b["ComputedGeometry"]];
   If[todo === {}, Return[<|"Computed" -> {}, "Cached" -> wanted, "Seconds" -> 0., "MetricRevision" -> b["MetricRevision"]|>]];
   repairMissingGeometryCache[b];before=nativeMetricState[b];
   specs = Flatten[Lookup[$geometryTargets, todo]];
-  {seconds, result} = AbsoluteTiming[guard[MetricCompute[b["Metric"], b["Chart"], specs,
-    CVSimplify -> fun, Verbose -> OptionValue[Verbose]]]];
+  {seconds, result} = AbsoluteTiming[guard[Block[{$Assumptions=ass,$insideManagedCalculation=True},MetricCompute[b["Metric"], b["Chart"], specs,
+    CVSimplify -> fun, Verbose -> OptionValue[Verbose]]]]];
   If[result === $Failed, Return[failure["GeometryComputation", "xCoba could not compute the requested geometry."]]];
   refreshNativeMetricState[tag,before];
   put[tag, <|"ComputedGeometry" -> Union[b["ComputedGeometry"], wanted], "GeometryPolicy" -> policy,
@@ -1123,7 +1133,7 @@ ensureFieldConfiguration[b_,rec_,signs_] := Module[{target,init,r,tag=b["Tag"],k
  target=fieldBasisExpression[b,rec,signs];
  init=fieldBasisExpression[b,rec,rec["IndexPositions"]];
  r=guard[Block[{$insideManagedCalculation=True,$CVVerbose=False,$CVReplace=True,$TUseValues=All,$BMUseValues=All},
-  ChangeComponents[target,init]]];
+  Block[{$Assumptions=geometryAssumptions[b]},ChangeComponents[target,init]]]];
  If[r===$Failed,Return[failure["FieldVariance","xCoba could not change the field configuration."]]];
  put[tag,<|"NativeVarianceStamps"->Append[stamps,key->nativeVarianceStamp[b,rec,signs]]|>];Null
 ];
@@ -1200,7 +1210,7 @@ ensureSelectedFieldComponent[b_,rec_,atom_] := Module[
  If[Lookup[stamps,key,Missing[]]===stamp,ComponentValue[atom];Return[Null]];
  target=fieldBasisExpression[b,rec,signs];ix=DeleteCases[List@@target,_LI];
  changed=Pick[ix,MapThread[UnsameQ,{signs,rec["IndexPositions"]}],True];
- r=guard[Block[{$insideManagedCalculation=True,$CVVerbose=False,$CVReplace=True},
+ r=guard[Block[{$insideManagedCalculation=True,$CVVerbose=False,$CVReplace=True,$Assumptions=geometryAssumptions[b]},
    separated=Fold[SeparateMetric[Automatic,b["Basis"]][#1,#2]&,target,changed];
    selected=componentAt[separated,ix,First/@DeleteCases[List@@can,_LI]];
    value=traceValues[selected];
@@ -1610,7 +1620,7 @@ prepareFieldConfigurations[tag_, expr_] := Module[{b = $BG[tag], atoms, fs, reco
     If[records =!= {} && fs["Rank"] > 0,
       init = Head[atom] @@ Join[Select[List @@ atom, MatchQ[#, _LI] &],
         MapThread[{#1 #2, #2 b["Basis"]} &, {indicesFor[b, fs["Rank"]], First[records]["IndexPositions"]}]];
-      result = If[SameQ[Last /@ DeleteCases[List@@atom,_LI],Last /@ DeleteCases[List@@init,_LI]],Null,guard[Block[{$insideManagedCalculation=True},ChangeComponents[atom, init]]]];
+      result = If[SameQ[Last /@ DeleteCases[List@@atom,_LI],Last /@ DeleteCases[List@@init,_LI]],Null,guard[Block[{$insideManagedCalculation=True,$Assumptions=geometryAssumptions[b]},ChangeComponents[atom, init]]]];
       If[result === $Failed, Return[failure["FieldVariance", "Could not change the field index configuration."]]]
     ], {atom, atoms}]; Null
 ];
@@ -1664,7 +1674,9 @@ ToComponents[tag_String, input_, OptionsPattern[]] := Module[
     inds = List @@ PortExpression[tag, IndexList @@ inds];
     If[Sort[inds] =!= Sort[actual], Return[failure["FreeIndices", "The specified indices must match all free indices exactly."]]]];
   If[output==="CTensor" && (inds==={} || !AllTrue[inds,AIndexQ] || !TrueQ[WeightOf[ex]===0]),Return[failure["ComponentOutput","CTensor output requires positive rank, abstract free indices and zero tensor weight."]]];
-  geometry = ComputeGeometry[tag, geometryNeeded[b, ex], CVSimplify -> OptionValue[CVSimplify]];
+  ass = Replace[OptionValue[Assumptions], Automatic :> Lookup[b, "Assumptions", True]];
+  ass=profileForBackground[tag,ass,b];If[FailureQ[ass],Return[ass]];
+  geometry = ComputeGeometry[tag, geometryNeeded[b, ex], CVSimplify -> OptionValue[CVSimplify],Assumptions->ass];
   If[FailureQ[geometry], Return[geometry]];
   ex=expandConnections[tag,ex];If[FailureQ[ex],Return[ex]];
   If[(OptionValue[Components]===All||rec===None) && MatchQ[ex,_[__]],fieldRecord=directFieldRecord[$BG[tag],ex]];
@@ -1703,7 +1715,6 @@ ToComponents[tag_String, input_, OptionsPattern[]] := Module[
    If[FailureQ[result],Return[result]]];
   arr = guard[resolveValues[traceValues[arr]]];
   If[arr === $Failed, Return[failure["ComponentValues", "xCoba could not evaluate component values."]]];
-  ass = Replace[OptionValue[Assumptions], Automatic :> Lookup[b, "Assumptions", True]];
   If[rec=!=None,
     If[!FreeQ[arr,h_[___] /; xTensorQ[h] && !MemberQ[b["Coordinates"],h]],
       Return[failure["ChartComponents","Supply field components before changing charts."]]];
@@ -2456,7 +2467,7 @@ externalRelativeHeads[b_] := Module[{cds=managedDerivativeHeads[b],allowed},
 Options[SetConnectionComponents]={ReferenceConnection->"Coordinates",Assumptions->Automatic};
 primaryGamma[tag_] := Module[{b=$BG[tag],ii,rr},
  If[!KeyExistsQ[b,"MetricMatrix"],Return[failure["NoMetricComponents","Assign metric components first."]]];
- rr=ComputeGeometry[tag,{"Christoffel"}];If[FailureQ[rr],Return[rr]];
+ rr=ComputeGeometry[tag,{"Christoffel"},CVSimplify->managedReadPolicy[b],Assumptions->geometryAssumptions[b]];If[FailureQ[rr],Return[rr]];
  ii=indicesFor[b,3];resolveValues[ComponentArray[Christoffel[b["CovD"],PDOfBasis[b["Chart"]]][{ii[[1]],b["Basis"]},{-ii[[2]],-b["Basis"]},{-ii[[3]],-b["Basis"]}]]]
 ];
 primaryGammaFromMetric[b_,mat_,ass_] := Module[{n=b["Dimension"],coords=coordinateValues[b],inv,gamma},
