@@ -1265,12 +1265,12 @@ prepareManagedRead[expr_,list_] := Module[{owners=managedReadOwners[list],atoms,
   If[FailureQ[r],Return[r,Module]],{tag,Keys[georequests]}];
  Do[b=$BG[req[[1]]];
   If[!MemberQ[b["ComputedGeometry"],"Metric"]||!nativeGeometryGroupPresentQ[b,"Metric"],
-   r=ComputeGeometry[req[[1]],{"Metric"},CVSimplify->managedReadPolicy[b]];If[FailureQ[r],Return[r,Module]]];
+   r=ComputeGeometry[req[[1]],{"Metric"},CVSimplify->managedReadPolicy[b],Assumptions->geometryAssumptions[b]];If[FailureQ[r],Return[r,Module]]];
   r=ensureFieldConfiguration[$BG[req[[1]]],req[[2]],req[[3]]];If[FailureQ[r],Return[r,Module]]
  ,{req,Values[requests]}];
  Do[b=$BG[req[[1]]];
   If[!MemberQ[b["ComputedGeometry"],"Metric"]||!nativeGeometryGroupPresentQ[b,"Metric"],
-   r=ComputeGeometry[req[[1]],{"Metric"},CVSimplify->managedReadPolicy[b]];If[FailureQ[r],Return[r,Module]]];
+   r=ComputeGeometry[req[[1]],{"Metric"},CVSimplify->managedReadPolicy[b],Assumptions->geometryAssumptions[b]];If[FailureQ[r],Return[r,Module]]];
   r=ensureSelectedFieldComponent[$BG[req[[1]]],req[[2]],req[[3]]];If[FailureQ[r],Return[r,Module]]
  ,{req,singleRequests}];
  Null
