@@ -171,13 +171,28 @@ TheorySector[sector_String] := AssociationMap[
   Select[b13Collection[$Theory,#],Lookup[#,"Sector",None]===sector&]&,
   {"Fields","Parameters","Lagrangians","Expressions"}];
 (* Raw snapshots are used by reconstruction; not an alternate positional API. *)
-RegisterTheory[assoc_Association] := ($Theory=Join[$Theory,assoc]; $Theory);
+RegisterTheory[assoc_Association] := Module[{candidate=Join[$Theory,assoc],status},
+ status=theoryExpressionGuard[candidate];If[FailureQ[status],Return[status]];
+ $Theory=candidate;$Theory
+];
 RegisterTheory[snapshot_Symbol] := Module[{value=snapshot},If[AssociationQ[value],RegisterTheory[Evaluate[value]],failure["Registration","Supply a saved theory association."]]];
-RegisterTheory["Metric",value_] := ($Theory["Metric"]=value;$Theory);
-RegisterTheory["CovD",value_] := ($Theory["CovD"]=value;$Theory);
-RegisterTheory["Indices",value_List] := ($Theory["Indices"]=value;$Theory);
+RegisterTheory["Metric",value_] := Module[{candidate=Join[$Theory,<|"Metric"->value|>],status},
+ status=theoryExpressionGuard[candidate];If[FailureQ[status],Return[status]];
+ $Theory=candidate;$Theory
+];
+RegisterTheory["CovD",value_] := Module[{candidate=Join[$Theory,<|"CovD"->value|>],status},
+ status=theoryExpressionGuard[candidate];If[FailureQ[status],Return[status]];
+ $Theory=candidate;$Theory
+];
+RegisterTheory["Indices",value_List] := Module[{candidate=Join[$Theory,<|"Indices"->value|>],status},
+ status=theoryExpressionGuard[candidate];If[FailureQ[status],Return[status]];
+ $Theory=candidate;$Theory
+];
 RegisterTheory[key:("Title"|"Description"),value_] := With[{v=value},If[StringQ[v],$Theory[key]=v;$Theory,failure["TheoryInformation","Title and Description must be strings."]]];
-RegisterTheory[key:("Assumptions"|"Conditions"),value_] := ($Theory[key]=value;$Theory);
+RegisterTheory[key:("Assumptions"|"Conditions"),value_] := Module[{candidate=Join[$Theory,<|key->value|>],status},
+ status=theoryExpressionGuard[candidate];If[FailureQ[status],Return[status]];
+ $Theory=candidate;$Theory
+];
 b13NativeField[h_Symbol,opts_Association] := Module[
  {g=Lookup[$Theory,"Metric",None],bundle,m,slots,rank,type,key,base,label,sector,pert,idx},
  If[!TrueQ[xTensorQ[h]] || TrueQ[MetricQ[h]],
@@ -342,10 +357,11 @@ makeOwnedField[key_, spec_, ctx_, suffix_, srcg_, srcm_, m_, g_, base_, inds_, l
 Options[CreateBackground] = {Indices -> Automatic, MetricSignature -> Automatic, Presentation -> <||>, SymbolSuffix -> Automatic, PrintAs -> Automatic, ShowObjectLabels->Automatic, BackgroundLabel->Automatic, ShowBackgroundLabel->Automatic};
 CreateBackground[tag_String, OptionsPattern[]] := Module[
   {theory = $Theory, srcg, srccd, srcm, dim, base, display, inds, ctx, m, g, cd, sig,
-   specs, fields = <||>, oldgeo, geo, rules, result, parameter, make, owned, labels, defaults, suffix, notation, perturbHead = None},
+   specs, fields = <||>, oldgeo, geo, rules, result, parameter, make, owned, labels, defaults, suffix, notation, perturbHead = None,status},
   If[KeyExistsQ[$BG, tag],
     If[!KeyExistsQ[$BG[tag],"AliasContext"],installBackgroundObjectAliases[tag,$Context]];
     Return[$BG[tag]]];
+  status=theoryExpressionGuard[theory];If[FailureQ[status],Return[status]];
   If[!And @@ (KeyExistsQ[theory, #] & /@ {"Metric", "CovD", "Indices"}),
     Return[failure["IncompleteTheory", "Register a metric, covariant derivative and indices first."]]];
   srcg = theory["Metric"]; srccd = theory["CovD"];
@@ -1975,7 +1991,10 @@ SetXPlorerPreferences[assoc_Association] := Module[{n = KeyTake[assoc,Keys[$nota
   If[!validNotation[n],Return[failure["Notation","Unknown derivative style."]]];
   If[AllTrue[Values[p], validLabelQ[#] || MatchQ[#, {_String,_String}] &],
   $PresentationPreferences = p; $sessionNotation = n; updatePrintHook[]; assoc, failure["Presentation", "Defaults must be strings or connection marker pairs."]]];
-RegisterTheory["Presentation", assoc_Association] := ($Theory["Presentation"] = assoc; $Theory);
+RegisterTheory["Presentation", assoc_Association] := Module[{candidate=Join[$Theory,<|"Presentation"->assoc|>],status},
+ status=theoryExpressionGuard[candidate];If[FailureQ[status],Return[status]];
+ $Theory=candidate;$Theory
+];
 BackgroundObject[tag_String, key_String] := Module[{b = background[tag]},
   If[FailureQ[b], Return[b]];
   If[KeyExistsQ[b["Field"], key], b["Field"][key]["NewHead"], If[KeyExistsQ[Lookup[b,"Connections",<||>],key],ConnectionOf[tag,key],getter[tag,key]]]
@@ -2029,6 +2048,9 @@ notationOwner[e_] := Module[{owners=expressionOwners[e]},If[Length[owners]===1,F
 backgroundExpressionGuard[tag_,expr_] := Module[{owners=expressionOwners[expr],foreign},
   foreign=DeleteCases[owners,tag];
   If[foreign==={},Null,failure["ForeignBackground","The expression contains objects of another managed background. Use the original source expression to specialize independently.",<|"Target"->tag,"Owners"->owners,"ForeignOwners"->foreign|>]]
+];
+theoryExpressionGuard[expr_] := Module[{owners=expressionOwners[expr]},
+  If[owners==={},Null,failure["ForeignBackground","The registered source theory contains objects owned by an active background. Use source xAct objects or explicitly evaluated snapshots.",<|"Owners"->owners|>]]
 ];
 notationSettings[tag_] := Join[$notationDefaults,$sessionNotation,
   If[StringQ[tag],Lookup[$BG[tag],"Notation",<||>],<||>]];
@@ -2342,7 +2364,8 @@ invalidateResults[tag_] := If[KeyExistsQ[$BG,tag],put[tag,<|"DataRevision"->Look
 
 (* Named derivatives keep the primary Levi-Civita workflow unchanged. *)
 Options[AddConnection]={SymbolOfCovD->Automatic};
-RegisterTheory["Connection",key_String,source_Symbol,opts___Rule] := Module[{a=Association[opts],spec},
+RegisterTheory["Connection",key_String,source_Symbol,opts___Rule] := Module[{a=Association[opts],spec,status},
+ status=theoryExpressionGuard[source];If[FailureQ[status],Return[status]];
  If[!CovDQ[source] || Complement[Keys[a],{SymbolOfCovD}]=!={},Return[failure["Connection","Register an existing xAct covariant derivative; only SymbolOfCovD may override presentation here."]]];
  spec=<|"Head"->source,"SymbolOfCovD"->Lookup[a,SymbolOfCovD,SymbolOfCovD[source]]|>;
  $Theory["Connections"]=Join[Lookup[$Theory,"Connections",<||>],<|key->spec|>];$Theory
