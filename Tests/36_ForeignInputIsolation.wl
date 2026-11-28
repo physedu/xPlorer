@@ -24,6 +24,22 @@ SetFieldComponents["One",phia,2];
 SetFieldComponents["Two",phia,7];
 recipe=ReconstructionData["One"];
 
+foreignTheoryMetric=RegisterTheory["Metric",ggO];
+check["RegisterTheory rejects a managed metric",MatchQ[foreignTheoryMetric,Failure["ForeignBackground",_Association]],True];
+foreignTheoryAssumptions=RegisterTheory["Assumptions",psiaO[]>0];
+check["RegisterTheory rejects managed assumptions",MatchQ[foreignTheoryAssumptions,Failure["ForeignBackground",_Association]],True];
+foreignTheoryFormula=RegisterTheory["Expression","Foreign"->psiaO[]];
+check["RegisterTheory rejects a managed formula",MatchQ[foreignTheoryFormula,Failure["ForeignBackground",_Association]],True];
+foreignTheoryField=RegisterTheory["Field",phiaO];
+check["RegisterTheory rejects a managed field",MatchQ[foreignTheoryField,Failure["ForeignBackground",_Association]],True];
+foreignTheoryConnection=RegisterTheory["Connection","Foreign",BackgroundObject["One","CovD"]];
+check["RegisterTheory rejects a managed connection",MatchQ[foreignTheoryConnection,Failure["ForeignBackground",_Association]],True];
+foreignTheorySnapshot=RegisterTheory[Append[TheorySnapshot[],"Foreign"->psiaO[]]];
+check["RegisterTheory rejects a contaminated snapshot",MatchQ[foreignTheorySnapshot,Failure["ForeignBackground",_Association]],True];
+check["Rejected theory registrations preserve source metric",TheorySnapshot[]["Metric"],gg];
+thirdBackground=CreateBackground["Three",SymbolSuffix->"R"];
+check["CreateBackground remains usable after rejected registrations",AssociationQ[thirdBackground],True];
+
 checks=<||>;
 SetAttributes[check,HoldRest];
 check[id_,actual_,expected_]:=Module[{x=actual,y=expected},
@@ -91,7 +107,7 @@ snapshotWrite=With[{head=phiaT,value=numericSnapshot},HeldComponentValue[head[],
 check["Held scalar accepts an already evaluated numeric snapshot",MatchQ[snapshotWrite,_Rule],True];
 check["Held numeric snapshot is stored as a value",ToComponents["Two",phiaT[]],2];
 
-check["Cleanup",And@@(SameQ[DeleteBackground[#],Null]&/@{"Copy","Two","One"}),True];
+check["Cleanup",And@@(SameQ[DeleteBackground[#],Null]&/@{"Three","Copy","Two","One"}),True];
 <|"Total"->Length[checks],"Passed"->Count[Lookup[Values[checks],"Passed"],True],
   "Failed"->Count[Lookup[Values[checks],"Passed"],False],
   "Failures"->Select[checks,!TrueQ[#["Passed"]]&]|>
