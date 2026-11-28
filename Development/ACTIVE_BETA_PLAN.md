@@ -44,6 +44,7 @@ Keep changes localized. Preserve native mathematics, no new public API unless ne
 
 - [ ] Compare native xAct and managed results in a small set of representative research workflows: Einstein-scalar/Klein-Gordon on independent backgrounds, Maxwell/Proca, metric perturbations, and a supported metric-affine example. Reuse existing examples and tests first.
 - [ ] Prioritize interoperability with optional xTras (e.g. native VarD/VarL and expression transport). This was part of the original motivation; do not build special solvers or variation engines. An f(R) example is useful if it adds distinct coverage.
+- [ ] **Bounded Rule/Set interoperability and performance experiment (optional, after Phase 2).** See [RULE_SET_RESEARCH.md](RULE_SET_RESEARCH.md): native transitions already work, managed reads are conservatively blocked, a per-ValID restoration prototype preserved mixed state, and prepared-array substitution timings justify further investigation. Test localized read-only compatibility and temporary Set evaluation after component preparation; compare full scientific workflows including conversion overhead and memory. Adopt only if correct, simple and demonstrably useful. Preserve existing explicit limits on Set-state mutations. No global modifications to xCoba transition functions; no unconditional release blocker.
 - [ ] Rerun both actual public notebooks and relevant regression groups on the frozen corrected source; record exact revision, environment, expected results and any blockers. Run historical suites where practical; distinguish missing execution evidence from a confirmed mathematical failure.
 
 ### Phase 4 — Public beta preparation
@@ -62,7 +63,7 @@ Prioritize concrete scientific use cases and reproducible reports from beta test
 - Universal transactions, arbitrary undo, general rollback or dependency tracking for the Mathematica kernel.
 - Dynamic metric-field dependency graphs, automatic backreaction or equation solvers.
 - Synchronizing every native mutation, arbitrary cache edit, general cycle detection or general external basis replay.
-- Full support for native xCoba Rule/Set storage transitions. RuleToSet changes stored component rules into direct assignments; SetToRule restores rule storage. They are advanced native operations, not part of the ordinary xPlorer workflow. Keep native behavior and the existing explicit managed Rule-state boundary; no automatic conversion or requirement to learn these commands.
+- Full support for native xCoba Rule/Set storage transitions or arbitrary Set-state mutations. RuleToSet changes stored component rules into direct assignments; SetToRule restores rule storage. Preserve native behavior and explicit managed mutation boundaries. The bounded read-only and optional performance experiment in Phase 3 is the sole exception; no permanent automatic state conversion or requirement to learn these commands.
 - General extra bundles, spinors, tetrads/Clifford algebra, complete xPand integration, exhaustive cross-version compatibility, or a broad rewrite of private adapters.
 - Mass removal of public convenience functions or speculative performance optimization. The API redundancy audit remains a future design reference.
 
