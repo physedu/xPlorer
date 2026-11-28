@@ -110,3 +110,44 @@ Evidence justifies adding a small optional interoperability/performance investig
 2. Independently test temporary Set evaluation only after native component preparation, at the appropriate substitution/contraction stage. Select exact already-known owned ValIDs; preserve mixed states, unknown sparse components, perturbation LI orders, geometry/field cache state and isolation, including Throw/Abort cleanup. Never convert all tensors indiscriminately or change the default before correctness evidence.
 3. Compare full wall time and memory for complete ToComponents workflows (scalar/vector/tensor, curved geometry, higher-order perturbation or repeated curvature contractions), with transition overhead and fresh/warm cache distinctions. Compare actual mathematical results against existing paths; benchmark without changing physical assumptions. A small prepared-array speedup alone is insufficient to adopt the optimization.
 4. Implement only a small safe integration if evidence demonstrates practical benefit; otherwise document the tested native workflow and close the optional task. No public API addition, permanent Set-state policy, new cache or universal rollback is required.
+
+## Follow-up — full-workflow prototype after Phase 2 (2026-11-28)
+
+Package revision [07090af](https://github.com/physedu/xPlorer/commit/07090afaf21af4244892eaf240ca0d6ae10c7ada), source blob 90cef340400e8fbcac7fb5b6a3d3514f97db8daa. Separate fresh kernels, Wolfram 15.0.1 Linux, xAct 1.3.0, portable backend. No production code change.
+
+A temporary local source copy replaced only the final prepared-array trace/resolve call in ToComponents with a scoped conversion of the exact native Rule ValIDs associated with tensor symbols in that array. The prototype keeps native TraceBasisDummy and ToValues, and restores original groups on exit. This is a feasibility experiment, not a supported adapter. The patch was applied only inside the evaluator's temporary directory.
+
+The test uses flat-spatial FLRW with a(t)=t, a covector VA_a=(t,2,3,4), and metric perturbation h_11=t^2, second order input zero. A separate Minkowski background is a positive control. Each workload was run after ClearComputedValues (cold), then RepeatedTiming[expr,0.5] (warm), then MaxMemoryUsed[expr] (reported allocation peak). These are single-run exploratory measurements from separate kernels, not statistically robust performance guarantees.
+
+| Complete operation | Baseline cold ms | Prototype cold ms | Baseline warm ms | Prototype warm ms | Baseline peak bytes | Prototype peak bytes |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Vector norm | 31.498 | 28.757 | 17.155 | 21.089 | 66928 | 82904 |
+| Ricci contraction | 136.280 | 125.218 | 43.314 | 36.424 | 90480 | 112272 |
+| Second inverse metric variation | 672.938 | 545.794 | 676.006 | 523.229 | 338304 | 360800 |
+
+All three analytic checks passed with and without the prototype: -t^2+29/t^2, 58/t^4 and DiagonalMatrix[{0,2/t^2,0,0}]. The data revision and source field records remained unchanged across warm runs, no Set groups leaked in the inspected metric, field and geometry heads, and the independent Minkowski norm remained 28. The measured warm-time reduction is about 16% for Ricci contraction and 23% for the second variation; vector norm was about 23% slower. All reported allocation peaks increased. This does not justify enabling Set conversion indiscriminately.
+
+Prototype core (temporary package copy only):
+
+```wl
+SetAttributes[probeSetPrepared,HoldFirst];
+probeSetPrepared[expr_,input_] := Module[{heads,ids,out},
+ heads=DeleteDuplicates@Cases[input,s_Symbol /; xTensorQ[s],{0,Infinity},Heads->True];
+ ids=Select[DeleteDuplicates@Flatten[TensorValIDs /@ heads],
+   xAct`xCoba`Private`StateOfValID[#]===Rule&];
+ Internal`WithLocalSettings[
+  Scan[RuleToSet,ids],
+  out=Block[{$insideManagedCalculation=True},expr],
+  Scan[SetToRule,ids]];
+ out];
+(* Experimental replacement of final prepared-array evaluation only: *)
+arr = guard[probeSetPrepared[resolveValues[traceValues[arr]],arr]];
+```
+
+### Read-only compatibility: remaining reason not to enable automatically
+
+A broader test used the metric, Ricci tensor, complete vector, sparse vector and metric perturbations (LI orders 1 and 2). It selected the first ValID per head and converted to Set, leaving a mixed state {Set,Rule,Set,Rule,Set,Set,Rule,Set}. A guarded scoped read prototype converted these exact groups back to Rule and required nativeMetricCurrentQ and nativeInputCurrentQ for every authoritative input before calculation. The guard declined all four reads, restoring the original states even on Abort; the other background was unaffected.
+
+The follow-up isolated the cause: before conversion, all fingerprints matched; after RuleToSet followed by SetToRule, the metric fingerprint and perturbation LI[2] fingerprint no longer matched, despite the vector, Ricci, inverse perturbation and sparse field component results all being SameQ to baseline on manual Rule restoration. The other input fingerprints matched. The state round trip was exact, but raw native rule-group representation was not fingerprint-equivalent. This does not prove a native value error; it establishes that automatic state restoration cannot yet certify authoritative inputs by the current stamps. Do not ignore or overwrite fingerprints blindly, especially when users may have actually changed Set definitions. The existing explicit transition path remains usable in tested read-only cases.
+
+**Decision:** the bounded experiment is complete for the beta roadmap. Do not ship the temporary optimization or broaden automatic managed reads in Set state in this beta candidate. Keep explicit native RuleToSet/SetToRule and the existing diagnostic. If researcher demand warrants it, revisit semantic state verification and targeted opt-in optimization after publication; test more workloads, sparse/LI/metric input identities, abnormal exit and cold/warm memory with repeated trials. This is a future improvement, not a mathematical release blocker.
