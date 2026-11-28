@@ -92,7 +92,7 @@ Do not mix conflicting traditional applications and paclets. If you tested the i
 
 Report reproducible problems in [GitHub Issues](https://github.com/physedu/xPlorer/issues), including xPlorer, Mathematica and xAct versions, OS, smallest input and expected versus actual output. Presentation issues benefit from a screenshot.
 
-The managed scope includes abstract tangent-bundle tensors, perturbations and named connections, native primary-chart inputs and registered secondary maps. Arbitrary external native edits, general spinors and arbitrary bundles, primary chart promotion and general foreign-basis replay are not part of this beta. Mathematical assumptions and chart domains remain the user's responsibility.
+The managed scope includes abstract tangent-bundle tensors, perturbations and named connections, native primary-chart inputs and registered secondary maps. Arbitrary external native edits, general spinors and arbitrary bundles, primary chart promotion and general foreign-basis replay are not part of this beta. Mathematical assumptions and chart domains remain the user's responsibility. Provide metric components as explicit coordinate expressions rather than unresolved tensor heads. Managed geometry uses the explicit assumption domain; specify Assumptions when needed instead of relying on ambient $Assumptions to specialize persistent component values. Native RuleToSet and SetToRule are available on the actual xAct objects; restore Rule state before managed calculations or input changes.
 
 ## Development
 
