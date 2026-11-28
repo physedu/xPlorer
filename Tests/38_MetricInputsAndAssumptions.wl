@@ -47,5 +47,12 @@ check["Automatic restores background domain",reset/.{ka->-2,ttO[]->1},8/3];
 upPos=Block[{$Assumptions=ka>0},ToComponents["One",VA[aa],CVSimplify->Simplify,StrictComponents->True]];
 upNeg=Block[{$Assumptions=ka<0},ToComponents["One",VA[aa],CVSimplify->Simplify,StrictComponents->True]];
 check["Raised field independent of ambient branch",{upPos,upNeg}/.{ka->-2,ttO[]->1},{{0,1/9,0,0},{0,1/9,0,0}}];
+(* Reproduce the explicit native inverse-assignment variant on a new metric. *)
+CreateBackground["NativeInverse",SymbolSuffix->"I"];DefineChart["NativeInverse",{tt[],xx[],yy[],zz[]}];
+chi=ChartOf["NativeInverse"];
+mi=DiagonalMatrix[{-1,(1+Abs[ka] ttI[])^2,(1+Abs[ka] ttI[])^2,(1+Abs[ka] ttI[])^2}];
+Block[{$Assumptions=ka>0},MetricInBasis[ggI,-chi,mi,Inverse->True,CVSimplify->Simplify]];
+check["Explicit native inverse is not poisoned by ambient assumptions",ToValues[ggI[{1,chi},{1,chi}]]/.{ka->-2,ttI[]->1},1/9];
+check["Native inverse assignment does not poison curvature",ToComponents["NativeInverse",RicciScalarCDa[],StrictComponents->True]/.{ka->-2,ttI[]->1},8/3];
 check["Other background unchanged",ToComponents["Two",RicciScalarCDa[],StrictComponents->True],36/ttT[]^2];
 <|"Total"->Length[checks],"Passed"->Count[Lookup[Values[checks],"Passed"],True],"Failed"->Count[Lookup[Values[checks],"Passed"],False],"Failures"->Select[checks,!TrueQ[#["Passed"]]&]|>
