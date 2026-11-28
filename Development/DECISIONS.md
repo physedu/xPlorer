@@ -1,5 +1,9 @@
 # Design decisions
 
+## Active scope decision — 2026-11-28
+
+Follow [ACTIVE_BETA_PLAN.md](ACTIVE_BETA_PLAN.md) for the remaining beta work. A different geometry normally means a new background; editing a metric in place is a secondary convenience. Document unsupported combinations and practical alternatives instead of implementing every possible native operation. Keep xAct as the mathematical engine, retain validated functionality, and prioritize demonstrated incorrect results in the supported workflow. Earlier decisions remain valid where consistent with this scope; historical implementation schedules are not current requirements.
+
 ## Next version: beta.13 registration redesign (agreed direction, 2026-11-25)
 
 Status: design only, not implemented or tested. The author-supplied beta.12 package and didactic notebook are preserved on main (merge commit 05b0b407b9bf4067e152594cecb5ba3eaf706d22). See CHANGELOG.md for the intervening betas. The previous beta.7 recovery record remains historical. The decisions in this section supersede earlier registration-interface choices where they conflict.
